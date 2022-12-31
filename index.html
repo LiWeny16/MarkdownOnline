@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>html内嵌markdown</title>
+    <script src="./showdown.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./githubMarkdownCss.css">
+    <!-- https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.css -->
+    <!-- https://cdn.jsdelivr.net/npm/showdown/dist/showdown.min.js -->
+</head>
+
+<body>
+    <span>\n</span>
+    <style>
+   /* #editor {
+        display: flex;
+        min-height: 600px;
+        width: 100%;
+    }*/
+
+    #md-area {
+        width: 100%;
+        background: #f5f5f5;
+        border: 1px solid #111;
+
+    }
+    #view-area {
+        width: 100%;
+        border: 1px solid #111;
+    }
+    
+    /*Github主题要求的样式引入*/
+    .markdown-body {
+        box-sizing: border-box;
+        min-width: 200px;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 45px;
+    }
+
+    @media (max-width: 767px) {
+        .markdown-body {
+            padding: 15px;
+        }
+    }
+    </style>
+
+<div id="editor">
+    <textarea id="md-area" onkeyup=mdConverter()></textarea>  <!-- 键盘每次点击实时调用 -->
+    <article id="view-area" class="markdown-body">            <!-- github主题样式应用 -->
+    </article>
+</div>
+
+<script>
+    function mdConverter() {
+        var md = document.getElementById("md-area").value;
+        var converter = new showdown.Converter();  //增加拓展table
+        converter.setOption('tables', true);  //启用表格选项。从showdown 1.2.0版开始，表支持已作为可选功能移入核心拓展，showdown.table.min.js扩展已被弃用
+        var view = converter.makeHtml(md);
+        console.log(view);
+        document.getElementById("view-area").innerHTML = view;
+    }
+</script>
+</body>
+</html>
