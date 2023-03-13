@@ -2,7 +2,7 @@ window.onload = () => {
     // rememberText()
     // document.getElementById("view-area").innerHTML= md2html(document.getElementById("md-area").value)
     // md2html(document.getElementById("md-area").value)
-    if (getRememberText()) { //有cookie
+    if (kit.getCookie("contentText")) { //有cookie
         preViewText(md2html(fillInRemeText()))
     }
     else {//否则显示教程
