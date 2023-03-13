@@ -1,3 +1,5 @@
+@import url("./print.css") print;
+
 #md-area {
   padding: 26px 38px;
   resize: horizontal;
@@ -7,4 +9,7 @@
 }
 #view-area {
 overflow-y: auto;
+}
+#aboutMd{
+  z-index: 999;
 }

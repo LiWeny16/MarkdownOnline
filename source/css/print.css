@@ -1,0 +1,32 @@
+@media print {
+  body {
+    background-color: white;
+  }
+
+  #header {
+    display: none !important;
+  }
+  #headerInner {
+    display: none !important;
+  }
+  #md-area {
+    display: none !important;
+  }
+
+  @media print {
+    @page {
+      size: A4 portrait;
+    }
+    #aboutMd{
+        /* z-index: 999; */
+        display: none !important;
+      }
+    #view-area {
+      display: block;
+      margin: 0;
+      border: none !important;
+      overflow: visible !important;
+      overflow-y: visible !important;
+    }
+  }
+}
