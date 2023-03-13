@@ -5,7 +5,7 @@ function getRememberText() {
 function restoreText() {
     let md = getMdText()
     md = md.replace(/\n/g, "<? br ?>")
-    kit.setCookie("contentText", md, 30, "/", "127.0.0.1")
+    kit.setCookie("contentText", md, 30, "/", "md.bigonion.cn")
 }
 function fillInRemeText(){
     let text = getRememberText()
