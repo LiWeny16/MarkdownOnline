@@ -31,7 +31,7 @@ window.onload = () => {
 
 [我是链接](https://bigonion.cn)
 ![我是图片](http://bigonion.cn/background/wallheaven.jfif)`)
-mdConverter()
+        mdConverter()
     }
 }
 
@@ -41,9 +41,16 @@ function mdConverter() {//按键触发，自动保存
     let view = md2html(md)
     preViewText(view)
     restoreText()//自动保存
+    hljs.highlightAll()
 }
 function md2html(md) {
+    // set Options
     var converter = new showdown.Converter()  //增加拓展table
+    converter.setOption('tasklists', true)
+    converter.setOption('moreStyling', true)
+    converter.setOption('completeHTMLDocument', true)
+    converter.setOption('smoothLivePreview', true)
+    converter.setOption('simplifiedAutoLink', true)
     converter.setOption('tables', true)//启用表格选项。从showdown 1.2.0版开始，表支持已作为可选功能移入核心拓展，showdown.table.min.js扩展已被弃用
     var view = converter.makeHtml(md)
     return view

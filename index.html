@@ -23,10 +23,16 @@
     <link rel="stylesheet" type="text/css" href="/source/css/header.css">
     <link rel="stylesheet" href="/source/css/aboutBox.css">
     <link rel="stylesheet" href="/source/css/response.css">
+
     <script src="https://cdn.jsdelivr.net/npm/bigonion-kit@0.9.13/umd/umd-kit.js"></script>
+    <!-- hilight js -->
+    <link rel="stylesheet" href="/source/css/hljsStyle/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    <!--  -->
     <script src="/source/js/index.js"></script>
 
-    <script src="./source/js/showdown.min.js"></script>
+    <!-- <script src="./source/js/showdown.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
     <script src="/source/js/remember.js"></script>
 
     <!-- https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.css -->
@@ -101,7 +107,7 @@
             <article id="aboutMd" class="aboutViewArea markdown-body">
                 <!-- 依赖githubMarkdownCss.css -->
                 <span>关于
-                    本项目使用了Marked.js来快速转换Markdown=>HTML，并且能够实时预览效果，不需要额外的操作即可体验到十分不错的在线markdown实时预览
+                    本项目使用了showdown.js来快速转换Markdown=>HTML，并且能够实时预览效果，不需要额外的操作即可体验到十分不错的在线markdown实时预览
                     如果你还不了解什么是markdown语法，那请点我了解markdown语法
                     Todo
                     增加PDF导出

@@ -6,7 +6,7 @@ let shutDownSvg=`
 let aboutMd = `
 # 关于
 
-本项目使用了Marked.js来快速转换Markdown=>HTML，并且能够实时预览效果，不需要额外的操作即可体验到十分不错的在线markdown实时预览<br>
+本项目使用了Showdown.js来快速转换Markdown=>HTML，并且能够实时预览效果，不需要额外的操作即可体验到十分不错的在线markdown实时预览<br>
 如果你还不了解什么是markdown语法，那请[点我了解markdown语法](https://markdown.com.cn/intro.html)
 
 ## Todo
