@@ -35,13 +35,31 @@ window.onload = () => {
     }
 }
 
-function mdConverter() {//按键触发，自动保存
+
+function mdConverter() {//按键触发，自动保存，主函数
     let md = getMdText()
-    console.log(md)
-    let view = md2html(md)
+    // console.log(md)
+    let view = markedParse(md)
+    // view = md2html(view)
+    view = latexParse(view)
     preViewText(view)
     restoreText()//自动保存
     hljs.highlightAll()
+}
+function latexParse(md) {
+    let latex = md.match(/\$.*?\$/g)
+    latex = latex[0].match(/(?<=\$)(.+?)(?=\$)/g)
+    if (latex[0]) {
+        console.log(latex)
+        let parsedLatex = katex.renderToString(latex[0], {
+            throwOnError: false
+        })
+        return md.replace(/\$.*?\$/g, parsedLatex)
+    }
+    else return md
+}
+function markedParse(md) {
+    return marked.parse(md)
 }
 function md2html(md) {
     // set Options

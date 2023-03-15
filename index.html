@@ -17,6 +17,9 @@
     <meta name="format-detection" content="telephone=no" />
     <meta name="description" content="markdown在线编辑，html在线展示，方便调试与快速实现目标效果，支持markdown基础语法。 预计新增:LATEX拓展语法和PDF导出">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+
+
+
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="/source/css/index.css">
     <link rel="stylesheet" type="text/css" href="/source/css/githubMarkdownCss.css">
@@ -24,15 +27,22 @@
     <link rel="stylesheet" href="/source/css/aboutBox.css">
     <link rel="stylesheet" href="/source/css/response.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/bigonion-kit@0.9.13/umd/umd-kit.js"></script>
-    <!-- hilight js -->
+    <script src="https://cdn.jsdelivr.net/npm/bigonion-kit@0.10.13/umd/umd-kit.js"></script>
+    <!-- *********外*********部*********资*********源*********区********* -->
+    <!-- hilight showdown markded  -->
     <link rel="stylesheet" href="/source/css/hljsStyle/default.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-    <!--  -->
-    <script src="/source/js/index.js"></script>
-
-    <!-- <script src="./source/js/showdown.min.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Latex  -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
+        integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+    <!-- <script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"
+        integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"
+        onload="renderMathInElement(document.getElementById(`view-area`));"></script> -->
+    <!-- *********外*********部*********资*********源*********区********* -->
+    <script defer="defer" src="/source/js/index.js"></script>
     <script src="/source/js/remember.js"></script>
 
     <!-- https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.css -->
