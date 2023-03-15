@@ -48,13 +48,20 @@ function mdConverter() {//按键触发，自动保存，主函数
 }
 function latexParse(md) {
     let latex = md.match(/\$.*?\$/g)
-    latex = latex[0].match(/(?<=\$)(.+?)(?=\$)/g)
-    if (latex[0]) {
-        console.log(latex)
-        let parsedLatex = katex.renderToString(latex[0], {
-            throwOnError: false
-        })
-        return md.replace(/\$.*?\$/g, parsedLatex)
+    if (latex) {
+        try {
+            latex = latex[0].match(/(?<=\$)(.+?)(?=\$)/g)
+            // console.log(latex)
+            if (latex) {
+                let parsedLatex = katex.renderToString(latex[0], {
+                    throwOnError: false
+                })
+                return md.replace(/\$.*?\$/g, parsedLatex)
+            }
+        } catch (err) {
+            console.log(err);
+        }
+
     }
     else return md
 }
