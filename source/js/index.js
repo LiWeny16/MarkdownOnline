@@ -56,10 +56,12 @@ function latexParse(md) {
                 let parsedLatex = katex.renderToString(latex[0], {
                     throwOnError: false
                 })
-                return md.replace(/\$.*?\$/g, parsedLatex)==undefined?md:md.replace(/\$.*?\$/g, parsedLatex)
+                return md.replace(/\$.*?\$/g, parsedLatex) == undefined ? md : md.replace(/\$.*?\$/g, parsedLatex)
+            } else {
+                return md
             }
         } catch (err) {
-            console.log(err);
+            console.log(err)
         }
 
     }
