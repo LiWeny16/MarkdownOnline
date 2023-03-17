@@ -10,8 +10,14 @@ let aboutMd = `
 如果你还不了解什么是markdown语法，那请[点我了解markdown语法](https://markdown.com.cn/intro.html)
 
 ## Todo
-+ 增加PDF导出
-+ 增加代码高亮
++ <s>增加PDF导出</s>
++ <s>增加代码高亮</s>
++ <s>LATEX公式支持</s>
++ img图片支持
+
+## 教程
++ LATEX请写在用$$中间  
+例如 $\lambda$ 
 
 ## 作者
 

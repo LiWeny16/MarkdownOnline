@@ -3,7 +3,9 @@ window.onload = () => {
     // document.getElementById("view-area").innerHTML= md2html(document.getElementById("md-area").value)
     // md2html(document.getElementById("md-area").value)
     if (kit.getCookie("contentText")) { //有cookie
-        preViewText(md2html(fillInRemeText()))
+        // preViewText(md2html(fillInRemeText()))
+        fillInRemeText()
+        mdConverter()
     }
     else {//否则显示教程
         writeMdText(`欢迎来到在线markdown，请在这里输入markdown语法  
@@ -74,7 +76,7 @@ function latexParse(md) {
                             throwOnError: false
                         })
                     } else {
-                        parsedTex[index]="<span style='color:#cc0000;'>ERR_NULL</span>"
+                        parsedTex[index] = "<span style='color:#cc0000;'>ERR_NULL</span>"
                         // resolve(origin)
                     }
                 })
