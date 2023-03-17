@@ -27,7 +27,12 @@
 }
 /* 关于样式 */
 #aboutMd{
-  width: 100%;
+  /* width: 100%; */
+}
+#markdownParser{
+  background: #00000066;
+  width: 100vw;
+  height: 100vh;
 }
 .noStylelabel {
   text-decoration: none;

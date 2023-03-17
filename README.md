@@ -4,4 +4,8 @@
 
 ## 用法
 + markdown基础语法
-+ LATEX公式语法 请用$$包裹，例如 $\lambda$
++ LATEX公式语法 请用$$包裹，例如 `$\lambda$`
+
+## 在线地址
+
+[md.bigonion.cn](https://md.bigonion.cn)

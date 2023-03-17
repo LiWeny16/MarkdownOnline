@@ -1,8 +1,31 @@
 /* 电脑端 */
-@media (min-width: 769px) and (max-width: 1236px) {
- 
+@media (min-width: 769px)  {
+  #aboutMd {
+    width: 44%;
+    /* height: 6%; */
+  }
+  #md-area {
+    width: 100%;
+  }
 }
 /* 手机端 */
 @media (max-width: 769px) {
-
+  #aboutMd {
+    width: 98%;
+    /* height: 6%; */
+  }
+  #editor {
+    flex-direction: column-reverse;
+  }
+  #view-area {
+    flex: 0 0 50%;
+  }
+  #md-area {
+    flex: 0 0 48%;
+  }
+}
+@media (min-width: 471px) and (max-width: 769px) {
+  #md-area {
+    flex: 0 0 43% !important;
+  }
 }
