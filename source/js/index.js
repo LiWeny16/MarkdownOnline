@@ -38,7 +38,6 @@ window.onload = () => {
 
 async function mdConverter() {//按键触发，自动保存，主函数
     let md = getMdText()
-    // console.log(md)
     let view = markedParse(md)
     // view = md2html(view)
     view = await latexParse(view)
@@ -64,13 +63,10 @@ function latexParse(md) {
         let latex = md.match(reg1)
         let latexIndex = getRegIndex(md, reg1)
         let finalResult = ""
-        // console.log(md)
-        console.log(getRegIndex(md, reg1))
 
         // let result
         if (latex) {
             try {
-                // console.log(latex)
                 latex.forEach((ele, index) => {
                     ele = ele.match(reg2)
                     if (ele) {
@@ -86,12 +82,10 @@ function latexParse(md) {
                 md = md.replace(reg1, "<!temp?.!>")
                 md = md.split("<!temp?.!>")
                 parsedTex = [...parsedTex, ""]
-                console.log(parsedTex)
-                console.log(md)
                 // debugger
                 for (let i = 0; i <= md.length - 1; i++) {
                     finalResult += md[i] + parsedTex[i]
-                    console.log(finalResult);
+                    // console.log(finalResult);
                     if (i == md.length - 1) {
                         resolve(finalResult)
 
