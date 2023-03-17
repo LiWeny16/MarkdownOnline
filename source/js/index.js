@@ -36,36 +36,113 @@ window.onload = () => {
 }
 
 
-function mdConverter() {//按键触发，自动保存，主函数
+async function mdConverter() {//按键触发，自动保存，主函数
     let md = getMdText()
     // console.log(md)
     let view = markedParse(md)
     // view = md2html(view)
-    view = latexParse(view)
+    view = await latexParse(view)
     preViewText(view)
     restoreText()//自动保存
     hljs.highlightAll()
 }
+function insertStr(source, start, newStr) {
+    return source.slice(0, start) + newStr + source.slice(start)
+}
+function getRegIndex(text, regex) {
+    // const text = '$匹配我$ $匹配我$ 不要匹配我 $匹配我$'
+    // const regex = /\$(.*?)\$/g
+    const result = Array.from(text.matchAll(regex), match => match.index)
+    return result
+}
 function latexParse(md) {
-    let latex = md.match(/\$.*?\$/g)
-    if (latex) {
-        try {
-            latex = latex[0].match(/(?<=\$)(.+?)(?=\$)/g)
-            // console.log(latex)
-            if (latex) {
-                let parsedLatex = katex.renderToString(latex[0], {
-                    throwOnError: false
-                })
-                return md.replace(/\$.*?\$/g, parsedLatex) == undefined ? md : md.replace(/\$.*?\$/g, parsedLatex)
-            } else {
-                return md
-            }
-        } catch (err) {
-            console.log(err)
-        }
+    return new Promise((resolve) => {
+        let reg1 = /\$.*?\$/g //含有$的
+        let reg2 = /(?<=\$)(.+?)(?=\$)/g
+        let parsedTex = new Array()
+        let origin = md
+        let latex = md.match(reg1)
+        let latexIndex = getRegIndex(md, reg1)
+        let finalResult = ""
+        // console.log(md)
+        console.log(getRegIndex(md, reg1))
 
-    }
-    else return md
+        // let result
+        if (latex) {
+            try {
+                // console.log(latex)
+                latex.forEach((ele, index) => {
+                    ele = ele.match(reg2)
+                    if (ele) {
+                        parsedTex[index] = katex.renderToString(ele[0], {
+                            throwOnError: false
+                        })
+                    } else {
+                        parsedTex[index]="<span style='color:#cc0000;'>ERR_NULL</span>"
+                        // resolve(origin)
+                    }
+                })
+                // 取出来之后
+                md = md.replace(reg1, "<!temp?.!>")
+                md = md.split("<!temp?.!>")
+                parsedTex = [...parsedTex, ""]
+                console.log(parsedTex)
+                console.log(md)
+                // debugger
+                for (let i = 0; i <= md.length - 1; i++) {
+                    finalResult += md[i] + parsedTex[i]
+                    console.log(finalResult);
+                    if (i == md.length - 1) {
+                        resolve(finalResult)
+
+                    }
+                }
+                // 以下都是无用功（悲）
+                // parsedTex.forEach((ele, index) => {
+                //     // let temp  = insertStr(md,latexIndex[index])
+                //     // md= md[index]+ele+md[index+1]
+                //     for(let i=0;i<=md.length;i++){
+                //         md+=md[i]
+                //     }
+                //     // md = insertStr(md, latexIndex[index]+ele.length+1, ele)
+                //     if (index == parsedTex.length - 1) {
+                //         console.log(md)
+                //         resolve(md)
+                //     }
+                // })
+                // latex.forEach((ele, index) => {
+                //     ele = ele.match(reg2)
+                //     parsedTex[index] = katex.renderToString(ele[index], {
+                //         throwOnError: false
+                //     })
+                // })
+                // parsedTex.forEach((ele,index)=>{
+                //     result = md.replace(reg1,) 
+                // })
+                // parsedTex.map(e => console.log(e))
+
+
+                // latex = latex.match(/(?<=\$)(.+?)(?=\$)/g)
+
+
+                // console.log(latex)
+                // if (latex) {
+                //     let parsedLatex = katex.renderToString(latex[0], {
+                //         throwOnError: false
+                //     })
+                //     return md.replace(/\$.*?\$/g, parsedLatex) == undefined ? md : md.replace(/\$.*?\$/g, parsedLatex)
+                // } else {
+                //     return md
+                // }
+            } catch (err) {
+                console.log(err)
+                return 5
+            }
+
+        }
+        else resolve(origin)
+    })
+
 }
 function markedParse(md) {
     return marked.parse(md)
