@@ -32,7 +32,9 @@ dragBox.addEventListener("drop", function (ev) {
             fileReader.onload = function () {
                 console.log("上传成功")
                 dragBox.value = this.result
-                console.log(this)
+                mdConverter()
+                restoreText()
+                // console.log(this)
             }
             fileReader.onerror = function () {
                 console.log("上传失败")
