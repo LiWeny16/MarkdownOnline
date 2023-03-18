@@ -1,7 +1,8 @@
 window.onload = () => {
-    // rememberText()
-    // document.getElementById("view-area").innerHTML= md2html(document.getElementById("md-area").value)
-    // md2html(document.getElementById("md-area").value)
+    allInit()
+}
+
+function allInit() {
     if (kit.getCookie("contentText")) { //有cookie
         // preViewText(md2html(fillInRemeText()))
         fillInRemeText()
