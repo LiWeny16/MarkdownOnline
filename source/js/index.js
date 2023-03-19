@@ -1,6 +1,6 @@
 window.onload = () => {
     allInit()
-    setInterval(()=>{restoreText()},4000)
+    // setInterval(()=>{restoreText()},4000)
 }
 
 function allInit() {
@@ -42,13 +42,15 @@ $\lambda$
 }
 
 
-async function mdConverter() {//按键触发，自动保存，主函数
+async function mdConverter(save = true) {//按键触发，自动保存，主函数
     let md = getMdText()
     let view = markedParse(md)
     // view = md2html(view)
     view = await latexParse(view)
     preViewText(view)
-    restoreText()//自动保存
+    if(save){
+        restoreText()//自动保存
+    }
     hljs.highlightAll()
 }
 function insertStr(source, start, newStr) {
