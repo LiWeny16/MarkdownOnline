@@ -26,8 +26,12 @@
   margin-right: 20px;
 }
 /* 关于样式 */
-#aboutMd{
-  /* width: 100%; */
+#aboutMd {
+  z-index: 999;
+  margin-top: 10vh;
+}
+#closeAboutSvg{
+  cursor: pointer;
 }
 #markdownParser{
   background: #00000066;

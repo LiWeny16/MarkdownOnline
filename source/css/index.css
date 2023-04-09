@@ -16,10 +16,11 @@
 #view-area {
   overflow-y: auto;
 }
-#aboutMd {
-  z-index: 999;
-}
 
+#markdownParser{
+  display: flex;
+  justify-content: center;
+}
 
 
 #view-area {

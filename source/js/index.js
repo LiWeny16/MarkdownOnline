@@ -10,7 +10,8 @@ function allInit() {
         mdConverter()
     }
     else {//否则显示教程
-        writeMdText(`欢迎来到在线markdown，请在这里输入markdown语法  
+        writeMdText(`
+欢迎来到在线markdown，请在这里输入markdown语法  
 
 比如:
 
@@ -23,7 +24,15 @@ function allInit() {
 如果不打空格，就不换行
 
 你好,我是LATEX  
-$\lambda$
+
+<center>
+$ln({😅}) =💧ln({😄})$ <br><br>  
+
+$\int_{😅}^{😆} 😆^2 dx=😅$
+</center>  
+
+<br>
+<br>
 
 我下面是分割线
 
@@ -36,7 +45,8 @@ $\lambda$
 我是 **强调语句**
 
 [我是链接](https://bigonion.cn)
-![我是图片](http://bigonion.cn/background/wallheaven.jfif)`)
+![我是图片](http://bigonion.cn/background/wallheaven.jfif)
+`)
         mdConverter()
     }
 }
@@ -47,6 +57,7 @@ async function mdConverter(save = true) {//按键触发，自动保存，主函�
     let view = markedParse(md)
     // view = md2html(view)
     view = await latexParse(view)
+    console.log(view);
     preViewText(view)
     if(save){
         restoreText()//自动保存
