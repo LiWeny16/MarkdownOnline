@@ -57,7 +57,7 @@ async function mdConverter(save = true) {//按键触发，自动保存，主函�
     let view = markedParse(md)
     // view = md2html(view)
     view = await latexParse(view)
-    console.log(view);
+    // console.log(view);
     preViewText(view)
     if(save){
         restoreText()//自动保存
