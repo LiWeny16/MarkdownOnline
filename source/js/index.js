@@ -26,9 +26,9 @@ function allInit() {
 你好,我是LATEX  
 
 <center>
-$ln({😅}) =💧ln({😄})$ <br><br>  
+$ln({1}) =3ln({2})$ <br><br>  
 
-$\int_{😅}^{😆} 😆^2 dx=😅$
+$\int_{4}^{5} 6^2 dx=7$
 </center>  
 
 <br>
@@ -51,18 +51,25 @@ $\int_{😅}^{😆} 😆^2 dx=😅$
     }
 }
 
-
+initAll()
+function initAll() {
+    enableFastKeyEvent()
+}
 async function mdConverter(save = true) {//按键触发，自动保存，主函数
     let md = getMdText()
     let view = markedParse(md)
     // view = md2html(view)
+    view = await latexParse2(view)
     view = await latexParse(view)
+
     // console.log(view);
     preViewText(view)
-    if(save){
+    if (save) {
         restoreText()//自动保存
     }
+    // 拓展功能
     hljs.highlightAll()
+
 }
 function insertStr(source, start, newStr) {
     return source.slice(0, start) + newStr + source.slice(start)
@@ -72,6 +79,34 @@ function getRegIndex(text, regex) {
     // const regex = /\$(.*?)\$/g
     const result = Array.from(text.matchAll(regex), match => match.index)
     return result
+}
+function latexParse2(md, center = true) {
+    return new Promise((resolve) => {
+        let reg1 = /\$\$.*?\$\$/g  //含有$的
+        let reg2 = /(?<=(\$\$))(.+?)(?=(\$\$))/g
+        if (md) {
+            md = md.replace(reg1, (e) => {
+                e = e.match(reg2)[0]
+                // 官方示例API
+                if (e) {
+                    var html = katex.renderToString(e, {
+                        throwOnError: false
+                    });
+                    if (center) {
+                        html = `<center>${html}</center>`
+                    }
+                    return html
+                } else {
+                    return ""
+                }
+
+            })
+            resolve(md)
+        }
+        else {
+            resolve(md)
+        }
+    })
 }
 function latexParse(md) {
     return new Promise((resolve) => {
@@ -110,43 +145,6 @@ function latexParse(md) {
 
                     }
                 }
-                // 以下都是无用功（悲）
-                // parsedTex.forEach((ele, index) => {
-                //     // let temp  = insertStr(md,latexIndex[index])
-                //     // md= md[index]+ele+md[index+1]
-                //     for(let i=0;i<=md.length;i++){
-                //         md+=md[i]
-                //     }
-                //     // md = insertStr(md, latexIndex[index]+ele.length+1, ele)
-                //     if (index == parsedTex.length - 1) {
-                //         console.log(md)
-                //         resolve(md)
-                //     }
-                // })
-                // latex.forEach((ele, index) => {
-                //     ele = ele.match(reg2)
-                //     parsedTex[index] = katex.renderToString(ele[index], {
-                //         throwOnError: false
-                //     })
-                // })
-                // parsedTex.forEach((ele,index)=>{
-                //     result = md.replace(reg1,) 
-                // })
-                // parsedTex.map(e => console.log(e))
-
-
-                // latex = latex.match(/(?<=\$)(.+?)(?=\$)/g)
-
-
-                // console.log(latex)
-                // if (latex) {
-                //     let parsedLatex = katex.renderToString(latex[0], {
-                //         throwOnError: false
-                //     })
-                //     return md.replace(/\$.*?\$/g, parsedLatex) == undefined ? md : md.replace(/\$.*?\$/g, parsedLatex)
-                // } else {
-                //     return md
-                // }
             } catch (err) {
                 console.log(err)
                 return 5
@@ -160,6 +158,9 @@ function latexParse(md) {
 function markedParse(md) {
     return marked.parse(md)
 }
+/**
+ * @description showdown转换
+*/
 function md2html(md) {
     // set Options
     var converter = new showdown.Converter()  //增加拓展table
@@ -184,26 +185,68 @@ function preViewText(text) {
 }
 
 function getRememberText() {
-    let text = kit.getCookie("contentText").replace(/\<\? br \?\>/g,"\n")
-    text = text.replace(/\<\? semicolon \?\>/g,";")
+    let text = kit.getCookie("contentText").replace(/\<\? br \?\>/g, "\n")
+    text = text.replace(/\<\? semicolon \?\>/g, ";")
     return text
 }
 function restoreText() {
     let md = getMdText()
     md = md.replace(/\n/g, "<? br ?>")
-    md = md.replace(/\;/g,"<? semicolon ?>")
+    md = md.replace(/\;/g, "<? semicolon ?>")
     kit.setCookie("contentText", md, 30, "/", "md.bigonion.cn")
     kit.setCookie("contentText", md, 30, "/", "127.0.0.1")
 }
-function fillInRemeText(){
+function fillInRemeText() {
     let text = getRememberText()
     writeMdText(text)
     return text
 }
 // print 函数
-function myPrint(){
+function myPrint() {
     let printString = document.getElementById("view-area").innerHTML
-    window.document.body.innerHTML = `<div style="display=none;" class="markdown-body">${printString}</div>`
+    window.document.body.innerHTML = `<div class="markdown-body">${printString}</div>`
     window.print()
     location.reload();
+}
+
+// 快捷键
+/**
+ * @description 使能快捷键
+*/
+function enableFastKeyEvent() {
+    document.addEventListener('keydown', (e) => {
+        e.stopPropagation()
+        // Ctrl + B 黑体
+        let editor = document.getElementById("md-area")
+        if (e.ctrlKey && e.key == "b") {
+            replaceSelection(editor, "**", "**")
+        }
+        if (e.key == "c" && e.altKey) {
+            replaceSelection(editor, "<center>", "</center>")
+        }
+    })
+}
+/**
+ * @description 插入选中文本
+ * @param e HTMLelement
+ * @param leftStr String
+ * @param rightStr String
+*/
+function replaceSelection(e, leftStr, rightStr) {
+    var start = e.selectionStart;
+    var end = e.selectionEnd;
+    console.log(start, end);
+    if (start == end) {
+        return ""
+    } else {
+        temp = e.value.substr(0, start) + leftStr + e.value.substring(start, end) + rightStr +
+            e.value.substring(end, e.value.length);
+        e.value = temp
+        console.log(e.value.substring(start, end));
+        console.log(e.value.substring(start, end).length);
+        // 移动光标
+        e.setSelectionRange(start, end + leftStr.length + rightStr.length)
+
+    }
+
 }

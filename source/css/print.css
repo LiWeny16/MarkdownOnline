@@ -6,7 +6,7 @@
     display: none !important;
   }
   #view-area {
-    display: block;
+    display: block !important;
     margin: 0;
     border: none !important;
     /* overflow: visible !important;
