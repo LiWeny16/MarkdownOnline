@@ -200,3 +200,10 @@ function fillInRemeText(){
     writeMdText(text)
     return text
 }
+// print 函数
+function myPrint(){
+    let printString = document.getElementById("view-area").innerHTML
+    window.document.body.innerHTML = `<div class="markdown-body">${printString}</div>`
+    window.print()
+    location.reload();
+}

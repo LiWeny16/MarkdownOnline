@@ -1,8 +1,19 @@
 @media print {
+  @page {
+    size: A4 portrait;
+  }
+  #aboutMd {
+    display: none !important;
+  }
+  #view-area {
+    margin: 0;
+    border: none !important;
+    /* overflow: visible !important;
+    overflow-y: visible !important; */
+  }
   body {
     background-color: white;
   }
-
   #header {
     display: none !important;
   }
@@ -12,21 +23,10 @@
   #md-area {
     display: none !important;
   }
-
-  @media print {
-    @page {
-      size: A4 portrait;
-    }
-    #aboutMd{
-        /* z-index: 999; */
-        display: none !important;
-      }
-    #view-area {
-      display: block;
-      margin: 0;
-      border: none !important;
-      overflow: visible !important;
-      overflow-y: visible !important;
-    }
-  }
 }
+
+/* @media print {
+  :has(.print-element) > :not(.print-element):not(:has(.print-element)) {
+    display: none;
+  }
+} */

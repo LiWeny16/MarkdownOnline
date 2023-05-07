@@ -76,7 +76,7 @@
                 <a id="showAbout" class="rightComponents noStylelabel" href="#">
                     <p2 class="headerP">关于</p2>
                 </a>
-                <div class="rightComponents" id="pdfButton" onclick=print()>
+                <div class="rightComponents" id="pdfButton" onclick=myPrint()>
                     <button>导出</button>
                 </div>
             </div>
@@ -85,7 +85,7 @@
     <div id="editor">
         <textarea placeholder="" spellcheck="false" id="md-area" onkeyup=mdConverter() onblur=mdConverter()></textarea>
         <!-- 键盘每次点击实时调用 -->
-        <article id="view-area" class="markdown-body"> <!-- github主题样式应用 -->
+        <article meida="print" id="view-area" class="markdown-body"> <!-- github主题样式应用 -->
         </article>
     </div>
 
