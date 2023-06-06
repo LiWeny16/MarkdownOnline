@@ -278,8 +278,11 @@ function myPrint() {
     let printString = document.getElementById("view-area").innerHTML
     console.log(printString);
     window.document.body.innerHTML = `<div class="markdown-body">${printString}</div>`
-    window.print()
-    location.reload();
+    kit.sleep(100).then(()=>{
+        window.print()
+        location.reload();
+    })
+ 
 }
 
 // 快捷键
