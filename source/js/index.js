@@ -11,25 +11,27 @@ function allInit() {
     }
     else {//否则显示教程
         writeMdText(`
-欢迎来到在线markdown，请在这里输入markdown语法  
 
-比如:
+# "新一代的$“Markdown^+”$编辑器".RED 
+
 
 # 你好，我是标题
 
 ## 你好，我是二级标题
 
 你好，我是正文  
+"你好,我是markdown扩展语法".RIGHT 
 正文换行需要结尾打两个空格
 如果不打空格，就不换行
 
 你好,我是LATEX  
 
-<center>
-$ln({1}) =3ln({2})$ <br><br>  
+$$
+ln({1}) =3ln({2})  
+\
+int_{4}^{5} 6^2 dx=7
+$$
 
-$\int_{4}^{5} 6^2 dx=7$
-</center>  
 
 <br>
 <br>
@@ -39,28 +41,49 @@ $\int_{4}^{5} 6^2 dx=7$
 ---
 
 | 我      | 是    | 
-| -----   | ---- |
+| -        |  -     |
 | 表      |   格  |
 
 我是 **强调语句**
 
 [我是链接](https://bigonion.cn)
 ![我是图片](http://bigonion.cn/background/wallheaven.jfif)
+
+### 我是扩展语法
+
+"![我是图片](http://bigonion.cn/background/wallheaven.jfif)
+![我是图片](http://bigonion.cn/background/wallheaven.jfif)
+![我是图片](http://bigonion.cn/background/wallheaven.jfif)
+![我是图片](http://bigonion.cn/background/wallheaven.jfif)".GRID4 
+
+        
+     
+                
+        
 `)
         mdConverter()
     }
 }
+const enObj = {
+    enFastKey: true,
+    enScript: true,
+    enHilightJs: true,
+    enClue: true
+}
 
-initAll()
-function initAll() {
-    enableFastKeyEvent()
+initialize()
+function initialize() {
+    enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is on");
 }
 async function mdConverter(save = true) {//按键触发，自动保存，主函数
-    let md = getMdText()
-    let view = markedParse(md)
-    // view = md2html(view)
+    let view = getMdText()
+    enObj.enClue ? view = await clueParse(view) : console.log("clue off");
+   
     view = await latexParse2(view)
     view = await latexParse(view)
+    view = markedParse(view)
+    enObj.enScript ? enableScript(view) : console.log("fast scripts off");
+    // view = md2html(view)
 
     // console.log(view);
     preViewText(view)
@@ -68,7 +91,8 @@ async function mdConverter(save = true) {//按键触发，自动保存，主函�
         restoreText()//自动保存
     }
     // 拓展功能
-    hljs.highlightAll()
+    enObj.enHilightJs ? hljs.highlightAll() : console.log("hilight off");
+    // mermaid.initialize()
 
 }
 function insertStr(source, start, newStr) {
@@ -80,13 +104,60 @@ function getRegIndex(text, regex) {
     const result = Array.from(text.matchAll(regex), match => match.index)
     return result
 }
+/**
+ * @description clue CSS HTML
+*/
+function clueParse(md) {
+    md = md.replace(/\n/g,">br") //暂时替代换行符号
+    return new Promise((resolve) => {
+        const reg1 = /".*?"\..*?\s/g  //整个"content".CLASS 结构
+        const reg2 = /".*?"/g //匹配 "之间"
+        const reg3 = /\..*?\s/g //匹配class 的. 和空格之间 未反转前
+        const reg3_reverse = /\s.*?\./g //匹配class 的. 和空格之间 反转
+        const reg4 = /(?<=.).*?(?=\s)/g //匹配 . 和 空格之间 不包括. \s
+        const reg5 = /(?<=").*(?=")/g  //匹配"之间"不包括""
+        if (md) {
+            md = md.replace(reg1, (e) => {
+                var parsedHTML = ""
+                var content
+                var clueClass
+                if (e.match(reg2)) {
+                    content = e.match(reg5)[0]
+                }
+                if (e.match(reg3)) {
+                    e = reverseString(e)
+                    // console.log(e.match(reg4))
+                    clueClass = e.match(reg3_reverse)[0]
+                    clueClass = reverseString(clueClass)
+                    clueClass = clueClass.replace(/(\s)|(\.)/g, "")
+                    // clueClass = clueClass.match(reg4)[0]
+                }
+                // console.log(content);
+                // console.log(clueClass);
+                content = content.replace(/\>br/g,"\n")//解除换行限制
+                parsedHTML = `<div class="${clueClass}">${markedParse(content)}</div>`
+                return parsedHTML
+            })
+        }
+        md=md.replace(/\>br/g,"\n")
+        resolve(md)
+
+    })
+}
+
 function latexParse2(md, center = true) {
+    md = md.replace(/\n/g,"<!br") //暂时替代换行符号
     return new Promise((resolve) => {
         let reg1 = /\$\$.*?\$\$/g  //含有$的
         let reg2 = /(?<=(\$\$))(.+?)(?=(\$\$))/g
         if (md) {
             md = md.replace(reg1, (e) => {
-                e = e.match(reg2)[0]
+                if (e.match(reg2)) {
+                    e = e.match(reg2)[0]
+                    e = e.replace(/\<\!br/g,"") //解除换行替代
+                } else {
+                    return ""
+                }
                 // 官方示例API
                 if (e) {
                     var html = katex.renderToString(e, {
@@ -100,7 +171,8 @@ function latexParse2(md, center = true) {
                     return ""
                 }
 
-            })
+            }) 
+            md=md.replace(/\<\!br/g,"\n")//解除换行替代
             resolve(md)
         }
         else {
@@ -204,6 +276,7 @@ function fillInRemeText() {
 // print 函数
 function myPrint() {
     let printString = document.getElementById("view-area").innerHTML
+    console.log(printString);
     window.document.body.innerHTML = `<div class="markdown-body">${printString}</div>`
     window.print()
     location.reload();
@@ -227,6 +300,19 @@ function enableFastKeyEvent() {
     })
 }
 /**
+ * @description 使能脚本注入
+*/
+function enableScript(md) {
+    md = md ? md.match(/(?<=(\<script\>))(.+?)(?=(\<\/script\>))/g) : ""
+    if (md) {
+        md.forEach((e) => {
+            e = e.match(/alert\(.*?\)/g) ? "" : e
+            eval(e)
+        })
+    }
+}
+
+/**
  * @description 插入选中文本
  * @param e HTMLelement
  * @param leftStr String
@@ -249,4 +335,13 @@ function replaceSelection(e, leftStr, rightStr) {
 
     }
 
+}
+/**
+ * @description 倒序
+ * @params string
+ * @returns revser
+*/
+
+function reverseString(str) {
+    return str.split('').reverse().join('');
 }

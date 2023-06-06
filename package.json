@@ -1,0 +1,28 @@
+{
+  "name": "markdownol",
+  "version": "1.0.0",
+  "description": "这是一个在线 markdown 渲染的网页\r 可以帮助你实时渲染 markdown",
+  "scripts": {
+    "dev":"yarn parcel ./index.html",
+    "build":"yarn parcel build ./index.html",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LiWeny16/MarkdownOnline.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LiWeny16/MarkdownOnline/issues"
+  },
+  "homepage": "https://github.com/LiWeny16/MarkdownOnline#readme",
+  "dependencies": {
+    "mermaid": "^10.1.0",
+    "monaco-editor": "^0.38.0"
+  },
+  "devDependencies": {
+    "parcel": "^2.9.1"
+  }
+}

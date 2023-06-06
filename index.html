@@ -13,11 +13,13 @@
     <!-- /seo -->
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=yes">
-    <meta name="keywords" content="大聪花,markdown在线,markdown在线展示,latex,文本编辑,markdown在线编辑,md,bigonion,Markdwon,Online,html,editor" />
+    <meta name="keywords"
+        content="大聪花,markdown在线,markdown在线展示,latex,文本编辑,markdown在线编辑,md,bigonion,Markdwon,Online,html,editor" />
     <meta name="author" content="bigonion,bigonion@bigonion.cn">
     <meta name="robots" content="index,follow" />
     <meta name="format-detection" content="telephone=no" />
-    <meta name="description" content="markdown在线编辑,markdown在线展示,markdown在线支持latex公式支持,基于showdown marked ketex,html在线展示,方便调试与快速实现目标效果,支持markdown基础语法和部分拓展语法, 预计新增:LATEX拓展语法和PDF导出（已完成）md文件读取">
+    <meta name="description"
+        content="markdown在线编辑,markdown在线展示,markdown在线支持latex公式支持,基于showdown marked katex,html在线展示,方便调试与快速实现目标效果,支持markdown基础语法和部分拓展语法, 预计新增:LATEX拓展语法和PDF导出（已完成）md文件读取">
     <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
 
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
@@ -25,8 +27,8 @@
     <link rel="stylesheet" type="text/css" href="/source/css/header.css">
     <link rel="stylesheet" href="/source/css/aboutBox.css">
     <link rel="stylesheet" href="/source/css/response.css">
-
-    <script src="/source/js/packJs/umd-kit.js"></script>
+    <link rel="stylesheet" href="/source/css/clueParser.css">
+    <script src="https://npm.elemecdn.com/bigonion-kit@0.10.16/umd/umd-kit.min.js"></script>
     <!-- *********外*********部*********资*********源*********区********* -->
     <!-- hilight showdown markded  -->
     <link rel="stylesheet" type="text/css" href="/source/css/githubMarkdownCss.css">
@@ -36,13 +38,15 @@
     <script src="/source/js/packJs/showdown.min.js"></script>
     <script src="./source/js/packJs/marked.min.js"></script>
     <!-- Latex  -->
-    <script src="/source/js/packJs/katex.min.js"></script>
-    <link rel="stylesheet" href="/source/css/katex.min.css"
-        integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0" crossorigin="anonymous">
+    <script async src="https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.js"></script>
+    <link href="https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.css" rel="stylesheet">
     <!-- *********外*********部*********资*********源*********区********* -->
-    <script src="/source/js/packJs/index.min.js"></script>
+    <script async="false" src="/source/js/index.js"></script>
     <script src="/source/js/remember.js"></script>
     <script defer="defer" src="/source/js/dragFile.js"></script>
+    <!-- <script type="module">
+        import mermaid from './node_modules/mermaid/dist/mermaid.esm.mjs';
+    </script> -->
     <!-- https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.css -->
 </head>
 <style>
@@ -53,8 +57,6 @@
     body {
         margin: 0 !important;
     }
-
-
 </style>
 
 <body>
@@ -63,7 +65,7 @@
         <div id="headerInner">
             <div id="headerLeft">
                 <a class="noStylelabel" href="https://md.bigonion.cn/">
-                    <p2 class="headerP">Markdown Online View</p2>
+                    <p2 class="headerP">Markdown+ Online View</p2>
                 </a>
             </div>
             <div id="headerRight">
@@ -72,6 +74,9 @@
                 </a>
                 <a id="showAbout" class="rightComponents noStylelabel" href="#">
                     <p2 class="headerP">关于</p2>
+                </a>
+                <a id="showAbout" class="rightComponents noStylelabel" href="#">
+                    <p2 class="headerP">⚙</p2>
                 </a>
                 <div class="rightComponents" id="pdfButton" onclick=myPrint()>
                     <button>导出</button>

@@ -1,0 +1,137 @@
+/* 
+* @命名规则：原有布局,一律大写,自定义布局,驼峰命名法
+* @author bigonion
+ */
+code {
+  font-size: 17px;
+}
+/* 文字 */
+.P0 {
+  font-size: 20vh;
+}
+.P1 {
+  font-size: 15vh;
+}
+.P2 {
+  font-size: 10vh;
+}
+.P3 {
+  font-size: 5vh;
+}
+.P4 {
+  font-size: 4vh;
+}
+.P5 {
+  font-size: 2.5vh !important;
+}
+.P6 {
+  font-size: 1.5vh !important;
+}
+
+/* 颜色 */
+.RED {
+  color: RED;
+}
+.BLUE {
+  color: BLUE;
+}
+.PINK {
+  color: pink;
+}
+.WHITE {
+  color: white;
+}
+.GRAY {
+  color: gray;
+}
+.GOLD {
+  color: gold;
+}
+/* 图像 */
+.smallPic {
+  height: 34vh !important;
+}
+.midPic {
+  height: 60vh;
+}
+.bigPic {
+  height: 80vh !important;
+}
+
+.chartPic {
+  width: 86%;
+  /* margin: 0px 20px !important; */
+}
+
+/* 布局 */
+.FLEX {
+  display: flex;
+}
+.ROW {
+  flex-direction: row;
+}
+.COL {
+  flex-direction: column;
+}
+.ROW-REV {
+  flex-direction: row-reverse;
+}
+.COL-REV {
+  flex-direction: column-reverse;
+}
+.JUS-CENTER {
+  justify-content: center;
+}
+.ALI-CENTER {
+  align-items: center;
+}
+
+.GRID4 p{
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  grid-gap: 20px;
+  justify-content: center;
+  align-items: center;
+  justify-items: center;
+}
+.GRID2 p{
+  display: grid !important;
+  grid-template-columns: repeat(2, auto);
+  grid-gap: 20px;
+  justify-content: center;
+  align-items: center;
+  justify-items: center;
+}
+.NOMARGIN {
+  margin: 0 !important;
+}
+
+.fullPreCode {
+  height: 80% !important;
+  overflow: hidden;
+}
+.fullSection {
+  height: 116vh;
+}
+.fullSectionWidth {
+  width: 80vw !important;
+}
+.tableFont {
+  font-size: 26px;
+}
+
+.NOLIST {
+  list-style: none;
+}
+
+.NOLIST li {
+  list-style: none;
+}
+
+.RIGHT{
+    float: right;
+    width: 100%;
+}
+.RIGHT p{
+    float: right;
+}

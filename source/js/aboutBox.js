@@ -21,6 +21,12 @@ let aboutMd = `
 + LATEX请写在用$$中间  
 例如 $\lambda$ 
 
+## 新增特性
++ 右对齐可以用 "右边对齐".RIGHT 
++ 红色文字可以用 "我是红色的耶".RED 
++ 注意!，最后必须有一个**空格**表示结束
++ 支持脚本注入,请用script标签包裹
+
 ## 作者
 
 **Bigonion**
@@ -45,6 +51,9 @@ function md2Html(md) {
 }
 // event mount
 document.getElementById('closeAboutSvg').addEventListener('click',()=>{
+    document.getElementById('aboutBox').style.display="none"
+})
+document.getElementById('aboutBox').addEventListener('click',()=>{
     document.getElementById('aboutBox').style.display="none"
 })
 document.getElementById('showAbout').addEventListener('click',()=>{
