@@ -3,7 +3,7 @@
 
 # 忽略node_modules目录
 node_modules/
- /assets
+/assets
 # 忽略Logs
 logs
 *.log
