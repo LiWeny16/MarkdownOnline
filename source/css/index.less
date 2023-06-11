@@ -4,7 +4,7 @@
 @import url("./githubMarkdownCss.less");
 @import url("./clueParser.css");
 @import url("./aboutBox.css");
-
+@import url("https://unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/default.min.css");
 #topBox {
   display: flex;
   flex-direction: column;
@@ -40,7 +40,9 @@
   border: 1px solid #111;
 }
 
-
+/**
+@my hljs
+*/
 .hljs {
   .hljs-comment {
     color: #697070;
@@ -64,7 +66,16 @@
   .hljs-selector-tag {
     font-weight: 700;
   }
-
+  .hljs-link,
+  .hljs-operator,
+  .hljs-regexp,
+  .hljs-selector-attr,
+  .hljs-selector-pseudo,
+  .hljs-symbol,
+  .hljs-template-variable,
+  .hljs-variable {
+    color: #ff0000 !important;
+  }
   .hljs-deletion,
   .hljs-number,
   .hljs-quote,
@@ -73,7 +84,7 @@
   .hljs-string,
   .hljs-template-tag,
   .hljs-type {
-    color: #098658 !important;
+    color: #00a424 !important;
   }
 
   .hljs-literal {

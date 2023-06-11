@@ -2,9 +2,13 @@ import aboutBox from "./aboutBox"
 import welcomeText from "../assets/welcome.md?raw"
 import { marked } from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
 import mermaid from "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs"
+import kit from "https://npm.elemecdn.com/bigonion-kit@0.11.0/esm/esm-kit.mjs"
 // import hljs from "https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"
 import hljs from "https://npm.elemecdn.com/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js"
 import replaceAsync from "string-replace-async";
+
+import { myPrint } from "./functions/myPrint"
+
 
 import "../css/index.less"
 // import "https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
@@ -308,16 +312,6 @@ function getRegIndex(text, regex) {
     return result
 }
 // print 函数
-function myPrint() {
-    let printString = document.getElementById("view-area").innerHTML
-    console.log(printString);
-    window.document.body.innerHTML = `<div class="markdown-body">${printString}</div>`
-    kit.sleep(250).then(() => {
-        window.print()
-        location.reload();
-    })
-
-}
 
 // 快捷键
 /**
