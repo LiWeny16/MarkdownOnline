@@ -1,4 +1,3 @@
-import dragFile from "./dragFile"
 import aboutBox from "./aboutBox"
 import welcomeText from "../assets/welcome.md?raw"
 import { marked } from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
@@ -6,7 +5,7 @@ import mermaid from "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mj
 // import hljs from "https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"
 import hljs from "https://npm.elemecdn.com/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js"
 import replaceAsync from "string-replace-async";
-import "../css/response.less"
+
 import "../css/index.less"
 // import "https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
 /**
@@ -15,9 +14,9 @@ import "../css/index.less"
 */
 const enObj = {
     //基础事件
-    enMainConverter:true,
+    enMainConverter: true,
     enAboutBox: true,
-    enPdfExport:true,
+    enPdfExport: true,
     //拓展事件
     enFastKey: true,//快捷键
     enScript: true,//允许脚本注入
@@ -33,7 +32,7 @@ window.onload = () => {
  * @description 初始化配置和事件初始化
  * @returns {void}
 */
-function allInit() {
+export function allInit() {
     /**@description Settings Init*/
     const settings = new settingsClass()
     settings.settingsAllInit()
@@ -43,18 +42,19 @@ function allInit() {
     mdConverter()
 
     /***@description All Events */
-    enObj.enMainConverter? triggerConverterEvent():console.log("converter if off"); //按下写字板触发事件
-    enObj.enPdfExport? exportToPdfEvent():console.log("pdf export is off"); //导出PDF
-    enObj.enDragFile ? dragFile() : console.log("dragFile is off");//开启拖拽事件
+    enObj.enMainConverter ? triggerConverterEvent() : console.log("converter if off"); //按下写字板触发事件
+    enObj.enPdfExport ? exportToPdfEvent() : console.log("pdf export is off"); //导出PDF
+    enObj.enDragFile ? dragFileEvent() : console.log("dragFile is off");//开启拖拽事件
     enObj.enAboutBox ? aboutBox() : console.log("aboutBox is off");
     enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is off");//开启快捷键事件
+    
 }
 
 /** 
  * @description 循环执行触发主解析事件流
  * @param {boolean} save
 */
-async function mdConverter(save = true) {//按键触发，自动保存，主函数
+export async function mdConverter(save = true) {//按键触发，自动保存，主函数
     let view = getMdText()
     enObj.enClue ? view = await clueParser(view) : console.log("clue off");
     view = await latexParse2(view)
@@ -408,4 +408,69 @@ function exportToPdfEvent() {
     document.getElementById("pdfButton").addEventListener("click", () => {
         myPrint()
     })
+}
+
+function dragFileEvent() {
+    let dragBox = document.getElementById("md-area")
+    let grayStyle = "#c4c4c482"
+    let errRedStyle = "#cc0000"
+    let originStyle = "#f5f5f5"
+    dragBox.addEventListener("dragenter", function () {
+        // dragBox.value = "已读取到文件,请松手"
+        dragBox.style.background = grayStyle
+    }, false)
+    //拖拽离开
+    dragBox.addEventListener("dragleave", function () {
+        // dragBox.innerHTML = "拖到这里上传"
+        dragBox.style.background = originStyle
+        allInit()
+    }, false)
+    //悬停
+    dragBox.addEventListener("dragover", function (ev) {
+        ev.preventDefault()//取消事件的默认动作,防止浏览器打开文件
+        // dragBox.innerHTML = "拖到这里上传2"
+    }, false)
+    //松手
+    dragBox.addEventListener("drop", function (ev) {
+        ev.preventDefault()//取消事件的默认动作。
+        dragBox.style.background = originStyle
+        try {
+            let fileReader = new FileReader()
+            let file = ev.dataTransfer.files[0]
+            // debugger
+            console.log(file);
+            let nameArr = file.name.split(".")
+            nameArr = nameArr[nameArr.length - 1]
+            if (!(nameArr == "bat" || nameArr == "txt" || nameArr == "md" || nameArr == "js" || nameArr == "html" || nameArr == "css")) {
+                dragBox.style.color = errRedStyle
+                if (nameArr == "lnk") {
+                    dragBox.value = "错误的文件格式: " + nameArr + " ,请不要直接拖拽快捷方式！"
+                } else {
+                    dragBox.value = "错误的文件格式: " + nameArr + " ,仅支持txt/md/html/js/css/bat"
+                }
+                kit.sleep(2000).then(() => {
+                    dragBox.style.color = ""
+                    fillInRemeText()
+                }).catch((err) => {
+
+                });
+            } else {
+                fileReader.onload = function () {
+                    console.log("上传成功")
+                    dragBox.value = this.result
+                    mdConverter(true) //保存
+                    // restoreText()
+                    // console.log(this)
+                }
+                fileReader.onerror = function () {
+                    console.log("上传失败")
+                }
+                fileReader.readAsText(file)
+            }
+        } catch (err) {
+            console.log(err)
+        }
+
+    }, false)
+
 }

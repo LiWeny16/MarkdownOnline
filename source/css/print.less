@@ -1,4 +1,7 @@
 @media print {
+  *{
+    background: white !important;
+  }
   @page {
     size: A4 portrait;
   }
@@ -12,8 +15,11 @@
     /* overflow: visible !important;
     overflow-y: visible !important; */
   }
+  #md-area {
+    display: none !important;
+  }
   body {
-    background-color: white;
+    background-color: white !important;
   }
   #header {
     display: none !important;
@@ -21,9 +27,7 @@
   #headerInner {
     display: none !important;
   }
-  #md-area {
-    display: none !important;
-  }
+
 }
 
 /* @media print {

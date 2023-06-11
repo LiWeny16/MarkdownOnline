@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    // TypeScript 默认会把代码编译为 ECMAScript 3
+    // esnext 表示仅仅校验转换 TypeScript 类型，不进行语法编译
+    "target": "esnext",
+    "module": "esnext",
+    // 开启严格模式，这使得对“this”的数据属性进行更严格的推断成为可能
+    "strict": true,
+    "jsx": "preserve",
+    "moduleResolution": "node"
+  },
+
+  // 配置需要校验的文件
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "source/js/types/*.d.ts"
+  ],
+
+  // 排除不需要 TypeScript 校验的文件
+  "exclude": [
+    "node_modules",
+  ]
+}
