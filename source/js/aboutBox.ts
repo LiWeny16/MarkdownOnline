@@ -1,5 +1,5 @@
 import * as marked_esm from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
-import svg_1 from "../assets/img/aboutBox关闭.svg?raw"
+import svg_1 from "../assets/img/aboutBox关闭.svg"
 import welcomeText from "../assets/about.md?raw"
 import "./types/index.d.ts"
 export default () => {
