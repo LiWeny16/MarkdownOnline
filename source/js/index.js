@@ -1,35 +1,56 @@
 import dragFile from "./dragFile"
+import aboutBox from "./aboutBox"
+import welcomeText from "../assets/welcome.md?raw"
 import hljs from "highlight.js"
 import { marked } from "marked"
 import mermaid from "mermaid"
-
+import replaceAsync from "string-replace-async";
+// import { v4 as uuidv4 } from 'uuid';
+/**
+ * @description 拓展使能配置 
+ * @type {Boolean}
+*/
 const enObj = {
-    enFastKey: true,
-    enScript: true,
-    enHilightJs: true,
-    enClue: true,
-    enDragFile: true
+    //基础事件
+    enMainConverter:true,
+    enAboutBox: true,
+    enPdfExport:true,
+    //拓展事件
+    enFastKey: true,//快捷键
+    enScript: true,//允许脚本注入
+    enHilightJs: true,//高亮代码
+    enClue: true,//clueCSS写法
+    enDragFile: true,//拖拽外部markdown
+
 }
 window.onload = () => {
     allInit()
 }
-
+/**
+ * @description 初始化配置和事件初始化
+ * @returns {void}
+*/
 function allInit() {
-    /**@description settings init*/
+    /**@description Settings Init*/
     const settings = new settingsClass()
-    settings.markedInit()
-    settings.mermaidInit()
+    settings.settingsAllInit()
 
+    /**@description Input Area Init*/
     blankTextInit() //初始化输入区域
     mdConverter()
 
-    /***@description Events ****/
-    triggerConverterEvent() //按下写字板触发事件
-    exportToPdfEvent() //导出PDF
-    enObj.enDragFile ? dragFile() : console.log("dragFile is off");
-    enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is off");
+    /***@description All Events */
+    enObj.enMainConverter? triggerConverterEvent():console.log("converter if off"); //按下写字板触发事件
+    enObj.enPdfExport? exportToPdfEvent():console.log("pdf export is off"); //导出PDF
+    enObj.enDragFile ? dragFile() : console.log("dragFile is off");//开启拖拽事件
+    enObj.enAboutBox ? aboutBox() : console.log("aboutBox is off");
+    enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is off");//开启快捷键事件
 }
 
+/** 
+ * @description 循环执行触发主解析事件流
+ * @param {boolean} save
+*/
 async function mdConverter(save = true) {//按键触发，自动保存，主函数
     let view = getMdText()
     enObj.enClue ? view = await clueParser(view) : console.log("clue off");
@@ -37,22 +58,13 @@ async function mdConverter(save = true) {//按键触发，自动保存，主函�
     view = await latexParse(view)
     view = markedParse(view)
     enObj.enScript ? enableScript(view) : console.log("fast scripts off");
-    // view = md2html(view)
-
-    // console.log(view);
     preViewText(view)
-    if (save) {
-        restoreText()//自动保存
-    }
-    // 拓展功能
+    save ? restoreText() : 1
     enObj.enHilightJs ? hljs.highlightAll() : console.log("hilight off");
-    kit.sleep(200).then(() => {
-        // console.log(1);
-        mermaidParse()
-        // mermaid.init({ noteMargin: 10 }, '.someOtherClass');
-    })
-
 }
+/** 
+ * @description 初始化设置类
+*/
 class settingsClass {
     constructor() {
     }
@@ -69,8 +81,18 @@ class settingsClass {
         });
         mermaid.mermaidAPI.initialize({ startOnLoad: false });
     }
+    hljsInit() {
+        hljs.configure({
+            ignoreUnescapedHTML: true
+        })
+    }
+    settingsAllInit() {
+        this.markedInit()
+        this.mermaidInit()
+        this.hljsInit()
+    }
     static newSettings() {
-        return this
+        return new this
     }
 }
 
@@ -79,7 +101,7 @@ class settingsClass {
  * @param {string} md
  */
 function clueParser(md) {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
         md = md.replace(/\n/g, ">br") //暂时替代换行符号
         const reg1 = /".*?"\..*?\s/g  //整个"content".CLASS 结构
         const reg2 = /".*?"/g //匹配 "之间"
@@ -88,64 +110,62 @@ function clueParser(md) {
         const reg4 = /(?<=.).*?(?=\s)/g //匹配 . 和 空格之间 不包括. \s
         const reg5 = /(?<=").*(?=")/g  //匹配"之间"不包括""
         if (md) {
-            md = md.replace(reg1, (e) => {
-                function temp(e) {
-                    var parsedHTML = "f"
-                    var content
-                    var clueClass
-                    if (e.match(reg2)) {
-                        content = e.match(reg5)[0]
-                    }
-                    if (e.match(reg3)) {
-                        e = reverseString(e)
-                        // console.log(e.match(reg4))
-                        clueClass = e.match(reg3_reverse)[0]
-                        clueClass = reverseString(clueClass)
-                        clueClass = clueClass.replace(/(\s)|(\.)/g, "")
-                        // clueClass = clueClass.match(reg4)[0]
-                    }
-                    // console.log(content);
-                    // console.log(clueClass);
-                    content = content.replace(/\>br/g, "\n")//解除换行限制
-                    if (clueClass == "mermaid") {
-                        parsedHTML = `<pre class="${clueClass}">${content}</pre>`
-                        // parsedHTML = `${mermaidParse2(content)}`
-                    } else {
-                        parsedHTML = `<div class="${clueClass}">${markedParse(content)}</div>`
-                    }
-
-                    return parsedHTML
+            md = await replaceAsync(md, reg1, temp)
+            async function temp(e, seq) {
+                var parsedHTML = "f"
+                var content
+                var clueClass
+                if (e.match(reg2)) {
+                    content = e.match(reg5)[0]
                 }
-                let temp1 = temp(e)
-                return temp1
+                if (e.match(reg3)) {
+                    e = reverseString(e)
+                    // console.log(e.match(reg4))
+                    clueClass = e.match(reg3_reverse)[0]
+                    clueClass = reverseString(clueClass)
+                    clueClass = clueClass.replace(/(\s)|(\.)/g, "")
+                    // clueClass = clueClass.match(reg4)[0]
+                }
+                // console.log(content);
+                // console.log(clueClass);
+                content = content.replace(/\>br/g, "\n")//解除换行限制
+                if (clueClass == "mermaid") {
+                    // parsedHTML = `<pre class="${clueClass}">${content}</pre>`
+                    try {
+                        parsedHTML = `${await mermaidParse2(content, seq)}`
+                    } catch (error) {
+                        // parsedHTML = `<div class="RED">${error}</div>`
+                        parsedHTML = "<div class='RED P5'> MERMAID ERROR! </div>  " +
+                            `<pre><code class="language-js hljs language-javascript"><span class="hljs-number">${error}</span></code></pre>`
+                    }
 
+                } else {
+                    parsedHTML = `<div class="${clueClass}">${markedParse(content)}</div>`
+                }
+
+                return parsedHTML
             }
-            )
         }
         md = md.replace(/\>br/g, "\n")
         resolve(md)
     })
 
 }
-async function mermaidParse2(content) {
-    const { svg } = await mermaid.mermaidAPI.render('graphDiv', content);
-    return svg
-}
-async function mermaidParse() {
-    try {
-        let element = document.querySelector(".mermaid")
-        if(element){
-            let content = element.innerHTML
-            content = content.replace(/\&gt\;/g, ">")
-            content = content.replace(/\&lt\;/g, "<")
-            const { svg } = await mermaid.mermaidAPI.render('graphDiv', content);
-            element.innerHTML = svg
-        }
-    } catch (error) {
-     console.log(error);   
+/**
+ * @description asyncParser2
+ * @param {string} content
+ * @param {string} seq
+ * @returns {Promise<string>}
+ */
+async function mermaidParse2(content, seq) {
+    const isValid = await mermaid.parse(content)
+    if (isValid) {
+        const { svg } = await mermaid.mermaidAPI.render("seq_" + seq, content);
+        return svg
+
+    } else {
+        return "err"
     }
-   
-  
 }
 function latexParse2(md, center = true) {
     md = md.replace(/\n/g, "<!br") //暂时替代换行符号
@@ -289,7 +309,7 @@ function myPrint() {
     let printString = document.getElementById("view-area").innerHTML
     console.log(printString);
     window.document.body.innerHTML = `<div class="markdown-body">${printString}</div>`
-    kit.sleep(100).then(() => {
+    kit.sleep(250).then(() => {
         window.print()
         location.reload();
     })
@@ -376,56 +396,7 @@ function blankTextInit() {
         fillInRemeText()
     }
     else {//否则显示教程
-        writeMdText(`
-# "新一代的$“Markdown^+”$编辑器".RED 
-
-
-# 你好，我是标题
-
-## 你好，我是二级标题
-
-你好，我是正文  
-"你好,我是markdown扩展语法".RIGHT 
-正文换行需要结尾打两个空格
-如果不打空格，就不换行
-
-你好,我是LATEX  
-
-$$
-ln({1}) =3ln({2})  
-\\\\
-int_{4}^{5} 6^2 dx=7
-$$
-
-
-<br>
-<br>
-
-我下面是分割线
-
----
-
-| 我      | 是    | 
-| -        |  -     |
-| 表      |   格  |
-
-我是 **强调语句**
-
-[我是链接](https://bigonion.cn)
-![我是图片](http://bigonion.cn/background/wallheaven.jfif)
-
-### 我是扩展语法
-
-"![我是图片](http://bigonion.cn/background/wallheaven.jfif)
-![我是图片](http://bigonion.cn/background/wallheaven.jfif)
-![我是图片](http://bigonion.cn/background/wallheaven.jfif)
-![我是图片](http://bigonion.cn/background/wallheaven.jfif)".GRID4 
-
-        
-     
-                
-        
-`)
+        writeMdText(welcomeText)
 
     }
 }
