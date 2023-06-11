@@ -3,7 +3,7 @@ import aboutBox from "./aboutBox"
 import welcomeText from "../assets/welcome.md?raw"
 import { marked } from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
 import mermaid from "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs"
-import hljs from "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/es/highlight.min.js"
+import hljs from "https://unpkg.com/@highlightjs/cdn-assets@11.7.0/highlight.min.js"
 import replaceAsync from "string-replace-async";
 import "../css/response.less"
 import "../css/index.less"
