@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite'
-
+import viteCompression from "vite-plugin-compression"
 
 export default defineConfig({
     build: {
@@ -13,4 +13,15 @@ export default defineConfig({
         outDir: "docs", // 输出名称
         assetsDir: "static" // 静态资源目录
     },
+    resolve: {
+        alias: {
+            'mermaid': "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs"
+        }
+    },
+    plugins: [
+        // ...
+        viteCompression({
+            threshold: 1024000 // 对大于 1mb 的文件进行压缩
+        })
+    ],
 })

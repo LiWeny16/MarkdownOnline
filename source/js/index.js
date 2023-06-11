@@ -1,11 +1,13 @@
 import dragFile from "./dragFile"
 import aboutBox from "./aboutBox"
 import welcomeText from "../assets/welcome.md?raw"
-import hljs from "highlight.js"
-import { marked } from "marked"
-import mermaid from "mermaid"
+import { marked } from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
+import mermaid from "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs"
+import hljs from "https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.7.0/build/es/highlight.min.js"
 import replaceAsync from "string-replace-async";
-// import { v4 as uuidv4 } from 'uuid';
+import "../css/response.less"
+import "../css/index.less"
+// import "https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
 /**
  * @description 拓展使能配置 
  * @type {Boolean}

@@ -47,27 +47,3 @@
   font-size: 4.6vh;
 }
 
-/* 响应式布局 */
-/* 电脑端 */
-@media (min-width: 769px) and (max-width: 1236px) {
-}
-/* 手机端 */
-@media (max-width: 769px) {
-  .headerP {
-    font-size: 2.5vh;
-  }
-  #pdfButton > button {
-    font-size: 2.5vh;
-  }
-}
-@media (max-width: 462px) {
-  .headerP {
-    font-size: 1.8vh;
-  }
-  #pdfButton > button {
-    font-size: 1.8vh;
-  }
-  #md-area {
-    padding: 8px 13px !important;
-  }
-}
