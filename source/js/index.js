@@ -1,84 +1,38 @@
-window.onload = () => {
-    allInit()
-    // setInterval(()=>{restoreText()},4000)
-}
+import dragFile from "./dragFile"
+import hljs from "highlight.js"
+import { marked } from "marked"
+import mermaid from "mermaid"
 
-function allInit() {
-    if (kit.getCookie("contentText")) { //有cookie
-        // preViewText(md2html(fillInRemeText()))
-        fillInRemeText()
-        mdConverter()
-    }
-    else {//否则显示教程
-        writeMdText(`
-
-# "新一代的$“Markdown^+”$编辑器".RED 
-
-
-# 你好，我是标题
-
-## 你好，我是二级标题
-
-你好，我是正文  
-"你好,我是markdown扩展语法".RIGHT 
-正文换行需要结尾打两个空格
-如果不打空格，就不换行
-
-你好,我是LATEX  
-
-$$
-ln({1}) =3ln({2})  
-\
-int_{4}^{5} 6^2 dx=7
-$$
-
-
-<br>
-<br>
-
-我下面是分割线
-
----
-
-| 我      | 是    | 
-| -        |  -     |
-| 表      |   格  |
-
-我是 **强调语句**
-
-[我是链接](https://bigonion.cn)
-![我是图片](http://bigonion.cn/background/wallheaven.jfif)
-
-### 我是扩展语法
-
-"![我是图片](http://bigonion.cn/background/wallheaven.jfif)
-![我是图片](http://bigonion.cn/background/wallheaven.jfif)
-![我是图片](http://bigonion.cn/background/wallheaven.jfif)
-![我是图片](http://bigonion.cn/background/wallheaven.jfif)".GRID4 
-
-        
-     
-                
-        
-`)
-        mdConverter()
-    }
-}
 const enObj = {
     enFastKey: true,
     enScript: true,
     enHilightJs: true,
-    enClue: true
+    enClue: true,
+    enDragFile: true
+}
+window.onload = () => {
+    allInit()
 }
 
-initialize()
-function initialize() {
-    enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is on");
+function allInit() {
+    /**@description settings init*/
+    const settings = new settingsClass()
+    settings.markedInit()
+    settings.mermaidInit()
+
+    blankTextInit() //初始化输入区域
+    mdConverter()
+
+    /***@description Events ****/
+    triggerConverterEvent() //按下写字板触发事件
+    exportToPdfEvent() //导出PDF
+    enObj.enDragFile ? dragFile() : console.log("dragFile is off");
+    enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is off");
 }
+
 async function mdConverter(save = true) {//按键触发，自动保存，主函数
     let view = getMdText()
-    enObj.enClue ? view = await clueParse(view) : console.log("clue off");
-   
+    enObj.enClue ? view = await clueParser(view) : console.log("clue off");
     view = await latexParse2(view)
     view = await latexParse(view)
     view = markedParse(view)
@@ -92,24 +46,41 @@ async function mdConverter(save = true) {//按键触发，自动保存，主函�
     }
     // 拓展功能
     enObj.enHilightJs ? hljs.highlightAll() : console.log("hilight off");
-    // mermaid.initialize()
+    kit.sleep(200).then(() => {
+        // console.log(1);
+        mermaidParse()
+        // mermaid.init({ noteMargin: 10 }, '.someOtherClass');
+    })
 
 }
-function insertStr(source, start, newStr) {
-    return source.slice(0, start) + newStr + source.slice(start)
+class settingsClass {
+    constructor() {
+    }
+    markedInit() {
+        marked.use({
+            mangle: false,
+            headerIds: false,
+            strict: false,
+        });
+    }
+    mermaidInit() {
+        mermaid.initialize({
+            securityLevel: 'loose',
+        });
+        mermaid.mermaidAPI.initialize({ startOnLoad: false });
+    }
+    static newSettings() {
+        return this
+    }
 }
-function getRegIndex(text, regex) {
-    // const text = '$匹配我$ $匹配我$ 不要匹配我 $匹配我$'
-    // const regex = /\$(.*?)\$/g
-    const result = Array.from(text.matchAll(regex), match => match.index)
-    return result
-}
+
 /**
  * @description clue CSS HTML
-*/
-function clueParse(md) {
-    md = md.replace(/\n/g,">br") //暂时替代换行符号
+ * @param {string} md
+ */
+function clueParser(md) {
     return new Promise((resolve) => {
+        md = md.replace(/\n/g, ">br") //暂时替代换行符号
         const reg1 = /".*?"\..*?\s/g  //整个"content".CLASS 结构
         const reg2 = /".*?"/g //匹配 "之间"
         const reg3 = /\..*?\s/g //匹配class 的. 和空格之间 未反转前
@@ -118,35 +89,66 @@ function clueParse(md) {
         const reg5 = /(?<=").*(?=")/g  //匹配"之间"不包括""
         if (md) {
             md = md.replace(reg1, (e) => {
-                var parsedHTML = ""
-                var content
-                var clueClass
-                if (e.match(reg2)) {
-                    content = e.match(reg5)[0]
+                function temp(e) {
+                    var parsedHTML = "f"
+                    var content
+                    var clueClass
+                    if (e.match(reg2)) {
+                        content = e.match(reg5)[0]
+                    }
+                    if (e.match(reg3)) {
+                        e = reverseString(e)
+                        // console.log(e.match(reg4))
+                        clueClass = e.match(reg3_reverse)[0]
+                        clueClass = reverseString(clueClass)
+                        clueClass = clueClass.replace(/(\s)|(\.)/g, "")
+                        // clueClass = clueClass.match(reg4)[0]
+                    }
+                    // console.log(content);
+                    // console.log(clueClass);
+                    content = content.replace(/\>br/g, "\n")//解除换行限制
+                    if (clueClass == "mermaid") {
+                        parsedHTML = `<pre class="${clueClass}">${content}</pre>`
+                        // parsedHTML = `${mermaidParse2(content)}`
+                    } else {
+                        parsedHTML = `<div class="${clueClass}">${markedParse(content)}</div>`
+                    }
+
+                    return parsedHTML
                 }
-                if (e.match(reg3)) {
-                    e = reverseString(e)
-                    // console.log(e.match(reg4))
-                    clueClass = e.match(reg3_reverse)[0]
-                    clueClass = reverseString(clueClass)
-                    clueClass = clueClass.replace(/(\s)|(\.)/g, "")
-                    // clueClass = clueClass.match(reg4)[0]
-                }
-                // console.log(content);
-                // console.log(clueClass);
-                content = content.replace(/\>br/g,"\n")//解除换行限制
-                parsedHTML = `<div class="${clueClass}">${markedParse(content)}</div>`
-                return parsedHTML
-            })
+                let temp1 = temp(e)
+                return temp1
+
+            }
+            )
         }
-        md=md.replace(/\>br/g,"\n")
+        md = md.replace(/\>br/g, "\n")
         resolve(md)
-
     })
-}
 
+}
+async function mermaidParse2(content) {
+    const { svg } = await mermaid.mermaidAPI.render('graphDiv', content);
+    return svg
+}
+async function mermaidParse() {
+    try {
+        let element = document.querySelector(".mermaid")
+        if(element){
+            let content = element.innerHTML
+            content = content.replace(/\&gt\;/g, ">")
+            content = content.replace(/\&lt\;/g, "<")
+            const { svg } = await mermaid.mermaidAPI.render('graphDiv', content);
+            element.innerHTML = svg
+        }
+    } catch (error) {
+     console.log(error);   
+    }
+   
+  
+}
 function latexParse2(md, center = true) {
-    md = md.replace(/\n/g,"<!br") //暂时替代换行符号
+    md = md.replace(/\n/g, "<!br") //暂时替代换行符号
     return new Promise((resolve) => {
         let reg1 = /\$\$.*?\$\$/g  //含有$的
         let reg2 = /(?<=(\$\$))(.+?)(?=(\$\$))/g
@@ -154,14 +156,15 @@ function latexParse2(md, center = true) {
             md = md.replace(reg1, (e) => {
                 if (e.match(reg2)) {
                     e = e.match(reg2)[0]
-                    e = e.replace(/\<\!br/g,"") //解除换行替代
+                    e = e.replace(/\<\!br/g, "") //解除换行替代
                 } else {
                     return ""
                 }
                 // 官方示例API
                 if (e) {
                     var html = katex.renderToString(e, {
-                        throwOnError: false
+                        throwOnError: false,
+                        strict: false
                     });
                     if (center) {
                         html = `<center>${html}</center>`
@@ -171,8 +174,8 @@ function latexParse2(md, center = true) {
                     return ""
                 }
 
-            }) 
-            md=md.replace(/\<\!br/g,"\n")//解除换行替代
+            })
+            md = md.replace(/\<\!br/g, "\n")//解除换行替代
             resolve(md)
         }
         else {
@@ -197,7 +200,8 @@ function latexParse(md) {
                     ele = ele.match(reg2)
                     if (ele) {
                         parsedTex[index] = katex.renderToString(ele[0], {
-                            throwOnError: false
+                            throwOnError: false,
+                            strict: false
                         })
                     } else {
                         parsedTex[index] = "<span style='color:#cc0000;'>ERR_NULL</span>"
@@ -228,6 +232,7 @@ function latexParse(md) {
 
 }
 function markedParse(md) {
+
     return marked.parse(md)
 }
 /**
@@ -273,16 +278,22 @@ function fillInRemeText() {
     writeMdText(text)
     return text
 }
+function getRegIndex(text, regex) {
+    // const text = '$匹配我$ $匹配我$ 不要匹配我 $匹配我$'
+    // const regex = /\$(.*?)\$/g
+    const result = Array.from(text.matchAll(regex), match => match.index)
+    return result
+}
 // print 函数
 function myPrint() {
     let printString = document.getElementById("view-area").innerHTML
     console.log(printString);
     window.document.body.innerHTML = `<div class="markdown-body">${printString}</div>`
-    kit.sleep(100).then(()=>{
+    kit.sleep(100).then(() => {
         window.print()
         location.reload();
     })
- 
+
 }
 
 // 快捷键
@@ -347,4 +358,80 @@ function replaceSelection(e, leftStr, rightStr) {
 
 function reverseString(str) {
     return str.split('').reverse().join('');
+}
+
+function triggerConverterEvent() {
+    document.getElementById("md-area").addEventListener("keyup", () => {
+        mdConverter()
+    })
+    document.getElementById("md-area").addEventListener("blur", () => {
+        mdConverter()
+    })
+}
+/** 
+ * @description 初始化写字板
+*/
+function blankTextInit() {
+    if (kit.getCookie("contentText")) { //有cookie
+        fillInRemeText()
+    }
+    else {//否则显示教程
+        writeMdText(`
+# "新一代的$“Markdown^+”$编辑器".RED 
+
+
+# 你好，我是标题
+
+## 你好，我是二级标题
+
+你好，我是正文  
+"你好,我是markdown扩展语法".RIGHT 
+正文换行需要结尾打两个空格
+如果不打空格，就不换行
+
+你好,我是LATEX  
+
+$$
+ln({1}) =3ln({2})  
+\\\\
+int_{4}^{5} 6^2 dx=7
+$$
+
+
+<br>
+<br>
+
+我下面是分割线
+
+---
+
+| 我      | 是    | 
+| -        |  -     |
+| 表      |   格  |
+
+我是 **强调语句**
+
+[我是链接](https://bigonion.cn)
+![我是图片](http://bigonion.cn/background/wallheaven.jfif)
+
+### 我是扩展语法
+
+"![我是图片](http://bigonion.cn/background/wallheaven.jfif)
+![我是图片](http://bigonion.cn/background/wallheaven.jfif)
+![我是图片](http://bigonion.cn/background/wallheaven.jfif)
+![我是图片](http://bigonion.cn/background/wallheaven.jfif)".GRID4 
+
+        
+     
+                
+        
+`)
+
+    }
+}
+
+function exportToPdfEvent() {
+    document.getElementById("pdfButton").addEventListener("click", () => {
+        myPrint()
+    })
 }

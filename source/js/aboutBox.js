@@ -1,6 +1,10 @@
-let shutDownSvg=`
+import { marked } from 'marked';
+import svg_1 from "../assets/aboutBox关闭.svg"
+
+
+let shutDownSvg = `
 <div class="closeBox" id="closeAbout">
-<img id="closeAboutSvg" class="closeSvg" src="./source/assets/aboutBox关闭.svg" alt="">
+<img id="closeAboutSvg" class="closeSvg" src=${svg_1} alt="">
 </div>
 `
 let aboutMd = `
@@ -39,24 +43,24 @@ let aboutMd = `
 [https://github.com/LiWeny16/MarkdownOnline](https://github.com/LiWeny16/MarkdownOnline)  
 [https://bigonion.cn](https://bigonion.cn)
 `
-document.getElementById('aboutMd').innerHTML=shutDownSvg+md2Html(aboutMd)
+document.getElementById('aboutMd').innerHTML = shutDownSvg + md2Html(aboutMd)
 
 function md2Html(md) {
-    let converter = new showdown.Converter()
-    converter.setOption('tables', true)
-    let md_html = converter.makeHtml(md)
+    // let converter = new showdown.Converter()
+    // converter.setOption('tables', true)
+    // let md_html = converter.makeHtml(md)
     console.log(md);
-    console.log(md_html);
-    return md_html
+    // console.log(md_html);
+    return marked.parse(md)
 }
 // event mount
-document.getElementById('closeAboutSvg').addEventListener('click',()=>{
-    document.getElementById('aboutBox').style.display="none"
+document.getElementById('closeAboutSvg').addEventListener('click', () => {
+    document.getElementById('aboutBox').style.display = "none"
 })
-document.getElementById('aboutBox').addEventListener('click',()=>{
-    document.getElementById('aboutBox').style.display="none"
+document.getElementById('aboutBox').addEventListener('click', () => {
+    document.getElementById('aboutBox').style.display = "none"
 })
-document.getElementById('showAbout').addEventListener('click',()=>{
-    document.getElementById('aboutBox').style.display="block"
-    document.body.style.background="#00000066"
+document.getElementById('showAbout').addEventListener('click', () => {
+    document.getElementById('aboutBox').style.display = "block"
+    document.body.style.background = "#00000066"
 })

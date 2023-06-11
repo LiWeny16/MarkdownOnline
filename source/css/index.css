@@ -3,8 +3,8 @@
 #md-area {
   padding: 26px 38px;
   resize: horizontal;
-  background: #f5f5f5;
-  border: 1px solid #111;
+  background: white;
+  border: 1px solid #9d9898;
   /* width: 100%; */
 }
 #editor {
