@@ -19,10 +19,14 @@
   },
   "homepage": "https://github.com/LiWeny16/MarkdownOnline#readme",
   "dependencies": {
-    "marked": "^5.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "string-replace-async": "^3.0.2"
   },
   "devDependencies": {
+    "@types/react": "^18.2.12",
+    "@types/react-dom": "^18.2.5",
+    "@vitejs/plugin-react": "^4.0.0",
     "less": "^4.1.3",
     "typescript": "^5.1.3",
     "vite": "^4.3.9",

@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import viteCompression from "vite-plugin-compression"
-
+import react from '@vitejs/plugin-react'
 export default defineConfig({
     build: {
         rollupOptions: { // 配置rollup的一些构建策略
@@ -22,6 +22,7 @@ export default defineConfig({
         // ...
         viteCompression({
             threshold: 1024000 // 对大于 1mb 的文件进行压缩
-        })
+        }),
+        [react()]
     ],
 })
