@@ -51,6 +51,20 @@ $$
 ![我是图片](http://bigonion.cn/background/wallheaven.jfif)".GRID4 
 
 
+我是mermaid**流程图表** 
+
+
+"sequenceDiagram
+    participant Alice
+    participant Bob
+    Alice->>John: Hello John, how are you?
+    loop Healthcheck
+        John->>John: Fight against hypochondria
+    end
+    Note right of John: Rational thoughts <br/>prevail!
+    John-->>Alice: Great!
+    John->>Bob: How about you?
+    Bob-->>John: Jolly good!".mermaid 
 
 ```js
 // 我是代码
@@ -78,18 +92,3 @@ model.fit(xs, ys, {epochs: 100}).then(() => {
 ```
      
                 
-
-我是mermaid**流程图表** 
-
-
-"sequenceDiagram
-    participant Alice
-    participant Bob
-    Alice->>John: Hello John, how are you?
-    loop Healthcheck
-        John->>John: Fight against hypochondria
-    end
-    Note right of John: Rational thoughts <br/>prevail!
-    John-->>Alice: Great!
-    John->>Bob: How about you?
-    Bob-->>John: Jolly good!".mermaid 

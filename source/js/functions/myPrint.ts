@@ -1,4 +1,5 @@
-import kit from "https://npm.elemecdn.com/bigonion-kit@0.11.0/esm/esm-kit.mjs";
+import { allInit, fillInRemeText, kit, mdConverter } from "../index.js"
+
 
 export function myPrint() {
   let printString = document.getElementById("view-area")!.innerHTML;
