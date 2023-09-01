@@ -1,7 +1,7 @@
-import { allInit, fillInRemeText, kit, mdConverter } from "../index.js"
+import { allInit, fillInRemeText, kit, mdConverter } from "@Root/js/index.js"
 
 
-export function myPrint() {
+export default function myPrint() {
   let printString = document.getElementById("view-area")!.innerHTML;
   console.log(printString);
   window.document.body.innerHTML = `<div class="markdown-body">${printString}</div>`;

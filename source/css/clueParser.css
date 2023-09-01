@@ -86,7 +86,7 @@ code {
   align-items: center;
 }
 
-.GRID4 p{
+.GRID4 p {
   display: grid;
   grid-template-columns: repeat(2, auto);
   grid-gap: 20px;
@@ -94,7 +94,7 @@ code {
   align-items: center;
   justify-items: center;
 }
-.GRID2 p{
+.GRID2 p {
   display: grid !important;
   grid-template-columns: repeat(2, auto);
   grid-gap: 20px;
@@ -128,10 +128,18 @@ code {
   list-style: none;
 }
 
-.RIGHT{
-    float: right;
-    width: 100%;
+.NOA a {
+  text-decoration: none;
+  color: inherit;
 }
-.RIGHT p{
-    float: right;
+.NOA {
+  text-decoration: none;
+  color: inherit;
+}
+.RIGHT {
+  float: right;
+  width: 100%;
+}
+.RIGHT p {
+  float: right;
 }

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "这是一个在线 markdown 渲染的网页\r 可以帮助你实时渲染 markdown",
   "scripts": {
-    "dev": "yarn vite",
+    "dev": "yarn vite --open",
     "build": "yarn vite build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,8 +19,14 @@
   },
   "homepage": "https://github.com/LiWeny16/MarkdownOnline#readme",
   "dependencies": {
+    "@arco-design/web-react": "^2.51.2",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.3",
+    "@mui/material": "^5.14.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.15.0",
     "string-replace-async": "^3.0.2"
   },
   "devDependencies": {

@@ -53,8 +53,8 @@
     <!-- *********外*********部*********资*********源*********区********* -->
     
     <!-- https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown.css -->
-    <script type="module" crossorigin src="/static/index-6296734a.js"></script>
-    <link rel="stylesheet" href="/58ba354e.index.css">
+    <script type="module" crossorigin src="./static/index-f96eefdf.js"></script>
+    <link rel="stylesheet" href="./cecb6b57.index.css">
   </head>
   <style>
     * {
@@ -66,35 +66,13 @@
     }
   </style>
 
-  <body>
+  <body style="overflow: hidden;">
     <h1 style="display: none">
       markdown在线编辑,html在线展示,方便调试与快速实现目标效果,支持markdown基础语法。
       预计新增:LATEX拓展语法和PDF导出
     </h1>
     <div id="topBox">
-      <div id="header">
-        <div id="headerInner">
-          <div id="headerLeft">
-            <a class="noStylelabel" href="https://md.bigonion.cn/">
-              <p2 class="headerP">Markdown+ Online View</p2>
-            </a>
-          </div>
-          <div id="headerRight">
-            <a class="rightComponents noStylelabel" href="https://bigonion.cn">
-              <p2 class="headerP">首页</p2>
-            </a>
-            <a id="showAbout" class="rightComponents noStylelabel" href="#">
-              <p2 class="headerP">关于</p2>
-            </a>
-            <a class="rightComponents noStylelabel" href="#">
-              <p2 class="headerP">⚙</p2>
-            </a>
-            <div class="rightComponents" id="pdfButtonBox">
-              <button id="pdfButton">导出</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <div id="root"></div>
       <div id="editor">
         <textarea placeholder="" spellcheck="false" id="md-area"></textarea>
         <!-- 键盘每次点击实时调用 -->

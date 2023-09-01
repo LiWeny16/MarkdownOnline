@@ -3,6 +3,7 @@ import viteCompression from "vite-plugin-compression"
 import react from "@vitejs/plugin-react"
 import { resolve } from "path"
 export default defineConfig({
+  base:"./",
   build: {
     rollupOptions: {
       // 配置rollup的一些构建策略
@@ -18,8 +19,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      mermaid: "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs",
-      "@Asset": resolve(__dirname, "./source/assets")
+      // mermaid: "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs",
+      "@Asset": resolve(__dirname, "./source/assets"),
+      "@App":resolve(__dirname,"./source/js/functions/App/"),
+      "@Root":resolve(__dirname,"./source/"),
+      "@Com":resolve(__dirname,"./source/js/React/Components"),
     }
   },
   plugins: [

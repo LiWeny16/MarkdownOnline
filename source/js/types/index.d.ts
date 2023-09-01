@@ -20,16 +20,35 @@ declare module "kit" {
   export default kit
 }
 
+declare module "@App/myPrint" {
+  const myPrint :any
+  export default myPrint
+}
+
 declare module "*index.js" {
   const allInit: any
   const fillInRemeText: any
   const kit: any
+  const enObj: any
   const mdConverter: any
-  const replaceSelection:(e:any,any,any)=>string
-  const insertTextAtCursor:any
-  export { allInit, fillInRemeText, kit, mdConverter,replaceSelection,insertTextAtCursor }
+  const replaceSelection: (e: any, any, any) => string
+  const insertTextAtCursor: any
+  export {
+    allInit,
+    fillInRemeText,
+    kit,
+    enObj,
+    mdConverter,
+    replaceSelection,
+    insertTextAtCursor
+  }
 }
 
 declare interface Window {
   clipboardData: any
+}
+
+interface Window {
+  theme: string
+  location:any
 }

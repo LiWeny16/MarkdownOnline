@@ -8,8 +8,7 @@ import kit from "https://npm.elemecdn.com/bigonion-kit@0.11.0/esm/esm-kit.mjs"
 // import hljs from "https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"
 import hljs from "https://npm.elemecdn.com/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js"
 import replaceAsync from "string-replace-async"
-
-import { myPrint } from "./functions/myPrint"
+import "@App/db.js"
 
 import "../css/index.less"
 // import "https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
@@ -18,10 +17,10 @@ import "../css/index.less"
  * @type {Boolean}
  */
 export { kit }
-const enObj = {
+export const enObj = {
   //基础事件
   enMainConverter: true,
-  enAboutBox: true,
+  enAboutBox: false,
   enPdfExport: true,
   //拓展事件
   enFastKey: true, //快捷键
@@ -412,7 +411,7 @@ function blankTextInit() {
 }
 
 function exportToPdfEvent() {
-  document.getElementById("pdfButton").addEventListener("click", () => {
-    myPrint()
-  })
+  // document.getElementById("pdfButton").addEventListener("click", () => {
+  //   myPrint()
+  // })
 }

@@ -1,4 +1,4 @@
-import { allInit, fillInRemeText, kit, mdConverter } from "../index.js"
+import { allInit, fillInRemeText, kit, mdConverter } from "@Root/js/index.js"
 
 export default function dragFileEvent() {
   let dragBox = (document.getElementById("md-area") as HTMLInputElement) || null
