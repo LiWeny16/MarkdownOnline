@@ -20,7 +20,7 @@ export { kit }
 export const enObj = {
   //基础事件
   enMainConverter: true,
-  enAboutBox: false,
+  enAboutBox: true,
   enPdfExport: true,
   //拓展事件
   enFastKey: true, //快捷键
@@ -52,7 +52,7 @@ export function allInit() {
     : console.log("converter if off") //按下写字板触发事件
   enObj.enPdfExport ? exportToPdfEvent() : console.log("pdf export is off") //导出PDF
   enObj.enDragFile ? dragFileEvent() : console.log("dragFile is off") //开启拖拽事件
-  enObj.enAboutBox ? aboutBox() : console.log("aboutBox is off")
+  // enObj.enAboutBox ? aboutBox() : console.log("aboutBox is off")
   enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is off") //开启快捷键事件
   enObj.enPasteEvent ? pasteEvent() : console.log("Paste Event is off") //开启快捷键事件
 }

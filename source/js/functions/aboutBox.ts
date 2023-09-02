@@ -26,8 +26,5 @@ export default () => {
       document.getElementById("aboutBox")!.style.display = "none"
     }
   })
-  document.getElementById("showAbout")!.addEventListener("click", () => {
-    document.getElementById("aboutBox")!.style.display = "block"
-    document.body.style.background = "#00000066"
-  })
+  document.getElementById("aboutBox")!.style.display = "block"
 }

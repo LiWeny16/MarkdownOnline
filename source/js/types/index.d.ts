@@ -25,6 +25,10 @@ declare module "@App/myPrint" {
   export default myPrint
 }
 
+declare module "@Root/js/functions/aboutBox" {
+  const aboutBox :any
+  export default aboutBox
+}
 declare module "*index.js" {
   const allInit: any
   const fillInRemeText: any

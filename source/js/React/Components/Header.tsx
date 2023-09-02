@@ -32,7 +32,7 @@ import Paper from "@mui/material/Paper"
 import { kit, enObj } from "@Root/js/index.js"
 import MyButton from "./myCom/CustomButton.tsx"
 import myPrint from "@App/myPrint"
-
+import aboutBox from "@Root/js/functions/aboutBox"
 // import Alert from "@mui/material/Alert"
 // Arco-Design
 // import { Message } from '@arco-design/web-react';
@@ -140,7 +140,11 @@ export default function DrawerAppBar(props: Props) {
           </ListItem>
 
           <ListItem>
-            <ListItemButton>
+            <ListItemButton
+              onClick={() => {
+                enObj.enAboutBox ? aboutBox() : undefined
+              }}
+            >
               <ListItemAvatar>
                 <Avatar>
                   <InfoIcon />
@@ -194,12 +198,13 @@ export default function DrawerAppBar(props: Props) {
             </MyButton>
             <MyButton
               onClick={() => {
-                Message.info({
-                  content: "此功能仍然在开发中",
-                  closable: true,
-                  duration: 3000,
-                  position: "bottom"
-                })
+                enObj.enAboutBox ? aboutBox() : undefined
+                // Message.info({
+                //   content: "此功能仍然在开发中",
+                //   closable: true,
+                //   duration: 3000,
+                //   position: "bottom"
+                // })
               }}
               startIcon={<HelpOutlineIcon />}
             >
