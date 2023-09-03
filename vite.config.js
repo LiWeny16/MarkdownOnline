@@ -26,6 +26,9 @@ export default defineConfig({
       "@Com":resolve(__dirname,"./source/js/React/Components"),
     }
   },
+  server:{
+    host:"0.0.0.0",
+  },
   plugins: [
     // ...
     viteCompression({

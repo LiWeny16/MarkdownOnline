@@ -31,7 +31,10 @@ export const enObj = {
   enPasteEvent: true
 }
 window.onload = () => {
-  allInit()
+  // 等待React 渲染完成
+  kit.sleep(300).then(()=>{
+    allInit()
+  })
 }
 /**
  * @description 初始化配置和事件初始化
