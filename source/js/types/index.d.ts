@@ -1,3 +1,14 @@
+type EnObjType = {
+  enMainConverter: boolean
+  enAboutBox: boolean
+  enPdfExport: boolean
+  enFastKey: boolean
+  enScript: boolean
+  enHilightJs: boolean
+  enClue: boolean
+  enDragFile: boolean
+  enPasteEvent: boolean
+}
 declare module "*.svg" {
   const src: any
   export default src
@@ -20,20 +31,19 @@ declare module "kit" {
   export default kit
 }
 
-declare module "@App/myPrint" {
-  const myPrint :any
-  export default myPrint
-}
-
 declare module "@Root/js/functions/aboutBox" {
-  const aboutBox :any
+  const aboutBox: any
+  export default aboutBox
+}
+declare module "@Root/js/functions/fastKey" {
+  const aboutBox: any
   export default aboutBox
 }
 declare module "*index.js" {
   const allInit: any
   const fillInRemeText: any
   const kit: any
-  const enObj: any
+  const enObj: EnObjType
   const mdConverter: any
   const replaceSelection: (e: any, any, any) => string
   const insertTextAtCursor: any
@@ -54,5 +64,5 @@ declare interface Window {
 
 interface Window {
   theme: string
-  location:any
+  location: any
 }

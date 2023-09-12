@@ -55,6 +55,7 @@ export default function CustomizedButtons(props: any) {
     // </BootstrapButton>
     <ColorButton
       id="demo-customized-button"
+      href={props.href ? props.href : undefined}
       aria-controls={props.open ? "demo-customized-menu" : undefined}
       aria-haspopup="true"
       aria-expanded={props.open ? "true" : undefined}

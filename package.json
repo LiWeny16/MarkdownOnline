@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "description": "这是一个在线 markdown 渲染的网页\r 可以帮助你实时渲染 markdown",
   "scripts": {
-    "dev": "yarn vite --open",
-    "build": "yarn vite build",
+    "dev": " yarn vite --open ",
+    "build": "tsc && yarn vite build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -26,14 +26,16 @@
     "@mui/material": "^5.14.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-photo-view": "^1.2.3",
     "react-router-dom": "^6.15.0",
+    "react-zmage": "^0.8.5-beta.36",
     "string-replace-async": "^3.0.2"
   },
   "devDependencies": {
     "@types/react": "^18.2.12",
     "@types/react-dom": "^18.2.5",
     "@vitejs/plugin-react": "^4.0.0",
-    "less": "^4.1.3",
+    "less": "^4.2.0",
     "typescript": "^5.1.3",
     "vite": "^4.3.9",
     "vite-plugin-compression": "^0.5.1"

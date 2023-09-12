@@ -24,13 +24,13 @@ import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
 import { grey, lime, purple } from "@mui/material/colors"
-import Menu from "./Mui/Menu.tsx"
+import Menu from "./SubHeader/Menu.tsx"
 import HomeIcon from "@mui/icons-material/Home"
 import Stack from "@mui/material/"
 import { alpha, styled } from "@mui/material/styles"
 import Paper from "@mui/material/Paper"
 import { kit, enObj } from "@Root/js/index.js"
-import MyButton from "./myCom/CustomButton.tsx"
+import MyButton from "../Components/myCom/CustomButton.tsx"
 import myPrint from "@App/myPrint"
 import aboutBox from "@Root/js/functions/aboutBox"
 // import Alert from "@mui/material/Alert"
@@ -159,7 +159,7 @@ export default function DrawerAppBar(props: Props) {
   )
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", position: "relative", zIndex: 1 }}>
       <CssBaseline />
       <AppBar
         component="nav"
@@ -193,7 +193,7 @@ export default function DrawerAppBar(props: Props) {
             Markdown+ Online View
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
-            <MyButton startIcon={<LinkIcon />} onClick={handleHomeClick}>
+            <MyButton href="https://bigonion.cn" startIcon={<LinkIcon />}>
               首页
             </MyButton>
             <MyButton

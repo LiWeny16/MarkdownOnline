@@ -5,25 +5,42 @@
     "module": "esnext",
     "target": "ES2020",
     "skipLibCheck": true,
+    "baseUrl": "./",
     // 开启严格模式，这使得对“this”的数据属性进行更严格的推断成为可能
     "strict": true,
+    "declaration": true,
+    // "emitDeclarationOnly": true,
+    // "declarationDir": "allTypes",
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "paths": {
+      "@Asset": ["./source/assets"],
+      "@Asset/*": ["./source/assets/*"],
+      "@App": ["./source/js/functions/App/"],
+      "@App/*": ["./source/js/functions/App/*"],
+      "@Root":["./source/"],
+      "@Root/*":["./source/*"],
+      "@Com":["./source/js/React/Components"],
+      "@Com/*":["./source/js/React/Components/*"]
+    }
+    // "outDir": "./"
   },
 
   // 配置需要校验的文件
   "include": [
     "src/**/*.ts",
-    "src/**/*.vue",
     "source/js/types/*.d.ts",
-    "source"
+    "source",
+    "source/functions/*.ts"
+
+    // "allTypes/*.d.ts",
   ],
 
   // 排除不需要 TypeScript 校验的文件
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "docs"]
 }

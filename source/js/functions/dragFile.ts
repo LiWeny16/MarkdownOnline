@@ -1,4 +1,5 @@
-import { allInit, fillInRemeText, kit, mdConverter } from "@Root/js/index.js"
+import { allInit, kit, mdConverter } from "@Root/js/index.js"
+import blankTextInit from "./Init/blankTextInit"
 
 export default function dragFileEvent() {
   let dragBox = (document.getElementById("md-area") as HTMLInputElement) || null
@@ -64,7 +65,9 @@ export default function dragFileEvent() {
         }
         kit.sleep(2000).then(() => {
           dragBox.style.color = ""
-          fillInRemeText()
+          blankTextInit().then(() => {
+            mdConverter()
+          })
         })
       } else {
         fileReader.onload = function () {

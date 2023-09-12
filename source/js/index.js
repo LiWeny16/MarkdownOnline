@@ -7,16 +7,20 @@ import mermaid from "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mj
 import kit from "https://npm.elemecdn.com/bigonion-kit@0.11.0/esm/esm-kit.mjs"
 // import hljs from "https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"
 import hljs from "https://npm.elemecdn.com/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js"
+import "https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.js"
+// import {katex} from "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"
 import replaceAsync from "string-replace-async"
-import "@App/db.js"
-
+import getMdText from "@App/text/getMdText"
+import blankTextInit from "@Root/js/functions/Init/blankTextInit"
+import { fillInMemoryImg, readMemoryImg } from "@App/textMemory/memory"
 import "../css/index.less"
+
 // import "https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
 /**
  * @description 拓展使能配置
  * @type {Boolean}
  */
-export { kit }
+export { kit, marked, hljs }
 export const enObj = {
   //基础事件
   enMainConverter: true,
@@ -28,11 +32,12 @@ export const enObj = {
   enHilightJs: true, //高亮代码
   enClue: true, //clueCSS写法
   enDragFile: true, //拖拽外部markdown
-  enPasteEvent: true
+  enPasteEvent: true, //粘贴事件
+  enVirtualFileSystem: true
 }
 window.onload = () => {
   // 等待React 渲染完成
-  kit.sleep(300).then(()=>{
+  kit.sleep(300).then(() => {
     allInit()
   })
 }
@@ -46,17 +51,20 @@ export function allInit() {
   settings.settingsAllInit()
 
   /**@description Input Area Init*/
-  blankTextInit() //初始化输入区域
-  mdConverter()
+  blankTextInit().then(() => {
+    mdConverter()
+    // kit.sleep(300).then(()=>{
+    // })
+  }) //初始化输入区域
 
   /***@description All Events */
   enObj.enMainConverter
     ? triggerConverterEvent()
     : console.log("converter if off") //按下写字板触发事件
-  enObj.enPdfExport ? exportToPdfEvent() : console.log("pdf export is off") //导出PDF
+  // enObj.enPdfExport ? exportToPdfEvent() : console.log("pdf export is off") //导出PDF
   enObj.enDragFile ? dragFileEvent() : console.log("dragFile is off") //开启拖拽事件
   // enObj.enAboutBox ? aboutBox() : console.log("aboutBox is off")
-  enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is off") //开启快捷键事件
+  // enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is off") //开启快捷键事件
   enObj.enPasteEvent ? pasteEvent() : console.log("Paste Event is off") //开启快捷键事件
 }
 
@@ -65,15 +73,18 @@ export function allInit() {
  * @param {boolean} save
  */
 export async function mdConverter(save = true) {
-  //按键触发，自动保存，主函数
+  //按键触发，主函数
   let view = getMdText()
   enObj.enClue ? (view = await clueParser(view)) : console.log("clue off")
+  enObj.enVirtualFileSystem
+    ? (view = await virtualFileSystem(view))
+    : console.log("VFS off")
   view = await latexParse2(view)
   view = await latexParse(view)
   view = markedParse(view)
   enObj.enScript ? enableScript(view) : console.log("fast scripts off")
   preViewText(view)
-  save ? restoreText() : 1
+  // save ? restoreText() : 1
   enObj.enHilightJs ? hljs.highlightAll() : console.log("hilight off")
 }
 /**
@@ -108,7 +119,25 @@ class settingsClass {
     return new this()
   }
 }
-
+/**
+ * @description VFS
+ */
+function virtualFileSystem(md) {
+  return new Promise((resolve) => {
+    const reg1 = /\!\[我是图片\]\(\/vf.*?\)/g //全部的
+    const reg2 = /\d+/g
+    if (md.match(reg1)) {
+      md.replace(reg1, (e) => {
+        console.log(parseInt(e.match(reg2)[0]));
+        readMemoryImg("imgBase64", parseInt(e.match(reg2)[0]))
+        return 
+      })
+      // let indexName = full.match()
+      // console.log(md.match(reg1))
+    }
+    resolve(md)
+  })
+}
 /**
  * @description clue CSS HTML
  * @param {string} md
@@ -278,30 +307,30 @@ function writeMdText(text) {
   document.getElementById("md-area").value = text
 }
 
-function getMdText() {
-  return document.getElementById("md-area").value
-}
+// function getMdText() {
+//   return document.getElementById("md-area").value
+// }
 function preViewText(text) {
   document.getElementById("view-area").innerHTML = text
 }
 
-function getRememberText() {
-  let text = kit.getCookie("contentText").replace(/\<\? br \?\>/g, "\n")
-  text = text.replace(/\<\? semicolon \?\>/g, ";")
-  return text
-}
-function restoreText() {
-  let md = getMdText()
-  md = md.replace(/\n/g, "<? br ?>")
-  md = md.replace(/\;/g, "<? semicolon ?>")
-  kit.setCookie("contentText", md, 30, "/", "md.bigonion.cn")
-  kit.setCookie("contentText", md, 30, "/", "127.0.0.1")
-}
-export function fillInRemeText() {
-  let text = getRememberText()
-  writeMdText(text)
-  return text
-}
+// function getRememberText() {
+//   let text = kit.getCookie("contentText").replace(/\<\? br \?\>/g, "\n")
+//   text = text.replace(/\<\? semicolon \?\>/g, ";")
+//   return text
+// }
+// function restoreText() {
+//   let md = getMdText()
+//   md = md.replace(/\n/g, "<? br ?>")
+//   md = md.replace(/\;/g, "<? semicolon ?>")
+//   kit.setCookie("contentText", md, 30, "/", "md.bigonion.cn")
+//   kit.setCookie("contentText", md, 30, "/", "127.0.0.1")
+// }
+// export function fillInRemeText() {
+//   let text = getRememberText()
+//   writeMdText(text)
+//   return text
+// }
 function getRegIndex(text, regex) {
   // const text = '$匹配我$ $匹配我$ 不要匹配我 $匹配我$'
   // const regex = /\$(.*?)\$/g
@@ -311,22 +340,26 @@ function getRegIndex(text, regex) {
 // print 函数
 
 // 快捷键
-/**
- * @description 使能快捷键
- */
-function enableFastKeyEvent() {
-  document.addEventListener("keydown", (e) => {
-    e.stopPropagation()
-    // Ctrl + B 黑体
-    let editor = document.getElementById("md-area")
-    if (e.ctrlKey && e.key == "b") {
-      replaceSelection(editor, "**", "**")
-    }
-    if (e.key == "c" && e.altKey) {
-      replaceSelection(editor, "<center>", "</center>")
-    }
-  })
-}
+// /**
+//  * @description 使能快捷键
+//  */
+// function enableFastKeyEvent() {
+//   document.addEventListener("keydown", (e) => {
+//     e.stopPropagation()//停止冒泡，向上传递事件
+//     // Ctrl + B 黑体
+//     let editor = document.getElementById("md-area")
+//     if (e.ctrlKey && e.key == "b") {
+//       replaceSelection(editor, "**", "**")
+//     }
+//     if (e.key == "c" && e.altKey) {
+//       replaceSelection(editor, "<center>", "</center>")
+//     }
+//     if(e.ctrlKey && e.key=="s" ){
+//       e.preventDefault()
+//       console.log(e);
+//     }
+//   })
+// }
 /**
  * @description 使能脚本注入
  */
@@ -340,49 +373,49 @@ function enableScript(md) {
   }
 }
 
-/**
- * @description 替换选中文本
- * @param e HTMLelement
- * @param leftStr String
- * @param rightStr String
- */
-export function replaceSelection(e, leftStr, rightStr) {
-  var start = e.selectionStart
-  var end = e.selectionEnd
-  console.log(start, end)
-  if (start == end) {
-    return ""
-  } else {
-    temp =
-      e.value.substr(0, start) +
-      leftStr +
-      e.value.substring(start, end) +
-      rightStr +
-      e.value.substring(end, e.value.length)
-    e.value = temp
-    console.log(e.value.substring(start, end))
-    console.log(e.value.substring(start, end).length)
-    // 移动光标
-    e.setSelectionRange(start, end + leftStr.length + rightStr.length)
-  }
-}
-/**
- * @description 插入文本
- */
-export function insertTextAtCursor(textElement,textToInsert) {
-  const startPos = textElement.selectionStart
-  const endPos = textElement.selectionEnd
+// /**
+//  * @description 替换选中文本
+//  * @param e HTMLelement
+//  * @param leftStr String
+//  * @param rightStr String
+//  */
+// export function replaceSelection(e, leftStr, rightStr) {
+//   var start = e.selectionStart
+//   var end = e.selectionEnd
+//   // console.log(start, end)
+//   if (start == end) {
+//     return ""
+//   } else {
+//     let temp =
+//       e.value.substr(0, start) +
+//       leftStr +
+//       e.value.substring(start, end) +
+//       rightStr +
+//       e.value.substring(end, e.value.length)
+//     e.value = temp
+//     // console.log(e.value.substring(start, end))
+//     // console.log(e.value.substring(start, end).length)
+//     // 移动光标
+//     e.setSelectionRange(start, end + leftStr.length + rightStr.length)
+//   }
+// }
+// /**
+//  * @description 插入文本
+//  */
+// export function insertTextAtCursor(textElement, textToInsert) {
+//   const startPos = textElement.selectionStart
+//   const endPos = textElement.selectionEnd
 
-  textElement.value =
-    textElement.value.substring(0, startPos) +
-    textToInsert +
-    textElement.value.substring(endPos)
+//   textElement.value =
+//     textElement.value.substring(0, startPos) +
+//     textToInsert +
+//     textElement.value.substring(endPos)
 
-  textElement.selectionStart = startPos + textToInsert.length
-  textElement.selectionEnd = startPos + textToInsert.length
+//   textElement.selectionStart = startPos + textToInsert.length
+//   textElement.selectionEnd = startPos + textToInsert.length
 
-  textElement.focus()
-}
+//   textElement.focus()
+// }
 /**
  * @description 倒序
  * @params string
@@ -403,18 +436,24 @@ function triggerConverterEvent() {
 /**
  * @description 初始化写字板
  */
-function blankTextInit() {
-  if (kit.getCookie("contentText")) {
-    //有cookie
-    fillInRemeText()
-  } else {
-    //否则显示教程
-    writeMdText(welcomeText)
-  }
-}
-
-function exportToPdfEvent() {
-  // document.getElementById("pdfButton").addEventListener("click", () => {
-  //   myPrint()
-  // })
-}
+// function blankTextInit() {
+//   openDB("md_content", 2).then((db) => {
+//     let initData = {
+//       uuid: new Date().getTime(),
+//       contentText: getMdText()
+//     }
+//     // addData(db, "users", data)
+//     // getDataByKey(db, "users", 1691843289748)
+//     // updateDB(db, "users", data)
+//     cursorGetData(db, "users")
+//     getDataByIndex(db, "users", "contentText", "123")
+//     // cursorGetDataByIndex(db, "users", "uuid", 2)
+//   })
+//   if (kit.getCookie("contentText")) {
+//     //有cookie
+//     fillInRemeText()
+//   } else {
+//     //否则显示教程
+//     writeMdText(welcomeText)
+//   }
+// }

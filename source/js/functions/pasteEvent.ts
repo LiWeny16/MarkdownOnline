@@ -1,11 +1,18 @@
-import { allInit, fillInRemeText, kit, mdConverter,replaceSelection,insertTextAtCursor } from "../index.js"
+// import { allInit, kit, mdConverter } from "../index.js"
 
-export default function pasteEvent (){
-  document.getElementById('md-area')!.addEventListener('paste', (e) => {
-    pic2base64(e).then((base64:unknown)=>{
+import insertTextAtCursor from "@App/text/insertTextAtCursor"
+import { fillInMemoryImg, readMemoryImg } from "@App/textMemory/memory"
+
+export default function pasteEvent() {
+  document.getElementById("md-area")!.addEventListener("paste", (e) => {
+    pic2base64(e).then((base64: any) => {
+      if (base64) {
+        let timeStamp = new Date().getTime()
+        let insertImg = `![我是图片](/vf/${timeStamp})`
+        fillInMemoryImg(base64,timeStamp)
+        insertTextAtCursor(document.getElementById("md-area")!, insertImg)
+      }
       // console.log(base64);
-      let insertImg = `![我是图片](${base64})`
-      insertTextAtCursor(document.getElementById('md-area')!,insertImg)
     })
   })
 }
@@ -13,11 +20,10 @@ export default function pasteEvent (){
 function pic2base64(e: ClipboardEvent) {
   return new Promise((resolve) => {
     e.stopPropagation()
-    console.log(e);
     // e.preventDefault();
     // 阻止粘贴
     // 获取剪贴板信息
-    var clipboardData = (e.clipboardData || window.clipboardData);  
+    var clipboardData = e.clipboardData || window.clipboardData
     var items = clipboardData.items
     for (var i = 0; i < items.length; i++) {
       var item = items[i]
@@ -33,9 +39,8 @@ function pic2base64(e: ClipboardEvent) {
         reader.readAsDataURL(pasteFile)
         break
       } else {
-        resolve(0)
+        resolve("")
       }
     }
   })
 }
-

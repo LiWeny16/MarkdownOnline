@@ -9,11 +9,11 @@ import ArchiveIcon from "@mui/icons-material/Archive"
 import FileCopyIcon from "@mui/icons-material/FileCopy"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
-import MyButton from "../myCom/CustomButton"
+import MyButton from "../../Components/myCom/CustomButton"
 import myPrint from "@App/myPrint"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { Message } from "@arco-design/web-react"
-
+import ImageManager from "./ImageManager"
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
     elevation={0}
@@ -56,6 +56,7 @@ const StyledMenu = styled((props: MenuProps) => (
 
 export default function CustomizedMenus() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const [imgManagerState, setImgManagerState] = React.useState<boolean>(false)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -66,7 +67,16 @@ export default function CustomizedMenus() {
   const handleExport = () => {
     myPrint()
   }
-
+  const handleImageManager = () => {
+    handleClose()
+    Message.info({
+      content: "此功能仍然在开发中",
+      closable: true,
+      duration: 3000,
+      position: "bottom"
+    })
+    setImgManagerState(true)
+  }
   return (
     <div>
       <MyButton
@@ -88,20 +98,10 @@ export default function CustomizedMenus() {
         open={open}
         onClose={handleClose}
       >
-        <MenuItem
-          onClick={() => {
-            handleClose()
-            Message.info({
-              content: "此功能仍然在开发中",
-              closable: true,
-              duration: 3000,
-              position: "bottom"
-            })
-          }}
-          disableRipple
-        >
+        <MenuItem onClick={handleImageManager} disableRipple>
           <EditIcon />
           图片管理器
+          {/* {imgManagerState ? <ImageManager /> : undefined} */}
         </MenuItem>
         <MenuItem onClick={handleExport} disableRipple>
           <FileCopyIcon />
