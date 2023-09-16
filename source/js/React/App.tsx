@@ -7,14 +7,19 @@ import Header from "./SubComponents/Header"
 // import DragBox from "./Components/myCom/DragBox"
 import "@arco-design/web-react/dist/css/arco.css"
 import Body from "./SubComponents/Body"
+import { observer } from "mobx-react"
+import { useImage } from './Store/Image'
 // import { Button } from "@mui/material"
-function App() {
+const App = observer(() => {
+  const image = useImage()
+  console.log(image.displayState)
   return (
     <>
-      <Header></Header>
-      <Body></Body>
+      <Header/>
+      <Body/>
+      {/* 放到这里作为顶层 */}
     </>
   )
-}
+})
 
 export default App

@@ -25,6 +25,7 @@ import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
 import { grey, lime, purple } from "@mui/material/colors"
 import Menu from "./SubHeader/Menu.tsx"
+import ImageManger from "./SubHeader/ImageManager.tsx"
 import HomeIcon from "@mui/icons-material/Home"
 import Stack from "@mui/material/"
 import { alpha, styled } from "@mui/material/styles"
@@ -37,6 +38,8 @@ import aboutBox from "@Root/js/functions/aboutBox"
 // Arco-Design
 // import { Message } from '@arco-design/web-react';
 import { Message } from "@arco-design/web-react"
+import { useImage } from '../Store/Image.ts'
+import { observer } from "mobx-react"
 
 interface Props {
   /**
@@ -67,8 +70,9 @@ const theme = createTheme({
 const drawerWidth = 240
 // const navItems = ["Home", "About3", "Contact"]
 
-export default function DrawerAppBar(props: Props) {
+const DrawerAppBar = observer((props: Props) => {
   const { window } = props
+  const image  = useImage()
   const [mobileOpen, setMobileOpen] = React.useState(false)
 
   const handleDrawerToggle = () => {
@@ -193,6 +197,14 @@ export default function DrawerAppBar(props: Props) {
             Markdown+ Online View
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
+            <button onClick={() => {
+              image.display()
+              alert(image.displayState)
+            }} style={{backgroundColor: 'red'}}>显示{image.displayState+'1111'}111</button>
+             <button onClick={() => {
+              image.hidden()
+              alert(image.displayState)
+}} style={{backgroundColor: 'red'}}>隐藏</button>
             <MyButton href="https://bigonion.cn" startIcon={<LinkIcon />}>
               首页
             </MyButton>
@@ -213,6 +225,7 @@ export default function DrawerAppBar(props: Props) {
           </Box>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
             <Menu></Menu>
+            <ImageManger/>
           </Box>
         </Toolbar>
       </AppBar>
@@ -241,4 +254,5 @@ export default function DrawerAppBar(props: Props) {
       </Box>
     </Box>
   )
-}
+})
+export default DrawerAppBar

@@ -24,6 +24,7 @@ export default defineConfig({
       "@App":resolve(__dirname,"./source/js/functions/App/"),
       "@Root":resolve(__dirname,"./source/"),
       "@Com":resolve(__dirname,"./source/js/React/Components"),
+      "@Store":resolve(__dirname,"./source/js/React/Store"),
     }
   },
   server:{
