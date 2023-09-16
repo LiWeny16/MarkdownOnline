@@ -13,11 +13,11 @@ import MyButton from "../../Components/myCom/CustomButton"
 import myPrint from "@App/myPrint"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { Message } from "@arco-design/web-react"
-import ImageManager from "./ImageManager"
+// import ImageManager from "./ImageManager"
 import save, { isSaved } from "@App/save"
 import { Modal } from "@arco-design/web-react"
 import { kit } from "@Root/js/index.js"
-import { useImage } from '../../Store/Image'
+import { useImage } from "@Mobx/Image"
 import { observer } from "mobx-react"
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
@@ -62,7 +62,6 @@ const StyledMenu = styled((props: MenuProps) => (
 const CustomizedMenus = observer(() => {
   const image = useImage()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-  const [imgManagerState, setImgManagerState] = React.useState<boolean>(false)
   const [modalState, setModalState] = React.useState<boolean>(false)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -80,16 +79,9 @@ const CustomizedMenus = observer(() => {
     }
   }
   const handleImageManager = () => {
-    console.log(image.displayState)
+    // console.log(image.displayState)
     image.display()
     handleClose()
-    Message.info({
-      content: "此功能仍然在开发中"+image.displayState,
-      closable: true,
-      duration: 3000,
-      position: "bottom"
-    })
-    setImgManagerState(true)
     // 点击这个的时候 传递一个信号给另一个抽屉组件
   }
   return (
@@ -112,13 +104,10 @@ const CustomizedMenus = observer(() => {
         autoFocus={false}
         focusLock={true}
       >
-        <p>
-          <center>
-            <b>您还未保存，确定要导出吗？</b>
-            {<br />}
-            (确定将会自动保存并导出)
-          </center>
-        </p>
+        <div className="FLEX JUS-CENTER">
+          <b>您还未保存，确定要导出吗？</b>
+          (确定将会自动保存并导出)
+        </div>
       </Modal>
       <MyButton
         open={open}

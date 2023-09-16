@@ -38,7 +38,7 @@ import aboutBox from "@Func/Events/aboutBox.ts"
 // Arco-Design
 // import { Message } from '@arco-design/web-react';
 import { Message } from "@arco-design/web-react"
-import { useImage } from '../Store/Image.ts'
+import { useImage } from "@Root/js/React/Mobx/Image.ts"
 import { observer } from "mobx-react"
 
 interface Props {
@@ -72,7 +72,7 @@ const drawerWidth = 240
 
 const DrawerAppBar = observer((props: Props) => {
   const { window } = props
-  const image  = useImage()
+  const image = useImage()
   const [mobileOpen, setMobileOpen] = React.useState(false)
 
   const handleDrawerToggle = () => {
@@ -197,14 +197,24 @@ const DrawerAppBar = observer((props: Props) => {
             Markdown+ Online View
           </Typography>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
-            <button onClick={() => {
-              image.display()
-              alert(image.displayState)
-            }} style={{backgroundColor: 'red'}}>显示{image.displayState+'1111'}111</button>
-             <button onClick={() => {
-              image.hidden()
-              alert(image.displayState)
-}} style={{backgroundColor: 'red'}}>隐藏</button>
+            {/* <button
+              onClick={() => {
+                image.display()
+                alert(image.displayState)
+              }}
+              style={{ backgroundColor: "red" }}
+            >
+              显示{image.displayState + "1111"}111
+            </button>
+            <button
+              onClick={() => {
+                image.hidden()
+                alert(image.displayState)
+              }}
+              style={{ backgroundColor: "red" }}
+            >
+              隐藏
+            </button> */}
             <MyButton href="https://bigonion.cn" startIcon={<LinkIcon />}>
               首页
             </MyButton>
@@ -225,8 +235,8 @@ const DrawerAppBar = observer((props: Props) => {
           </Box>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
             <Menu />
-            <Menu></Menu>
-            <ImageManger/>
+            {/* <Menu></Menu> */}
+            <ImageManger />
           </Box>
         </Toolbar>
       </AppBar>

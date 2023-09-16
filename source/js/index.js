@@ -16,7 +16,7 @@ import { fillInMemoryImg, readMemoryImg } from "@App/textMemory/memory"
 import pageBreaker from "@Func/Parser/pageBreaker"
 import virtualFileSystem from "@Func/Parser/VFS"
 import "../css/index.less"
-
+import { Notification } from "@arco-design/web-react"
 // import "https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
 /**
  * @description 拓展使能配置
@@ -36,7 +36,7 @@ export const enObj = {
   enDragFile: true, //拖拽外部markdown
   enPasteEvent: true, //粘贴事件
   enVirtualFileSystem: true,
-  enPageBreaker:true
+  enPageBreaker: true
 }
 window.onload = () => {
   // 等待React 渲染完成
@@ -59,6 +59,25 @@ export function allInit() {
     // kit.sleep(300).then(()=>{
     // })
   }) //初始化输入区域
+  Notification.success({
+    title: "已更新到最新版本",
+    content: `当前版本:v1.0.0`,
+    position: "bottomRight"
+  })
+  kit.sleep(200).then(() => {
+    Notification.info({
+      title: "版本新增特性",
+      content: `图片管理器、PDF分页导出`,
+      position: "bottomRight"
+    })
+    kit.sleep(100).then(() => {
+      Notification.info({
+        title: "版本新增特性",
+        content: `修复巨量Bug`,
+        position: "bottomRight"
+      })
+    })
+  })
 
   /***@description All Events */
   enObj.enMainConverter
@@ -79,7 +98,9 @@ export async function mdConverter(save = true) {
   //按键触发，主函数
   let view = getMdText()
   enObj.enClue ? (view = await clueParser(view)) : console.log("clue off")
-  enObj.enPageBreaker ? (view = pageBreaker(view)) : console.log("page breaker off");
+  enObj.enPageBreaker
+    ? (view = pageBreaker(view))
+    : console.log("page breaker off")
   enObj.enVirtualFileSystem
     ? (view = await virtualFileSystem(view))
     : console.log("VFS off")

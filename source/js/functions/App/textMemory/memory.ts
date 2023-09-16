@@ -61,3 +61,16 @@ export async function readMemoryImg(
     })
   })
 }
+export async function readAllMemoryImg(
+): Promise<any> {
+  return new Promise((resolve) => {
+    openDB("md_content", 2).then((db: DB) => {
+      // cursorGetData(db, "users_img", processList)
+      cursorGetData(db, "users_img").then(
+        (list: Array<any>) => {
+          resolve(list)
+        }
+      )
+    })
+  })
+}

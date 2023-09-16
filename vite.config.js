@@ -25,7 +25,7 @@ export default defineConfig({
       "@Func":resolve(__dirname,"./source/js/functions"),
       "@Root":resolve(__dirname,"./source/"),
       "@Com":resolve(__dirname,"./source/js/React/Components"),
-      "@Store":resolve(__dirname,"./source/js/React/Store"),
+      "@Mobx":resolve(__dirname,"./source/js/React/Mobx"),
     }
   },
   server:{

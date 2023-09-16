@@ -35,7 +35,7 @@ export default (message = true) => {
 export async function isSaved() {
   return await readMemoryText().then((list) => {
     if (list) {
-      if (list[0].contentText === getMdText()) {
+      if (list[0]?.contentText === getMdText()) {
         // 已保存
         return true
       } else {

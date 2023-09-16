@@ -28,7 +28,9 @@
       "@Root": ["./source/"],
       "@Root/*": ["./source/*"],
       "@Com": ["./source/js/React/Components"],
-      "@Com/*": ["./source/js/React/Components/*"]
+      "@Com/*": ["./source/js/React/Components/*"],
+      "@Mobx":["source/js/React/Mobx"],
+      "@Mobx/*":["source/js/React/Mobx/*"],
     }
     // "outDir": "./"
   },

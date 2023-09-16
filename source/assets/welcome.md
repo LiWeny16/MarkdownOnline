@@ -45,6 +45,8 @@ $$
 
 ### 我是扩展语法
 
+我是分页器:|---|
+
 "![我是图片](http://bigonion.cn/background/wallheaven.jfif)
 ![我是图片](http://bigonion.cn/background/wallheaven.jfif)
 ![我是图片](http://bigonion.cn/background/wallheaven.jfif)
