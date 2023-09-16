@@ -22,19 +22,23 @@ export function fillInMemoryText(md: MD) {
     // cursorGetDataByIndex(db, "users", "uuid", 2)
   })
 }
-export async function readMemoryText(processList: Function): Promise<any> {
-  openDB("md_content", 2).then((db: DB) => {
-    // addData(db, "users", data)
-    // getDataByKey(db, "users", 1691843289748)
-    // updateDB(db, "users", data)
-    cursorGetData(db, "users_md", processList)
-    // getDataByIndex(db, "users", "contentText", "123")
-    // cursorGetDataByIndex(db, "users", "uuid", 2)
+export async function readMemoryText(): Promise<any> {
+  return new Promise((resolve) => {
+    openDB("md_content", 2).then((db: DB) => {
+      // addData(db, "users", data)
+      // getDataByKey(db, "users", 1691843289748)
+      // updateDB(db, "users", data)
+      cursorGetData(db, "users_md").then((list:Array<any>)=>{
+        resolve(list)
+      })
+      // getDataByIndex(db, "users", "contentText", "123")
+      // cursorGetDataByIndex(db, "users", "uuid", 2)
+    })
   })
 }
-export function fillInMemoryImg(base64: string | undefined, timeStamp: number) {
+export function fillInMemoryImg(base64: string, timeStamp: number) {
   openDB("md_content", 2).then((db: DB) => {
-    let data = {
+    let data: ImgData = {
       uuid: timeStamp,
       imgBase64: base64
     }
@@ -46,8 +50,14 @@ export async function readMemoryImg(
   indexName: any,
   indexValue: any
 ): Promise<any> {
-  openDB("md_content", 2).then((db: DB) => {
-    // cursorGetData(db, "users_img", processList)
-    cursorGetDataByIndex(db, "users_img", indexName, indexValue)
+  return new Promise((resolve) => {
+    openDB("md_content", 2).then((db: DB) => {
+      // cursorGetData(db, "users_img", processList)
+      cursorGetDataByIndex(db, "users_img", indexName, indexValue).then(
+        (list: Array<any>) => {
+          resolve(list)
+        }
+      )
+    })
   })
 }

@@ -14,6 +14,9 @@ import myPrint from "@App/myPrint"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { Message } from "@arco-design/web-react"
 import ImageManager from "./ImageManager"
+import save, { isSaved } from "@App/save"
+import { Modal } from "@arco-design/web-react"
+import { kit } from "@Root/js/index.js"
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
     elevation={0}
@@ -57,6 +60,7 @@ const StyledMenu = styled((props: MenuProps) => (
 export default function CustomizedMenus() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const [imgManagerState, setImgManagerState] = React.useState<boolean>(false)
+  const [modalState, setModalState] = React.useState<boolean>(false)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
@@ -64,8 +68,13 @@ export default function CustomizedMenus() {
   const handleClose = () => {
     setAnchorEl(null)
   }
-  const handleExport = () => {
-    myPrint()
+  const handleExport = async () => {
+    if (await isSaved()) {
+      myPrint()
+    } else {
+      handleClose()
+      setModalState(true)
+    }
   }
   const handleImageManager = () => {
     handleClose()
@@ -79,6 +88,32 @@ export default function CustomizedMenus() {
   }
   return (
     <div>
+      <Modal
+        title={
+          <>
+            <div className="ERR">注意!</div>
+          </>
+        }
+        visible={modalState}
+        onOk={() => {
+          setModalState(false)
+          save()
+          kit.sleep(1000).then(() => {
+            myPrint()
+          })
+        }}
+        onCancel={() => setModalState(false)}
+        autoFocus={false}
+        focusLock={true}
+      >
+        <p>
+          <center>
+            <b>您还未保存，确定要导出吗？</b>
+            {<br />}
+            (确定将会自动保存并导出)
+          </center>
+        </p>
+      </Modal>
       <MyButton
         open={open}
         endIcon={<MoreVertIcon />}

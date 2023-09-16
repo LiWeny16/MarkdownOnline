@@ -1,3 +1,8 @@
-type MD= string | undefined
+type MD = string
 
-type DB= any
+type DB = any
+
+interface ImgData {
+  uuid: number
+  imgBase64: string 
+}

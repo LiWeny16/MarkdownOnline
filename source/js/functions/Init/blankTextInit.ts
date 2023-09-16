@@ -17,15 +17,11 @@ import { allInit, kit, mdConverter } from "@Root/js/index.js"
 export default function blankTextInit() {
   let editor = document.getElementById("md-area") as HTMLInputElement
   return new Promise<void>((resolve) => {
-    readMemoryText((list: Array<any>) => {
+    readMemoryText().then((list) => {
       if (list.length && list[0].contentText) {
-        // do sth...
-        readMemoryText((list: any) => {
-          editor.value = list[0].contentText
-          resolve()
-        })
+        editor.value = list[0].contentText
+        resolve()
       } else {
-        // init
         editor.value = welcomeText
         resolve()
       }

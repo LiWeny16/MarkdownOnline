@@ -31,10 +31,11 @@ declare module "kit" {
   export default kit
 }
 
-declare module "@Root/js/functions/aboutBox" {
-  const aboutBox: any
-  export default aboutBox
-}
+
+// declare module "@Root/js/functions/aboutBox" {
+//   const aboutBox: any
+//   export default aboutBox
+// }
 declare module "@Root/js/functions/fastKey" {
   const aboutBox: any
   export default aboutBox
@@ -65,4 +66,8 @@ declare interface Window {
 interface Window {
   theme: string
   location: any
+}
+
+interface HandleDBListFun {
+	(List:string): void;
 }

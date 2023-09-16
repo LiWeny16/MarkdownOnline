@@ -1,6 +1,6 @@
-import aboutBox from "./functions/aboutBox"
-import dragFileEvent from "./functions/dragFile"
-import pasteEvent from "./functions/pasteEvent"
+import aboutBox from "./functions/Events/aboutBox"
+import dragFileEvent from "./functions/Events/dragFile"
+import pasteEvent from "./functions/Events/pasteEvent"
 import welcomeText from "../assets/welcome.md?raw"
 import { marked } from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
 import mermaid from "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs"
@@ -13,6 +13,8 @@ import replaceAsync from "string-replace-async"
 import getMdText from "@App/text/getMdText"
 import blankTextInit from "@Root/js/functions/Init/blankTextInit"
 import { fillInMemoryImg, readMemoryImg } from "@App/textMemory/memory"
+import pageBreaker from "@Func/Parser/pageBreaker"
+import virtualFileSystem from "@Func/Parser/VFS"
 import "../css/index.less"
 
 // import "https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
@@ -33,7 +35,8 @@ export const enObj = {
   enClue: true, //clueCSS写法
   enDragFile: true, //拖拽外部markdown
   enPasteEvent: true, //粘贴事件
-  enVirtualFileSystem: true
+  enVirtualFileSystem: true,
+  enPageBreaker:true
 }
 window.onload = () => {
   // 等待React 渲染完成
@@ -62,10 +65,10 @@ export function allInit() {
     ? triggerConverterEvent()
     : console.log("converter if off") //按下写字板触发事件
   // enObj.enPdfExport ? exportToPdfEvent() : console.log("pdf export is off") //导出PDF
-  enObj.enDragFile ? dragFileEvent() : console.log("dragFile is off") //开启拖拽事件
+  // enObj.enDragFile ? dragFileEvent() : console.log("dragFile is off") //开启拖拽事件
   // enObj.enAboutBox ? aboutBox() : console.log("aboutBox is off")
   // enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is off") //开启快捷键事件
-  enObj.enPasteEvent ? pasteEvent() : console.log("Paste Event is off") //开启快捷键事件
+  // enObj.enPasteEvent ? pasteEvent() : console.log("Paste Event is off") //开启快捷键事件
 }
 
 /**
@@ -76,6 +79,7 @@ export async function mdConverter(save = true) {
   //按键触发，主函数
   let view = getMdText()
   enObj.enClue ? (view = await clueParser(view)) : console.log("clue off")
+  enObj.enPageBreaker ? (view = pageBreaker(view)) : console.log("page breaker off");
   enObj.enVirtualFileSystem
     ? (view = await virtualFileSystem(view))
     : console.log("VFS off")
@@ -119,25 +123,7 @@ class settingsClass {
     return new this()
   }
 }
-/**
- * @description VFS
- */
-function virtualFileSystem(md) {
-  return new Promise((resolve) => {
-    const reg1 = /\!\[我是图片\]\(\/vf.*?\)/g //全部的
-    const reg2 = /\d+/g
-    if (md.match(reg1)) {
-      md.replace(reg1, (e) => {
-        console.log(parseInt(e.match(reg2)[0]));
-        readMemoryImg("imgBase64", parseInt(e.match(reg2)[0]))
-        return 
-      })
-      // let indexName = full.match()
-      // console.log(md.match(reg1))
-    }
-    resolve(md)
-  })
-}
+
 /**
  * @description clue CSS HTML
  * @param {string} md
@@ -288,25 +274,6 @@ function latexParse(md) {
 function markedParse(md) {
   return marked.parse(md)
 }
-/**
- * @description showdown转换
- */
-function md2html(md) {
-  // set Options
-  var converter = new showdown.Converter() //增加拓展table
-  converter.setOption("tasklists", true)
-  converter.setOption("moreStyling", true)
-  converter.setOption("completeHTMLDocument", true)
-  converter.setOption("smoothLivePreview", true)
-  converter.setOption("simplifiedAutoLink", true)
-  converter.setOption("tables", true) //启用表格选项。从showdown 1.2.0版开始，表支持已作为可选功能移入核心拓展，showdown.table.min.js扩展已被弃用
-  var view = converter.makeHtml(md)
-  return view
-}
-function writeMdText(text) {
-  document.getElementById("md-area").value = text
-}
-
 // function getMdText() {
 //   return document.getElementById("md-area").value
 // }
@@ -419,7 +386,7 @@ function enableScript(md) {
 /**
  * @description 倒序
  * @params string
- * @returns revser
+ * @returns reviser
  */
 function reverseString(str) {
   return str.split("").reverse().join("")
@@ -433,9 +400,9 @@ function triggerConverterEvent() {
     mdConverter()
   })
 }
-/**
- * @description 初始化写字板
- */
+// /**
+//  * @description 初始化写字板
+//  */
 // function blankTextInit() {
 //   openDB("md_content", 2).then((db) => {
 //     let initData = {

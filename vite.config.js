@@ -22,6 +22,7 @@ export default defineConfig({
       // mermaid: "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs",
       "@Asset": resolve(__dirname, "./source/assets"),
       "@App":resolve(__dirname,"./source/js/functions/App/"),
+      "@Func":resolve(__dirname,"./source/js/functions"),
       "@Root":resolve(__dirname,"./source/"),
       "@Com":resolve(__dirname,"./source/js/React/Components"),
     }

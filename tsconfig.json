@@ -23,10 +23,12 @@
       "@Asset/*": ["./source/assets/*"],
       "@App": ["./source/js/functions/App/"],
       "@App/*": ["./source/js/functions/App/*"],
-      "@Root":["./source/"],
-      "@Root/*":["./source/*"],
-      "@Com":["./source/js/React/Components"],
-      "@Com/*":["./source/js/React/Components/*"]
+      "@Func": ["./source/js/functions"],
+      "@Func/*": ["./source/js/functions/*"],
+      "@Root": ["./source/"],
+      "@Root/*": ["./source/*"],
+      "@Com": ["./source/js/React/Components"],
+      "@Com/*": ["./source/js/React/Components/*"]
     }
     // "outDir": "./"
   },

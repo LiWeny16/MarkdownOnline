@@ -32,7 +32,7 @@ import Paper from "@mui/material/Paper"
 import { kit, enObj } from "@Root/js/index.js"
 import MyButton from "../Components/myCom/CustomButton.tsx"
 import myPrint from "@App/myPrint"
-import aboutBox from "@Root/js/functions/aboutBox"
+import aboutBox from "@Func/Events/aboutBox.ts"
 // import Alert from "@mui/material/Alert"
 // Arco-Design
 // import { Message } from '@arco-design/web-react';
@@ -212,7 +212,7 @@ export default function DrawerAppBar(props: Props) {
             </MyButton>
           </Box>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
-            <Menu></Menu>
+            <Menu />
           </Box>
         </Toolbar>
       </AppBar>

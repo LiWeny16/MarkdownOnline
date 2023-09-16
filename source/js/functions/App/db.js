@@ -19,7 +19,6 @@ export function openDB(dbName, version = 1) {
     // 数据库打开成功回调
     request.onsuccess = function (event) {
       db = event.target.result // 数据库对象
-      console.log("数据库打开成功")
       resolve(db)
     }
     // 数据库打开失败的回调
@@ -42,7 +41,9 @@ export function openDB(dbName, version = 1) {
       })
       // 创建索引，在后面查询数据的时候可以根据索引查
       objectStore_md.createIndex("uuid", "uuid", { unique: true })
-      objectStore_md.createIndex("contentText", "contentText", { unique: false })
+      objectStore_md.createIndex("contentText", "contentText", {
+        unique: false
+      })
       // objectStore.createIndex("age", "age", { unique: false })
       objectStore_img.createIndex("uuid", "uuid", { unique: true })
       objectStore_img.createIndex("imgBase64", "imgBase64", { unique: false })
@@ -118,7 +119,8 @@ export function getDataByKey(db, storeName, key) {
  * @param {string} storeName 仓库名称
  * @returns {Array} 读取的列表
  */
-export function cursorGetData(db, storeName,success) {
+export function cursorGetData(db, storeName) {
+ return new Promise((resolve)=>{
   let list = []
   var store = db
     .transaction(storeName, "readwrite") // 事务
@@ -134,11 +136,10 @@ export function cursorGetData(db, storeName,success) {
       list.push(cursor.value)
       cursor.continue() // 遍历了存储对象中的所有内容
     } else {
-      // console.log(list);
-      success(list)
-      return list
+      resolve (list)
     }
   }
+ })
 }
 
 /**
@@ -167,23 +168,29 @@ export function getDataByIndex(db, storeName, indexName, indexValue) {
  * @param {string} indexName 索引名称
  * @param {string} indexValue 索引值
  */
-export function cursorGetDataByIndex(db, storeName, indexName, indexValue) {
-  let list = []
-  var store = db.transaction(storeName, "readwrite").objectStore(storeName) // 仓库对象
-  var request = store
-    .index(indexName) // 索引对象
-    .openCursor(IDBKeyRange.only(indexValue)) // 指针对象
-  request.onsuccess = function (e) {
-    var cursor = e.target.result
-    if (cursor) {
-      // 必须要检查
-      list.push(cursor.value)
-      cursor.continue() // 遍历了存储对象中的所有内容
-    } else {
-      console.log("游标索引查询结果：", list)
+export function cursorGetDataByIndex(
+  db,
+  storeName,
+  indexName,
+  indexValue,
+) {
+  return new Promise((resolve) => {
+    let list = []
+    var store = db.transaction(storeName, "readwrite").objectStore(storeName) // 仓库对象
+    var request = store
+      .index(indexName) // 索引对象
+      .openCursor(IDBKeyRange.only(indexValue)) // 指针对象
+    request.onsuccess = function (e) {
+      var cursor = e.target.result
+      if (cursor) {
+        list.push(cursor.value)
+        cursor.continue() // 遍历了存储对象中的所有内容
+      } else {
+        resolve(list)
+      }
     }
-  }
-  request.onerror = function (e) {}
+
+  })
 }
 
 /**
