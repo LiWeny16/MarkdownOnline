@@ -14,6 +14,8 @@ import myPrint from "@App/myPrint"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { Message } from "@arco-design/web-react"
 import ImageManager from "./ImageManager"
+import { useImage } from '../../Store/Image'
+import { observer } from "mobx-react"
 const StyledMenu = styled((props: MenuProps) => (
   <Menu
     elevation={0}
@@ -54,7 +56,8 @@ const StyledMenu = styled((props: MenuProps) => (
   }
 }))
 
-export default function CustomizedMenus() {
+const CustomizedMenus = observer(() => {
+  const image = useImage()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const [imgManagerState, setImgManagerState] = React.useState<boolean>(false)
   const open = Boolean(anchorEl)
@@ -68,14 +71,17 @@ export default function CustomizedMenus() {
     myPrint()
   }
   const handleImageManager = () => {
+    console.log(image.displayState)
+    image.display()
     handleClose()
     Message.info({
-      content: "此功能仍然在开发中",
+      content: "此功能仍然在开发中"+image.displayState,
       closable: true,
       duration: 3000,
       position: "bottom"
     })
     setImgManagerState(true)
+    // 点击这个的时候 传递一个信号给另一个抽屉组件
   }
   return (
     <div>
@@ -130,4 +136,6 @@ export default function CustomizedMenus() {
       </StyledMenu>
     </div>
   )
-}
+})
+
+export default CustomizedMenus
