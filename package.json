@@ -26,6 +26,7 @@
     "@mui/material": "^5.14.5",
     "mobx": "^6.10.2",
     "mobx-react": "^9.0.1",
+    "qiniu-js": "^3.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-photo-view": "^1.2.3",

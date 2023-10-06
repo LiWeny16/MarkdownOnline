@@ -1,10 +1,14 @@
 // import { allInit, enObj, fillInRemeText, kit } from "@Root/js/index.js"
 import save from "@App/save"
 import replaceSelection from "@App/text/replaceText"
+import sound from "@App/sound/sound"
+import qiniuFileAPI from "@App/qiniu/index"
 /**
  * @description 使能快捷键
  */
 function enableFastKeyEvent() {
+  let recState = false
+  let _rec: any
   document.addEventListener("keydown", (e) => {
     e.stopPropagation() //停止冒泡，向上传递事件
     // Ctrl + B 黑体
@@ -16,9 +20,26 @@ function enableFastKeyEvent() {
     if (e.key == "c" && e.altKey) {
       replaceSelection(editor, "<center>", "</center>")
     }
+    //  Ctrl+ S 保存
     if (e.ctrlKey && e.key == "s") {
       e.preventDefault()
       save()
+    }
+    // Ctrl + Alt + I
+    if (e.key == "i" && e.altKey && e.ctrlKey) {
+      if (recState) {
+        _rec?.stop()
+      } else {
+        _rec = sound("zh-CN", true)
+      }
+      recState = !recState
+
+      // console.log(rec.recognition);
+    }
+    if (e.key == "o" && e.altKey && e.ctrlKey) {
+      // let rec = sound("zh-CN")
+      qiniuFileAPI()
+      // console.log(rec.recognition)
     }
   })
 }

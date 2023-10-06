@@ -120,26 +120,26 @@ export function getDataByKey(db, storeName, key) {
  * @returns {Array} 读取的列表
  */
 export function cursorGetData(db, storeName) {
- return new Promise((resolve)=>{
-  let list = []
-  var store = db
-    .transaction(storeName, "readwrite") // 事务
-    .objectStore(storeName) // 仓库对象
-    .openCursor()
-  // var request = store.openCursor() // 指针对象
-  // 游标开启成功，逐行读数据
-  // console.log(store)
-  store.onsuccess = function (e) {
-    var cursor = e.target.result
-    if (cursor) {
-      // 必须要检查
-      list.push(cursor.value)
-      cursor.continue() // 遍历了存储对象中的所有内容
-    } else {
-      resolve (list)
+  return new Promise((resolve) => {
+    let list = []
+    var store = db
+      .transaction(storeName, "readwrite") // 事务
+      .objectStore(storeName) // 仓库对象
+      .openCursor()
+    // var request = store.openCursor() // 指针对象
+    // 游标开启成功，逐行读数据
+    // console.log(store)
+    store.onsuccess = function (e) {
+      var cursor = e.target.result
+      if (cursor) {
+        // 必须要检查
+        list.push(cursor.value)
+        cursor.continue() // 遍历了存储对象中的所有内容
+      } else {
+        resolve(list)
+      }
     }
-  }
- })
+  })
 }
 
 /**
@@ -168,12 +168,7 @@ export function getDataByIndex(db, storeName, indexName, indexValue) {
  * @param {string} indexName 索引名称
  * @param {string} indexValue 索引值
  */
-export function cursorGetDataByIndex(
-  db,
-  storeName,
-  indexName,
-  indexValue,
-) {
+export function cursorGetDataByIndex(db, storeName, indexName, indexValue) {
   return new Promise((resolve) => {
     let list = []
     var store = db.transaction(storeName, "readwrite").objectStore(storeName) // 仓库对象
@@ -189,7 +184,6 @@ export function cursorGetDataByIndex(
         resolve(list)
       }
     }
-
   })
 }
 
@@ -289,4 +283,19 @@ export function cursorDelete(db, storeName, indexName, indexValue) {
     }
   }
   request.onerror = function (e) {}
+}
+
+/**
+ * 删除数据库
+ * @param {object} dbName 数据库名称
+ */
+export function deleteDBAll(dbName) {
+  // console.log(dbName)
+  let deleteRequest = window.indexedDB.deleteDatabase(dbName)
+  deleteRequest.onerror = function (event) {
+    console.log("删除失败")
+  }
+  deleteRequest.onsuccess = function (event) {
+    console.log("删除成功")
+  }
 }

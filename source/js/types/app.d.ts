@@ -58,6 +58,7 @@ declare module "@App/db.js" {
    * @param {object} data 数据
    */
   const updateDB: (db: Object, storeName: string, data: Object) => void
+  const deleteDBAll :any
   export {
     openDB,
     getDataByIndex,
@@ -65,6 +66,10 @@ declare module "@App/db.js" {
     addData,
     getDataByKey,
     cursorGetData,
-    updateDB
+    updateDB,
+    deleteDBAll
   }
 }
+
+declare var webkitSpeechRecognition: any;  
+declare var SpeechRecognition: any;  
