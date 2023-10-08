@@ -13,7 +13,6 @@ const App = observer(() => {
     <>
       <Header/>
       <Body/>
-      {/* 放到这里作为顶层 */}
     </>
   )
 })

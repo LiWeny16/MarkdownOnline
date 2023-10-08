@@ -4,6 +4,8 @@ import pasteEvent from "./functions/Events/pasteEvent"
 import welcomeText from "../assets/welcome.md?raw"
 import { marked } from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
 import mermaid from "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs"
+// import "https://cdn.bootcdn.net/ajax/libs/mermaid/10.2.0/mermaid.min.js"
+// import mermaid from "https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.esm.min.mjs"
 import kit from "https://npm.elemecdn.com/bigonion-kit@0.11.0/esm/esm-kit.mjs"
 // import hljs from "https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"
 import hljs from "https://npm.elemecdn.com/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js"
@@ -61,21 +63,14 @@ export function allInit() {
   }) //初始化输入区域
   Notification.success({
     title: "已更新到最新版本",
-    content: `当前版本:v1.0.0`,
+    content: `当前版本:v1.0.1`,
     position: "bottomRight"
   })
   kit.sleep(200).then(() => {
     Notification.info({
       title: "版本新增特性",
-      content: `图片管理器、PDF分页导出`,
+      content: `完善图片管理器、修复mermaid闪烁bug`,
       position: "bottomRight"
-    })
-    kit.sleep(100).then(() => {
-      Notification.info({
-        title: "版本新增特性",
-        content: `修复巨量Bug`,
-        position: "bottomRight"
-      })
     })
   })
 
@@ -98,6 +93,7 @@ export async function mdConverter(save = true) {
   //按键触发，主函数
   let view = getMdText()
   enObj.enClue ? (view = await clueParser(view)) : console.log("clue off")
+
   enObj.enPageBreaker
     ? (view = pageBreaker(view))
     : console.log("page breaker off")
@@ -108,8 +104,14 @@ export async function mdConverter(save = true) {
   view = await latexParse(view)
   view = markedParse(view)
   enObj.enScript ? enableScript(view) : console.log("fast scripts off")
-  preViewText(view)
+
+  writeHiddenPre(view)
   // save ? restoreText() : 1
+  await mermaid.run({
+    querySelector: ".mermaid",
+    suppressErrors: true
+  })
+  writePre(readHiddenPre())
   enObj.enHilightJs ? hljs.highlightAll() : console.log("hilight off")
 }
 /**
@@ -126,7 +128,9 @@ class settingsClass {
   }
   mermaidInit() {
     mermaid.initialize({
-      securityLevel: "loose"
+      securityLevel: "loose",
+      startOnLoad: false,
+      theme: "base"
     })
     mermaid.mermaidAPI.initialize({ startOnLoad: false })
   }
@@ -180,14 +184,15 @@ function clueParser(md) {
         content = content.replace(/\>br/g, "\n") //解除换行限制
         if (clueClass == "mermaid") {
           // parsedHTML = `<pre class="${clueClass}">${content}</pre>`
-          try {
-            parsedHTML = `${await mermaidParse2(content, seq)}`
-          } catch (error) {
-            // parsedHTML = `<div class="RED">${error}</div>`
-            parsedHTML =
-              "<div class='RED P5'> MERMAID ERROR! </div>  " +
-              `<pre><code class="language-js hljs language-javascript"><span class="hljs-number">${error}</span></code></pre>`
-          }
+          // try {
+          //   parsedHTML = `${await mermaidParse2(content, seq)}`
+          // } catch (error) {
+          //   // parsedHTML = `<div class="RED">${error}</div>`
+          //   parsedHTML =
+          //     "<div class='RED P5'> MERMAID ERROR! </div>  " +
+          //     `<pre><code class="language-js hljs language-javascript"><span class="hljs-number">${error}</span></code></pre>`
+          // }
+          parsedHTML = `<div class="${clueClass}">${content}</div>`
         } else {
           parsedHTML = `<div class="${clueClass}">${markedParse(content)}</div>`
         }
@@ -298,7 +303,13 @@ function markedParse(md) {
 // function getMdText() {
 //   return document.getElementById("md-area").value
 // }
-function preViewText(text) {
+function writeHiddenPre(text) {
+  document.getElementById("view-area-hidden").innerHTML = text
+}
+function readHiddenPre() {
+  return document.getElementById("view-area-hidden").innerHTML
+}
+function writePre(text) {
   document.getElementById("view-area").innerHTML = text
 }
 

@@ -1,6 +1,5 @@
 # "新一代的$“Markdown^+”$编辑器".RED 
 
-
 # 你好，我是标题
 
 ## 你好，我是二级标题
@@ -43,30 +42,17 @@ $$
 
 [我是链接](https://bigonion.cn)
 
-### 我是扩展语法
+
 
 我是分页器:|---|
 
-"![我是图片](http://bigonion.cn/background/wallheaven.jfif)
-![我是图片](http://bigonion.cn/background/wallheaven.jfif)
-![我是图片](http://bigonion.cn/background/wallheaven.jfif)
-![我是图片](http://bigonion.cn/background/wallheaven.jfif)".GRID4 
-
-
 我是mermaid**流程图表** 
 
+"
+flowchart LR
+    id1[(Cylinder)]--->   id2{Box}---> id3(((Double circle)))
+".mermaid 
 
-"sequenceDiagram
-    participant Alice
-    participant Bob
-    Alice->>John: Hello John, how are you?
-    loop Healthcheck
-        John->>John: Fight against hypochondria
-    end
-    Note right of John: Rational thoughts <br/>prevail!
-    John-->>Alice: Great!
-    John->>Bob: How about you?
-    Bob-->>John: Jolly good!".mermaid 
 
 ```js
 // 我是代码

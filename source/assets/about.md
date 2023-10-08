@@ -1,6 +1,7 @@
 # 关于
 
 本项目使用了marked.js来快速转换Markdown=>HTML，并且能够实时预览效果，不需要额外的操作即可体验到十分不错的在线markdown实时预览体验<br>
+能有什么坏心思，单纯想做一个不一样的markdown解析器罢了QAQ
 
 ## 什么是markdown?
 
@@ -42,7 +43,7 @@
 ## 教程
 + LATEX请写在用$$中间  
 例如 $\lambda$ [知乎:LaTeX数学公式、常用符号大全](https://zhuanlan.zhihu.com/p/510451940)
-+ mermaid请见官网[https://mermaid.js.org/intro/](https://mermaid.js.org/intro/)
++ mermaid请见官网[https://mermaid.js.org/intro/](https://mermaid.nodejs.cn/syntax/flowchart.html)
 
 ## 新增特性
 + 右对齐可以用 "右边对齐".RIGHT 
@@ -50,6 +51,11 @@
 + 注意！最后必须有一个**空格**表示结束
 + [[DEV]](#)支持脚本注入，请用script标签包裹
 + mermaid 流程图支持！
+
+## 更新日志 
++ v0.1.x 修复大量bug，新增图片管理器
+
+
 ## 作者
 
 **Bigonion**

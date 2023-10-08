@@ -27,15 +27,16 @@ export default function Body() {
       <div id="topBox">
         <div id="editor">
           <textarea placeholder="" id="md-area"></textarea>
+          <article id="view-area-hidden" className="hidden-pre"></article>
           <article id="view-area" className="markdown-body"></article>
         </div>
       </div>
 
       <div id="aboutBox">
         <div id="markdownParser">
-          <article id="aboutMd" className="aboutViewArea markdown-body">
+          <div id="aboutMd" className="aboutViewArea markdown-body">
             <span></span>
-          </article>
+          </div>
         </div>
       </div>
     </>
