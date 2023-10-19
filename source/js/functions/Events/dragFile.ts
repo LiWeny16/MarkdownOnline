@@ -1,4 +1,4 @@
-import { allInit, kit, mdConverter } from "@Root/js/index.js"
+import { allInit, kit, mdConverter } from "@Root/js/index"
 import blankTextInit from "../Init/blankTextInit"
 
 export default function dragFileEvent() {

@@ -24,6 +24,9 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.14.3",
     "@mui/material": "^5.14.5",
+    "axios": "1.4.0",
+    "dom-to-image": "^2.6.0",
+    "html2canvas": "^1.4.1",
     "mobx": "^6.10.2",
     "mobx-react": "^9.0.1",
     "qiniu-js": "^3.4.1",
@@ -34,6 +37,8 @@
     "string-replace-async": "^3.0.2"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
+    "@types/dom-to-image": "^2.6.6",
     "@types/react": "^18.2.12",
     "@types/react-dom": "^18.2.5",
     "@vitejs/plugin-react": "^4.0.0",

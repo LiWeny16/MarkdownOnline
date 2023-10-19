@@ -62,6 +62,7 @@ export default function CustomizedButtons(props: any) {
       disableElevation
       // style={{ background: "white", color: "black" }}
       onClick={props.onClick}
+      onMouseOver={props.onHover}
       endIcon={props.endIcon}
       startIcon={props.startIcon ? props.startIcon: undefined}
       variant="contained"

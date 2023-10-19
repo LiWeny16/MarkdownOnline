@@ -4,3 +4,10 @@ export default function getMdText(id = "md-area") {
     return inputEle.value
   }
 }
+
+export function getRenderHTML(id = "view-area") {
+  let ele = document.getElementById(id) as HTMLInputElement
+  if (ele) {
+    return ele.innerHTML
+  }
+}

@@ -31,6 +31,20 @@ declare module "kit" {
   export default kit
 }
 
+declare module "katex" {
+  const katex: any
+  export default katex
+}
+
+declare module "*/highlight.min.js" {
+  const hljs: any
+  export default hljs
+}
+declare module "dom-to-image" {
+  const domtoimg: any
+  export default domtoimg
+}
+
 
 // declare module "@Root/js/functions/aboutBox" {
 //   const aboutBox: any
@@ -55,7 +69,7 @@ declare module "*index.js" {
     enObj,
     mdConverter,
     replaceSelection,
-    insertTextAtCursor
+    insertTextAtCursor,
   }
 }
 
@@ -69,5 +83,5 @@ interface Window {
 }
 
 interface HandleDBListFun {
-	(List:string): void;
+  (List: string): void
 }

@@ -1,7 +1,7 @@
-import aboutBox from "./functions/Events/aboutBox"
-import dragFileEvent from "./functions/Events/dragFile"
-import pasteEvent from "./functions/Events/pasteEvent"
-import welcomeText from "../assets/welcome.md?raw"
+// import aboutBox from "./functions/Events/aboutBox"
+// import dragFileEvent from "./functions/Events/dragFile"
+// import pasteEvent from "./functions/Events/pasteEvent"
+// import welcomeText from "../assets/welcome.md?raw"
 import { marked } from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
 import mermaid from "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs"
 // import "https://cdn.bootcdn.net/ajax/libs/mermaid/10.2.0/mermaid.min.js"
@@ -14,11 +14,12 @@ import "https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.js"
 import replaceAsync from "string-replace-async"
 import getMdText from "@App/text/getMdText"
 import blankTextInit from "@Root/js/functions/Init/blankTextInit"
-import { fillInMemoryImg, readMemoryImg } from "@App/textMemory/memory"
+// import { fillInMemoryImg, readMemoryImg } from "@App/textMemory/memory"
 import pageBreaker from "@Func/Parser/pageBreaker"
 import virtualFileSystem from "@Func/Parser/VFS"
 import "../css/index.less"
 import { Notification } from "@arco-design/web-react"
+import { isSyntaxValid } from "@App/script.ts"
 // import "https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
 /**
  * @description 拓展使能配置
@@ -38,19 +39,19 @@ export const enObj = {
   enDragFile: true, //拖拽外部markdown
   enPasteEvent: true, //粘贴事件
   enVirtualFileSystem: true,
-  enPageBreaker: true
+  enPageBreaker: true,
 }
-window.onload = () => {
-  // 等待React 渲染完成
-  kit.sleep(300).then(() => {
-    allInit()
-  })
-}
+// ;(() => {
+//   // 等待React 渲染完成
+//   kit.sleep(50).then(() => {
+//     allInit()
+//   })
+// })()
 /**
  * @description 初始化配置和事件初始化
  * @returns {void}
  */
-export function allInit() {
+export function allInit(): void {
   /**@description Settings Init*/
   const settings = new settingsClass()
   settings.settingsAllInit()
@@ -64,13 +65,13 @@ export function allInit() {
   Notification.success({
     title: "已更新到最新版本",
     content: `当前版本:v1.0.1`,
-    position: "bottomRight"
+    position: "bottomRight",
   })
   kit.sleep(200).then(() => {
     Notification.info({
       title: "版本新增特性",
       content: `完善图片管理器、修复mermaid闪烁bug`,
-      position: "bottomRight"
+      position: "bottomRight",
     })
   })
 
@@ -89,9 +90,9 @@ export function allInit() {
  * @description 循环执行触发主解析事件流
  * @param {boolean} save
  */
-export async function mdConverter(save = true) {
+export async function mdConverter(save: boolean = true) {
   //按键触发，主函数
-  let view = getMdText()
+  let view: any = getMdText()
   enObj.enClue ? (view = await clueParser(view)) : console.log("clue off")
 
   enObj.enPageBreaker
@@ -103,13 +104,13 @@ export async function mdConverter(save = true) {
   view = await latexParse2(view)
   view = await latexParse(view)
   view = markedParse(view)
-  enObj.enScript ? enableScript(view) : console.log("fast scripts off")
+  // enObj.enScript ? enableScript(view) : console.log("fast scripts off")
 
   writeHiddenPre(view)
   // save ? restoreText() : 1
   await mermaid.run({
     querySelector: ".mermaid",
-    suppressErrors: true
+    suppressErrors: true,
   })
   writePre(readHiddenPre())
   enObj.enHilightJs ? hljs.highlightAll() : console.log("hilight off")
@@ -123,20 +124,20 @@ class settingsClass {
     marked.use({
       mangle: false,
       headerIds: false,
-      strict: false
+      strict: false,
     })
   }
   mermaidInit() {
     mermaid.initialize({
       securityLevel: "loose",
       startOnLoad: false,
-      theme: "base"
+      theme: "base",
     })
     mermaid.mermaidAPI.initialize({ startOnLoad: false })
   }
   hljsInit() {
     hljs.configure({
-      ignoreUnescapedHTML: true
+      ignoreUnescapedHTML: true,
     })
   }
   settingsAllInit() {
@@ -153,7 +154,7 @@ class settingsClass {
  * @description clue CSS HTML
  * @param {string} md
  */
-function clueParser(md) {
+function clueParser(md: any) {
   return new Promise(async (resolve) => {
     md = md.replace(/\n/g, ">br") //暂时替代换行符号
     const reg1 = /".*?"\..*?\s/g //整个"content".CLASS 结构
@@ -164,7 +165,7 @@ function clueParser(md) {
     const reg5 = /(?<=").*(?=")/g //匹配"之间"不包括""
     if (md) {
       md = await replaceAsync(md, reg1, temp)
-      async function temp(e, seq) {
+      async function temp(e: any, _seq: any) {
         var parsedHTML = "f"
         var content
         var clueClass
@@ -193,6 +194,20 @@ function clueParser(md) {
           //     `<pre><code class="language-js hljs language-javascript"><span class="hljs-number">${error}</span></code></pre>`
           // }
           parsedHTML = `<div class="${clueClass}">${content}</div>`
+        } else if (clueClass == "js" && enObj.enScript) {
+          // console.log(content)
+          if (isSyntaxValid(content)) {
+            if (document.getElementById("unsafe_script")) {
+              document.getElementById("unsafe_script")!.remove()
+            }
+            let script = document.createElement("script")
+            script.setAttribute("type", "text/javascript")
+            script.innerHTML = content
+            script.id = "unsafe_script"
+            document.documentElement.appendChild(script)
+          }
+
+          parsedHTML = ``
         } else {
           parsedHTML = `<div class="${clueClass}">${markedParse(content)}</div>`
         }
@@ -204,28 +219,14 @@ function clueParser(md) {
     resolve(md)
   })
 }
-/**
- * @description asyncParser2
- * @param {string} content
- * @param {string} seq
- * @returns {Promise<string>}
- */
-async function mermaidParse2(content, seq) {
-  const isValid = await mermaid.parse(content)
-  if (isValid) {
-    const { svg } = await mermaid.mermaidAPI.render("seq_" + seq, content)
-    return svg
-  } else {
-    return "err"
-  }
-}
-function latexParse2(md, center = true) {
+
+function latexParse2(md: any, center = true) {
   md = md.replace(/\n/g, "<!br") //暂时替代换行符号
   return new Promise((resolve) => {
     let reg1 = /\$\$.*?\$\$/g //含有$的
     let reg2 = /(?<=(\$\$))(.+?)(?=(\$\$))/g
     if (md) {
-      md = md.replace(reg1, (e) => {
+      md = md.replace(reg1, (e: any) => {
         if (e.match(reg2)) {
           e = e.match(reg2)[0]
           e = e.replace(/\<\!br/g, "") //解除换行替代
@@ -234,9 +235,10 @@ function latexParse2(md, center = true) {
         }
         // 官方示例API
         if (e) {
+          //@ts-ignore
           var html = katex.renderToString(e, {
             throwOnError: false,
-            strict: false
+            strict: false,
           })
           if (center) {
             html = `<center>${html}</center>`
@@ -253,7 +255,7 @@ function latexParse2(md, center = true) {
     }
   })
 }
-function latexParse(md) {
+function latexParse(md: any) {
   return new Promise((resolve) => {
     let reg1 = /\$.*?\$/g //含有$的
     let reg2 = /(?<=\$)(.+?)(?=\$)/g
@@ -266,12 +268,13 @@ function latexParse(md) {
     // let result
     if (latex) {
       try {
-        latex.forEach((ele, index) => {
+        latex.forEach((ele: any, index: any) => {
           ele = ele.match(reg2)
           if (ele) {
+            //@ts-ignore
             parsedTex[index] = katex.renderToString(ele[0], {
               throwOnError: false,
-              strict: false
+              strict: false,
             })
           } else {
             parsedTex[index] = "<span style='color:#cc0000;'>ERR_NULL</span>"
@@ -297,138 +300,36 @@ function latexParse(md) {
     } else resolve(origin)
   })
 }
-function markedParse(md) {
+function markedParse(md: any) {
   return marked.parse(md)
 }
 // function getMdText() {
 //   return document.getElementById("md-area").value
 // }
-function writeHiddenPre(text) {
-  document.getElementById("view-area-hidden").innerHTML = text
+function writeHiddenPre(text: any) {
+  document.getElementById("view-area-hidden")!.innerHTML = text
 }
 function readHiddenPre() {
-  return document.getElementById("view-area-hidden").innerHTML
+  return document.getElementById("view-area-hidden")!.innerHTML
 }
-function writePre(text) {
-  document.getElementById("view-area").innerHTML = text
-}
-
-// function getRememberText() {
-//   let text = kit.getCookie("contentText").replace(/\<\? br \?\>/g, "\n")
-//   text = text.replace(/\<\? semicolon \?\>/g, ";")
-//   return text
-// }
-// function restoreText() {
-//   let md = getMdText()
-//   md = md.replace(/\n/g, "<? br ?>")
-//   md = md.replace(/\;/g, "<? semicolon ?>")
-//   kit.setCookie("contentText", md, 30, "/", "md.bigonion.cn")
-//   kit.setCookie("contentText", md, 30, "/", "127.0.0.1")
-// }
-// export function fillInRemeText() {
-//   let text = getRememberText()
-//   writeMdText(text)
-//   return text
-// }
-function getRegIndex(text, regex) {
-  // const text = '$匹配我$ $匹配我$ 不要匹配我 $匹配我$'
-  // const regex = /\$(.*?)\$/g
-  const result = Array.from(text.matchAll(regex), (match) => match.index)
-  return result
-}
-// print 函数
-
-// 快捷键
-// /**
-//  * @description 使能快捷键
-//  */
-// function enableFastKeyEvent() {
-//   document.addEventListener("keydown", (e) => {
-//     e.stopPropagation()//停止冒泡，向上传递事件
-//     // Ctrl + B 黑体
-//     let editor = document.getElementById("md-area")
-//     if (e.ctrlKey && e.key == "b") {
-//       replaceSelection(editor, "**", "**")
-//     }
-//     if (e.key == "c" && e.altKey) {
-//       replaceSelection(editor, "<center>", "</center>")
-//     }
-//     if(e.ctrlKey && e.key=="s" ){
-//       e.preventDefault()
-//       console.log(e);
-//     }
-//   })
-// }
-/**
- * @description 使能脚本注入
- */
-function enableScript(md) {
-  md = md ? md.match(/(?<=(\<script\>))(.+?)(?=(\<\/script\>))/g) : ""
-  if (md) {
-    md.forEach((e) => {
-      e = e.match(/alert\(.*?\)/g) ? "" : e
-      eval(e)
-    })
-  }
+function writePre(text: any) {
+  document.getElementById("view-area")!.innerHTML = text
 }
 
-// /**
-//  * @description 替换选中文本
-//  * @param e HTMLelement
-//  * @param leftStr String
-//  * @param rightStr String
-//  */
-// export function replaceSelection(e, leftStr, rightStr) {
-//   var start = e.selectionStart
-//   var end = e.selectionEnd
-//   // console.log(start, end)
-//   if (start == end) {
-//     return ""
-//   } else {
-//     let temp =
-//       e.value.substr(0, start) +
-//       leftStr +
-//       e.value.substring(start, end) +
-//       rightStr +
-//       e.value.substring(end, e.value.length)
-//     e.value = temp
-//     // console.log(e.value.substring(start, end))
-//     // console.log(e.value.substring(start, end).length)
-//     // 移动光标
-//     e.setSelectionRange(start, end + leftStr.length + rightStr.length)
-//   }
-// }
-// /**
-//  * @description 插入文本
-//  */
-// export function insertTextAtCursor(textElement, textToInsert) {
-//   const startPos = textElement.selectionStart
-//   const endPos = textElement.selectionEnd
-
-//   textElement.value =
-//     textElement.value.substring(0, startPos) +
-//     textToInsert +
-//     textElement.value.substring(endPos)
-
-//   textElement.selectionStart = startPos + textToInsert.length
-//   textElement.selectionEnd = startPos + textToInsert.length
-
-//   textElement.focus()
-// }
 /**
  * @description 倒序
  * @params string
  * @returns reviser
  */
-function reverseString(str) {
+function reverseString(str: any) {
   return str.split("").reverse().join("")
 }
 
 function triggerConverterEvent() {
-  document.getElementById("md-area").addEventListener("keyup", () => {
+  document.getElementById("md-area")!.addEventListener("keyup", () => {
     mdConverter()
   })
-  document.getElementById("md-area").addEventListener("blur", () => {
+  document.getElementById("md-area")!.addEventListener("blur", () => {
     mdConverter()
   })
 }

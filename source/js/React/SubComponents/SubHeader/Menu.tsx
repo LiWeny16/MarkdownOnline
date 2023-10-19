@@ -4,71 +4,48 @@ import Button from "@mui/material/Button"
 import Menu, { MenuProps } from "@mui/material/Menu"
 import MenuItem from "@mui/material/MenuItem"
 import EditIcon from "@mui/icons-material/Edit"
+import AttachEmailIcon from "@mui/icons-material/AttachEmail"
 import Divider from "@mui/material/Divider"
 import ArchiveIcon from "@mui/icons-material/Archive"
 import FileCopyIcon from "@mui/icons-material/FileCopy"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
 import MyButton from "../../Components/myCom/CustomButton"
-import myPrint from "@App/myPrint"
+import myPrint from "@App/export/myPrint"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { Message } from "@arco-design/web-react"
 // import ImageManager from "./ImageManager"
 import save, { isSaved } from "@App/save"
 import { Modal } from "@arco-design/web-react"
-import { kit } from "@Root/js/index.js"
+import { kit } from "@Root/js/index"
 import { useImage } from "@Mobx/Image"
 import { observer } from "mobx-react"
-const StyledMenu = styled((props: MenuProps) => (
-  <Menu
-    elevation={0}
-    anchorOrigin={{
-      vertical: "bottom",
-      horizontal: "right"
-    }}
-    transformOrigin={{
-      vertical: "top",
-      horizontal: "right"
-    }}
-    {...props}
-  />
-))(({ theme }) => ({
-  "& .MuiPaper-root": {
-    borderRadius: 6,
-    marginTop: theme.spacing(1),
-    minWidth: 180,
-    color:
-      theme.palette.mode === "light"
-        ? "rgb(55, 65, 81)"
-        : theme.palette.grey[300],
-    boxShadow:
-      "rgb(255, 255, 255) 0px 0px 0px 0px, rgba(0, 0, 0, 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.05) 0px 4px 6px -2px",
-    "& .MuiMenu-list": {
-      padding: "4px 0"
-    },
-    "& .MuiMenuItem-root": {
-      "& .MuiSvgIcon-root": {
-        fontSize: 20,
-        color:
-          theme.palette.mode === "light"
-            ? "rgb(55, 65, 81)"
-            : theme.palette.grey[300],
-        marginRight: theme.spacing(1.5)
-      }
-    }
-  }
-}))
+import StyledMenu from "@Com/myCom/StyleMenu"
+import CloudMail from "@App/share/CloudMail"
+import { getRenderHTML } from "@App/text/getMdText"
+import exportAsImage from "@App/export/domToImg"
+// import domtoimg from "@App/export/domToImg"
 
 const CustomizedMenus = observer(() => {
   const image = useImage()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const [anchorEl2, setAnchorEl2] = React.useState<null | HTMLElement>(null)
   const [modalState, setModalState] = React.useState<boolean>(false)
   const open = Boolean(anchorEl)
+  const openShare = Boolean(anchorEl2)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
+  const handleHover = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl2(event.currentTarget)
+    event.stopPropagation()
+  }
   const handleClose = () => {
     setAnchorEl(null)
+  }
+  const handleClose2 = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl2(null)
+    e.stopPropagation()
   }
   const handleExport = async () => {
     if (await isSaved()) {
@@ -118,10 +95,11 @@ const CustomizedMenus = observer(() => {
       >
         {"更多"}
       </MyButton>
+
       <StyledMenu
         id="demo-customized-menu"
         MenuListProps={{
-          "aria-labelledby": "demo-customized-button"
+          "aria-labelledby": "demo-customized-button",
         }}
         elevation={24}
         anchorEl={anchorEl}
@@ -135,27 +113,78 @@ const CustomizedMenus = observer(() => {
         </MenuItem>
         <MenuItem onClick={handleExport} disableRipple>
           <FileCopyIcon />
-          导出
+          导出为PDF
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         <MenuItem
-          onClick={() => {
-            handleClose()
-            Message.info({
-              content: "此功能仍然在开发中",
-              closable: true,
-              duration: 3000,
-              position: "bottom"
-            })
+          onClick={(e) => {
+            handleHover(e)
+            // handleClose()
           }}
           disableRipple
         >
           <ArchiveIcon />
-          分享(开发中)
+          {/* 
+          <MyButton
+            open={openShare}
+            endIcon={<MoreVertIcon />}
+            onClick={handleHover}
+            // endIcon={<KeyboardArrowDownIcon />}
+            // style={{ fontFamily: "monospace" }}
+          >
+            {"更多"}
+          </MyButton> */}
+          分享(测试中)
+          <StyledMenu
+            style={{ width: "fitContent" }}
+            anchorOrigin={{
+              vertical: -5,
+              horizontal: 12,
+            }}
+            id="demo-customized-menu"
+            MenuListProps={{
+              "aria-labelledby": "demo-customized-button",
+            }}
+            elevation={24}
+            anchorEl={anchorEl2}
+            open={openShare}
+            onClick={handleClose2}
+          >
+            <MenuItem
+              onClick={() => {
+                CloudMail(
+                  "https://service-g12i7wh1-1321514649.sh.apigw.tencentcs.com/release/mail",
+                  "post",
+                  {
+                    to: "454888395@qq.com",
+                    subject: "My Markdown Shareヾ(•ω•`)o",
+                    html: getRenderHTML(),
+                  }
+                )
+                Message.info({
+                  content: "此功能仍处于测试阶段！",
+                  closable: true,
+                  duration: 3000,
+                  position: "bottom",
+                })
+              }}
+              disableRipple
+            >
+              <AttachEmailIcon />
+              邮箱分享
+            </MenuItem>
+          </StyledMenu>
         </MenuItem>
-        <MenuItem onClick={handleClose} disableRipple>
+        <MenuItem
+          onClick={() => {
+            handleClose()
+            // exportAsImage()
+            exportAsImage()
+          }}
+          disableRipple
+        >
           <MoreHorizIcon />
-          敬请期待
+          导出为图片(测试中)
         </MenuItem>
       </StyledMenu>
     </div>

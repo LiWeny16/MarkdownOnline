@@ -25,14 +25,14 @@ import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
 import { grey, lime, purple } from "@mui/material/colors"
 import Menu from "./SubHeader/Menu.tsx"
-import ImageManger from "./SubHeader/ImageManager.tsx"
+import ImageManger from "./SubHeader/SubMenu/ImageManager.tsx"
 import HomeIcon from "@mui/icons-material/Home"
 import Stack from "@mui/material/"
 import { alpha, styled } from "@mui/material/styles"
 import Paper from "@mui/material/Paper"
-import { kit, enObj } from "@Root/js/index.js"
+import { kit, enObj } from "@Root/js/index"
 import MyButton from "../Components/myCom/CustomButton.tsx"
-import myPrint from "@App/myPrint"
+import myPrint from "@App/export/myPrint.ts"
 import aboutBox from "@Func/Events/aboutBox.ts"
 // import Alert from "@mui/material/Alert"
 // Arco-Design
@@ -235,7 +235,6 @@ const DrawerAppBar = observer((props: Props) => {
           </Box>
           <Box sx={{ display: { xs: "none", sm: "block" } }}>
             <Menu />
-            {/* <Menu></Menu> */}
             <ImageManger />
           </Box>
         </Toolbar>

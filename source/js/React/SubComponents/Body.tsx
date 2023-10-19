@@ -1,23 +1,24 @@
-import React from "react"
+import React from "react";
 
 // import fastKeyEvent from "@Root/js/functions/fastKey"
-// @ts-ignore
-import { kit, enObj } from "@Root/js/index.js"
-import fastKeyEvent from "@Func/Events/fastKey"
-import pasteEvent from "@Func/Events/pasteEvent"
-import dragFileEvent from "@Func/Events/dragFile"
+import { kit, enObj } from "@Root/js/index";
+import fastKeyEvent from "@Func/Events/fastKey";
+import pasteEvent from "@Func/Events/pasteEvent";
+import dragFileEvent from "@Func/Events/dragFile";
+import MdArea from "./SubBody/MdArea";
+
 function enEvents(doIt: boolean): void {
   if (doIt) {
-    enObj.enFastKey ? fastKeyEvent() : undefined
-    enObj.enPasteEvent ? pasteEvent() : undefined
-    enObj.enDragFile ? dragFileEvent() : undefined
+    enObj.enFastKey ? fastKeyEvent() : undefined;
+    enObj.enPasteEvent ? pasteEvent() : undefined;
+    enObj.enDragFile ? dragFileEvent() : undefined;
   }
 }
 
 export default function Body() {
   React.useEffect(() => {
-    enEvents(true)
-  }, [])
+    enEvents(true);
+  }, []);
   return (
     <>
       <h1 style={{ display: "none" }}>
@@ -26,7 +27,7 @@ export default function Body() {
       </h1>
       <div id="topBox">
         <div id="editor">
-          <textarea placeholder="" id="md-area"></textarea>
+          <MdArea />
           <article id="view-area-hidden" className="hidden-pre"></article>
           <article id="view-area" className="markdown-body"></article>
         </div>
@@ -40,5 +41,5 @@ export default function Body() {
         </div>
       </div>
     </>
-  )
+  );
 }
