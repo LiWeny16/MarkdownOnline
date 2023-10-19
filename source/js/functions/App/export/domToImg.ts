@@ -16,7 +16,7 @@ export default function exportAsImage() {
       let dataURL = canvas.toDataURL("image/png", 0.6)
       console.log(dataURL)
       var link = document.createElement("a")
-      link.download = "my-image-name.jpeg"
+      link.download = "markdown.jpeg"
       link.href = dataURL
       link.click()
     })

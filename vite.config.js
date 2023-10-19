@@ -26,6 +26,7 @@ export default defineConfig({
       "@Root":resolve(__dirname,"./source/"),
       "@Com":resolve(__dirname,"./source/js/React/Components"),
       "@Mobx":resolve(__dirname,"./source/js/React/Mobx"),
+      "@Css":resolve(__dirname,"./source/css"),
     }
   },
   server:{

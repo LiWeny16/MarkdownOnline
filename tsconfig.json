@@ -31,6 +31,9 @@
       "@Com/*": ["./source/js/React/Components/*"],
       "@Mobx":["source/js/React/Mobx"],
       "@Mobx/*":["source/js/React/Mobx/*"],
+      "@Css":["source/js/React/Css"],
+      "@Css/*":["source/js/React/Css/*"],
+      
     }
     // "outDir": "./"
   },

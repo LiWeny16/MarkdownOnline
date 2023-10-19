@@ -64,13 +64,13 @@ export function allInit(): void {
   }) //初始化输入区域
   Notification.success({
     title: "已更新到最新版本",
-    content: `当前版本:v1.0.1`,
+    content: `当前版本:v1.2.1`,
     position: "bottomRight",
   })
   kit.sleep(200).then(() => {
     Notification.info({
       title: "版本新增特性",
-      content: `完善图片管理器、修复mermaid闪烁bug`,
+      content: `新增图片导出,邮箱分享`,
       position: "bottomRight",
     })
   })

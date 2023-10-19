@@ -22,6 +22,16 @@ declare module "*.md?raw" {
   const md: any
   export default md
 }
+
+declare module "*.css?raw" {
+  const md: any
+  export default md
+}
+
+declare module "*.less?raw" {
+  const md: any
+  export default md
+}
 declare module "*.mjs" {
   const mjs: any
   export default mjs
