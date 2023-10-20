@@ -56,25 +56,26 @@ const CustomizedMenus = observer(() => {
       setAnchorEl3(event.target)
       event.stopPropagation()
     } else {
-      handleClose()
+      event.stopPropagation()
+      handleCloseMenu()
       setModalState(true)
     }
   }
-  const handleClose = () => {
+  const handleCloseMenu = () => {
     setAnchorEl(null)
   }
-  const handleClose2 = (e: React.MouseEvent<HTMLElement>) => {
+  const handleCloseShare = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl2(null)
     e.stopPropagation()
   }
-  const handleClose3 = (e: React.MouseEvent<HTMLElement>) => {
+  const handleCloseExport = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl3(null)
     e.stopPropagation()
   }
   const handleImageManager = () => {
     // console.log(image.displayState)
     image.display()
-    handleClose()
+    handleCloseMenu()
     // 点击这个的时候 传递一个信号给另一个抽屉组件
   }
   return (
@@ -117,7 +118,7 @@ const CustomizedMenus = observer(() => {
         elevation={24}
         anchorEl={anchorEl}
         open={open}
-        onClose={handleClose}
+        onClose={handleCloseMenu}
       >
         <MenuItem onClick={handleImageManager} disableRipple>
           <EditIcon />
@@ -126,28 +127,37 @@ const CustomizedMenus = observer(() => {
         </MenuItem>
         <MenuItem
           onClick={(e) => {
-            console.log(e)
             handleClick3(e)
-            // handleClose()
+            // handleCloseMenu()s
           }}
           disableRipple
         >
-          <Export anchorEl={anchorEl3} open={open3} onClick={handleClose3} />
+          <Export
+            anchorEl={anchorEl3}
+            open={open3}
+            closeMenu = {handleCloseMenu}
+            closeExportMenu={handleCloseExport}
+          />
         </MenuItem>
         <Divider sx={{ my: 0.5 }} />
         <MenuItem
           onClick={(e) => {
             handleClick2(e)
-            // handleClose()
+            // handleCloseMenu()
           }}
           disableRipple
         >
-          <Share closAll={handleClose} anchorEl={anchorEl2} open={open2} onClick={handleClose2} />
+          <Share
+            closAll={handleCloseMenu}
+            anchorEl={anchorEl2}
+            open={open2}
+            onClick={handleCloseShare}
+          />
         </MenuItem>
 
         <MenuItem
           onClick={() => {
-            handleClose()
+            handleCloseMenu()
           }}
           disableRipple
         >

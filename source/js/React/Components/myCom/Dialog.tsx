@@ -7,10 +7,9 @@ import DialogContent from "@mui/material/DialogContent"
 import DialogContentText from "@mui/material/DialogContentText"
 import DialogTitle from "@mui/material/DialogTitle"
 
-export default function FormDialog(props: any) {
-  const [open, setOpen] = React.useState(false)
 
-  const handleClose = () => {
+export default function FormDialog(props: DialogOptions<boolean>) {
+  const handleClose = (e: React.MouseEvent) => {
     props.setMailSharePanelState(false)
   }
 
@@ -23,7 +22,7 @@ export default function FormDialog(props: any) {
             To subscribe to this website, please enter your email address here.
             We will send updates occasionally.
           </DialogContentText>
-          <TextField
+          {/* <TextField
             autoFocus
             margin="dense"
             id="name"
@@ -31,7 +30,8 @@ export default function FormDialog(props: any) {
             type="email"
             fullWidth
             variant="standard"
-          />
+          /> */}
+          {props.children}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>

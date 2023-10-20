@@ -11,7 +11,7 @@ export default function TB(props: LayoutOptions) {
     justifyContent: props.jus ?? "center",
     alignItems: props.ali ?? "center",
     width: "100%",
-    height: "100%"
+    height: "100%",
     // marginBottom: "20px"
   }
 
@@ -21,14 +21,16 @@ export default function TB(props: LayoutOptions) {
     className: _className + (props.className ?? ""),
     // 自有属性
     space: props.space ?? undefined,
-    order: props.order ?? []
+    order: props.order ?? [],
+    margin: props.margin ?? "",
   })
 
   // 循环盒子样式
   let [bothStyle, setBothStyle] = React.useState<React.CSSProperties>({
-    marginRight: "5px",
+    marginTop: "5px",
     width: "100%",
-    height: "100%"
+    height: "100%",
+    margin: mergeProps.margin,
   })
 
   return (
@@ -47,7 +49,7 @@ export default function TB(props: LayoutOptions) {
                 style={{
                   ...bothStyle,
                   order: `${mergeProps.order![index]}`,
-                  flex: mergeProps.space ? "auto" : undefined
+                  flex: mergeProps.space ? "auto" : undefined,
                 }}
               >
                 {children}
@@ -61,7 +63,7 @@ export default function TB(props: LayoutOptions) {
                 order: `${mergeProps.order![index]}`,
                 flex: `0 0 ${
                   mergeProps.space ? mergeProps.space[index] : undefined
-                }%`
+                }%`,
               }}
             >
               {children}

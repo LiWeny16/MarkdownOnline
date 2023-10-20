@@ -11,6 +11,11 @@ interface MagicImgOptions extends NormalComponentsOptions {
   magic?: any
   src: string
 }
+
+interface DialogOptions<T> extends NormalComponentsOptions {
+  setMailSharePanelState: React.Dispatch<React.SetStateAction<T>>
+  mailSharePanelState: any
+}
 interface NormalComponentsOptions extends React.HTMLProps<HTMLDivElement> {
   // className?: string
   children?: React.ReactNode | JSX.Element
@@ -25,11 +30,10 @@ interface LayoutOptions extends NormalComponentsOptions {
   order?: Array<number>
   move?: Movement
   min?: any
+  margin? :React.CSSProperties["margin"]
 }
 
 interface Movement {
   x?: any
   y?: any
 }
-
-
