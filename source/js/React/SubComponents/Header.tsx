@@ -63,8 +63,8 @@ const boxShadow =
 const theme = createTheme({
   palette: {
     primary: lime,
-    secondary: purple
-  }
+    secondary: purple,
+  },
 })
 
 const drawerWidth = 240
@@ -89,7 +89,7 @@ const DrawerAppBar = observer((props: Props) => {
       content: "此功能仍然在开发中",
       closable: true,
       duration: 3000,
-      position: "bottom"
+      position: "bottom",
     })
   }
   const drawer = (
@@ -99,12 +99,13 @@ const DrawerAppBar = observer((props: Props) => {
         sx={{ textAlign: "center", height: "100%", bgcolor: "black" }}
       >
         <Typography
-          variant="h6"
+          variant="h1"
           sx={{
+            fontSize: "20px",
             my: 2,
             color: "wheat",
             textAlign: "center",
-            boxShadow: boxShadow
+            boxShadow: boxShadow,
           }}
         >
           Markdown+ Online View
@@ -180,60 +181,35 @@ const DrawerAppBar = observer((props: Props) => {
           </IconButton>
           <EditNoteIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
           <Typography
-            variant="h5"
+            variant="h1"
             component="a"
             fontFamily="monospace"
             href="/"
             sx={{
               flexGrow: 1,
+              fontSize: "28px",
               display: { xs: "none", sm: "block" },
               color: "wheat",
               // fontFamily: "monospace",
               fontWeight: 700,
               letterSpacing: ".3rem",
-              textDecoration: "none"
+              textDecoration: "none",
             }}
           >
             Markdown+ Online View
           </Typography>
-          <Box sx={{ display: { xs: "none", sm: "block" } }}>
-            {/* <button
-              onClick={() => {
-                image.display()
-                alert(image.displayState)
-              }}
-              style={{ backgroundColor: "red" }}
-            >
-              显示{image.displayState + "1111"}111
-            </button>
-            <button
-              onClick={() => {
-                image.hidden()
-                alert(image.displayState)
-              }}
-              style={{ backgroundColor: "red" }}
-            >
-              隐藏
-            </button> */}
+          <Box sx={{ display: { xs: "none", sm: "flex",flexDirection:"row" } }}>
             <MyButton href="https://bigonion.cn" startIcon={<LinkIcon />}>
               首页
             </MyButton>
             <MyButton
               onClick={() => {
                 enObj.enAboutBox ? aboutBox() : undefined
-                // Message.info({
-                //   content: "此功能仍然在开发中",
-                //   closable: true,
-                //   duration: 3000,
-                //   position: "bottom"
-                // })
               }}
               startIcon={<HelpOutlineIcon />}
             >
               关于
             </MyButton>
-          </Box>
-          <Box sx={{ display: { xs: "none", sm: "block" } }}>
             <Menu />
             <ImageManger />
           </Box>
@@ -246,14 +222,14 @@ const DrawerAppBar = observer((props: Props) => {
           open={mobileOpen}
           onClose={handleDrawerToggle}
           ModalProps={{
-            keepMounted: true // Better open performance on mobile.
+            keepMounted: true, // Better open performance on mobile.
           }}
           sx={{
             display: { xs: "block", sm: "none" },
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
-              width: drawerWidth
-            }
+              width: drawerWidth,
+            },
           }}
         >
           {drawer}
