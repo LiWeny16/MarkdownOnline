@@ -187,7 +187,7 @@ const DrawerAppBar = observer((props: Props) => {
             href="/"
             sx={{
               flexGrow: 1,
-              fontSize: "28px",
+
               display: { xs: "none", sm: "block" },
               color: "wheat",
               // fontFamily: "monospace",
@@ -196,9 +196,11 @@ const DrawerAppBar = observer((props: Props) => {
               textDecoration: "none",
             }}
           >
-            Markdown+ Online View
+            <h1 style={{ fontSize: "28px" }}>Markdown+ Online View</h1>
           </Typography>
-          <Box sx={{ display: { xs: "none", sm: "flex",flexDirection:"row" } }}>
+          <Box
+            sx={{ display: { xs: "none", sm: "flex", flexDirection: "row" } }}
+          >
             <MyButton href="https://bigonion.cn" startIcon={<LinkIcon />}>
               首页
             </MyButton>
