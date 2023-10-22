@@ -21,10 +21,6 @@ export default function Body() {
   }, []);
   return (
     <>
-      <h1 style={{ display: "none" }}>
-        markdown在线编辑,html在线展示,方便调试与快速实现目标效果,支持markdown基础语法。
-        预计新增:图片管理器、语音识别
-      </h1>
       <div id="topBox">
         <div id="editor">
           <MdArea />
