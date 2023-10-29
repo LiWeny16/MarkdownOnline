@@ -3,9 +3,9 @@ import ArchiveIcon from "@mui/icons-material/Archive"
 import AttachEmailIcon from "@mui/icons-material/AttachEmail"
 import StyledMenu from "@Com/myCom/StyleMenu"
 import MenuItem from "@mui/material/MenuItem"
-import mailCss from "@Css/mail.css?raw"
-import katexCss from "@Css/katex.min.css?raw"
-import hljsCss from "@Css/hljs.css?raw"
+// import mailCss from "@Css/mail.css?raw"
+// import katexCss from "@Css/katex.min.css?raw"
+// import hljsCss from "@Css/hljs.css?raw"
 
 // dialog
 import Button from "@mui/material/Button"
@@ -41,8 +41,9 @@ export default function Share(props: any) {
         to: mailTo,
         subject: "Mailed from Markdown Online+",
         html:
-          `<div class="markdown-body">${getRenderHTML()}</div>` +
-          `<style>${mailCss + katexCss + hljsCss}</style>`,
+          `<div class="markdown-body">${getRenderHTML()}</div>` ,
+          // `<style>${mailCss + katexCss + hljsCss}</style>`,
+        raw: 0,
       }
     )
     handleCloseAll(e)
