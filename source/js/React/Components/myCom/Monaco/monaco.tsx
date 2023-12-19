@@ -1,6 +1,12 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
+import { loader } from '@monaco-editor/react';
 import Editor from '@monaco-editor/react';
+loader.config({
+  paths: {
+    vs: "https://md.bigonion.cn/source/assets/cdn/min/vs/",
+  },
+})
 const files:any = {
   'script.js': {
     name: 'script.js',
@@ -20,13 +26,12 @@ const files:any = {
 };
 export default function MonacoEditor() {
   const [fileName, setFileName] = useState('script.js');
-
   const file = files[fileName];
 
   return (
     <>
-      <div style={{position:"absolute",left:"36%",height:"50vh"}}>
-      <button disabled={fileName === 'script.js'} onClick={() => setFileName('script.js')}>
+      <div style={{position:"absolute",left:"36%",top:"20%",height:"50vh"}}>
+      {/* <button disabled={fileName === 'script.js'} onClick={() => setFileName('script.js')}>
         script.js
       </button>
       <button disabled={fileName === 'style.css'} onClick={() => setFileName('style.css')}>
@@ -34,9 +39,10 @@ export default function MonacoEditor() {
       </button>
       <button disabled={fileName === 'index.md'} onClick={() => setFileName('index.md')}>
         index.md
-      </button>
+      </button> */}
       <Editor
-        height="40vh"
+        height="50vh"
+        width={"40vw"}
         theme="vs-dark"
         path={file.name}
         defaultLanguage={file.language}
