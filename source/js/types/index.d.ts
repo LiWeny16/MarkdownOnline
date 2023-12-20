@@ -56,6 +56,23 @@ declare module "dom-to-image" {
 }
 
 
+declare module "@cdn-marked" {
+  const marked: any
+  export { marked }
+}
+declare module "@cdn-mermaid" {
+  const mermaid: any
+  export default mermaid 
+}
+declare module "@cdn-kit" {
+  const kit: any
+  export default kit 
+}
+
+declare module "@cdn-hljs" {
+  const hljs: any
+  export default hljs 
+}
 // declare module "@Root/js/functions/aboutBox" {
 //   const aboutBox: any
 //   export default aboutBox
@@ -85,9 +102,8 @@ declare module "*index.js" {
 
 declare interface Window {
   clipboardData: any
-}
-
-interface Window {
+  editor: any
+  monaco: any
   theme: string
   location: any
 }

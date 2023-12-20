@@ -7,6 +7,17 @@
 @import url("./body.less");
 // @import url("https://unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/default.min.css");
 @import url("https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.css");
+
+.draggable-box {
+  width: fit-content;
+  // height: 60vh;
+  background-color: rgb(0, 0, 0);
+  position: absolute;
+  user-select: none;
+  cursor: grab;
+  z-index: 9999;
+}
+
 #topBox {
   display: flex;
   flex-direction: column;
@@ -41,8 +52,6 @@
   width: 100%;
   border: 1px solid #111;
 }
-
-
 
 /**
 @my hljs

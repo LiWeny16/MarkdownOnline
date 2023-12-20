@@ -20,6 +20,10 @@ export default defineConfig({
   resolve: {
     alias: {
       // mermaid: "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs",
+      "@cdn-marked":"https://npm.elemecdn.com/marked/lib/marked.esm.js",
+      "@cdn-mermaid":"https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs",
+      "@cdn-kit":"https://npm.elemecdn.com/bigonion-kit@0.11.0/esm/esm-kit.mjs",
+      "@cdn-hljs":"https://npm.elemecdn.com/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js",
       "@Asset": resolve(__dirname, "./source/assets"),
       "@App":resolve(__dirname,"./source/js/functions/App/"),
       "@Func":resolve(__dirname,"./source/js/functions"),

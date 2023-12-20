@@ -8,28 +8,26 @@
 //   updateDB
 // } from "@App/db.js"
 import { Message } from "@arco-design/web-react"
-import getMdText from "@App/text/getMdText"
+import getMdText, { getMdTextFromMonaco } from "@App/text/getMdText"
 import {
   fillInMemoryText,
   readMemoryText,
-  readMemoryImg
+  readMemoryImg,
 } from "@App/textMemory/memory"
-export default (message = true) => {
-  if (message) {
+export default function save(message = true) {
+  let text = getMdTextFromMonaco()
+  if (message && text != "null") {
     Message.success({
       style: { position: "relative", zIndex: 1 },
       content: "保存成功!",
       closable: true,
       duration: 2500,
-      position: "top"
+      position: "top",
     })
+    fillInMemoryText(text)
+  } else {
+    save()
   }
-  fillInMemoryText(getMdText()!)
-  // readMemoryImg("users_img",1694491426117)
-  // readMemoryText((list: any) => {
-  //   console.log(list)
-  // })
-  // console.log(readMemoryText());
 }
 
 export async function isSaved() {

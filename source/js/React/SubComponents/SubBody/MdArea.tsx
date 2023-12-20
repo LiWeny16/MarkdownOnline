@@ -3,7 +3,7 @@ import MonacoEditor from '@Com/myCom/Monaco/monaco'
 export default function MdArea() {
   return (
     <>
-    <textarea placeholder="" id="md-area" ></textarea>
+    {/* <textarea style={{display:"none"}} placeholder="" id="md-area" ></textarea> */}
     <MonacoEditor/>
     </>
   )

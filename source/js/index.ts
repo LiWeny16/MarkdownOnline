@@ -2,24 +2,24 @@
 // import dragFileEvent from "./functions/Events/dragFile"
 // import pasteEvent from "./functions/Events/pasteEvent"
 // import welcomeText from "../assets/welcome.md?raw"
-import { marked } from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
-import mermaid from "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs"
+// import { marked } from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
+import { marked } from "@cdn-marked"
+import mermaid from "@cdn-mermaid"
 // import "https://cdn.bootcdn.net/ajax/libs/mermaid/10.2.0/mermaid.min.js"
 // import mermaid from "https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.esm.min.mjs"
-import kit from "https://npm.elemecdn.com/bigonion-kit@0.11.0/esm/esm-kit.mjs"
+import kit from "@cdn-kit"
 // import hljs from "https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"
-import hljs from "https://npm.elemecdn.com/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js"
+import hljs from "@cdn-hljs"
 import "https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.js"
 // import {katex} from "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"
 import replaceAsync from "string-replace-async"
-import getMdText from "@App/text/getMdText"
-import blankTextInit from "@Root/js/functions/Init/blankTextInit"
+import getMdText, { getMdTextFromMonaco } from "@App/text/getMdText"
 // import { fillInMemoryImg, readMemoryImg } from "@App/textMemory/memory"
 import pageBreaker from "@Func/Parser/pageBreaker"
 import virtualFileSystem from "@Func/Parser/VFS"
 import "../css/index.less"
 import "@arco-design/web-react/dist/css/arco.css"
-import { Notification } from "@arco-design/web-react"
+
 import { isSyntaxValid } from "@App/script.ts"
 // import "https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
 /**
@@ -48,44 +48,6 @@ export const enObj = {
 //     allInit()
 //   })
 // })()
-/**
- * @description 初始化配置和事件初始化
- * @returns {void}
- */
-export function allInit(): void {
-  /**@description Settings Init*/
-  const settings = new settingsClass()
-  settings.settingsAllInit()
-
-  /**@description Input Area Init*/
-  blankTextInit().then(() => {
-    mdConverter()
-    // kit.sleep(300).then(()=>{
-    // })
-  }) //初始化输入区域
-  Notification.success({
-    title: "已更新到最新版本",
-    content: `当前版本:v1.2.1`,
-    position: "bottomRight",
-  })
-  kit.sleep(200).then(() => {
-    Notification.info({
-      title: "版本新增特性",
-      content: `新增图片导出,邮箱分享`,
-      position: "bottomRight",
-    })
-  })
-
-  /***@description All Events */
-  enObj.enMainConverter
-    ? triggerConverterEvent()
-    : console.log("converter if off") //按下写字板触发事件
-  // enObj.enPdfExport ? exportToPdfEvent() : console.log("pdf export is off") //导出PDF
-  // enObj.enDragFile ? dragFileEvent() : console.log("dragFile is off") //开启拖拽事件
-  // enObj.enAboutBox ? aboutBox() : console.log("aboutBox is off")
-  // enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is off") //开启快捷键事件
-  // enObj.enPasteEvent ? pasteEvent() : console.log("Paste Event is off") //开启快捷键事件
-}
 
 /**
  * @description 循环执行触发主解析事件流
@@ -93,7 +55,9 @@ export function allInit(): void {
  */
 export async function mdConverter(save: boolean = true) {
   //按键触发，主函数
-  let view: any = getMdText()
+  let view: any = getMdTextFromMonaco()
+  // let view:any = getMdText()
+  console.log(view);
   enObj.enClue ? (view = await clueParser(view)) : console.log("clue off")
 
   enObj.enPageBreaker
@@ -119,37 +83,6 @@ export async function mdConverter(save: boolean = true) {
 /**
  * @description 初始化设置类
  */
-class settingsClass {
-  constructor() {}
-  markedInit() {
-    marked.use({
-      mangle: false,
-      headerIds: false,
-      strict: false,
-    })
-  }
-  mermaidInit() {
-    mermaid.initialize({
-      securityLevel: "loose",
-      startOnLoad: false,
-      theme: "base",
-    })
-    mermaid.mermaidAPI.initialize({ startOnLoad: false })
-  }
-  hljsInit() {
-    hljs.configure({
-      ignoreUnescapedHTML: true,
-    })
-  }
-  settingsAllInit() {
-    this.markedInit()
-    this.mermaidInit()
-    this.hljsInit()
-  }
-  static newSettings() {
-    return new this()
-  }
-}
 
 /**
  * @description clue CSS HTML
@@ -325,36 +258,3 @@ function writePre(text: any) {
 function reverseString(str: any) {
   return str.split("").reverse().join("")
 }
-
-function triggerConverterEvent() {
-  document.getElementById("md-area")!.addEventListener("keyup", () => {
-    mdConverter()
-  })
-  document.getElementById("md-area")!.addEventListener("blur", () => {
-    mdConverter()
-  })
-}
-// /**
-//  * @description 初始化写字板
-//  */
-// function blankTextInit() {
-//   openDB("md_content", 2).then((db) => {
-//     let initData = {
-//       uuid: new Date().getTime(),
-//       contentText: getMdText()
-//     }
-//     // addData(db, "users", data)
-//     // getDataByKey(db, "users", 1691843289748)
-//     // updateDB(db, "users", data)
-//     cursorGetData(db, "users")
-//     getDataByIndex(db, "users", "contentText", "123")
-//     // cursorGetDataByIndex(db, "users", "uuid", 2)
-//   })
-//   if (kit.getCookie("contentText")) {
-//     //有cookie
-//     fillInRemeText()
-//   } else {
-//     //否则显示教程
-//     writeMdText(welcomeText)
-//   }
-// }

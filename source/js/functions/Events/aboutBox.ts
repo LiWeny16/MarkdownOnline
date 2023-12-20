@@ -1,4 +1,4 @@
-import * as marked_esm from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
+import * as marked_esm from "@cdn-marked"
 import svg_1 from "@Asset/img/aboutBox关闭.svg"
 import welcomeText from "@Asset/about.md?raw"
 export default () => {

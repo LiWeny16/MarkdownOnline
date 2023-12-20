@@ -3,7 +3,7 @@ import save from "@App/save"
 import replaceSelection from "@App/text/replaceText"
 import sound from "@App/sound/sound"
 import qiniuFileAPI from "@App/qiniu/index"
-import insertTextAtCursor from "@App/text/insertTextAtCursor"
+// import insertTextAtCursor from "@App/text/insertTextAtCursor"
 /**
  * @description 使能快捷键
  */
@@ -12,22 +12,27 @@ function enableFastKeyEvent() {
   let _rec: any
   document.addEventListener("keydown", (e) => {
     e.stopPropagation() //停止冒泡，向上传递事件
-    let editor = document.getElementById("md-area")
+    // let editor = document.getElementById("md-area")
 
     // console.log(e);
 
     // TAB
     if (e.key == "Tab") {
       e.preventDefault()
-      insertTextAtCursor(editor,"    ")
+      // insertTextAtCursor(editor,"    ")
     }
+    // if (e.ctrlKey && e.key == "v") {
+    //   e.stopPropagation()
+    //   e.preventDefault()
+    //   console.log(e);
+    // }
     // Ctrl + B 黑体
     if (e.ctrlKey && e.key == "b") {
-      replaceSelection(editor, "**", "**")
+      // replaceSelection(editor, "**", "**")
     }
     // Alt + C 中心
     if (e.key == "c" && e.altKey) {
-      replaceSelection(editor, "<center>", "</center>")
+      // replaceSelection(editor, "<center>", "</center>")
     }
     //  Ctrl+ S 保存
     if (e.ctrlKey && e.key == "s") {

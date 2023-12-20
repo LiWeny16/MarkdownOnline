@@ -1,24 +1,56 @@
-import React, { useState } from 'react';  
-  
-const ResizableBox = () => {  
-  const [width, setWidth] = useState(200); // 设置初始宽度为200px  
-  
-  const handleDrag = (event:any) => {  
-    // 处理拖拽事件，根据鼠标移动的距离来动态改变宽度  
-    const newWidth = width + event.movementX;  
-    setWidth(newWidth);  
-  };  
-  
-  return (  
-    <div  
-      style={{ width: `${width}px`, border: '1px solid black', padding: '10px' }}  
-      draggable="true"  
-      onDrag={handleDrag}  
-    >  
-      {/* 这里可以添加盒子的内容 */}  
-      Resizable Box  
-    </div>  
-  );  
-};  
-  
-export default ResizableBox;  
+import React, { useState } from 'react';
+
+const DraggableBox = (props:any) => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    setOffset({
+      x: e.clientX - position.x,
+      y: e.clientY - position.y
+    });
+  };
+
+  const handleMouseMove = (e) => {
+    if (isDragging) {
+      let newX = e.clientX - offset.x;
+      let newY = e.clientY - offset.y;
+
+      if (newX < 0) {
+        newX = 0;
+      } else if (newX > window.innerWidth - 100) {
+        newX = window.innerWidth - 100;
+      }
+
+      if (newY < 0) {
+        newY = 0;
+      } else if (newY > window.innerHeight - 100) {
+        newY = window.innerHeight - 100;
+      }
+
+      setPosition({ x: newX, y: newY });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  return (
+    <div
+      className="draggable-box"
+      style={{
+        transform: `translate(${position.x}px, ${position.y}px)`,
+      }}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleMouseMove}
+      onMouseUp={handleMouseUp}
+    >
+      {props.children}
+    </div>
+  );
+};
+
+export default DraggableBox;

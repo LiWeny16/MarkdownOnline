@@ -10,8 +10,8 @@ import MdArea from "./SubBody/MdArea";
 function enEvents(doIt: boolean): void {
   if (doIt) {
     enObj.enFastKey ? fastKeyEvent() : undefined;
-    enObj.enPasteEvent ? pasteEvent() : undefined;
-    enObj.enDragFile ? dragFileEvent() : undefined;
+    // enObj.enPasteEvent ? pasteEvent() : undefined;
+    // enObj.enDragFile ? dragFileEvent() : undefined;
   }
 }
 
