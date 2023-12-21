@@ -65,7 +65,7 @@ export default function allInit(): void {
       position: "bottomRight",
     })
   })
-
+  window.theme = "light"
   /***@description All Events */
   // enObj.enMainConverter
   //   ? triggerConverterEvent()

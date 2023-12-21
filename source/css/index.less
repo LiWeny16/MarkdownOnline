@@ -1,7 +1,7 @@
 @import url("./print.less") print;
 @import url("./header.less");
 @import url("./response.less");
-@import url("./githubMarkdownCss.less");
+@import url("./githubMdLight.css");
 @import url("./clueParser.css");
 @import url("./aboutBox.css");
 @import url("./body.less");
@@ -29,6 +29,7 @@
     width: 100%;
 
     #view-area {
+      width: 100%;
       overflow-y: auto;
       height: 100%;
     }
@@ -37,7 +38,7 @@
       padding: 26px 38px;
       resize: horizontal;
       background: white;
-      border: 1px solid #9d9898;
+      // border: 1px solid #9d9898;
       /* width: 100%; */
     }
   }
@@ -48,11 +49,15 @@
   justify-content: center;
 }
 
-#view-area {
-  width: 100%;
-  border: 1px solid #111;
+.theme-light {
+  background: white;
 }
-
+.theme-dark {
+  background: #1e1e1e;
+}
+.monaco-editor-inner{
+  padding: 20px 0px 0px 0px;
+}
 /**
 @my hljs
 */

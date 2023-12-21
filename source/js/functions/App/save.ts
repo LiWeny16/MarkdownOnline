@@ -8,7 +8,7 @@
 //   updateDB
 // } from "@App/db.js"
 import { Message } from "@arco-design/web-react"
-import getMdText, { getMdTextFromMonaco } from "@App/text/getMdText"
+import  { getMdTextFromMonaco } from "@App/text/getMdText"
 import {
   fillInMemoryText,
   readMemoryText,
@@ -33,7 +33,7 @@ export default function save(message = true) {
 export async function isSaved() {
   return await readMemoryText().then((list) => {
     if (list) {
-      if (list[0]?.contentText === getMdText()) {
+      if (list[0]?.contentText === getMdTextFromMonaco()) {
         // 已保存
         return true
       } else {

@@ -8,7 +8,7 @@ import {
   updateDB
 } from "@App/db.js"
 import welcomeText from "@Asset/welcome.md?raw"
-import getMdText from "@App/text/getMdText"
+// import getMdText from "@App/text/getMdText"
 import { fillInMemoryText, readMemoryText } from "@App/textMemory/memory"
 /**
  * @description 初始化写字板

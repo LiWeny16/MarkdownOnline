@@ -4,13 +4,16 @@ import { loader, Monaco } from "@monaco-editor/react"
 import Editor from "@monaco-editor/react"
 import DraggableBox from "@Com/myCom/DragBox"
 import { getMdTextFromMonaco } from "@App/text/getMdText"
-import * as monaco from "monaco-editor"
+// import * as monaco from "monaco-editor"
 import allInit from "@Func/Init/allInit"
 import { monacoPasteEvent } from "@Func/Events/pasteEvent"
 import { editor } from "monaco-editor"
 import { triggerConverterEvent } from "@Func/Events/convert"
-import { transform } from "html2canvas/dist/types/css/property-descriptors/transform"
+// import { transform } from "html2canvas/dist/types/css/property-descriptors/transform"
 // loader.config({ monaco });
+import { useTheme } from "@Root/js/React/Mobx/Theme"
+import { observer } from "mobx-react"
+import changeTheme from "@App/theme/change"
 loader.config({
   paths: {
     vs: "https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/monaco-editor/0.33.0-dev.20220228/min/vs/",
@@ -34,10 +37,11 @@ const files: any = {
     value: "",
   },
 }
-export default function MonacoEditor() {
+export default observer(function MonacoEditor() {
+  let theme = useTheme().themeState
   const editorOptions = {
-    fontSize: 18  // 设置字体大小
-  };
+    fontSize: 16, // 设置字体大小
+  }
   const [fileName, setFileName] = useState("index.md")
   // let previousValue = window.editor.getValue();
   const file = files[fileName]
@@ -58,13 +62,20 @@ export default function MonacoEditor() {
     <>
       {/* <DraggableBox> */}
       <div
-        style={{ transform: "translateY(1vh)", padding: "10px 0px 0px 0px" }}
         id="monaco-editor"
       >
+        {/* <button
+          onClick={() => {
+            changeTheme()
+          }}
+        >
+          change theme
+        </button> */}
         <Editor
+          className="monaco-editor-inner"
           height="90vh"
           width="50vw"
-          theme="vs-light"
+          theme={theme == "light" ? "vs-light" : "vs-dark"}
           path={file.name}
           defaultLanguage={file.language}
           defaultValue={file.value}
@@ -76,4 +87,4 @@ export default function MonacoEditor() {
       {/* </DraggableBox> */}
     </>
   )
-}
+})

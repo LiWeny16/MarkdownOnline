@@ -7,7 +7,7 @@ import {
   cursorGetData,
   updateDB
 } from "@App/db.js"
-import getMdText from "@App/text/getMdText"
+// import getMdText from "@App/text/getMdText"
 
 export function fillInMemoryText(md: MD) {
   openDB("md_content", 2).then((db: DB) => {

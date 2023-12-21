@@ -1,31 +1,43 @@
-import React from "react";
+import React from "react"
 
 // import fastKeyEvent from "@Root/js/functions/fastKey"
-import { kit, enObj } from "@Root/js/index";
-import fastKeyEvent from "@Func/Events/fastKey";
-import pasteEvent from "@Func/Events/pasteEvent";
-import dragFileEvent from "@Func/Events/dragFile";
-import MdArea from "./SubBody/MdArea";
-
+import { kit, enObj } from "@Root/js/index"
+import fastKeyEvent from "@Func/Events/fastKey"
+import pasteEvent from "@Func/Events/pasteEvent"
+import dragFileEvent from "@Func/Events/dragFile"
+import MdArea from "./SubBody/MdArea"
+import { observer } from "mobx-react"
+import { useImage } from "@Root/js/React/Mobx/Image.ts"
+import { useTheme } from "@Root/js/React/Mobx/Theme"
 function enEvents(doIt: boolean): void {
   if (doIt) {
-    enObj.enFastKey ? fastKeyEvent() : undefined;
-    // enObj.enPasteEvent ? pasteEvent() : undefined;
-    // enObj.enDragFile ? dragFileEvent() : undefined;
+    enObj.enFastKey ? fastKeyEvent() : undefined
   }
 }
 
-export default function Body() {
+export default observer(function Body() {
+  // const image = useImage()
+  let theme = useTheme()
   React.useEffect(() => {
-    enEvents(true);
-  }, []);
+    enEvents(true)
+  }, [])
   return (
     <>
       <div id="topBox">
-        <div id="editor">
+        <div
+          id="editor"
+          className={theme.themeState == "light" ? "theme-light" : "theme-dark"}
+        >
           <MdArea />
           <article id="view-area-hidden" className="hidden-pre"></article>
-          <article id="view-area" className="markdown-body"></article>
+          <article
+            id="view-area"
+            className={
+              theme.themeState == "light"
+                ? "markdown-body"
+                : "markdown-body-dark"
+            }
+          ></article>
         </div>
       </div>
 
@@ -37,5 +49,5 @@ export default function Body() {
         </div>
       </div>
     </>
-  );
-}
+  )
+})

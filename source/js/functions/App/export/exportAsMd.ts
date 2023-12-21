@@ -1,10 +1,10 @@
 import { kit } from "@Root/js/index"
 import html2canvas from "html2canvas"
-import getMdText from "@App/text/getMdText";
+import {getMdTextFromMonaco} from "@App/text/getMdText";
 // var node = document.getElementById("view-area")!
 
 export default function exportAsMd() {
-  let md = getMdText() ?? ""
+  let md = getMdTextFromMonaco() ?? ""
   kit.sleep(250).then(() => {
     // 使用 html2canvas 将 HTML 元素渲染为图像
 

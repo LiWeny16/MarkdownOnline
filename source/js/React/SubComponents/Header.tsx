@@ -72,8 +72,8 @@ const drawerWidth = 240
 
 const DrawerAppBar = observer((props: Props) => {
   const { window } = props
-  const image = useImage()
-  const [mobileOpen, setMobileOpen] = React.useState(false)
+  // const image = useImage()
+    const [mobileOpen, setMobileOpen] = React.useState(false)
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState)
@@ -212,6 +212,7 @@ const DrawerAppBar = observer((props: Props) => {
             >
               关于
             </MyButton>
+            {/* 更多 */}
             <Menu />
             <ImageManger />
           </Box>

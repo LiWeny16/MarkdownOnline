@@ -5,7 +5,7 @@ const DraggableBox = (props:any) => {
   const [isDragging, setIsDragging] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
-  const handleMouseDown = (e) => {
+  const handleMouseDown = (e:any) => {
     setIsDragging(true);
     setOffset({
       x: e.clientX - position.x,
@@ -13,7 +13,7 @@ const DraggableBox = (props:any) => {
     });
   };
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e:any) => {
     if (isDragging) {
       let newX = e.clientX - offset.x;
       let newY = e.clientY - offset.y;

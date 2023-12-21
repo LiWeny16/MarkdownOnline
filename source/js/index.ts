@@ -13,7 +13,7 @@ import hljs from "@cdn-hljs"
 import "https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.js"
 // import {katex} from "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"
 import replaceAsync from "string-replace-async"
-import getMdText, { getMdTextFromMonaco } from "@App/text/getMdText"
+import  { getMdTextFromMonaco } from "@App/text/getMdText"
 // import { fillInMemoryImg, readMemoryImg } from "@App/textMemory/memory"
 import pageBreaker from "@Func/Parser/pageBreaker"
 import virtualFileSystem from "@Func/Parser/VFS"
@@ -57,7 +57,7 @@ export async function mdConverter(save: boolean = true) {
   //按键触发，主函数
   let view: any = getMdTextFromMonaco()
   // let view:any = getMdText()
-  console.log(view);
+  // console.log(view);
   enObj.enClue ? (view = await clueParser(view)) : console.log("clue off")
 
   enObj.enPageBreaker
