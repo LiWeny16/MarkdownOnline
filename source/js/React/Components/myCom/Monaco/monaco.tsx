@@ -14,6 +14,8 @@ import { triggerConverterEvent } from "@Func/Events/convert"
 import { useTheme } from "@Root/js/React/Mobx/Theme"
 import { observer } from "mobx-react"
 import changeTheme from "@App/theme/change"
+import monacoKeyDownEvent from "@Func/Events/key/monacoKey"
+import monacoKeyEvent from "@Func/Events/key/monacoKey"
 loader.config({
   paths: {
     vs: "https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/monaco-editor/0.33.0-dev.20220228/min/vs/",
@@ -46,7 +48,9 @@ export default observer(function MonacoEditor() {
   // let previousValue = window.editor.getValue();
   const file = files[fileName]
   // const editorRef = useRef(null)
-
+  function handleOnChange() {
+    triggerConverterEvent(4)
+  }
   function handleEditorDidMount(
     editor: editor.IStandaloneCodeEditor,
     monaco: Monaco
@@ -56,14 +60,15 @@ export default observer(function MonacoEditor() {
     window.editor = editor
     window.monaco = monaco
     monacoPasteEvent()
+    monacoKeyEvent()
+    // monacoKeyDownEvent()
     allInit()
+ 
   }
   return (
     <>
       {/* <DraggableBox> */}
-      <div
-        id="monaco-editor"
-      >
+      <div id="monaco-editor">
         {/* <button
           onClick={() => {
             changeTheme()
@@ -77,10 +82,11 @@ export default observer(function MonacoEditor() {
           width="50vw"
           theme={theme == "light" ? "vs-light" : "vs-dark"}
           path={file.name}
+          // language="markdown"
           defaultLanguage={file.language}
           defaultValue={file.value}
           onMount={handleEditorDidMount}
-          onChange={triggerConverterEvent}
+          onChange={handleOnChange}
           options={editorOptions}
         />
       </div>

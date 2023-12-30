@@ -73,6 +73,12 @@ declare module "@cdn-hljs" {
   const hljs: any
   export default hljs 
 }
+
+declare module "@cdn-katex" {
+  const hljs: any
+  export default hljs 
+}
+
 // declare module "@Root/js/functions/aboutBox" {
 //   const aboutBox: any
 //   export default aboutBox

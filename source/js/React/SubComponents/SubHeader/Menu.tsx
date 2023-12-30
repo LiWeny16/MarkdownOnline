@@ -26,6 +26,7 @@ import { getRenderHTML } from "@App/text/getMdText"
 import exportAsImage from "@App/export/domToImg"
 import Share from "./Share/Share"
 import Export from "./Export/Export"
+import Settings from "./Settings/Settings"
 // import domtoimg from "@App/export/domToImg"
 
 const CustomizedMenus = observer(() => {
@@ -39,10 +40,14 @@ const CustomizedMenus = observer(() => {
   // 3导出 anchor
   const [anchorEl3, setAnchorEl3] = React.useState<null | HTMLElement>(null)
 
+  // 4设置 anchor
+  const [anchorEl4, setAnchorEl4] = React.useState<null | HTMLElement>(null)
+
   const [modalState, setModalState] = React.useState<boolean>(false)
   const open = Boolean(anchorEl)
   const open2 = Boolean(anchorEl2)
   const open3 = Boolean(anchorEl3)
+  const open4 = Boolean(anchorEl4)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -61,6 +66,9 @@ const CustomizedMenus = observer(() => {
       setModalState(true)
     }
   }
+  const handleClick4 = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl4(event.currentTarget)
+  }
   const handleCloseMenu = () => {
     setAnchorEl(null)
   }
@@ -70,6 +78,10 @@ const CustomizedMenus = observer(() => {
   }
   const handleCloseExport = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl3(null)
+    e.stopPropagation()
+  }
+  const handleCloseSettings = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl4(null)
     e.stopPropagation()
   }
   const handleImageManager = () => {
@@ -135,7 +147,7 @@ const CustomizedMenus = observer(() => {
           <Export
             anchorEl={anchorEl3}
             open={open3}
-            closeMenu = {handleCloseMenu}
+            closeMenu={handleCloseMenu}
             closeExportMenu={handleCloseExport}
           />
         </MenuItem>
@@ -152,6 +164,21 @@ const CustomizedMenus = observer(() => {
             anchorEl={anchorEl2}
             open={open2}
             onClick={handleCloseShare}
+          />
+        </MenuItem>
+
+        <MenuItem
+          onClick={(e) => {
+            handleClick4(e)
+            // handleCloseMenu()
+          }}
+          disableRipple
+        >
+          <Settings
+            closAll={handleCloseMenu}
+            anchorEl={anchorEl4}
+            open={open4}
+            onClick={handleCloseSettings}
           />
         </MenuItem>
 

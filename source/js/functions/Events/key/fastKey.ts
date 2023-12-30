@@ -2,7 +2,7 @@
 import save from "@App/save"
 import replaceSelection from "@App/text/replaceText"
 import sound from "@App/sound/sound"
-import qiniuFileAPI from "@App/qiniu/index"
+// import qiniuFileAPI from "@App/qiniu/index"
 // import insertTextAtCursor from "@App/text/insertTextAtCursor"
 /**
  * @description 使能快捷键
@@ -52,7 +52,7 @@ function enableFastKeyEvent() {
     }
     if (e.key == "o" && e.altKey && e.ctrlKey) {
       // let rec = sound("zh-CN")
-      qiniuFileAPI()
+      // qiniuFileAPI()
       // console.log(rec.recognition)
     }
   })

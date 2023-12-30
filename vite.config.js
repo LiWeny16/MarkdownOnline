@@ -24,6 +24,7 @@ export default defineConfig({
       "@cdn-mermaid":"https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs",
       "@cdn-kit":"https://npm.elemecdn.com/bigonion-kit@0.11.0/esm/esm-kit.mjs",
       "@cdn-hljs":"https://npm.elemecdn.com/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js",
+      "@cdn-katex":"https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.js",
       "@Asset": resolve(__dirname, "./source/assets"),
       "@App":resolve(__dirname,"./source/js/functions/App/"),
       "@Func":resolve(__dirname,"./source/js/functions"),

@@ -10,7 +10,7 @@ import mermaid from "@cdn-mermaid"
 import kit from "@cdn-kit"
 // import hljs from "https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"
 import hljs from "@cdn-hljs"
-import "https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.js"
+import "@cdn-katex"
 // import {katex} from "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"
 import replaceAsync from "string-replace-async"
 import  { getMdTextFromMonaco } from "@App/text/getMdText"
@@ -90,7 +90,8 @@ export async function mdConverter(save: boolean = true) {
  */
 function clueParser(md: any) {
   return new Promise(async (resolve) => {
-    md = md.replace(/\n/g, ">br") //暂时替代换行符号
+    md = md.replace(/\n/g, "?br") //暂时替代换行符号
+    // const regForEscape = /```(.*?)```/gs
     const reg1 = /".*?"\..*?\s/g //整个"content".CLASS 结构
     const reg2 = /".*?"/g //匹配 "之间"
     const reg3 = /\..*?\s/g //匹配class 的. 和空格之间 未反转前
@@ -98,6 +99,9 @@ function clueParser(md: any) {
     const reg4 = /(?<=.).*?(?=\s)/g //匹配 . 和 空格之间 不包括. \s
     const reg5 = /(?<=").*(?=")/g //匹配"之间"不包括""
     if (md) {
+      // if(md.match(regForEscape)){
+
+      // }
       md = await replaceAsync(md, reg1, temp)
       async function temp(e: any, _seq: any) {
         var parsedHTML = "f"
@@ -116,7 +120,7 @@ function clueParser(md: any) {
         }
         // console.log(content);
         // console.log(clueClass);
-        content = content.replace(/\>br/g, "\n") //解除换行限制
+        content = content.replace(/\?br/g, "\n") //解除换行限制
         if (clueClass == "mermaid") {
           // parsedHTML = `<pre class="${clueClass}">${content}</pre>`
           // try {
@@ -149,7 +153,7 @@ function clueParser(md: any) {
         return parsedHTML
       }
     }
-    md = md.replace(/\>br/g, "\n")
+    md = md.replace(/\?br/g, "\n")
     resolve(md)
   })
 }

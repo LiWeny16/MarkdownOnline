@@ -93,7 +93,7 @@ const DrawerAppBar = observer((props: Props) => {
     })
   }
   const drawer = (
-    <ThemeProvider theme={theme}>
+    // <ThemeProvider theme={theme}>
       <Box
         onClick={handleDrawerToggle}
         sx={{ textAlign: "center", height: "100%", bgcolor: "black" }}
@@ -160,7 +160,7 @@ const DrawerAppBar = observer((props: Props) => {
           </ListItem>
         </List>
       </Box>
-    </ThemeProvider>
+    // </ThemeProvider>
   )
 
   return (

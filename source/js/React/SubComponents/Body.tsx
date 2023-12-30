@@ -2,13 +2,14 @@ import React from "react"
 
 // import fastKeyEvent from "@Root/js/functions/fastKey"
 import { kit, enObj } from "@Root/js/index"
-import fastKeyEvent from "@Func/Events/fastKey"
+import fastKeyEvent from "@Func/Events/key/fastKey"
 import pasteEvent from "@Func/Events/pasteEvent"
 import dragFileEvent from "@Func/Events/dragFile"
 import MdArea from "./SubBody/MdArea"
 import { observer } from "mobx-react"
 import { useImage } from "@Root/js/React/Mobx/Image.ts"
 import { useTheme } from "@Root/js/React/Mobx/Theme"
+
 function enEvents(doIt: boolean): void {
   if (doIt) {
     enObj.enFastKey ? fastKeyEvent() : undefined
@@ -30,14 +31,7 @@ export default observer(function Body() {
         >
           <MdArea />
           <article id="view-area-hidden" className="hidden-pre"></article>
-          <article
-            id="view-area"
-            className={
-              theme.themeState == "light"
-                ? "markdown-body"
-                : "markdown-body-dark"
-            }
-          ></article>
+          <article id="view-area" className={"markdown-body"}></article>
         </div>
       </div>
 
