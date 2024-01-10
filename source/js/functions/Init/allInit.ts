@@ -1,5 +1,6 @@
 import hljs from "@cdn-hljs"
 import { marked } from "@cdn-marked"
+// import { marked } from "marked"
 import mermaid from "@cdn-mermaid"
 import blankTextInit from "./blankTextInit"
 import { enObj, mdConverter } from "@Root/js"
@@ -7,14 +8,46 @@ import { Notification } from "@arco-design/web-react"
 import kit from "@cdn-kit"
 import { triggerConverterEvent } from "@Func/Events/convert"
 
+// 创建renderer
+// const renderer = new marked.Renderer();
+
+// // // 重写代码块渲染函数
+// renderer.code = function (code: any, language: string) {
+//   if (language === 'mermaid') {
+//     // 如果是mermaid代码块，将代码用<pre><code>标签包裹，并赋予class属性以便后续mermaid初始化
+//     return `<pre><code class="mermaid">${code}</code></pre>`;
+//   } else {
+//     // 其他代码块按照默认渲染
+//     return marked.Renderer.prototype.code.apply(this, arguments);
+//   }
+// };
+// const md = marked.setOptions({ renderer });
+const renderer = {
+  heading(text: string, level: any) {
+    const escapedText = text.toLowerCase().replace(/[^\w]+/g, "-")
+
+    return `
+            <h${level}>
+              <a name="${escapedText}" class="anchor" href="#${escapedText}">
+                <span class="header-link"></span>
+              </a>
+              ${text}
+            </h${level}>`
+  },
+}
+// 渲染markdown文本
+// const html = md("\`\`\`mermaid\n nihao\`\`\`");
+// console.log(html);
 class settingsClass {
   constructor() {}
   markedInit() {
     marked.use({
+      // renderer:renderer,
       mangle: false,
       headerIds: false,
       strict: false,
     })
+    // marked.use({ renderer })
   }
   mermaidInit() {
     mermaid.initialize({
@@ -76,5 +109,3 @@ export default function allInit(): void {
   // enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is off") //开启快捷键事件
   // enObj.enPasteEvent ? pasteEvent() : console.log("Paste Event is off") //开启快捷键事件
 }
-
-

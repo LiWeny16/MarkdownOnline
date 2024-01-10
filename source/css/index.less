@@ -18,6 +18,22 @@
   z-index: 9999;
 }
 
+.custom-resizable .react-resizable-handle {
+  height: 100%;
+  transform: translateX(1.3vw);
+  width: 1.3vw;
+  border-right: black;
+  transition: 0.7s cubic-bezier(0.25, 0.1, 0.25, 1.0);
+  // background: skyblue !important;
+
+}
+.custom-resizable .react-resizable-handle:hover {
+  background-color: #ffddee !important;
+
+}
+.react-resizable-handle-se {
+  cursor: col-resize !important;
+}
 #topBox {
   display: flex;
   flex-direction: column;
@@ -55,7 +71,7 @@
 .theme-dark {
   background: #1e1e1e;
 }
-.monaco-editor-inner{
+.monaco-editor-inner {
   padding: 20px 0px 0px 0px;
 }
 /**

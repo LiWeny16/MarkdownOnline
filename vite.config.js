@@ -21,7 +21,7 @@ export default defineConfig({
     alias: {
       // mermaid: "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs",
       "@cdn-marked":"https://npm.elemecdn.com/marked/lib/marked.esm.js",
-      "@cdn-mermaid":"https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs",
+      "@cdn-mermaid":"https://jsd.onmicrosoft.cn/npm/mermaid@10/dist/mermaid.esm.min.mjs",
       "@cdn-kit":"https://npm.elemecdn.com/bigonion-kit@0.11.0/esm/esm-kit.mjs",
       "@cdn-hljs":"https://npm.elemecdn.com/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js",
       "@cdn-katex":"https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.js",
@@ -36,7 +36,7 @@ export default defineConfig({
   },
   server:{
     host:"0.0.0.0",
-    port:"3007"
+    port:"823"
   },
   
   plugins: [

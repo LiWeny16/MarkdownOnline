@@ -16,6 +16,8 @@ import { observer } from "mobx-react"
 import changeTheme from "@App/theme/change"
 import monacoKeyDownEvent from "@Func/Events/key/monacoKey"
 import monacoKeyEvent from "@Func/Events/key/monacoKey"
+import { ResizableBox } from "react-resizable"
+import "react-resizable/css/styles.css"
 loader.config({
   paths: {
     vs: "https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/monaco-editor/0.33.0-dev.20220228/min/vs/",
@@ -39,10 +41,27 @@ const files: any = {
     value: "",
   },
 }
+
 export default observer(function MonacoEditor() {
+  const onResizeStart = (e: any) => {
+    console.log("onResizeStart执行")
+    console.log(e)
+  }
+  const onResize = (e: any) => {
+    console.log("onResize执行")
+    console.log(e)
+  }
+  const onResizeStop = (e: any) => {
+    console.log("onResizeStop执行")
+    console.log(e)
+  }
+
   let theme = useTheme().themeState
-  const editorOptions = {
+  const editorOptions: editor.IStandaloneEditorConstructionOptions = {
     fontSize: 16, // 设置字体大小
+    wordBreak: "keepAll",
+    formatOnType: true,
+    formatOnPaste: true,
   }
   const [fileName, setFileName] = useState("index.md")
   // let previousValue = window.editor.getValue();
@@ -63,32 +82,35 @@ export default observer(function MonacoEditor() {
     monacoKeyEvent()
     // monacoKeyDownEvent()
     allInit()
- 
   }
   return (
     <>
       {/* <DraggableBox> */}
       <div id="monaco-editor">
-        {/* <button
-          onClick={() => {
-            changeTheme()
-          }}
+        <ResizableBox
+        className="custom-resizable"
+          width={640}
+          height={700}
+          draggableOpts={{ grid: [5, 15] }}
+          minConstraints={[100, 1800]}
+          // maxConstraints={[3000, 1800]}
+          axis="x"
         >
-          change theme
-        </button> */}
-        <Editor
-          className="monaco-editor-inner"
-          height="90vh"
-          width="50vw"
-          theme={theme == "light" ? "vs-light" : "vs-dark"}
-          path={file.name}
-          // language="markdown"
-          defaultLanguage={file.language}
-          defaultValue={file.value}
-          onMount={handleEditorDidMount}
-          onChange={handleOnChange}
-          options={editorOptions}
-        />
+          <Editor
+            className="monaco-editor-inner"
+            height="100vh"
+            width="100%"
+            theme={theme == "light" ? "vs-light" : "vs-dark"}
+            path={file.name}
+            // language="markdown"
+            defaultLanguage={file.language}
+            defaultValue={file.value}
+            onMount={handleEditorDidMount}
+            onChange={handleOnChange}
+            options={editorOptions}
+          />
+        </ResizableBox>
+        {/* <div style={{width:size.width}}>2323</div> */}
       </div>
       {/* </DraggableBox> */}
     </>

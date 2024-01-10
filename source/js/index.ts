@@ -5,6 +5,7 @@
 // import { marked } from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
 import { marked } from "@cdn-marked"
 import mermaid from "@cdn-mermaid"
+// import mermaid from "mermaid"
 // import "https://cdn.bootcdn.net/ajax/libs/mermaid/10.2.0/mermaid.min.js"
 // import mermaid from "https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.esm.min.mjs"
 import kit from "@cdn-kit"
@@ -13,7 +14,7 @@ import hljs from "@cdn-hljs"
 import "@cdn-katex"
 // import {katex} from "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"
 import replaceAsync from "string-replace-async"
-import  { getMdTextFromMonaco } from "@App/text/getMdText"
+import { getMdTextFromMonaco } from "@App/text/getMdText"
 // import { fillInMemoryImg, readMemoryImg } from "@App/textMemory/memory"
 import pageBreaker from "@Func/Parser/pageBreaker"
 import virtualFileSystem from "@Func/Parser/VFS"
@@ -42,12 +43,6 @@ export const enObj = {
   enVirtualFileSystem: true,
   enPageBreaker: true,
 }
-// ;(() => {
-//   // 等待React 渲染完成
-//   kit.sleep(50).then(() => {
-//     allInit()
-//   })
-// })()
 
 /**
  * @description 循环执行触发主解析事件流
@@ -71,13 +66,13 @@ export async function mdConverter(save: boolean = true) {
   view = markedParse(view)
   // enObj.enScript ? enableScript(view) : console.log("fast scripts off")
 
-  writeHiddenPre(view)
+  writePre(view)
   // save ? restoreText() : 1
   await mermaid.run({
-    querySelector: ".mermaid",
+    querySelector: ".language-mermaid",
     suppressErrors: true,
   })
-  writePre(readHiddenPre())
+  // writePre(readHiddenPre())
   enObj.enHilightJs ? hljs.highlightAll() : console.log("hilight off")
 }
 /**
@@ -131,7 +126,7 @@ function clueParser(md: any) {
           //     "<div class='RED P5'> MERMAID ERROR! </div>  " +
           //     `<pre><code class="language-js hljs language-javascript"><span class="hljs-number">${error}</span></code></pre>`
           // }
-          parsedHTML = `<div class="${clueClass}">${content}</div>`
+          parsedHTML = `<div class="language-${clueClass} language-plaintext">${content}</div>`
         } else if (clueClass == "js" && enObj.enScript) {
           // console.log(content)
           if (isSyntaxValid(content)) {
