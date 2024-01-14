@@ -66,13 +66,13 @@ export async function mdConverter(save: boolean = true) {
   view = markedParse(view)
   // enObj.enScript ? enableScript(view) : console.log("fast scripts off")
 
-  writePre(view)
+  writeHiddenPre(view)
   // save ? restoreText() : 1
   await mermaid.run({
     querySelector: ".language-mermaid",
     suppressErrors: true,
   })
-  // writePre(readHiddenPre())
+  writePre(readHiddenPre())
   enObj.enHilightJs ? hljs.highlightAll() : console.log("hilight off")
 }
 /**
