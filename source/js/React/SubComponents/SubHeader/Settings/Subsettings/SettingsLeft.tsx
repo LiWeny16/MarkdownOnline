@@ -83,19 +83,20 @@ export default function CustomizedAccordions() {
               boxShadow: "rgb(235 235 235) -7vh 3vh 21px",
             }}
           >
-            <LR style={{}} space={[80]}>
+            <LR space={[80]}>
               <Box>
                 <LightTooltip
                   style={{ width: "100" }}
-                  title="Add"
+                  title="编辑器主题"
                   placement="bottom"
                 >
                   <Typography>主题切换</Typography>
                 </LightTooltip>
               </Box>
               <SwitchTheme
+                inputProps={{ "aria-label": "controlled" }}
                 onChange={(e) => {
-                  // console.log(e.target.checked);
+                  console.log(e.target.checked);
                   changeTheme(e.target.checked ? "dark" : "light")
                 }}
               ></SwitchTheme>

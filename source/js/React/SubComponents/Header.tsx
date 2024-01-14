@@ -169,7 +169,7 @@ const DrawerAppBar = observer((props: Props) => {
       <AppBar
         component="nav"
         enableColorOnDark={false}
-        sx={{ bgcolor: "black" }}
+        // sx={{ bgcolor: "black" }}
       >
         <Toolbar>
           <IconButton

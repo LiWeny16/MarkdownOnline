@@ -7,27 +7,11 @@
 你好，我是正文  
 "你好,我是markdown扩展语法".RIGHT 
 
-`正文换行需要结尾打两个空格
-如果不打空格，就不换行`
 
 你好,我是LATEX  
-
 $$
-\begin{bmatrix}
-1&2&3\\
-4&5&6\\
-7&8&9
-\end{bmatrix}
-*
-\begin{bmatrix}
-1&2&3\\
-4&5&6\\
-7&8&9
-\end{bmatrix}=?
+\lambda+1=\lambda^3-1
 $$
-
-<br>
-
 
 
 我下面是分割线
@@ -49,34 +33,29 @@ $$
 我是mermaid**流程图表** 
 
 "
-flowchart LR
-    id1[(Cylinder)]--->   id2{Box}---> id3(((Double circle)))
+mindmap
+  root((mindmap))
+    Origins
+      Long history
+      ::icon(fa fa-book)
+      Popularisation
+        British popular psychology author Tony Buzan
+    Research
+      On effectiveness<br/>and features
+      On Automatic creation
+        Uses
+            Creative techniques
+            Strategic planning
+            Argument mapping
+    Tools
+      Pen and paper
+      Mermaid
 ".mermaid 
 
 
-```js
+```py
 // 我是代码
-// 创建模型  
-const model = tf.sequential();  
-model.add(tf.layers.dense({units: 1, inputShape: [1]}));  
-  
-// 编译模型  
-model.compile({loss: 'meanSquaredError', optimizer: 'sgd'});  
-  
-// 准备训练数据  
-const xs = tf.tensor2d([[0], [1], [2], [3], [4], [5]], [6, 1]);  
-const ys = tf.tensor2d([[1], [3], [5], [7], [9], [11]], [6, 1]);  
-  
-// 训练模型  
-model.fit(xs, ys, {epochs: 100}).then(() => {  
-  // 使用模型进行预测  
-  const prediction = model.predict(tf.tensor2d([6], [1, 1]));  
-    
-  // 打印预测结果  
-  prediction.data().then((result) => {  
-    console.log(result); // 输出 12.002  
-  });  
-});  
+print("Hello Markdown!")
+
 ```
      
-                

@@ -175,7 +175,7 @@ const CustomizedMenus = observer(() => {
           disableRipple
         >
           <Settings
-            closAll={handleCloseMenu}
+            closeAll={handleCloseMenu}
             anchorEl={anchorEl4}
             open={open4}
             onClick={handleCloseSettings}

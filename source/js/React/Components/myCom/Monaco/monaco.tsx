@@ -18,6 +18,8 @@ import monacoKeyDownEvent from "@Func/Events/key/monacoKey"
 import monacoKeyEvent from "@Func/Events/key/monacoKey"
 import { ResizableBox } from "react-resizable"
 import "react-resizable/css/styles.css"
+import { mdConverter } from "@Root/js"
+import DragHandleIcon from "@mui/icons-material/DragHandle"
 loader.config({
   paths: {
     vs: "https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/monaco-editor/0.33.0-dev.20220228/min/vs/",
@@ -43,17 +45,9 @@ const files: any = {
 }
 
 export default observer(function MonacoEditor() {
-  const onResizeStart = (e: any) => {
-    console.log("onResizeStart执行")
-    console.log(e)
-  }
-  const onResize = (e: any) => {
-    console.log("onResize执行")
-    console.log(e)
-  }
-  const onResizeStop = (e: any) => {
-    console.log("onResizeStop执行")
-    console.log(e)
+  
+  const handleResizeStop = () => {
+    mdConverter()
   }
 
   let theme = useTheme().themeState
@@ -88,11 +82,15 @@ export default observer(function MonacoEditor() {
       {/* <DraggableBox> */}
       <div id="monaco-editor">
         <ResizableBox
-        className="custom-resizable"
+          className="custom-resizable"
+        //   handle={
+        //  <MyHandle />
+        //   }
           width={640}
           height={700}
           draggableOpts={{ grid: [5, 15] }}
           minConstraints={[100, 1800]}
+          onResizeStop={handleResizeStop}
           // maxConstraints={[3000, 1800]}
           axis="x"
         >

@@ -2,6 +2,7 @@ import hljs from "@cdn-hljs"
 import { marked } from "@cdn-marked"
 // import { marked } from "marked"
 import mermaid from "@cdn-mermaid"
+// import mermaid from "mermaid"
 import blankTextInit from "./blankTextInit"
 import { enObj, mdConverter } from "@Root/js"
 import { Notification } from "@arco-design/web-react"
@@ -54,6 +55,8 @@ class settingsClass {
       securityLevel: "loose",
       startOnLoad: false,
       theme: "base",
+      // gantt: { topPadding:0 , useMaxWidth: false},
+      // darkMode:true
     })
     mermaid.mermaidAPI.initialize({ startOnLoad: false })
   }
@@ -88,13 +91,13 @@ export default function allInit(): void {
   }) //初始化输入区域
   Notification.success({
     title: "已更新到最新版本",
-    content: `当前版本:v1.3.0`,
+    content: `当前版本:v1.4.1`,
     position: "bottomRight",
   })
   kit.sleep(250).then(() => {
     Notification.info({
       title: "版本新增特性",
-      content: `Vscode编辑器`,
+      content: `可调整边框,修复@mermaid-cdn源`,
       position: "bottomRight",
     })
   })
