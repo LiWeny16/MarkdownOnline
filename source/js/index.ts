@@ -118,7 +118,7 @@ const newRenderer = {
   },
 }
 // 重写标题的渲染结果
-marked.use({ renderer: headingRenderer })
+// marked.use({ renderer: headingRenderer })
 
 marked.use({ renderer: newRenderer, extensions: [markIt], async: true })
 // marked.use({
