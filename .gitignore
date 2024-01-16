@@ -1,6 +1,7 @@
 /node_modules/*
 /node_modules
 
+
 # 忽略node_modules目录
 node_modules/
 /assets
@@ -20,3 +21,7 @@ logs
 
 # parcel map
 *.map
+
+# 忽略 learning
+learning/
+/learning

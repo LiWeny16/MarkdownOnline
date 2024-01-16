@@ -91,6 +91,9 @@ code {
 .ALI-CENTER {
   align-items: center;
 }
+.JUS-RIGHT{
+  justify-content: right;
+}
 .GRID4 p {
   display: grid;
   grid-template-columns: repeat(2, auto);

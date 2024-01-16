@@ -30,10 +30,12 @@ interface LayoutOptions extends NormalComponentsOptions {
   order?: Array<number>
   move?: Movement
   min?: any
-  margin? :React.CSSProperties["margin"]
+  margin?: React.CSSProperties["margin"]
 }
 
 interface Movement {
   x?: any
   y?: any
 }
+
+type Position = "L" | "R" | "C" | "Any"
