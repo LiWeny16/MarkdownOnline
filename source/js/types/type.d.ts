@@ -38,4 +38,14 @@ interface Movement {
   y?: any
 }
 
+interface TokenType {
+  type:string
+}
+interface ImageToken extends TokenType {
+  href:string,
+  title:string,
+  text:string
+}
+
 type Position = "L" | "R" | "C" | "Any"
+

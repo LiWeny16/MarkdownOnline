@@ -91,7 +91,7 @@ code {
 .ALI-CENTER {
   align-items: center;
 }
-.JUS-RIGHT{
+.JUS-RIGHT {
   justify-content: right;
 }
 .GRID4 p {
@@ -160,22 +160,31 @@ code {
   text-decoration: none;
   color: inherit;
 }
-.RIGHT {
-  float: right;
-  width: 100%;
-}
-.RIGHT p {
-  float: right;
-}
-
 .R {
-  float: right;
-  width: 100%;
+  text-align: right;
+  justify-content: right;
 }
-.R p {
-  float: right;
+.L {
+  text-align: left;
+  justify-content: left;
 }
-
+.C {
+  text-align: center;
+  justify-content: center;
+}
+.RIGHT {
+  justify-content: right;
+}
+.LEFT {
+  justify-content: left;
+}
+.CENTER {
+  justify-content: center;
+}
+.MIN {
+  width: fit-content;
+  height: fit-content;
+}
 .CARD {
   background-color: yellow;
   border-radius: 8px;

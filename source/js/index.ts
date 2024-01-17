@@ -24,7 +24,12 @@ import "@arco-design/web-react/dist/css/arco.css"
 
 import { isSyntaxValid } from "@App/script.ts"
 import { readMemoryImg } from "@App/textMemory/memory"
-import { headingRenderer, initTocs } from "@Func/Parser/renderer"
+import {
+  headingRenderer,
+  initTocs,
+  markItExtension,
+} from "@Func/Parser/renderer"
+import regs from "@App/regs/regs"
 // import "https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
 /**
  * @description 拓展使能配置
@@ -43,99 +48,12 @@ export const enObj = {
   enClue: true, //clueCSS写法
   enDragFile: true, //拖拽外部markdown
   enPasteEvent: true, //粘贴事件
-  enVirtualFileSystem: true,
+  enVirtualFileSystem: false,
   enPageBreaker: true,
 }
 
-const markIt = {
-  name: "markIt",
-  level: "inline", // Signal that this extension should be run inline
-  start(src: any) {
-    return src.match(/@@/)?.index
-  },
-  tokenizer(src: string, tokens: any) {
-    const rule = /@@(.*?)@@/
-    const match = rule.exec(src)
-    if (match) {
-      return {
-        type: "markIt",
-        raw: match[0],
-        text: match[1].trim(),
-      }
-    }
-  },
-  renderer(token: { text: any }) {
-    return `<mark>${token.text}</mark>`
-  },
-}
-
-// 拓展语法标识
-const grammar = "#"
-
-const newRenderer = {
-  /**
-   * 拓展图片
-   *
-   * @param href   图片路径
-   * @param _title null
-   * @param text   图片的名称
-   */
-  image(href: string | null, _title: string | null, text: string): any {
-    let randon = Math.random()
-    let width = "auto" // 宽度
-    let style = "" // 样式
-    let position: Position = "L"
-    let tags: string[] = text.split(grammar)
-    if (tags.length > 1) {
-      for (let i = 0; i < tags.length; i++) {
-        let tag = tags[i]
-        if (tag === "s") {
-          style += "box-shadow: rgb(199 199 199) 1vh 2vh 21px"
-        }
-        if (tag === "s1") {
-          style += "box-shadow: rgb(146 146 146) 1vh 2vh 21px;"
-        }
-        if (tag === "s2") {
-          style += "box-shadow: rgb(32 32 32 / 86%) 1vh 2vh 21px"
-        }
-        if (tag === "C" || tag == "c") {
-          position = "C"
-        }
-        if (tag === "R" || tag == "r") {
-          position = "R"
-        }
-        if (tag.startsWith("w")) {
-          width = tags[i].substring(1)
-          if (!width.endsWith("%")) {
-            width += "px"
-          }
-        }
-      }
-    }
-    return `<div class="imgBox-r FLEX ${randon} ${
-      position == "C" ? " JUS-CENTER" : position == "R" ? "JUS-RIGHT" : ""
-    }" ><img class="img_resize_transition" width="${width}" style="${style}" src="${href}" alt="${text}"></div>`
-  },
-}
 // 重写标题的渲染结果
 // marked.use({ renderer: headingRenderer })
-
-marked.use({ renderer: newRenderer, extensions: [markIt], async: true })
-// marked.use({
-//   extensions: [
-//     {
-//       name: "code2",
-//       renderer(code) {
-//         console.log(code);
-//         if (code.lang == "mindmap") {
-//           console.log(code)
-//         } else {
-//           return false
-//         }
-//       },
-//     },
-//   ],
-// })
 
 /**
  * @description 循环执行触发主解析事件流
@@ -151,9 +69,9 @@ export async function mdConverter(save: boolean = true) {
   enObj.enPageBreaker
     ? (view = pageBreaker(view))
     : console.log("page breaker off")
-  enObj.enVirtualFileSystem
-    ? (view = await virtualFileSystem(view))
-    : console.log("VFS off")
+  // enObj.enVirtualFileSystem
+  //   ? (view = await virtualFileSystem(view))
+  //   : console.log("VFS off")
   view = await latexParse2(view)
   view = await latexParse(view)
   view = await markedParse(view)
@@ -210,15 +128,6 @@ function clueParser(md: any) {
         // console.log(clueClass);
         content = content.replace(/\?br/g, "\n") //解除换行限制
         if (clueClass == "mermaid") {
-          // parsedHTML = `<pre class="${clueClass}">${content}</pre>`
-          // try {
-          //   parsedHTML = `${await mermaidParse2(content, seq)}`
-          // } catch (error) {
-          //   // parsedHTML = `<div class="RED">${error}</div>`
-          //   parsedHTML =
-          //     "<div class='RED P5'> MERMAID ERROR! </div>  " +
-          //     `<pre><code class="language-js hljs language-javascript"><span class="hljs-number">${error}</span></code></pre>`
-          // }
           parsedHTML = `<div class="language-${clueClass} language-plaintext">${content}</div>`
         } else if (clueClass == "js" && enObj.enScript) {
           // console.log(content)
@@ -235,7 +144,7 @@ function clueParser(md: any) {
 
           parsedHTML = ``
         } else {
-          parsedHTML = `<div class="${clueClass}">${await markedParse(
+          parsedHTML = `<div class="FLEX ${clueClass}">${await markedParse(
             content
           )}</div>`
         }

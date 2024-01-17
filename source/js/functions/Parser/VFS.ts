@@ -7,7 +7,7 @@ export default function virtualFileSystem(md: any): any {
   return new Promise(async (resolve) => {
     const reg1 = /\!\[.*?\]\(\/vf\/.*?\)/g //全部的
     // console.log(md.match(reg1));
-    const reg2 = /\d+/g
+    const reg2 = /\d+/g //匹配数字
     const reg3 = new RegExp(/\[(.*?)\]/)
     const regSrc = new RegExp(/\((.*?)\)/)
 

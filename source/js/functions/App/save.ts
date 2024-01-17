@@ -14,7 +14,7 @@ import {
   readMemoryText,
   readMemoryImg,
 } from "@App/textMemory/memory"
-export default function save(message = true) {
+export default function save(editor=null ,message = true) {
   let text = getMdTextFromMonaco()
   if (message && text != "null") {
     Message.success({

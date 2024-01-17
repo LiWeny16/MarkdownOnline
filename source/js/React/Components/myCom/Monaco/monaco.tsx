@@ -72,8 +72,10 @@ export default observer(function MonacoEditor() {
     // 暴露出去
     window.editor = editor
     window.monaco = monaco
+    
+    // editor.addAction()
     monacoPasteEvent()
-    monacoKeyEvent()
+    monacoKeyEvent(editor,monaco)
     // monacoKeyDownEvent()
     allInit()
   }
