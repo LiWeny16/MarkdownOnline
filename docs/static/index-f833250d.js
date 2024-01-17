@@ -268,10 +268,11 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
 你好，我是正文  \r
 "你好,我是markdown扩展语法".RIGHT \r
 \r
+我是表情包:sweat_smile::sweat_smile:\r
 \r
 你好,我是LATEX  \r
 $$\r
-\\lambda+1=\\lambda^3-1\r
+\\lambda+1=\\lambda^3-1 \r
 $$\r
 \r
 \r

@@ -7,10 +7,11 @@
 你好，我是正文  
 "你好,我是markdown扩展语法".RIGHT 
 
+我是表情包:sweat_smile::sweat_smile:
 
 你好,我是LATEX  
 $$
-\lambda+1=\lambda^3-1
+\lambda+1=\lambda^3-1 
 $$
 
 
