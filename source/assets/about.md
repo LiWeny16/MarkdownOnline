@@ -35,26 +35,29 @@
 + <s>增加代码高亮</s>
 + <s>LATEX公式支持</s>
 + <s>增加快捷键Ctrl+B加粗和Ctrl+Alt+C居中</s>
++ <s>Img图片支持</s>
++ <s>替换成Vscode前端编辑器，加入完整的快捷键提示支持</s>
 + 像[jupyter](https://jupyter.org/)那样支持一行一行的运行JS/Python脚本(基于[WASM](https://developer.mozilla.org/zh-CN/docs/WebAssembly))
 + 增加设置按钮以配置脚本注入和换行等规则
-+ Img图片支持
-+ 替换成Vscode前端编辑器，加入完整的快捷键提示支持
++ [TOC] 支持
 
 ## 教程
 + LATEX请写在用$$中间  
-例如 $\lambda$ [知乎:LaTeX数学公式、常用符号大全](https://zhuanlan.zhihu.com/p/510451940)
-+ mermaid请见官网[https://mermaid.js.org/intro/](https://mermaid.nodejs.cn/syntax/flowchart.html)
+例如 $\lambda$ 详情请见:
+[知乎:LaTeX数学公式、常用符号大全](https://zhuanlan.zhihu.com/p/510451940)
++ mermaid请见官网: [mermaid docs](https://mermaid.nodejs.cn/syntax/flowchart.html)
++ emoji标签码表见: [emoji I :hearts: You!](https://gist.github.com/rxaviers/7360908)
++ 本编辑器特性请见: [还没写文档嘻嘻](#)
 
 ## 新增特性
-+ 右对齐可以用 "右边对齐".RIGHT 
-+ 红色文字可以用 "我是红色的耶".RED &nbsp;
++ 右对齐可以用 "右边对齐".R 
 + 注意！最后必须有一个**空格**表示结束
-+ [[DEV]](#)支持脚本注入，请用script标签包裹
 + mermaid 流程图支持！
++ 小表情支持！！！
 
 ## 更新日志 
 + v0.1.x 修复大量bug，新增图片管理器
-
++ vx.x.x 懒得写，更新N个特性了已经
 
 ## 作者
 
@@ -68,7 +71,7 @@
 **MIT**
 
 ## Namespace 
-[https://github.com/LiWeny16/MarkdownOnline](https://github.com/LiWeny16/MarkdownOnline)  
-[https://bigonion.cn](https://bigonion.cn)
++ [github](https://github.com/LiWeny16/MarkdownOnline)  
++ [namespace](https://bigonion.cn)
 
 

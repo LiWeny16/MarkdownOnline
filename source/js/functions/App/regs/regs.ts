@@ -1,6 +1,6 @@
 const regs = {
-  mark_reg: /@@(.*?)@@/,
+  markHighlight: /@@(.*?)@@/,
+  emoji: /^:([a-zA-Z0-9_\+\-]+):/,
 }
-
 
 export default regs

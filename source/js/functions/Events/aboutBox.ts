@@ -1,4 +1,4 @@
-import * as marked_esm from "@cdn-marked"
+import { marked } from "@cdn-marked"
 import svg_1 from "@Asset/img/aboutBox关闭.svg"
 import welcomeText from "@Asset/about.md?raw"
 export default async () => {
@@ -15,7 +15,7 @@ export default async () => {
 
   function md2Html(md: string) {
     // console.log(md);
-    return marked_esm.marked.parse(md)
+    return marked.parse(md)
   }
   // event mount
   document.getElementById("closeAboutSvg")!.addEventListener("click", () => {

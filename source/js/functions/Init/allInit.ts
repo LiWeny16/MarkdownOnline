@@ -13,6 +13,7 @@ import {
   importUrlExtension,
   newRenderer,
   imgExtension,
+  emojiExtension,
 } from "@Func/Parser/renderer"
 
 class settingsClass {
@@ -30,7 +31,8 @@ class settingsClass {
       },
       importUrlExtension,
       imgExtension,
-      markItExtension
+      markItExtension,
+      emojiExtension
     )
 
     // marked.use({ renderer })

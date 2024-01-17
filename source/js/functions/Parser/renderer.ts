@@ -1,6 +1,7 @@
 import regs from "@App/regs/regs"
 import { readMemoryImg } from "@App/textMemory/memory"
 import { marked } from "@cdn-marked"
+import { emojify, has } from "node-emoji"
 
 //#region *********************renderer*********************
 
@@ -153,7 +154,7 @@ export const markItExtension = {
         return src.match(/@@/)?.index
       },
       tokenizer(src: string, tokens: any) {
-        const match = src.match(regs.mark_reg)
+        const match = src.match(regs.markHighlight)
         const text = match ? match[1] : ""
         if (match) {
           return {
@@ -165,7 +166,7 @@ export const markItExtension = {
       },
       renderer(token: any) {
         let renderText = token.raw.replace(
-          regs.mark_reg,
+          regs.markHighlight,
           `<mark>${token.text}</mark>`
         )
         return `${renderText}`
@@ -239,5 +240,34 @@ export const imgExtension = {
       // console.log(token);
     }
   },
+}
+
+export const emojiExtension = {
+  extensions: [
+    {
+      name: "emoji",
+      level: "inline", // Signal that this extension should be run inline
+      start(src: any) {
+        return src.match(/:/)?.index
+      },
+      tokenizer(src: string, _tokens: any) {
+        const match = src.match(regs.emoji)
+        if (match) {
+          return {
+            type: "emoji",
+            raw: match[0],
+            text: match[1],
+          }
+        }
+        return false
+      },
+      renderer(token: any) {
+        if (has(token.raw)) {
+          return emojify(token.raw)
+        }
+        return token.raw
+      },
+    },
+  ],
 }
 // #endregion
