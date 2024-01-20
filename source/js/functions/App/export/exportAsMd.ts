@@ -1,5 +1,5 @@
 import { kit } from "@Root/js/index"
-import html2canvas from "html2canvas"
+// import html2canvas from "html2canvas"
 import {getMdTextFromMonaco} from "@App/text/getMdText";
 // var node = document.getElementById("view-area")!
 

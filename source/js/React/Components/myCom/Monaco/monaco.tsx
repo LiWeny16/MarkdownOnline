@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react"
 import ReactDOM from "react-dom"
-import { loader, Monaco } from "@monaco-editor/react"
-import Editor from "@monaco-editor/react"
+import Editor, { loader, Monaco } from "@monaco-editor/react"
 import DraggableBox from "@Com/myCom/DragBox"
 import { getMdTextFromMonaco } from "@App/text/getMdText"
 // import * as monaco from "monaco-editor"
@@ -45,7 +44,6 @@ const files: any = {
 }
 
 export default observer(function MonacoEditor() {
-  
   const handleResizeStop = () => {
     mdConverter()
   }
@@ -72,10 +70,10 @@ export default observer(function MonacoEditor() {
     // 暴露出去
     window.editor = editor
     window.monaco = monaco
-    
+
     // editor.addAction()
     monacoPasteEvent()
-    monacoKeyEvent(editor,monaco)
+    monacoKeyEvent(editor, monaco)
     // monacoKeyDownEvent()
     allInit()
   }
@@ -85,9 +83,9 @@ export default observer(function MonacoEditor() {
       <div id="monaco-editor">
         <ResizableBox
           className="custom-resizable"
-        //   handle={
-        //  <MyHandle />
-        //   }
+          //   handle={
+          //  <MyHandle />
+          //   }
           width={640}
           height={700}
           draggableOpts={{ grid: [5, 15] }}

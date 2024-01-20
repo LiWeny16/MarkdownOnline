@@ -1,7 +1,7 @@
 import regs from "@App/regs/regs"
 import { readMemoryImg } from "@App/textMemory/memory"
 // import { marked } from "@cdn-marked"
-import { emojify, has } from "node-emoji"
+import { emojify, has } from "@cdn-node-emoji"
 
 // import * as emoji from 'https://jsd.onmicrosoft.cn/npm/node-emoji@2.1.3/lib/index.js'
 // const emojify =emoji.emojify

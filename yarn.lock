@@ -1559,11 +1559,6 @@ dom-helpers@^5.0.1:
     "@babel/runtime" "^7.8.7"
     csstype "^3.0.2"
 
-dom-to-image@^2.6.0:
-  version "2.6.0"
-  resolved "https://registry.npmmirror.com/dom-to-image/-/dom-to-image-2.6.0.tgz#8a503608088c87b1c22f9034ae032e1898955867"
-  integrity sha512-Dt0QdaHmLpjURjU7Tnu3AgYSF2LuOmksSGsUcE6ItvJoCWTBEmiMXcqBdNSAm9+QbbwD7JMoVsuuKX6ZVQv1qA==
-
 dompurify@^3.0.5:
   version "3.0.8"
   resolved "https://registry.npmmirror.com/dompurify/-/dompurify-3.0.8.tgz#e0021ab1b09184bc8af7e35c7dd9063f43a8a437"
@@ -2185,16 +2180,16 @@ mime@^1.4.1:
   integrity sha512-x0Vn8spI+wuJ1O6S7gnbaQg8Pxh4NNHb7KSINmEWKiPE4RKOplvijn+NkmYmmRgP68mc70j2EbeTFRsrswaQeg==
 
 mobx-react-lite@^4.0.4:
-  version "4.0.4"
-  resolved "https://registry.npmjs.org/mobx-react-lite/-/mobx-react-lite-4.0.4.tgz"
-  integrity sha512-68uNYvQC/5Dazs3sIBv+bnpzRwcWde8y4ujHiLizhq8yeQtJ2tlNUGSh4r40gyE5M0utACIofBDsAj2hplcovQ==
+  version "4.0.5"
+  resolved "https://registry.npmmirror.com/mobx-react-lite/-/mobx-react-lite-4.0.5.tgz#e2cb98f813e118917bcc463638f5bf6ea053a67b"
+  integrity sha512-StfB2wxE8imKj1f6T8WWPf4lVMx3cYH9Iy60bbKXEs21+HQ4tvvfIBZfSmMXgQAefi8xYEwQIz4GN9s0d2h7dg==
   dependencies:
     use-sync-external-store "^1.2.0"
 
-mobx-react@^9.0.1:
-  version "9.0.1"
-  resolved "https://registry.npmjs.org/mobx-react/-/mobx-react-9.0.1.tgz"
-  integrity sha512-0idiElBgNMJg20YqGgHvYEnlqIJpPDQaOkxj2dHJIZeqCvUh+zBkBkMkpUFw/uEd1OdPUvT0y+AFBqsWIUAXww==
+mobx-react@^9.1.0:
+  version "9.1.0"
+  resolved "https://registry.npmmirror.com/mobx-react/-/mobx-react-9.1.0.tgz#5e54919ca27ffad5f2c0d835148a1f681cebdbc1"
+  integrity sha512-DeDRTYw4AlgHw8xEXtiZdKKEnp+c5/jeUgTbTQXEqnAzfkrgYRWP3p3Nv3Whc2CEcM/mDycbDWGjxKokQdlffg==
   dependencies:
     mobx-react-lite "^4.0.4"
 
@@ -2704,7 +2699,7 @@ use-sidecar@^1.1.2:
 
 use-sync-external-store@^1.2.0:
   version "1.2.0"
-  resolved "https://registry.npmjs.org/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz"
+  resolved "https://registry.npmmirror.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
   integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
 
 utrie@^1.0.2:

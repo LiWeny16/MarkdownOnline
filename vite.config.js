@@ -21,8 +21,17 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // mermaid: "https://npm.elemecdn.com/mermaid@10/dist/mermaid.esm.min.mjs",
-      // "@cdn-node-emoji":"https://jsd.onmicrosoft.cn/npm/node-emoji@2.1.3/lib/index.js",
+      "react-photo-view":
+        "https://jsd.onmicrosoft.cn/npm/react-photo-view@1.2.4/+esm?raw",
+      "string-replace-async":
+        "https://jsd.onmicrosoft.cn/npm/string-replace-async@3.0.2/index.min.js",
+      "react-resizable":
+        "https://jsd.onmicrosoft.cn/npm/react-resizable@3.0.5/+esm?raw",
+      // "dom-to-image":"https://jsd.onmicrosoft.cn/npm/dom-to-image@2.6.0/+esm",
+      html2canvas: "https://jsd.onmicrosoft.cn/npm/html2canvas@1.4.1/+esm",
+      mobx: "https://jsd.onmicrosoft.cn/npm/mobx@6.12.0/+esm",
+      axios: "https://jsd.onmicrosoft.cn/npm/axios@1.6.5/+esm",
+      "@cdn-node-emoji": "https://jsd.onmicrosoft.cn/npm/node-emoji@2.1.3/+esm",
       "@cdn-marked": "https://npm.elemecdn.com/marked/lib/marked.esm.js",
       "@cdn-mermaid":
         "https://jsd.onmicrosoft.cn/npm/mermaid@10/dist/mermaid.esm.min.mjs",
@@ -50,7 +59,7 @@ export default defineConfig({
 
   plugins: [
     viteCompression({
-      threshold: 1024000, // 对大于 1mb 的文件进行压缩
+      threshold: 256000, // 对大于 256kb 的文件进行压缩
     }),
     [react()],
     // importToCDN({
