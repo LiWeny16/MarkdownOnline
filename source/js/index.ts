@@ -20,7 +20,7 @@ import { getMdTextFromMonaco } from "@App/text/getMdText"
 import pageBreaker from "@Func/Parser/pageBreaker"
 import virtualFileSystem from "@Func/Parser/VFS"
 import "../css/index.less"
-import "@arco-design/web-react/dist/css/arco.css"
+// import "@arco-design/web-react/dist/css/arco.css"
 
 import { isSyntaxValid } from "@App/script.ts"
 import { readMemoryImg } from "@App/textMemory/memory"

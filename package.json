@@ -26,7 +26,7 @@
     "@mui/icons-material": "^5.14.3",
     "@mui/material": "^5.14.5",
     "@types/react-resizable": "^3.0.7",
-    "axios": "1.4.0",
+    "axios": "^1.6.5",
     "dom-to-image": "^2.6.0",
     "html2canvas": "^1.4.1",
     "marked": "^11.1.0",
@@ -35,7 +35,6 @@
     "mobx-react": "^9.0.1",
     "monaco-editor": "^0.45.0",
     "node-emoji": "^2.1.3",
-    "qiniu-js": "^3.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-photo-view": "^1.2.3",
@@ -44,14 +43,15 @@
     "string-replace-async": "^3.0.2"
   },
   "devDependencies": {
-    "@types/axios": "^0.14.0",
     "@types/dom-to-image": "^2.6.6",
     "@types/react": "^18.2.12",
     "@types/react-dom": "^18.2.5",
     "@vitejs/plugin-react": "^4.0.0",
+    "@vitejs/plugin-react-refresh": "^1.3.6",
     "less": "^4.2.0",
     "typescript": "^5.1.3",
     "vite": "^4.3.9",
+    "vite-plugin-cdn-import": "^0.3.5",
     "vite-plugin-compression": "^0.5.1"
   }
 }

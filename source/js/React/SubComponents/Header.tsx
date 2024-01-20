@@ -16,20 +16,20 @@ import Avatar from "@mui/material/Avatar"
 import ImageIcon from "@mui/icons-material/Image"
 import LinkIcon from "@mui/icons-material/Link"
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline"
-import WorkIcon from "@mui/icons-material/Work"
+// import WorkIcon from "@mui/icons-material/Work"
 import EditNoteIcon from "@mui/icons-material/EditNote"
-import BeachAccessIcon from "@mui/icons-material/BeachAccess"
+// import BeachAccessIcon from "@mui/icons-material/BeachAccess"
 import MenuIcon from "@mui/icons-material/Menu"
 import Toolbar from "@mui/material/Toolbar"
 import Typography from "@mui/material/Typography"
-import Button from "@mui/material/Button"
+// import Button from "@mui/material/Button"
 import { grey, lime, purple } from "@mui/material/colors"
 import Menu from "./SubHeader/Menu.tsx"
 import ImageManger from "./SubHeader/SubImgManager/ImageManager.tsx"
 import HomeIcon from "@mui/icons-material/Home"
-import Stack from "@mui/material/"
-import { alpha, styled } from "@mui/material/styles"
-import Paper from "@mui/material/Paper"
+// import Stack from "@mui/material/"
+// import { alpha, styled } from "@mui/material/styles"
+// import Paper from "@mui/material/Paper"
 import { kit, enObj } from "@Root/js/index"
 import MyButton from "../Components/myCom/CustomButton.tsx"
 import myPrint from "@App/export/myPrint.ts"
@@ -40,6 +40,7 @@ import aboutBox from "@Func/Events/aboutBox.ts"
 import { Message } from "@arco-design/web-react"
 import { useImage } from "@Root/js/React/Mobx/Image.ts"
 import { observer } from "mobx-react"
+import { useTheme } from "@mui/material"
 
 interface Props {
   /**
@@ -71,9 +72,10 @@ const drawerWidth = 240
 // const navItems = ["Home", "About3", "Contact"]
 
 const DrawerAppBar = observer((props: Props) => {
+  const theme = useTheme()
   const { window } = props
   // const image = useImage()
-    const [mobileOpen, setMobileOpen] = React.useState(false)
+  const [mobileOpen, setMobileOpen] = React.useState(false)
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState)
@@ -94,72 +96,72 @@ const DrawerAppBar = observer((props: Props) => {
   }
   const drawer = (
     // <ThemeProvider theme={theme}>
-      <Box
-        onClick={handleDrawerToggle}
-        sx={{ textAlign: "center", height: "100%", bgcolor: "black" }}
+    <Box
+      onClick={handleDrawerToggle}
+      sx={{ textAlign: "center", height: "100%", bgcolor: "black" }}
+    >
+      <Typography
+        variant="h1"
+        sx={{
+          fontSize: "20px",
+          my: 2,
+          color: "wheat",
+          textAlign: "center",
+          boxShadow: boxShadow,
+        }}
       >
-        <Typography
-          variant="h1"
-          sx={{
-            fontSize: "20px",
-            my: 2,
-            color: "wheat",
-            textAlign: "center",
-            boxShadow: boxShadow,
-          }}
-        >
-          Markdown+ Online View
-        </Typography>
-        <List sx={{ height: "100%", bgcolor: "background.paper" }}>
-          <ListItem>
-            <ListItemButton onClick={handleHomeClick}>
-              <ListItemAvatar>
-                <Avatar>
-                  <HomeIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary="Home" secondary="" />
-            </ListItemButton>
-          </ListItem>
+        Markdown+ Online View
+      </Typography>
+      <List sx={{ height: "100%", bgcolor: "background.paper" }}>
+        <ListItem>
+          <ListItemButton onClick={handleHomeClick}>
+            <ListItemAvatar>
+              <Avatar>
+                <HomeIcon />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText primary="Home" secondary="" />
+          </ListItemButton>
+        </ListItem>
 
-          <ListItem>
-            <ListItemButton onClick={handleAlert}>
-              <ListItemAvatar>
-                <Avatar>
-                  <ImageIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary="Photos" secondary="" />
-            </ListItemButton>
-          </ListItem>
+        <ListItem>
+          <ListItemButton onClick={handleAlert}>
+            <ListItemAvatar>
+              <Avatar>
+                <ImageIcon />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText primary="Photos" secondary="" />
+          </ListItemButton>
+        </ListItem>
 
-          <ListItem>
-            <ListItemButton onClick={myPrint}>
-              <ListItemAvatar>
-                <Avatar>
-                  <GetAppIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary="Export" secondary="" />
-            </ListItemButton>
-          </ListItem>
+        <ListItem>
+          <ListItemButton onClick={myPrint}>
+            <ListItemAvatar>
+              <Avatar>
+                <GetAppIcon />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText primary="Export" secondary="" />
+          </ListItemButton>
+        </ListItem>
 
-          <ListItem>
-            <ListItemButton
-              onClick={() => {
-                enObj.enAboutBox ? aboutBox() : undefined
-              }}
-            >
-              <ListItemAvatar>
-                <Avatar>
-                  <InfoIcon />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary="About" secondary="" />
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </Box>
+        <ListItem>
+          <ListItemButton
+            onClick={() => {
+              enObj.enAboutBox ? aboutBox() : undefined
+            }}
+          >
+            <ListItemAvatar>
+              <Avatar>
+                <InfoIcon />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText primary="About" secondary="" />
+          </ListItemButton>
+        </ListItem>
+      </List>
+    </Box>
     // </ThemeProvider>
   )
 
@@ -179,7 +181,13 @@ const DrawerAppBar = observer((props: Props) => {
           >
             <MenuIcon />
           </IconButton>
-          <EditNoteIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
+          <EditNoteIcon
+            sx={{
+              color: theme.palette.mode=="light" ? "black" : "white",
+              display: { xs: "none", md: "flex" },
+              mr: 1,
+            }}
+          />
           <Typography
             variant="h1"
             component="a"
@@ -187,10 +195,11 @@ const DrawerAppBar = observer((props: Props) => {
             href="/"
             sx={{
               flexGrow: 1,
-
               display: { xs: "none", sm: "block" },
-              color: "wheat",
-              // fontFamily: "monospace",
+              color: theme.palette.mode ==="light"
+                ? theme.palette.primary.contrastText
+                : theme.palette.secondary.contrastText,
+              fontFamily: "monospace",
               fontWeight: 700,
               letterSpacing: ".3rem",
               textDecoration: "none",

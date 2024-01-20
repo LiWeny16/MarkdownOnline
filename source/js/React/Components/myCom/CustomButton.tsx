@@ -2,7 +2,7 @@ import * as React from "react"
 import { styled } from "@mui/material/styles"
 import Button, { ButtonProps } from "@mui/material/Button"
 import Stack from "@mui/material/Stack"
-import { grey, pink, purple } from "@mui/material/colors"
+import { blue, grey, pink, purple } from "@mui/material/colors"
 // const BootstrapButton = styled(Button)({
 //   boxShadow: 'none',
 //   textTransform: 'none',
@@ -39,13 +39,17 @@ import { grey, pink, purple } from "@mui/material/colors"
 //   },
 // });
 const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
-  color: "black",
+  // color: "black",
+  color:
+    theme.palette.mode === "light"
+      ? "rgb(55, 65, 81)"
+      : "#FFFFFF",
   marginLeft: 10,
   fontFamily: ["electronicFont"].join(","),
-  backgroundColor: grey[200],
+  backgroundColor: theme.palette.mode === "light" ? "#FFFFFF" : "",
   "&:hover": {
-    backgroundColor: grey[300]
-  }
+    backgroundColor: theme.palette.mode === "light" ? grey[300] : "",
+  },
 }))
 
 export default function CustomizedButtons(props: any) {
@@ -64,7 +68,7 @@ export default function CustomizedButtons(props: any) {
       onClick={props.onClick}
       onMouseOver={props.onHover}
       endIcon={props.endIcon}
-      startIcon={props.startIcon ? props.startIcon: undefined}
+      startIcon={props.startIcon ? props.startIcon : undefined}
       variant="contained"
       // {...props}
     >

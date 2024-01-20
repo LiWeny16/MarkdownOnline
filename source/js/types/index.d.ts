@@ -50,12 +50,22 @@ declare module "*/highlight.min.js" {
   const hljs: any
   export default hljs
 }
-declare module "dom-to-image" {
+declare module "dom-to-image"  {
   const domtoimg: any
   export default domtoimg
 }
 
+declare module "@cdn-axios" {
+  const axios: any
+  export default axios
+  export { AxiosResponse, AxiosRequestConfig, Method }
+}
 
+declare module "@cdn-node-emoji" {
+  const emoji: any
+  export default emoji
+  export  { emojify, has } 
+}
 declare module "@cdn-marked" {
   const marked: any
   export { marked }

@@ -7,15 +7,17 @@ import { observer } from "mobx-react"
 
 import { createTheme, ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
-import { orange, green, grey, common, blue } from "@mui/material/colors"
+import { orange, green, grey, common, blue, pink } from "@mui/material/colors"
 import { getTheme } from "@App/theme/change"
 const lightTheme = createTheme({
   palette: {
     primary: {
-      main: common["black"],
+      main: blue[200],
+      contrastText: "#fff378",
     },
     secondary: {
       main: green[500],
+      contrastText: "pink"
     },
     mode: "light",
   },
@@ -25,9 +27,11 @@ const darkTheme = createTheme({
   palette: {
     primary: {
       main: blue[400],
+      contrastText: "wheat",
     },
     secondary: {
       main: green[700],
+      contrastText: "wheat",
     },
     mode: "dark",
   },

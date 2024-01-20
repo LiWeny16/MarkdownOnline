@@ -1,4 +1,4 @@
-import axios, { AxiosResponse, AxiosRequestConfig, Method } from "axios"
+import axios, { AxiosRequestConfig, Method } from "axios"
 export default function CloudMail(
   url: string,
   method: Method | string,
@@ -26,7 +26,7 @@ export default function CloudMail(
     },
   }
   // console.log(config)
-  axios(config).then((e) => {
+  axios(config).then((e: any) => {
     console.log(e)
   })
 }
