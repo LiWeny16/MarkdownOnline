@@ -2,17 +2,19 @@ import { defineConfig } from "vite"
 import viteCompression from "vite-plugin-compression"
 import react from "@vitejs/plugin-react"
 import importToCDN from "vite-plugin-cdn-import"
+import {vitePluginReactCdn} from "./vite-plugin/reactCdn.config"
 import { resolve } from "path"
 export default defineConfig({
   base: "./",
   build: {
     rollupOptions: {
       // 配置rollup的一些构建策略
+      // external:["react","react-dom"],
       output: {
         // 控制输出
         // 在rollup里面, hash代表将你的文件名和文件内容进行组合计算得来的结果
         assetFileNames: "[hash].[name].[ext]",
-        external: ["react", "react-dom"],
+        // external: ["react", "react-dom"],
       },
     },
     assetsInlineLimit: 4096000, // 4000kb  超过会以base64字符串显示
@@ -22,6 +24,7 @@ export default defineConfig({
   resolve: {
     alias: {
       // "react-photo-view":
+      // "react":"https://cdn.jsdelivr.net/npm/react@18.2.0/+esm?raw",
       //   "https://jsd.onmicrosoft.cn/npm/react-photo-view@1.2.4/+esm?raw",
       "string-replace-async":
         "https://jsd.onmicrosoft.cn/npm/string-replace-async@3.0.2/index.min.js",
@@ -62,6 +65,7 @@ export default defineConfig({
       threshold: 256000, // 对大于 256kb 的文件进行压缩
     }),
     [react()],
+    // [vitePluginReactCdn()]
     // importToCDN({
     //   modules: [
     //     {
