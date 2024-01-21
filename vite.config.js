@@ -21,12 +21,12 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "react-photo-view":
-        "https://jsd.onmicrosoft.cn/npm/react-photo-view@1.2.4/+esm?raw",
+      // "react-photo-view":
+      //   "https://jsd.onmicrosoft.cn/npm/react-photo-view@1.2.4/+esm?raw",
       "string-replace-async":
         "https://jsd.onmicrosoft.cn/npm/string-replace-async@3.0.2/index.min.js",
-      "react-resizable":
-        "https://jsd.onmicrosoft.cn/npm/react-resizable@3.0.5/+esm?raw",
+      // "react-resizable":
+      //   "https://jsd.onmicrosoft.cn/npm/react-resizable@3.0.5/+esm?raw",
       // "dom-to-image":"https://jsd.onmicrosoft.cn/npm/dom-to-image@2.6.0/+esm",
       html2canvas: "https://jsd.onmicrosoft.cn/npm/html2canvas@1.4.1/+esm",
       mobx: "https://jsd.onmicrosoft.cn/npm/mobx@6.12.0/+esm",
