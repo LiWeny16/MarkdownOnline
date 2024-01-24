@@ -52,8 +52,27 @@ export function monacoSnippets(
             monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
           detail: "table 2x4",
         },
+        {
+          label: "ignore",
+          kind: monaco.languages.CompletionItemKind.Field,
+          insertText: `<!-- prettier-ignore -->`,
+          insertTextRules:
+            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          detail: "ignore prettier",
+        },
+        {
+          label: "ignore-block",
+          kind: monaco.languages.CompletionItemKind.Field,
+          insertText: `<!-- prettier-ignore-start -->
+\${1:}
+<!-- prettier-ignore-end -->`,
+          insertTextRules:
+            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          detail: "ignore block",
+        },
       ]
       return { suggestions: suggestions }
     },
   })
 }
+//

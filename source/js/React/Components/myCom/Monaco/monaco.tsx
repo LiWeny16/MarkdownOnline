@@ -20,15 +20,16 @@ import "react-resizable/css/styles.css"
 import { mdConverter } from "@Root/js"
 import DragHandleIcon from "@mui/icons-material/DragHandle"
 import { monacoSnippets } from "@Func/Monaco/snippets/snippets"
+import monacoFormat from "@Func/Monaco/format/format"
 loader.config({
   paths: {
-    vs: "https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/monaco-editor/0.33.0-dev.20220228/min/vs/",
+    vs: "https://jsd.onmicrosoft.cn/npm/monaco-editor@0.45.0/dev/vs",
   },
 })
 
 const files: any = {
-  "script.js": {
-    name: "script.js",
+  "index.js": {
+    name: "index.js",
     language: "javascript",
     value: "nihao",
   },
@@ -81,6 +82,7 @@ export default observer(function MonacoEditor() {
     monacoPasteEvent()
     monacoKeyEvent(editor, monaco)
     monacoSnippets(editor,monaco)
+    monacoFormat(editor,monaco)
     // monacoKeyDownEvent()
     allInit()
   }

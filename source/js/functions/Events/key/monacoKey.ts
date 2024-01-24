@@ -12,6 +12,7 @@ export default function monacoKeyEvent(
     left: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyL,
     right: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyR,
     quotation: monaco.KeyMod.Shift | monaco.KeyCode.Quote,
+    format: monaco.KeyMod.Shift | monaco.KeyCode.KeyF,
   }
   // editor.addAction({
   //   id: 'fsKey',
@@ -22,15 +23,16 @@ export default function monacoKeyEvent(
   //     // save()
   //   },
   // })
-  // editor.addAction({
-  //   id: 'fsKey2',
-  //   label: 'fsKey2',
-  //   // precondition: 'isChrome == true',
-  //   keybindings: [keyMap.right],
-  //   run: () => {
-  //       // window.alert('chrome: cmd + R');
-  //   },
-  // })
+  editor.addAction({
+    id: "fsKey2",
+    label: "fsKey2",
+    // precondition: 'isChrome == true',
+    keybindings: [keyMap.format],
+    run: (e) => {
+      console.log(e)
+      editor.getAction("editor.action.formatDocument")!.run() //格式化
+    },
+  })
   editor.addAction({
     id: "fsKey3",
     label: "fsKey3",
@@ -46,7 +48,6 @@ export default function monacoKeyEvent(
     keybindings: [keyMap.quotation],
     run: () => {
       insertQuotationInMonaco()
-      // editor.getAction('editor.action.selectToBracket')!.run() //格式化代码
     },
   })
 }

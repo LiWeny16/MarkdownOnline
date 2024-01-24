@@ -1,3 +1,5 @@
+import { editor } from "monaco-editor"
+
 /**
  * @description 替换选中文本
  * @param e HTMLelement
@@ -25,11 +27,9 @@ export default function replaceSelection(e: any, leftStr: any, rightStr: any) {
   }
 }
 
-export function replaceMonacoSelection() {
+export function replaceMonacoSelection(newText: string = "nihao") {
   const _editor = window.editor // 假设你只有一个编辑器实例
-  const newText = "要插入的文本"
   const currentSelection = _editor.getSelection()
-
   _editor.executeEdits("my-replace", [
     {
       range: new window.monaco.Range(
@@ -38,6 +38,22 @@ export function replaceMonacoSelection() {
         currentSelection.endLineNumber,
         currentSelection.endColumn
       ),
+      text: newText,
+      forceMoveMarkers: true,
+    },
+  ])
+}
+
+export function replaceMonacoAll(
+  model: editor.ITextModel,
+  editor: editor.IStandaloneCodeEditor,
+  newText: string = ""
+) {
+  const _editor = editor ?? window.editor // 假设你只有一个编辑器实例
+  let allRange = model.getFullModelRange()
+  _editor.executeEdits("my-replace2", [
+    {
+      range: allRange,
       text: newText,
       forceMoveMarkers: true,
     },

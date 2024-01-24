@@ -76,8 +76,21 @@ export function insertQuotationInMonaco(
       endColumn: selection.endColumn + 1,
     }
     _editor.setSelection(nextSelection)
-  } else {
+  } else if (selectionIsNull()) {
     _editor.executeEdits("my-insert-quotation-single", [
+      {
+        range: new window.monaco.Range(
+          selection.startLineNumber,
+          selection.startColumn,
+          selection.startLineNumber,
+          selection.startColumn
+        ),
+        text: `"`,
+        forceMoveMarkers: true,
+      },
+    ])
+  } else {
+    _editor.executeEdits("my-insert-quotation-single2", [
       {
         range: new window.monaco.Range(
           selection.startLineNumber,

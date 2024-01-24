@@ -66,6 +66,15 @@ declare module "vconsole" {
   const vconsole
   export default vconsole
 }
+
+declare module "@cdn-prettier"{
+  const prettier
+  export default prettier
+}
+declare module "@cdn-prettier-plugins-markdown"{
+  export default parseMd
+}
+
 declare module "@cdn-node-emoji" {
   const emoji: any
   export default emoji

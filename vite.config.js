@@ -23,6 +23,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      "@cdn-prettier": "https://cdn.jsdelivr.net/npm/prettier@3.2.4/+esm",
+      "@cdn-prettier-plugins-markdown":
+        "https://cdn.jsdelivr.net/npm/prettier@3.2.4/plugins/markdown.js/+esm",
       vconsole: "https://jsd.onmicrosoft.cn/npm/vconsole@3.15.1/+esm",
       "string-replace-async":
         "https://jsd.onmicrosoft.cn/npm/string-replace-async@3.0.2/index.min.js",
