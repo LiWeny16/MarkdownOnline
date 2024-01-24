@@ -1,3 +1,6 @@
+import { IRange, editor } from "monaco-editor"
+import getSelectionText, { selectionIsNull } from "./getSelection"
+
 /**
  * @description 插入文本
  */
@@ -36,4 +39,55 @@ export function insertTextMonacoAtCursor(textToInsert: any) {
       forceMoveMarkers: false,
     },
   ])
+}
+
+export function insertQuotationInMonaco(
+  editor: editor.IStandaloneCodeEditor = window.editor
+) {
+  const _editor = editor ?? window.editor
+  const selection = _editor.getSelection()!
+  if (!selectionIsNull() && !getSelectionText(editor)[0].match(/["']/)) {
+    _editor.executeEdits("my-insert-quotation-double", [
+      {
+        range: new window.monaco.Range(
+          selection.startLineNumber,
+          selection.startColumn,
+          selection.startLineNumber,
+          selection.startColumn
+        ),
+        text: `"`,
+        forceMoveMarkers: false,
+      },
+      {
+        range: new window.monaco.Range(
+          selection.endLineNumber,
+          selection.endColumn,
+          selection.endLineNumber,
+          selection.endColumn
+        ),
+        text: `"`,
+        forceMoveMarkers: false,
+      },
+    ])
+    let nextSelection: IRange = {
+      startLineNumber: selection.startLineNumber,
+      startColumn: selection.startColumn + 1,
+      endLineNumber: selection.endLineNumber,
+      endColumn: selection.endColumn + 1,
+    }
+    _editor.setSelection(nextSelection)
+  } else {
+    _editor.executeEdits("my-insert-quotation-single", [
+      {
+        range: new window.monaco.Range(
+          selection.startLineNumber,
+          selection.startColumn + 1,
+          selection.startLineNumber,
+          selection.startColumn
+        ),
+        text: `"`,
+        forceMoveMarkers: true,
+      },
+    ])
+  }
 }

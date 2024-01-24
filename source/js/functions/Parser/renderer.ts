@@ -2,17 +2,22 @@ import regs from "@App/regs/regs"
 import { readMemoryImg } from "@App/textMemory/memory"
 // import { marked } from "@cdn-marked"
 import { emojify, has } from "@cdn-node-emoji"
+import vconsole from "vconsole"
 
-// import * as emoji from 'https://jsd.onmicrosoft.cn/npm/node-emoji@2.1.3/lib/index.js'
-// const emojify =emoji.emojify
-// const has = emoji.has
-// console.log(emoji);
 //#region *********************renderer*********************
 
 export const newRenderer = {
   code(code: string, lang: string, _escaped: boolean) {
-    // console.log(code, lang)
-    return false
+    if (lang == "js-run") {
+      // var vconsole = new window.vconsole()
+      // console.log();
+      let a = new vconsole()
+      return `${eval(code)}`
+    } else {
+      return false
+    }
+    // if (lang != "js") return false
+    // else `<code>${code}</code>`
   },
   /**
    * 拓展图片
@@ -192,30 +197,6 @@ export const markItExtension = {
  * 
 */
 export const imgExtension = {
-  // extensions: [
-  //   {
-  //     name: "vfImage",
-  //     level: "block",
-  //     start(src: string | string[]) {
-  //       return src.indexOf("\n:")
-  //     },
-  //     tokenizer(src: string) {
-  //       const rule = /^:(https?:\/\/.+?):/
-  //       const match = rule.exec(src)
-  //       if (match) {
-  //         return {
-  //           type: "vfImage",
-  //           raw: match[0],
-  //           url: match[1],
-  //           html: "", // will be replaced in walkTokens
-  //         }
-  //       }
-  //     },
-  //     renderer(token: { html: any }) {
-  //       return token.html
-  //     },
-  //   },
-  // ],
   name: "newRenderer",
   level: "block", // Signal that this extension should be run inline
   renderer: newRenderer,
@@ -237,13 +218,41 @@ export const imgExtension = {
         token.href = imgBase64_
       }
     } else if (token.type === "code") {
-      // console.log(token);
-    } else if (token.type === "vfImage") {
-      // console.log(token);
+      // eval
+      // console.log(token)
     } else if (token.type === "importUrl") {
       // console.log(token);
     }
   },
+}
+
+export const clueExtension = {
+  extensions: [
+    {
+      name: "clue",
+      level: "inline", // Signal that this extension should be run inline
+      start(src: any) {
+        return src.match(/:/)?.index
+      },
+      tokenizer(src: string, _tokens: any) {
+        const match = src.match(regs.emoji)
+        if (match) {
+          return {
+            type: "clue",
+            raw: match[0],
+            text: match[1],
+          }
+        }
+        return false
+      },
+      renderer(token: any) {
+        if (has(token.raw)) {
+          return emojify(token.raw)
+        }
+        return token.raw
+      },
+    },
+  ],
 }
 
 export const emojiExtension = {

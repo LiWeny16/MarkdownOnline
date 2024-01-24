@@ -19,6 +19,7 @@ import { ResizableBox } from "react-resizable"
 import "react-resizable/css/styles.css"
 import { mdConverter } from "@Root/js"
 import DragHandleIcon from "@mui/icons-material/DragHandle"
+import { monacoSnippets } from "@Func/Monaco/snippets/snippets"
 loader.config({
   paths: {
     vs: "https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/monaco-editor/0.33.0-dev.20220228/min/vs/",
@@ -44,6 +45,7 @@ const files: any = {
 }
 
 export default observer(function MonacoEditor() {
+  const [resizableWidth, setResizableWidth] = React.useState(640)
   const handleResizeStop = () => {
     mdConverter()
   }
@@ -54,12 +56,17 @@ export default observer(function MonacoEditor() {
     wordBreak: "keepAll",
     formatOnType: true,
     formatOnPaste: true,
+    autoSurround:"quotes",
+    autoClosingQuotes:"always",
+    automaticLayout:true,
+    smoothScrolling:true,
+    codeLens:false
   }
   const [fileName, setFileName] = useState("index.md")
   // let previousValue = window.editor.getValue();
   const file = files[fileName]
   // const editorRef = useRef(null)
-  function handleOnChange() {
+  function handleOnChange(e:any) {
     triggerConverterEvent(4)
   }
   function handleEditorDidMount(
@@ -70,10 +77,10 @@ export default observer(function MonacoEditor() {
     // 暴露出去
     window.editor = editor
     window.monaco = monaco
-
-    // editor.addAction()
+    setResizableWidth(document.getElementById("editor")!.clientWidth / 2)
     monacoPasteEvent()
     monacoKeyEvent(editor, monaco)
+    monacoSnippets(editor,monaco)
     // monacoKeyDownEvent()
     allInit()
   }
@@ -86,7 +93,7 @@ export default observer(function MonacoEditor() {
           //   handle={
           //  <MyHandle />
           //   }
-          width={640}
+          width={resizableWidth}
           height={700}
           draggableOpts={{ grid: [5, 15] }}
           minConstraints={[100, 1800]}

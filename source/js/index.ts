@@ -24,12 +24,12 @@ import "../css/index.less"
 
 import { isSyntaxValid } from "@App/script.ts"
 import { readMemoryImg } from "@App/textMemory/memory"
-import {
-  headingRenderer,
-  initTocs,
-  markItExtension,
-} from "@Func/Parser/renderer"
-import regs from "@App/regs/regs"
+// import {
+//   headingRenderer,
+//   initTocs,
+//   markItExtension,
+// } from "@Func/Parser/renderer"
+// import regs from "@App/regs/regs"
 // import "https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
 /**
  * @description 拓展使能配置

@@ -1,3 +1,5 @@
+// import { editor } from "monaco-editor";
+
 type EnObjType = {
   enMainConverter: boolean
   enAboutBox: boolean
@@ -50,7 +52,7 @@ declare module "*/highlight.min.js" {
   const hljs: any
   export default hljs
 }
-declare module "dom-to-image"  {
+declare module "dom-to-image" {
   const domtoimg: any
   export default domtoimg
 }
@@ -60,11 +62,14 @@ declare module "@cdn-axios" {
   export default axios
   export { AxiosResponse, AxiosRequestConfig, Method }
 }
-
+declare module "vconsole" {
+  const vconsole
+  export default vconsole
+}
 declare module "@cdn-node-emoji" {
   const emoji: any
   export default emoji
-  export  { emojify, has } 
+  export { emojify, has }
 }
 declare module "@cdn-marked" {
   const marked: any
@@ -72,21 +77,21 @@ declare module "@cdn-marked" {
 }
 declare module "@cdn-mermaid" {
   const mermaid: any
-  export default mermaid 
+  export default mermaid
 }
 declare module "@cdn-kit" {
   const kit: any
-  export default kit 
+  export default kit
 }
 
 declare module "@cdn-hljs" {
   const hljs: any
-  export default hljs 
+  export default hljs
 }
 
 declare module "@cdn-katex" {
   const hljs: any
-  export default hljs 
+  export default hljs
 }
 
 // declare module "@Root/js/functions/aboutBox" {

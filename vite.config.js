@@ -2,7 +2,7 @@ import { defineConfig } from "vite"
 import viteCompression from "vite-plugin-compression"
 import react from "@vitejs/plugin-react"
 import importToCDN from "vite-plugin-cdn-import"
-import {vitePluginReactCdn} from "./vite-plugin/reactCdn.config"
+import { vitePluginReactCdn } from "./vite-plugin/reactCdn.config"
 import { resolve } from "path"
 export default defineConfig({
   base: "./",
@@ -23,14 +23,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // "react-photo-view":
-      // "react":"https://cdn.jsdelivr.net/npm/react@18.2.0/+esm?raw",
-      //   "https://jsd.onmicrosoft.cn/npm/react-photo-view@1.2.4/+esm?raw",
+      vconsole: "https://jsd.onmicrosoft.cn/npm/vconsole@3.15.1/+esm",
       "string-replace-async":
         "https://jsd.onmicrosoft.cn/npm/string-replace-async@3.0.2/index.min.js",
-      // "react-resizable":
-      //   "https://jsd.onmicrosoft.cn/npm/react-resizable@3.0.5/+esm?raw",
-      // "dom-to-image":"https://jsd.onmicrosoft.cn/npm/dom-to-image@2.6.0/+esm",
       html2canvas: "https://jsd.onmicrosoft.cn/npm/html2canvas@1.4.1/+esm",
       mobx: "https://jsd.onmicrosoft.cn/npm/mobx@6.12.0/+esm",
       axios: "https://jsd.onmicrosoft.cn/npm/axios@1.6.5/+esm",
