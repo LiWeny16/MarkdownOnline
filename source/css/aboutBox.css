@@ -1,64 +1,69 @@
 #aboutBox {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .aboutViewArea {
-    width: 45%;
-    border: solid;
-    border-radius: 9px;
-    background: white;
-    transition: width 2s, height 2s, transform 2s;
-    animation: fadeIn 0.5s 1;
-    overflow-y: scroll;
-    height: 80vh;
+  width: 45%;
+  border: solid;
+  border-radius: 9px;
+  background: white;
+  transition:
+    width 2s,
+    height 2s,
+    transform 2s;
+  animation: fadeIn 0.5s 1;
+  overflow-y: scroll;
+  height: 80vh;
 }
 
-.aboutViewArea::-webkit-scrollbar{
-    width: 0;
+.aboutViewArea::-webkit-scrollbar {
+  width: 0;
 }
 
 .markdown-body {
-    box-sizing: border-box;
-    min-width: 200px;
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 26px 38px;
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 26px 38px;
 }
 .markdown-body-dark {
-    box-sizing: border-box;
-    min-width: 200px;
-    max-width: 980px;
-    margin: 0 auto;
-    padding: 26px 38px;
+  box-sizing: border-box;
+  min-width: 200px;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 26px 38px;
 }
 /* shutdown svg style */
 #closeAbout {
-    text-align: right;
-    line-height: 0px;
+  text-align: right;
+  line-height: 0px;
 }
 
 .closeSvg {
-    width: 20px;
+  width: 20px;
 }
-
+#aboutBox {
+  z-index: 9999 !important;
+}
 @keyframes fadeIn {
-    0% {
-        opacity: 0;
-        /*初始状态 透明度为0*/
-    }
+  0% {
+    opacity: 0;
+    /*初始状态 透明度为0*/
+  }
 
-    50% {
-        opacity: 0;
-        /*中间状态 透明度为0*/
-    }
+  50% {
+    opacity: 0;
+    /*中间状态 透明度为0*/
+  }
 
-    100% {
-        opacity: 1;
-        /*结尾状态 透明度为1*/
-    }
+  100% {
+    opacity: 1;
+    /*结尾状态 透明度为1*/
+  }
 }

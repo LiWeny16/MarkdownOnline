@@ -21,6 +21,7 @@ import { mdConverter } from "@Root/js"
 import DragHandleIcon from "@mui/icons-material/DragHandle"
 import { monacoSnippets } from "@Func/Monaco/snippets/snippets"
 import monacoFormat from "@Func/Monaco/format/format"
+// import monacoPalette from "@Func/Monaco/palette/palette"
 loader.config({
   paths: {
     vs: "https://jsd.onmicrosoft.cn/npm/monaco-editor@0.45.0/dev/vs",
@@ -61,7 +62,10 @@ export default observer(function MonacoEditor() {
     autoClosingQuotes:"always",
     automaticLayout:true,
     smoothScrolling:true,
-    codeLens:false
+    codeLens:false,
+  //   lightbulb: {
+  //     enabled: true, // 快速修复功能
+  //  },
   }
   const [fileName, setFileName] = useState("index.md")
   // let previousValue = window.editor.getValue();
@@ -83,6 +87,7 @@ export default observer(function MonacoEditor() {
     monacoKeyEvent(editor, monaco)
     monacoSnippets(editor,monaco)
     monacoFormat(editor,monaco)
+    // monacoPalette(editor,monaco)
     // monacoKeyDownEvent()
     allInit()
   }
