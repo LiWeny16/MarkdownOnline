@@ -4,6 +4,8 @@ import { mdConverter } from "@Root/js"
 /**
  * @description 我在这里设计了一个上锁机制，
  */
+
+
 let lock = false
 let triggerTime = 0
 export function triggerConverterEvent(threshold: number = 2) {

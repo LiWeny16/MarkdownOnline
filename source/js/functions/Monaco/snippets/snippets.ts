@@ -57,7 +57,7 @@ export function monacoSnippets(
         endLineNumber: position.lineNumber,
         endColumn: position.column,
       })
-      var suggestions = [
+      let _suggestions = [
         {
           label: "clg",
           kind: monaco.languages.CompletionItemKind.Function,
@@ -140,8 +140,8 @@ export function monacoSnippets(
           detail: "Create A LaTex Inline",
         },
       ]
-      if (!isNeedToUseLatexIntellisense(textUntilPosition)) {
-        return { suggestions: suggestions }
+      if (!isInLatexBlock(textUntilPosition)) {
+        return { suggestions: _suggestions }
       }
     },
   })
@@ -272,16 +272,22 @@ export function isNeedToUseLatexIntellisense(
 ): boolean {
   // console.log(textUntilPosition[textUntilPosition.length - 1]);
   if (
-    (textUntilPosition.match(/\$\$/g)
-      ? textUntilPosition.match(/\$\$/g)!.length % 2 === 1
-      : false) ||
-    ((textUntilPosition.match(/\$/g)
-      ? textUntilPosition.match(/\$/g)!.length % 2 === 1
-      : false) &&
-      textUntilPosition[textUntilPosition.length - 1] === "\\")
+    textUntilPosition[textUntilPosition.length - 1] === "\\" &&
+    isInLatexBlock(textUntilPosition)
   ) {
     return true
   } else {
     return false
   }
+}
+
+export function isInLatexBlock(textUntilPosition: string): boolean {
+  return (
+    (textUntilPosition.match(/\$\$/g)
+      ? textUntilPosition.match(/\$\$/g)!.length % 2 === 1
+      : false) ||
+    (textUntilPosition.match(/\$/g)
+      ? textUntilPosition.match(/\$/g)!.length % 2 === 1
+      : false)
+  )
 }
