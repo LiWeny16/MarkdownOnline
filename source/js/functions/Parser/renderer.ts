@@ -1,5 +1,6 @@
 import regs from "@App/regs/regs"
 import { readMemoryImg } from "@App/textMemory/memory"
+import hljs from "@cdn-hljs"
 // import { marked } from "@cdn-marked"
 import { emojify, has } from "@cdn-node-emoji"
 import vconsole from "vconsole"
@@ -8,16 +9,19 @@ import vconsole from "vconsole"
 
 export const newRenderer = {
   code(code: string, lang: string, _escaped: boolean) {
+    let finalCodeBlock
     if (lang == "js-run") {
-      // var vconsole = new window.vconsole()
-      // console.log();
-      let a = new vconsole()
+      let _vconsole = new vconsole()
       return `${eval(code)}`
-    } else {
-      return false
     }
-    // if (lang != "js") return false
-    // else `<code>${code}</code>`
+    if (hljs.getLanguage(lang)) {
+      finalCodeBlock = `<pre><code class="language-${lang} ">${code}</code></pre>`
+    } else if (lang == "mermaid") {
+      finalCodeBlock = `<div class="language-mermaid language-plaintext">${code}</div>`
+    } else {
+      finalCodeBlock = `<pre><code class="language-plaintext">${code}</code></pre>`
+    }
+    return finalCodeBlock
   },
   /**
    * 拓展图片

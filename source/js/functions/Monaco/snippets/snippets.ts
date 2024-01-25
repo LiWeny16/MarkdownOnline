@@ -51,6 +51,12 @@ export function monacoSnippets(
   monaco.languages.registerCompletionItemProvider("markdown", {
     //@ts-ignore
     provideCompletionItems: (model, position, context) => {
+      const textUntilPosition: string = model.getValueInRange({
+        startLineNumber: 1,
+        startColumn: 1,
+        endLineNumber: position.lineNumber,
+        endColumn: position.column,
+      })
       var suggestions = [
         {
           label: "clg",
@@ -64,8 +70,8 @@ export function monacoSnippets(
           label: "code",
           kind: monaco.languages.CompletionItemKind.Function,
           insertText: `
-\`\`\`\${1:language}
-\${2:value}
+\`\`\`\${1:js}
+\${2:}
 \`\`\`
 `,
           insertTextRules:
@@ -114,8 +120,29 @@ export function monacoSnippets(
             monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
           detail: "ignore block",
         },
+        {
+          label: "latex-block",
+          kind: monaco.languages.CompletionItemKind.Field,
+          insertText: `\$\$
+\${1:}
+\$\$
+`,
+          insertTextRules:
+            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          detail: "Create A LaTex Block",
+        },
+        {
+          label: "latex-inline",
+          kind: monaco.languages.CompletionItemKind.Field,
+          insertText: `\$\${1:}\$`,
+          insertTextRules:
+            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          detail: "Create A LaTex Inline",
+        },
       ]
-      return { suggestions: suggestions }
+      if (!isNeedToUseLatexIntellisense(textUntilPosition)) {
+        return { suggestions: suggestions }
+      }
     },
   })
   /**
@@ -133,11 +160,7 @@ export function monacoSnippets(
         endColumn: position.column,
       })
       // 类似的，如果是在一个 LaTeX 代码块中，返回 LaTeX 的提示。
-      if (
-        textUntilPosition.match(/\$\$/g)
-          ? textUntilPosition.match(/\$\$/g)!.length % 2 === 1
-          : false
-      ) {
+      if (isNeedToUseLatexIntellisense(textUntilPosition)) {
         const suggestions = Array.from(
           [
             ...delimiters0,
@@ -161,6 +184,20 @@ export function monacoSnippets(
             ...style0,
             ...symbolsAndPunctuation0,
             ...debugging0,
+          ],
+          (e, index) => {
+            return {
+              label: `\\${e}`,
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: e,
+              insertTextRules:
+                monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              sortText: /[A-Z]/.test(e[0]) ? "1" : "0",
+            }
+          }
+        )
+        const suggestions2 = Array.from(
+          [
             ...accents1,
             ...annotation1,
             ...verticalLayout1,
@@ -173,27 +210,78 @@ export function monacoSnippets(
             ...font1,
             ...braketNotation1,
             ...classAssignment1,
+          ],
+          (e, index) => {
+            return {
+              label: `\\${e}`,
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: `${e}\{$1\}`,
+              insertTextRules:
+                monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              sortText: /[A-Z]/.test(e[0]) ? "1" : "0",
+            }
+          }
+        )
+        const suggestions3 = Array.from(
+          [
             ...verticalLayout2,
             ...binomialCoefficients2,
             ...fractions2,
             ...color2,
-            ...envs,
           ],
-          (e) => {
+          (e, index) => {
             return {
               label: `\\${e}`,
               kind: monaco.languages.CompletionItemKind.Function,
-              insertText: e,
+              insertText: `${e}\{$1\}\{$2\}`,
               insertTextRules:
                 monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              sortText: /[A-Z]/.test(e[0]) ? "1" : "0",
             }
           }
         )
+        const suggestions4 = [
+          {
+            label: `\\begin`,
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: "begin{${1|" + envs.join(",") + "|}}\n\t$2\n\\end{$1}",
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          },
+        ]
         return {
-          suggestions: suggestions,
+          suggestions: [
+            ...suggestions,
+            ...suggestions2,
+            ...suggestions3,
+            ...suggestions4,
+          ],
         }
       }
     },
   })
 }
 //
+
+/**
+ * @description 判断是否需要启用LaTex提示
+ * @param textUntilPosition string
+ */
+export function isNeedToUseLatexIntellisense(
+  textUntilPosition: string
+): boolean {
+  // console.log(textUntilPosition[textUntilPosition.length - 1]);
+  if (
+    (textUntilPosition.match(/\$\$/g)
+      ? textUntilPosition.match(/\$\$/g)!.length % 2 === 1
+      : false) ||
+    ((textUntilPosition.match(/\$/g)
+      ? textUntilPosition.match(/\$/g)!.length % 2 === 1
+      : false) &&
+      textUntilPosition[textUntilPosition.length - 1] === "\\")
+  ) {
+    return true
+  } else {
+    return false
+  }
+}

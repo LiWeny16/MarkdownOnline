@@ -11,7 +11,11 @@ export default function exeTableAction() {
  * @description 生成行列markdown
  */
 function generateMarkdownTable(rows: any, columns: any) {
+  if (!rows || !columns) {
+    return ""
+  }
   let markdownTable = "| "
+
   // Generate table headers
   for (let c = 0; c < columns; c++) {
     markdownTable += `Header  ${c + 1} | `

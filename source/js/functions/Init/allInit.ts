@@ -51,6 +51,7 @@ class settingsClass {
     hljs.configure({
       ignoreUnescapedHTML: true,
     })
+    // hljs.registerLanguage('mermaid', window.hljsDefineMermaid);
   }
   settingsAllInit() {
     this.markedInit()
@@ -78,13 +79,13 @@ export default function allInit(): void {
   }) //初始化输入区域
   Notification.success({
     title: "已更新到最新版本",
-    content: `当前版本:v1.4.2`,
+    content: `当前版本:v1.5.1`,
     position: "bottomRight",
   })
   kit.sleep(250).then(() => {
     Notification.info({
       title: "版本新增特性",
-      content: `可调整边框,修复@mermaid-cdn源`,
+      content: `1. LaTex公式智能提示 2. hljs性能优化`,
       position: "bottomRight",
     })
   })

@@ -128,7 +128,7 @@ function clueParser(md: any) {
         // console.log(clueClass);
         content = content.replace(/\?br/g, "\n") //解除换行限制
         if (clueClass == "mermaid") {
-          parsedHTML = `<div class="language-${clueClass} language-plaintext">${content}</div>`
+          parsedHTML = `<div class="language-mermaid language-plaintext">${content}</div>`
         } else if (clueClass == "js" && enObj.enScript) {
           // console.log(content)
           if (isSyntaxValid(content)) {
