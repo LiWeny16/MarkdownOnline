@@ -1,20 +1,18 @@
-// import { allInit, kit, mdConverter } from "../index.js"
-
+import { Monaco } from "@monaco-editor/react"
+import { editor } from "monaco-editor"
 import insertTextAtCursor, {
   insertTextMonacoAtCursor,
 } from "@App/text/insertTextAtCursor"
 import { fillInMemoryImg, readMemoryImg } from "@App/textMemory/memory"
 // import { editor } from "monaco-editor"
 
+export function monacoPasteEventNative(
+  editor: editor.IStandaloneCodeEditor,
+  monaco: Monaco
+) {}
 export function monacoPasteEvent() {
-  // let isPasteForPic = false
-  // window.editor.onDidPaste(() => {
-
-  //   // if (isPasteForPic) {
-  //   //   window.editor.getModel().undo()
-  //   // }
-  // })
   document.addEventListener("paste", (event) => {
+    // console.log(event);
     if (
       document.activeElement!.className == "inputarea monaco-mouse-cursor-text"
     ) {
@@ -36,6 +34,7 @@ export default function pasteEvent() {
   document.getElementById("md-area")!.addEventListener("paste", (e) => {
     pic2base64(e).then((base64: any) => {
       if (base64) {
+        console.log(base64)
         let timeStamp = new Date().getTime()
         let insertImg = `![我是图片](/vf/${timeStamp})`
         fillInMemoryImg(base64, timeStamp)

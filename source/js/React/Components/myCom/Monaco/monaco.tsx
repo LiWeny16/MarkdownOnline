@@ -5,7 +5,10 @@ import DraggableBox from "@Com/myCom/DragBox"
 import { getMdTextFromMonaco } from "@App/text/getMdText"
 // import * as monaco from "monaco-editor"
 import allInit from "@Func/Init/allInit"
-import { monacoPasteEvent } from "@Func/Events/pasteEvent"
+import {
+  monacoPasteEvent,
+  monacoPasteEventNative,
+} from "@Func/Events/pasteEvent"
 import { editor } from "monaco-editor"
 import { triggerConverterEvent } from "@Func/Events/convert"
 // import { transform } from "html2canvas/dist/types/css/property-descriptors/transform"
@@ -24,7 +27,7 @@ import monacoFormat from "@Func/Monaco/format/format"
 // import monacoPalette from "@Func/Monaco/palette/palette"
 loader.config({
   paths: {
-    vs: "https://jsd.onmicrosoft.cn/npm/monaco-editor@0.45.0/dev/vs",
+    vs: "https://jsd.onmicrosoft.cn/npm/monaco-editor@0.33.0/dev/vs",
   },
 })
 
@@ -58,21 +61,25 @@ export default observer(function MonacoEditor() {
     wordBreak: "keepAll",
     formatOnType: true,
     formatOnPaste: true,
-    autoSurround:"quotes",
-    autoClosingQuotes:"always",
-    automaticLayout:true,
-    smoothScrolling:true,
-    codeLens:false,
-  //   lightbulb: {
-  //     enabled: true, // 快速修复功能
-  //  },
+    autoSurround: "quotes",
+    autoClosingQuotes: "always",
+    automaticLayout: true,
+    smoothScrolling: true,
+    codeLens: false,
+    pasteAs: { enabled: false },
+    //   lightbulb: {
+    //     enabled: true, // 快速修复功能
+    //  },
   }
   const [fileName, setFileName] = useState("index.md")
   // let previousValue = window.editor.getValue();
   const file = files[fileName]
   // const editorRef = useRef(null)
-  function handleOnChange(e:any) {
+  function handleOnChange(e: any) {
     triggerConverterEvent(4)
+  }
+  function handleBeforeMount() {
+    // monacoPasteEvent()
   }
   function handleEditorDidMount(
     editor: editor.IStandaloneCodeEditor,
@@ -83,10 +90,11 @@ export default observer(function MonacoEditor() {
     window.editor = editor
     window.monaco = monaco
     setResizableWidth(document.getElementById("editor")!.clientWidth / 2)
+    // monacoPasteEventNative(editor, monaco)
     monacoPasteEvent()
     monacoKeyEvent(editor, monaco)
-    monacoSnippets(editor,monaco)
-    monacoFormat(editor,monaco)
+    monacoSnippets(editor, monaco)
+    monacoFormat(editor, monaco)
     // monacoPalette(editor,monaco)
     // monacoKeyDownEvent()
     allInit()
@@ -120,6 +128,7 @@ export default observer(function MonacoEditor() {
             onMount={handleEditorDidMount}
             onChange={handleOnChange}
             options={editorOptions}
+            beforeMount={handleBeforeMount}
           />
         </ResizableBox>
         {/* <div style={{width:size.width}}>2323</div> */}

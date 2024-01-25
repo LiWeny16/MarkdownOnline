@@ -107,6 +107,7 @@ export default function monacoKeyEvent(
       exportAsImage()
     },
   })
+  
 }
 
 function ctrl_R() {}

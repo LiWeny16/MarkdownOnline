@@ -13,9 +13,7 @@ function enableFastKeyEvent() {
   document.addEventListener("keydown", (e) => {
     e.stopPropagation() //停止冒泡，向上传递事件
     // let editor = document.getElementById("md-area")
-
-    // console.log(e);
-
+    
     // TAB
     if (e.key == "Tab") {
       e.preventDefault()
