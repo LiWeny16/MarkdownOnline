@@ -1,0 +1,10 @@
+"filename", "language", "CSS", "Less", "TypeScript", "TypeScript JSX", "comment", "blank", "total"
+"c:\Learning\sample\synchronous github\MarkdownOL\source\css\aboutBox.css", "CSS", 6, 0, 0, 0, 0, 0, 6
+"c:\Learning\sample\synchronous github\MarkdownOL\source\css\index.less", "Less", 0, 9, 0, 0, 0, 1, 10
+"c:\Learning\sample\synchronous github\MarkdownOL\source\js\React\Components\myCom\Monaco\monaco.tsx", "TypeScript JSX", 0, 0, 0, 0, 5, 0, 5
+"c:\Learning\sample\synchronous github\MarkdownOL\source\js\functions\App\text\palette.ts", "TypeScript", 0, 0, 9, 0, 0, 1, 10
+"c:\Learning\sample\synchronous github\MarkdownOL\source\js\functions\Events\key\actions\table.ts", "TypeScript", 0, 0, 24, 0, 7, 2, 33
+"c:\Learning\sample\synchronous github\MarkdownOL\source\js\functions\Events\key\monacoKey.ts", "TypeScript", 0, 0, 53, 0, 4, 0, 57
+"c:\Learning\sample\synchronous github\MarkdownOL\source\js\functions\Monaco\palette\palette.ts", "TypeScript", 0, 0, 0, 0, 20, 3, 23
+"c:\Learning\sample\synchronous github\MarkdownOL\source\js\functions\Monaco\snippets\latexRules.ts", "TypeScript", 0, 0, 952, 0, 11, 2, 965
+"Total", "-", 6, 9, 1038, 0, 47, 9, 1109

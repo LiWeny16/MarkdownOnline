@@ -43,11 +43,11 @@
 
 ## 教程
 + LATEX请写在用$$中间  
-例如 $\lambda$ 详情请见:
-[知乎:LaTeX数学公式、常用符号大全](https://zhuanlan.zhihu.com/p/510451940)
+例如 $\lambda$ 详情请见:[LaTex语法大全](https://hub.fgit.cf/KaTeX/KaTeX/blob/main/docs/supported.md)
 + mermaid请见官网: [mermaid docs](https://mermaid.nodejs.cn/syntax/flowchart.html)
 + emoji标签码表见: [emoji I :hearts: You!](https://gist.github.com/rxaviers/7360908)
 + 本编辑器特性请见: [还没写文档嘻嘻](#)
++ 
 
 ## 新增特性
 + 右对齐可以用 "右边对齐".R 

@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "这是一个在线 markdown 渲染的网页\r 可以帮助你实时渲染 markdown",
   "scripts": {
+    "d": "yarn vite --open",
     "dev": " yarn vite --open ",
-    "build": "tsc && yarn vite build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc && yarn vite build"
   },
   "repository": {
     "type": "git",
