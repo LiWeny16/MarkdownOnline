@@ -40,6 +40,7 @@ import {
   debugging0,
   envs,
 } from "./latexRules"
+import emojilib from "@cdn-emojilib"
 export function monacoSnippets(
   editor: editor.IStandaloneCodeEditor,
   monaco: Monaco

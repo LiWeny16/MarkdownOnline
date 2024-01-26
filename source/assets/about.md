@@ -1,4 +1,4 @@
-# 关于
+# Markdown Online View+
 
 本项目使用了marked.js来快速转换Markdown=>HTML，并且能够实时预览效果，不需要额外的操作即可体验到十分不错的在线markdown实时预览体验<br>
 能有什么坏心思，单纯想做一个不一样的markdown解析器罢了QAQ
@@ -47,7 +47,7 @@
 + mermaid请见官网: [mermaid docs](https://mermaid.nodejs.cn/syntax/flowchart.html)
 + emoji标签码表见: [emoji I :hearts: You!](https://gist.github.com/rxaviers/7360908)
 + 本编辑器特性请见: [还没写文档嘻嘻](#)
-+ 
+
 
 ## 新增特性
 + 右对齐可以用 "右边对齐".R 
@@ -59,19 +59,36 @@
 + v0.1.x 修复大量bug，新增图片管理器
 + vx.x.x 懒得写，更新N个特性了已经
 
-## 作者
-
-**Bigonion**
 
 ## 开源协议
 /*  
-\* @Author bigonion  
+\* @Author Bigonion  
 \* @Copyright 2022© 至今  
 */  
 **MIT**
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline?ref=badge_large&issueType=license)
 
 ## Namespace 
 + [github](https://github.com/LiWeny16/MarkdownOnline)  
 + [namespace](https://bigonion.cn)
 
+## 在线地址
 
+[md.bigonion.cn](https://md.bigonion.cn)
+
+## 关于
+
+作者：Bigonion  
+邮箱：bigonion@bigonion.cn  
+
+## 致谢
+
+感谢以下开发者对本项目做出的贡献：
+
+<a href="https://github.com/LiWeny16/MarkdownOnline/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=LiWeny16/MarkdownOnline&max=1000" />
+</a>
+
+感谢以下开源项目对本项目做出的贡献：
+
+[Reliance Report](/LICENSES/report.md)

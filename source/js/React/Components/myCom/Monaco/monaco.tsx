@@ -24,6 +24,7 @@ import { mdConverter } from "@Root/js"
 import DragHandleIcon from "@mui/icons-material/DragHandle"
 import { monacoSnippets } from "@Func/Monaco/snippets/snippets"
 import monacoFormat from "@Func/Monaco/format/format"
+import errIntellisense from "@Func/Monaco/intellisense/error"
 // import monacoPalette from "@Func/Monaco/palette/palette"
 loader.config({
   paths: {
@@ -67,6 +68,7 @@ export default observer(function MonacoEditor() {
     smoothScrolling: true,
     codeLens: false,
     pasteAs: { enabled: false },
+    cursorSmoothCaretAnimation: "explicit",
     //   lightbulb: {
     //     enabled: true, // 快速修复功能
     //  },
@@ -98,6 +100,8 @@ export default observer(function MonacoEditor() {
     // monacoPalette(editor,monaco)
     // monacoKeyDownEvent()
     allInit()
+    // errIntellisense()
+
   }
   return (
     <>

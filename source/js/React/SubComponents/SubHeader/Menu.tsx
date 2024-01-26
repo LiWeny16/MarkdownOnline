@@ -1,29 +1,28 @@
 import * as React from "react"
-// import { styled, alpha } from "@mui/material/styles"
-// import Button from "@mui/material/Button"
-// import Menu, { MenuProps } from "@mui/material/Menu"
 import MenuItem from "@mui/material/MenuItem"
 import EditIcon from "@mui/icons-material/Edit"
-// import AttachEmailIcon from "@mui/icons-material/AttachEmail"
 import Divider from "@mui/material/Divider"
-// import ArchiveIcon from "@mui/icons-material/Archive"
-// import FileCopyIcon from "@mui/icons-material/FileCopy"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
-// import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
 import MyButton from "../../Components/myCom/CustomButton"
-// import myPrint from "@App/export/myPrint"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import save, { isSaved } from "@App/save"
-import { Modal } from "@arco-design/web-react"
 import { useImage } from "@Mobx/Image"
 import { observer } from "mobx-react"
 import StyledMenu from "@Com/myCom/StyleMenu"
-import CloudMail from "@App/share/CloudMail"
-import { getRenderHTML } from "@App/text/getMdText"
-import exportAsImage from "@App/export/domToImg"
 import Share from "./Share/Share"
 import Export from "./Export/Export"
 import Settings from "./Settings/Settings"
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Typography,
+} from "@mui/material"
+import { deleteDBAll } from "@App/db.js"
+import myPrint from "@App/export/myPrint"
 // import domtoimg from "@App/export/domToImg"
 
 const CustomizedMenus = observer(() => {
@@ -40,6 +39,7 @@ const CustomizedMenus = observer(() => {
   // 4设置 anchor
   const [anchorEl4, setAnchorEl4] = React.useState<null | HTMLElement>(null)
 
+  // 保存提示
   const [modalState, setModalState] = React.useState<boolean>(false)
   const open = Boolean(anchorEl)
   const open2 = Boolean(anchorEl2)
@@ -89,26 +89,44 @@ const CustomizedMenus = observer(() => {
   }
   return (
     <div>
-      <Modal
-        title={
-          <>
-            <div className="ERR">注意!</div>
-          </>
-        }
-        visible={modalState}
-        onOk={() => {
+      <Dialog
+        open={modalState}
+        onClose={() => {
           setModalState(false)
-          save()
         }}
-        onCancel={() => setModalState(false)}
-        autoFocus={false}
-        focusLock={true}
       >
-        <div className="FLEX JUS-CENTER">
-          <b>您还未保存，确定要继续导出吗？</b>
-          (确定将会自动保存)
-        </div>
-      </Modal>
+        <DialogTitle>
+          <Typography variant="h6" gutterBottom>
+            Ready To Export? You Have Not Saved Yet!
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <Typography variant="body1" gutterBottom>
+              Once you have clicked the "yes" button, your text will be saved.
+            </Typography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setModalState(false)
+              save()
+              myPrint()
+            }}
+          >
+            YES
+          </Button>
+          <Button
+            onClick={() => {
+              setModalState(false)
+            }}
+            autoFocus
+          >
+            NO
+          </Button>
+        </DialogActions>
+      </Dialog>
       <MyButton
         open={open}
         endIcon={<MoreVertIcon />}
