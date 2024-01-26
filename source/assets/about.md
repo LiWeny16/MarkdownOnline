@@ -66,6 +66,7 @@
 \* @Copyright 2022© 至今  
 */  
 **MIT**
+
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline?ref=badge_large&issueType=license)
 
 ## Namespace 
@@ -91,4 +92,4 @@
 
 感谢以下开源项目对本项目做出的贡献：
 
-[Reliance Report](/LICENSES/report.md)
+[Reliance Report](/LICENSES/report)

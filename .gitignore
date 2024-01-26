@@ -25,3 +25,6 @@ logs
 # 忽略 learning
 learning/
 /learning
+
+# BAT
+*.bat
