@@ -6,35 +6,48 @@ import insertTextAtCursor, {
 import { fillInMemoryImg, readMemoryImg } from "@App/textMemory/memory"
 // import { editor } from "monaco-editor"
 
+/**
+ * @description handle native event
+ */
 export function monacoPasteEventNative(
   editor: editor.IStandaloneCodeEditor,
   monaco: Monaco
 ) {}
-export function monacoPasteEvent() {
-  document.addEventListener("paste", (event) => {
-    // console.log(event);
-    if (
-      document.activeElement!.className == "inputarea monaco-mouse-cursor-text"
-    ) {
-      event.preventDefault()
+
+/**
+ * @description monaco粘贴事件处理
+ * @author bigonion
+ * @param editor
+ * @param monaco
+ */
+export function monacoPasteEvent(
+  editor: editor.IStandaloneCodeEditor,
+  monaco: Monaco
+) {
+  // editor.getDomNode()?.addEventListener("paste", (e) => {})
+  editor.getContainerDomNode().addEventListener(
+    "paste",
+    (event) => {
+      // event.preventDefault()
       event.stopPropagation()
       pic2base64(event).then((base64: any) => {
         if (base64) {
           let timeStamp = new Date().getTime()
           let insertImg = `![我是图片](/vf/${timeStamp})`
           fillInMemoryImg(base64, timeStamp)
-          insertTextMonacoAtCursor(insertImg)
+          insertTextMonacoAtCursor(insertImg, true)
         }
       })
-    }
-  })
+    },
+    true
+  )
 }
 
 export default function pasteEvent() {
   document.getElementById("md-area")!.addEventListener("paste", (e) => {
     pic2base64(e).then((base64: any) => {
       if (base64) {
-        console.log(base64)
+        // console.log(base64)
         let timeStamp = new Date().getTime()
         let insertImg = `![我是图片](/vf/${timeStamp})`
         fillInMemoryImg(base64, timeStamp)

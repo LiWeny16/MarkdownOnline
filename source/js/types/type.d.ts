@@ -10,6 +10,7 @@ interface ImgData {
 interface MagicImgOptions extends NormalComponentsOptions {
   magic?: any
   src: string
+  uuid?:any
 }
 
 interface DialogOptions<T> extends NormalComponentsOptions {

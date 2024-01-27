@@ -5,7 +5,7 @@ export default function exeTableAction() {
   // console.log(getCommandPaletteText().split("#"));
   const row = getCommandPaletteText().split("#")[1]
   const col = getCommandPaletteText().split("#")[2]
-  insertTextMonacoAtCursor(generateMarkdownTable(row, col))
+  insertTextMonacoAtCursor(generateMarkdownTable(row, col), true)
 }
 /**
  * @description 生成行列markdown

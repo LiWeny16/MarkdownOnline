@@ -1,3 +1,10 @@
+/**
+ * MIT License
+
+  Copyright (c) 2017 张宇
+  [link](https://github.com/yzhang-gh/vscode-markdown?tab=MIT-1-ov-file#readme)
+*/
+
 //
 // Suffixes explained:
 // \cmd         -> 0

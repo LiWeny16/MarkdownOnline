@@ -4,16 +4,32 @@ import React from "react"
 import { readAllMemoryImg } from "@App/textMemory/memory"
 import Zoom from "@mui/material/Zoom"
 import Tooltip from "@mui/material/Tooltip"
+import insertTextAtCursor, {
+  insertTextMonacoAtCursor,
+} from "@App/text/insertTextAtCursor"
+import kit from "@cdn-kit"
+import { writeClipboard } from "@App/text/clipboard"
+
+// 必须要转换forwarRef 不然MUI不接收
 const _MagicImg = React.forwardRef(MagicImg)
 function MagicImg(props: MagicImgOptions, ref: any) {
   let _className = "FLEX JUS-CENTER "
   let _style: React.CSSProperties = { width: "fitContent" }
   const [hasHover, setHasHover] = React.useState(false)
+  function handleOnClick(e: React.MouseEvent<HTMLElement>) {
+    if (e.altKey) {
+      writeClipboard(`![我是图片](/vf/${props.uuid})`)
+    }
+    if (e.ctrlKey) {
+      insertTextMonacoAtCursor(`![我是图片](/vf/${props.uuid})`, true)
+    }
+  }
   let [mergeProps, _NU] = React.useState<MagicImgOptions>({
     src: props.src,
+    uuid: props.uuid,
     magic: props.magic == 0 ? false : true,
     className: _className + (props.className ?? ""),
-    style: props.style ? { ...props.style, ..._style } : _style
+    style: props.style ? { ...props.style, ..._style } : _style,
   })
 
   function basicImg() {
@@ -33,7 +49,7 @@ function MagicImg(props: MagicImgOptions, ref: any) {
             transform: hasHover ? "translate(0px, -1vh)" : "",
             boxShadow: hasHover
               ? "1vh 2vh 21px rgb(79 79 79)"
-              : "rgb(216 216 216) 1vh 2vh 21px"
+              : "rgb(216 216 216) 1vh 2vh 21px",
           }}
           src={mergeProps.src}
           alt="error"
@@ -50,10 +66,15 @@ function MagicImg(props: MagicImgOptions, ref: any) {
         className={mergeProps.className}
         style={mergeProps.style}
       >
-        {mergeProps.magic ? (
+        {
           <PhotoProvider>
-            <PhotoView src={mergeProps.src}>
-              <Tooltip placement="right" TransitionComponent={Zoom} arrow title="点击插入">
+            <PhotoView triggers={["onDoubleClick"]} src={mergeProps.src}>
+              <Tooltip
+                placement="right"
+                TransitionComponent={Zoom}
+                arrow
+                title="按住Ctrl点击插入"
+              >
                 <img
                   onMouseEnter={() => {
                     setHasHover(true)
@@ -61,14 +82,17 @@ function MagicImg(props: MagicImgOptions, ref: any) {
                   onMouseLeave={() => {
                     setHasHover(false)
                   }}
+                  onClick={(e: React.MouseEvent<HTMLElement>) => {
+                    handleOnClick(e)
+                  }}
                   style={{
                     width: "70%",
                     transition: " 0.2s ease-in-out",
                     borderRadius: "5px",
-                    transform: hasHover ? "translate(0px, -1vh)" : "",
+                    transform: hasHover ? "translate(0px, -2px)" : "",
                     boxShadow: hasHover
                       ? "1vh 2vh 21px rgb(79 79 79)"
-                      : "rgb(216 216 216) 1vh 2vh 21px"
+                      : "rgb(216 216 216) 1vh 2vh 21px",
                   }}
                   src={mergeProps.src}
                   alt="error"
@@ -76,29 +100,7 @@ function MagicImg(props: MagicImgOptions, ref: any) {
               </Tooltip>
             </PhotoView>
           </PhotoProvider>
-        ) : (
-          <Tooltip placement="right" TransitionComponent={Zoom} arrow title="按住Ctrl点击插入">
-          <img
-            onMouseEnter={() => {
-              setHasHover(true)
-            }}
-            onMouseLeave={() => {
-              setHasHover(false)
-            }}
-            style={{
-              width: "70%",
-              transition: " 0.2s ease-in-out",
-              borderRadius: "5px",
-              transform: hasHover ? "translate(0px, -1vh)" : "",
-              boxShadow: hasHover
-                ? "1vh 2vh 21px rgb(79 79 79)"
-                : "rgb(216 216 216) 1vh 2vh 21px"
-            }}
-            src={mergeProps.src}
-            alt="error"
-          />
-          </Tooltip>
-        )}
+        }
       </div>
     </>
   )

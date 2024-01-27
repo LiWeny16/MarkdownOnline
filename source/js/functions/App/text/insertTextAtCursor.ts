@@ -22,12 +22,15 @@ export default function insertTextAtCursor(
   textElement.focus()
 }
 
-export function insertTextMonacoAtCursor(textToInsert: any) {
+export function insertTextMonacoAtCursor(
+  textToInsert: string,
+  forceMove: boolean
+) {
   const _editor = window.editor
   const newText = textToInsert
   // const position = window.editor.getPosition()
   const selection = window.editor.getSelections()[0]
-  _editor.executeEdits("my-insert", [
+  _editor.executeEdits("img-insert", [
     {
       range: new window.monaco.Range(
         selection.startLineNumber,
@@ -36,7 +39,7 @@ export function insertTextMonacoAtCursor(textToInsert: any) {
         selection.endColumn
       ),
       text: newText,
-      forceMoveMarkers: false,
+      forceMoveMarkers: forceMove,
     },
   ])
 }

@@ -57,7 +57,7 @@ export default function monacoKeyEvent(
   })
   editor.addAction({
     id: "table-any",
-    label: "table#row#col",
+    label: "table#x#x",
     keybindings: [],
     run: () => {
       exeTableAction()

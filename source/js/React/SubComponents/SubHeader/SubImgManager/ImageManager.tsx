@@ -25,7 +25,7 @@ import MyBox from "@Com/myCom/Layout/Box"
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline"
 import { createTheme, ThemeProvider } from "@mui/material/styles"
 import { lime, purple } from "@mui/material/colors"
-import { Modal } from "@arco-design/web-react"
+// import { Modal } from "@arco-design/web-react"
 
 import Dialog from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
@@ -39,8 +39,8 @@ import { deleteDBAll } from "@App/db.js"
 const theme = createTheme({
   palette: {
     primary: { main: "#1976d2" },
-    secondary: purple
-  }
+    secondary: purple,
+  },
 })
 
 const TemporaryDrawer = observer((props: any) => {
@@ -74,8 +74,8 @@ const TemporaryDrawer = observer((props: any) => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Once you have clicked the "yes" button, your pictures and your text will be
-            deleted!
+            Once you have clicked the "yes" button, your pictures and your text
+            will be deleted!
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -116,7 +116,17 @@ const TemporaryDrawer = observer((props: any) => {
                 <LR space={[90]}>
                   <MyBox min={1} move={{ x: "5vw" }}>
                     <p>图片管理器</p>
-                    <Tooltip title="管理粘贴上传的图片">
+                    <Tooltip
+                      title={
+                        <div>
+                          管理粘贴上传的图片
+                          <ul style={{margin:"2px"}}>
+                            <li>按住Ctrl点击图片插入</li>
+                            <li>双击图片放大预览</li>
+                          </ul>
+                        </div>
+                      }
+                    >
                       <IconButton>
                         <HelpOutlineIcon color="primary" />
                       </IconButton>
@@ -145,7 +155,11 @@ const TemporaryDrawer = observer((props: any) => {
               ? imgSrc.map((value, index) => {
                   return (
                     <Grid id={value.uuid} key={value.uuid} xs={8}>
-                      <MagicImg magic={0} src={value.imgBase64} />
+                      <MagicImg
+                        magic={0}
+                        src={value.imgBase64}
+                        uuid={value.uuid}
+                      />
                     </Grid>
                   )
                 })

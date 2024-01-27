@@ -26,11 +26,33 @@ import { monacoSnippets } from "@Func/Monaco/snippets/snippets"
 import monacoFormat from "@Func/Monaco/format/format"
 import errIntellisense from "@Func/Monaco/intellisense/error"
 // import monacoPalette from "@Func/Monaco/palette/palette"
-loader.config({
-  paths: {
-    vs: "https://jsd.onmicrosoft.cn/npm/monaco-editor@0.33.0/dev/vs",
+
+const version = "0.44.0"
+const cdnDomain = {
+  unpkg: ["npm.onmicrosoft.cn", "unpkg.com"],
+  jsDelivr: ["jsd.onmicrosoft.cn", "www.jsdelivr.com"],
+}
+const cdnLinks = {
+  unpkg: {
+    cdn: `https://${cdnDomain.unpkg[0]}/monaco-editor@${version}/dev/vs`,
   },
-})
+  jsDelivr: {
+    cdn: `https://${cdnDomain.jsDelivr[0]}/monaco-editor@${version}/dev/vs`,
+  },
+}
+try {
+  loader.config({
+    paths: {
+      vs: cdnLinks.unpkg.cdn,
+    },
+  })
+} catch (error) {
+  loader.config({
+    paths: {
+      vs: cdnLinks.jsDelivr.cdn,
+    },
+  })
+}
 
 const files: any = {
   "index.js": {
@@ -59,16 +81,19 @@ export default observer(function MonacoEditor() {
   let theme = useTheme().themeState
   const editorOptions: editor.IStandaloneEditorConstructionOptions = {
     fontSize: 16, // 设置字体大小
-    wordBreak: "keepAll",
+    wordWrap: "on",
     formatOnType: true,
-    formatOnPaste: true,
+    formatOnPaste: false,
     autoSurround: "quotes",
     autoClosingQuotes: "always",
     automaticLayout: true,
     smoothScrolling: true,
     codeLens: false,
-    pasteAs: { enabled: false },
+    pasteAs: { enabled: false, showPasteSelector: "never" },
+    peekWidgetDefaultFocus: "tree",
     cursorSmoothCaretAnimation: "explicit",
+    colorDecorators: true,
+    // dragAndDrop: true,
     //   lightbulb: {
     //     enabled: true, // 快速修复功能
     //  },
@@ -80,9 +105,10 @@ export default observer(function MonacoEditor() {
   function handleOnChange(e: any) {
     triggerConverterEvent(4)
   }
-  function handleBeforeMount() {
-    // monacoPasteEvent()
-  }
+  function handleBeforeMount() {}
+  /**
+   * @description do sth. after mounted.
+   */
   function handleEditorDidMount(
     editor: editor.IStandaloneCodeEditor,
     monaco: Monaco
@@ -93,7 +119,7 @@ export default observer(function MonacoEditor() {
     window.monaco = monaco
     setResizableWidth(document.getElementById("editor")!.clientWidth / 2)
     // monacoPasteEventNative(editor, monaco)
-    monacoPasteEvent()
+    monacoPasteEvent(editor, monaco)
     monacoKeyEvent(editor, monaco)
     monacoSnippets(editor, monaco)
     monacoFormat(editor, monaco)
@@ -101,7 +127,6 @@ export default observer(function MonacoEditor() {
     // monacoKeyDownEvent()
     allInit()
     // errIntellisense()
-
   }
   return (
     <>

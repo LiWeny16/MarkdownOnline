@@ -38,10 +38,10 @@ declare module "*.mjs" {
   const mjs: any
   export default mjs
 }
-declare module "kit" {
-  const kit: any
-  export default kit
-}
+// declare module "kit" {
+//   const kit: any
+//   export default kit
+// }
 
 declare module "katex" {
   const katex: any

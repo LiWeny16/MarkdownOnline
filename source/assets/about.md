@@ -1,7 +1,12 @@
 # Markdown Online View+
 
+
+
+
 本项目使用了marked.js来快速转换Markdown=>HTML，并且能够实时预览效果，不需要额外的操作即可体验到十分不错的在线markdown实时预览体验<br>
 能有什么坏心思，单纯想做一个不一样的markdown解析器罢了QAQ
+
+
 
 ## 什么是markdown?
 
@@ -65,7 +70,7 @@
 \* @Author Bigonion  
 \* @Copyright 2022© 至今  
 */  
-**MIT**
+<img src="https://img.shields.io/badge/LICENSE-MIT-pink.svg" alt="example">
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline?ref=badge_large&issueType=license)
 
