@@ -1,43 +1,43 @@
 import React, { useRef, useState } from "react"
 import ReactDOM from "react-dom"
 import Editor, { loader, Monaco } from "@monaco-editor/react"
-import DraggableBox from "@Com/myCom/DragBox"
-import { getMdTextFromMonaco } from "@App/text/getMdText"
+// import DraggableBox from "@Com/myCom/DragBox"
+// import { getMdTextFromMonaco } from "@App/text/getMdText"
 // import * as monaco from "monaco-editor"
 import allInit from "@Func/Init/allInit"
-import {
-  monacoPasteEvent,
-  monacoPasteEventNative,
-} from "@Func/Events/pasteEvent"
+import { monacoPasteEvent } from "@Func/Events/pasteEvent"
 import { editor } from "monaco-editor"
 import { triggerConverterEvent } from "@Func/Events/convert"
 // import { transform } from "html2canvas/dist/types/css/property-descriptors/transform"
 // loader.config({ monaco });
-import { useTheme } from "@Root/js/React/Mobx/Theme"
+// import { useTheme } from "@Root/js/React/Mobx/Theme"
 import { observer } from "mobx-react"
-import changeTheme from "@App/theme/change"
-import monacoKeyDownEvent from "@Func/Events/key/monacoKey"
+// import changeTheme from "@App/theme/change"
+// import monacoKeyDownEvent from "@Func/Events/key/monacoKey"
 import monacoKeyEvent from "@Func/Events/key/monacoKey"
 import { ResizableBox } from "react-resizable"
 import "react-resizable/css/styles.css"
 import { mdConverter } from "@Root/js"
-import DragHandleIcon from "@mui/icons-material/DragHandle"
+// import DragHandleIcon from "@mui/icons-material/DragHandle"
 import { monacoSnippets } from "@Func/Monaco/snippets/snippets"
 import monacoFormat from "@Func/Monaco/format/format"
-import errIntellisense from "@Func/Monaco/intellisense/error"
+import { getDeviceTyByProportion } from "@App/user/userAgent"
+import { getTheme } from "@App/config/change"
+import monacoMouseEvent from "@Func/Events/mouse/monacoMouse"
+// import errIntellisense from "@Func/Monaco/intellisense/error"
 // import monacoPalette from "@Func/Monaco/palette/palette"
 
 const version = "0.44.0"
 const cdnDomain = {
   unpkg: ["npm.onmicrosoft.cn", "unpkg.com"],
-  jsDelivr: ["jsd.onmicrosoft.cn", "www.jsdelivr.com"],
+  jsDelivr: ["jsd.onmicrosoft.cn", "www.jsdelivr.com", "jsd.haorwen.tk"],
 }
 const cdnLinks = {
   unpkg: {
     cdn: `https://${cdnDomain.unpkg[0]}/monaco-editor@${version}/dev/vs`,
   },
   jsDelivr: {
-    cdn: `https://${cdnDomain.jsDelivr[0]}/monaco-editor@${version}/dev/vs`,
+    cdn: `https://${cdnDomain.jsDelivr[0]}/npm/monaco-editor@${version}/dev/vs`,
   },
 }
 try {
@@ -78,7 +78,6 @@ export default observer(function MonacoEditor() {
     mdConverter()
   }
 
-  let theme = useTheme().themeState
   const editorOptions: editor.IStandaloneEditorConstructionOptions = {
     fontSize: 16, // 设置字体大小
     wordWrap: "on",
@@ -117,12 +116,15 @@ export default observer(function MonacoEditor() {
     // 暴露出去
     window.editor = editor
     window.monaco = monaco
-    setResizableWidth(document.getElementById("editor")!.clientWidth / 2)
+    getDeviceTyByProportion() == "PC"
+      ? setResizableWidth(document.getElementById("editor")!.clientWidth / 2)
+      : 1
     // monacoPasteEventNative(editor, monaco)
     monacoPasteEvent(editor, monaco)
     monacoKeyEvent(editor, monaco)
     monacoSnippets(editor, monaco)
     monacoFormat(editor, monaco)
+    monacoMouseEvent(editor,monaco)
     // monacoPalette(editor,monaco)
     // monacoKeyDownEvent()
     allInit()
@@ -149,7 +151,7 @@ export default observer(function MonacoEditor() {
             className="monaco-editor-inner"
             height="100vh"
             width="100%"
-            theme={theme == "light" ? "vs-light" : "vs-dark"}
+            theme={ getTheme() ==="light"?"vs-light": "vs-dark"}
             path={file.name}
             // language="markdown"
             defaultLanguage={file.language}

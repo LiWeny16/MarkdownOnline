@@ -7,6 +7,9 @@ import exeTableAction from "./actions/table"
 import myPrint from "@App/export/myPrint"
 import exportAsImage from "@App/export/domToImg"
 import kit from "@cdn-kit"
+import exeInsertPageBreakerAction from "./actions/pageBreaker"
+import exeLatexBlockAction from "./actions/latexBlock"
+import exeEmojiPickerAction from "./actions/emojiPicker"
 
 export default function monacoKeyEvent(
   editor: editor.IStandaloneCodeEditor,
@@ -18,6 +21,9 @@ export default function monacoKeyEvent(
     right: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyR,
     quotation: monaco.KeyMod.Shift | monaco.KeyCode.Quote,
     format: monaco.KeyMod.Shift | monaco.KeyCode.KeyF,
+    pageBreaker:
+      monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.Enter,
+    latexBlock: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyM,
   }
   // editor.addAction({
   //   id: 'fsKey',
@@ -107,7 +113,36 @@ export default function monacoKeyEvent(
       exportAsImage()
     },
   })
-  
+  editor.addAction({
+    id: "insert.pageBreaker",
+    label: "Insert A Page Breaker",
+    keybindings: [keyMap.pageBreaker],
+    contextMenuGroupId: "navigation",
+    contextMenuOrder: 0,
+    run: () => {
+      exeInsertPageBreakerAction()
+    },
+  })
+  editor.addAction({
+    id: "insert.latexBlock",
+    label: "Insert A Latex Block",
+    keybindings: [keyMap.latexBlock],
+    contextMenuGroupId: "navigation",
+    contextMenuOrder: 0,
+    run: () => {
+      exeLatexBlockAction(editor, monaco)
+    },
+  })
+  editor.addAction({
+    id: "show.emojiPicker",
+    label: "Show Emoji Picker 🤪",
+    keybindings: [],
+    contextMenuGroupId: "navigation",
+    contextMenuOrder: -100,
+    run: () => {
+      exeEmojiPickerAction(editor, monaco)
+    },
+  })
 }
 
 function ctrl_R() {}

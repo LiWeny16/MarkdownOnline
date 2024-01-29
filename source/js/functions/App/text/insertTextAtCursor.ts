@@ -1,5 +1,6 @@
 import { IRange, editor } from "monaco-editor"
 import getSelectionText, { selectionIsNull } from "./getSelection"
+import { Monaco } from "@monaco-editor/react"
 
 /**
  * @description 插入文本
@@ -24,7 +25,9 @@ export default function insertTextAtCursor(
 
 export function insertTextMonacoAtCursor(
   textToInsert: string,
-  forceMove: boolean
+  forceMove: boolean,
+  editor: editor.IStandaloneCodeEditor = window.editor,
+  monaco: Monaco = window.monaco
 ) {
   const _editor = window.editor
   const newText = textToInsert

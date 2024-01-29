@@ -8,7 +8,7 @@ import { observer } from "mobx-react"
 import { createTheme, ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
 import { orange, green, grey, common, blue, pink } from "@mui/material/colors"
-import { getTheme } from "@App/theme/change"
+import { getTheme } from "@App/config/change"
 const lightTheme = createTheme({
   palette: {
     primary: {
@@ -17,7 +17,7 @@ const lightTheme = createTheme({
     },
     secondary: {
       main: green[500],
-      contrastText: "pink"
+      contrastText: "pink",
     },
     mode: "light",
   },
@@ -26,7 +26,7 @@ const lightTheme = createTheme({
 const darkTheme = createTheme({
   palette: {
     primary: {
-      main: blue[400],
+      main: blue[400],  
       contrastText: "wheat",
     },
     secondary: {
@@ -39,7 +39,7 @@ const darkTheme = createTheme({
 const App: any = observer(() => {
   return (
     <>
-      <ThemeProvider theme={getTheme() == "light" ? lightTheme : darkTheme}>
+      <ThemeProvider theme={getTheme() === "light" ? lightTheme : darkTheme}>
         <CssBaseline />
         <Header />
         <Body />

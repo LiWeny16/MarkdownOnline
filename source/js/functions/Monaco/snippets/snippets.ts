@@ -40,7 +40,9 @@ import {
   debugging0,
   envs,
 } from "./latexRules"
-import emojilib from "@cdn-emojilib"
+
+
+// import emojilib from "@cdn-emojilib"
 export function monacoSnippets(
   editor: editor.IStandaloneCodeEditor,
   monaco: Monaco
@@ -58,90 +60,90 @@ export function monacoSnippets(
         endLineNumber: position.lineNumber,
         endColumn: position.column,
       })
-      let _suggestions = [
-        {
-          label: "clg",
-          kind: monaco.languages.CompletionItemKind.Function,
-          insertText: "console.log(${1:val})",
-          insertTextRules:
-            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          detail: "调试...",
-        },
-        {
-          label: "code",
-          kind: monaco.languages.CompletionItemKind.Function,
-          insertText: `
+      if (!isInLatexBlock(textUntilPosition) && position.column === 2) {
+        let _suggestions = [
+          {
+            label: "clg",
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: "console.log(${1:val})",
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: "调试...",
+          },
+          {
+            label: "code",
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: `
 \`\`\`\${1:js}
 \${2:}
 \`\`\`
 `,
-          insertTextRules:
-            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          detail: "code",
-        },
-        {
-          label: "table 2x2",
-          kind: monaco.languages.CompletionItemKind.Function,
-          insertText: `
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: "code",
+          },
+          {
+            label: "table 2x2",
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: `
 |\${1:}    |\${1:}     |
 |--- |---  |
 |\${1:}    |\${1:}     |
 `,
-          insertTextRules:
-            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          detail: "table 2x2",
-        },
-        {
-          label: "table 2x4",
-          kind: monaco.languages.CompletionItemKind.Function,
-          insertText: `
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: "table 2x2",
+          },
+          {
+            label: "table 2x4",
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: `
 |\${1:}    |\${1:}    |\${1:}    |\${1:}    |
 |--- |--- |--- |--- |
 |\${1:}    |\${1:}    |\${1:}    |\${1:}    |
 `,
-          insertTextRules:
-            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          detail: "table 2x4",
-        },
-        {
-          label: "ignore",
-          kind: monaco.languages.CompletionItemKind.Field,
-          insertText: `<!-- prettier-ignore -->`,
-          insertTextRules:
-            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          detail: "ignore prettier",
-        },
-        {
-          label: "ignore-block",
-          kind: monaco.languages.CompletionItemKind.Field,
-          insertText: `<!-- prettier-ignore-start -->
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: "table 2x4",
+          },
+          {
+            label: "ignore",
+            kind: monaco.languages.CompletionItemKind.Field,
+            insertText: `<!-- prettier-ignore -->`,
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: "ignore prettier",
+          },
+          {
+            label: "ignore-block",
+            kind: monaco.languages.CompletionItemKind.Field,
+            insertText: `<!-- prettier-ignore-start -->
 \${1:}
 <!-- prettier-ignore-end -->`,
-          insertTextRules:
-            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          detail: "ignore block",
-        },
-        {
-          label: "latex-block",
-          kind: monaco.languages.CompletionItemKind.Field,
-          insertText: `\$\$
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: "ignore block",
+          },
+          {
+            label: "latex-block",
+            kind: monaco.languages.CompletionItemKind.Field,
+            insertText: `\$\$
 \${1:}
 \$\$
 `,
-          insertTextRules:
-            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          detail: "Create A LaTex Block",
-        },
-        {
-          label: "latex-inline",
-          kind: monaco.languages.CompletionItemKind.Field,
-          insertText: `\$\${1:}\$`,
-          insertTextRules:
-            monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-          detail: "Create A LaTex Inline",
-        },
-      ]
-      if (!isInLatexBlock(textUntilPosition)) {
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: "Create A LaTex Block",
+          },
+          {
+            label: "latex-inline",
+            kind: monaco.languages.CompletionItemKind.Field,
+            insertText: `\$\${1:}\$`,
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: "Create A LaTex Inline",
+          },
+        ]
         return { suggestions: _suggestions }
       }
     },

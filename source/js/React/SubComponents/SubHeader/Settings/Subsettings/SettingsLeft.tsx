@@ -8,12 +8,16 @@ import MuiAccordionSummary, {
 } from "@mui/material/AccordionSummary"
 import MuiAccordionDetails from "@mui/material/AccordionDetails"
 import Typography from "@mui/material/Typography"
+// switchs
 import SwitchTheme from "@Com/myCom/Switches/SwitchTheme"
+import ControlledSwitches from "@Com/myCom/Switches/SwitchNormal"
+
 import LR from "@Root/js/React/Components/myCom/Layout/LR"
 import MyBox from "@Root/js/React/Components/myCom/Layout/Box"
 import { LightTooltip } from "@Com/myCom/Tooltips"
 import { Box } from "@mui/material"
-import changeTheme, { getTheme } from "@App/theme/change"
+import { getTheme, changeTheme } from "@App/config/change"
+import operateLocalStorage from "@App/localStorage/localStorage"
 const Accordion = styled((props: AccordionProps) => (
   <MuiAccordion disableGutters elevation={0} square {...props} />
 ))(({ theme }) => ({
@@ -54,6 +58,23 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 }))
 
 export default function CustomizedAccordions() {
+  const [themeState, setThemeState] = React.useState<boolean>(
+    // getTheme() === "dark" ? true : false
+    false
+  )
+  function handleOnChangeSwitch(e: any, b: any) {
+    if (b) {
+      changeTheme("dark")
+      setThemeState(e.target.checked)
+    } else {
+      changeTheme("light")
+      setThemeState(e.target.checked)
+    }
+  }
+  React.useEffect(() => {
+    setThemeState(getTheme() === "dark" ? true : false)
+  }, [getTheme()])
+  let opLocalStorage = new operateLocalStorage()
   const [expanded, setExpanded] = React.useState<string | false>("panel1")
 
   const handleChange =
@@ -94,11 +115,11 @@ export default function CustomizedAccordions() {
                 </LightTooltip>
               </Box>
               <SwitchTheme
+                checked={themeState}
+                // defaultChecked={getTheme() === "dark" ? true : false}
+                // checked={}
                 inputProps={{ "aria-label": "controlled" }}
-                onChange={(e) => {
-                  console.log(e.target.checked);
-                  changeTheme(e.target.checked ? "dark" : "light")
-                }}
+                onChange={handleOnChangeSwitch}
               ></SwitchTheme>
             </LR>
           </Box>

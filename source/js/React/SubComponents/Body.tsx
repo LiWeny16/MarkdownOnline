@@ -7,8 +7,11 @@ import fastKeyEvent from "@Func/Events/key/fastKey"
 import dragFileEvent from "@Func/Events/dragFile"
 import MdArea from "./SubBody/MdArea"
 import { observer } from "mobx-react"
-import { useImage } from "@Root/js/React/Mobx/Image.ts"
-import { useTheme } from "@Root/js/React/Mobx/Theme"
+// import { useImage } from "@Root/js/React/Mobx/Image.ts"
+// import { useTheme } from "@Root/js/React/Mobx/Theme"
+import EmojiPicker from "@Com/myCom/EmojiPicker"
+import { configInit } from "@Func/Init/allInit"
+import { getEmojiPickerState, getTheme } from "@App/config/change"
 
 function enEvents(doIt: boolean): void {
   if (doIt) {
@@ -18,18 +21,16 @@ function enEvents(doIt: boolean): void {
 
 export default observer(function Body() {
   // const image = useImage()
-  let theme = useTheme()
+  // let theme = useTheme()
   React.useEffect(() => {
     enEvents(true)
-    // monacoPasteEvent()
-    // monacoPasteEventNative()
   }, [])
   return (
     <>
       <div id="topBox">
         <div
           id="editor"
-          className={theme.themeState == "light" ? "theme-light" : "theme-dark"}
+          className={getTheme() == "light" ? "theme-light" : "theme-dark"}
         >
           <MdArea />
           <article id="view-area-hidden" className="hidden-pre"></article>
@@ -44,6 +45,7 @@ export default observer(function Body() {
           </div>
         </div>
       </div>
+      <EmojiPicker open={getEmojiPickerState() === "on" ? true : false} />
     </>
   )
 })

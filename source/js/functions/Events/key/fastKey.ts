@@ -19,11 +19,6 @@ function enableFastKeyEvent() {
       e.preventDefault()
       // insertTextAtCursor(editor,"    ")
     }
-    // if (e.ctrlKey && e.key == "v") {
-    //   e.stopPropagation()
-    //   e.preventDefault()
-    //   console.log(e);
-    // }
     // Ctrl + B 黑体
     if (e.ctrlKey && e.key == "b") {
       // replaceSelection(editor, "**", "**")

@@ -15,6 +15,13 @@ import {
   imgExtension,
   emojiExtension,
 } from "@Func/Parser/renderer"
+import { changeTheme } from "@App/config/change"
+import operateLocalStorage from "@App/localStorage/localStorage"
+import {
+  ConfigStore,
+  IConfig,
+  NormalConfigArr,
+} from "@Root/js/React/Mobx/Config"
 
 class settingsClass {
   constructor() {}
@@ -62,11 +69,15 @@ class settingsClass {
     return new this()
   }
 }
+
 /**
  * @description 初始化配置和事件初始化
  * @returns {void}
  */
 export default function allInit(): void {
+  // let opLocalStorage = new operateLocalStorage()
+  // changeTheme(opLocalStorage.getItem("ide-theme"))
+
   /**@description Settings Init*/
   const settings = new settingsClass()
   settings.settingsAllInit()
@@ -74,8 +85,6 @@ export default function allInit(): void {
   /**@description Input Area Init*/
   blankTextInit().then(() => {
     mdConverter()
-    // kit.sleep(300).then(()=>{
-    // })
   }) //初始化输入区域
   Notification.success({
     title: "已更新到最新版本",
@@ -89,7 +98,7 @@ export default function allInit(): void {
       position: "bottomRight",
     })
   })
-  window.theme = "light"
+  // window.theme = "light"
   /***@description All Events */
   // enObj.enMainConverter
   //   ? triggerConverterEvent()
@@ -100,3 +109,41 @@ export default function allInit(): void {
   // enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is off") //开启快捷键事件
   // enObj.enPasteEvent ? pasteEvent() : console.log("Paste Event is off") //开启快捷键事件
 }
+
+const normalConfigArr: NormalConfigArr = ["on", "off", "light", "dark"]
+const defaultConfig: IConfig = {
+  themeState: "light",
+  emojiPickerState: "off",
+  contextMenuClickPosition: { posx: 0, posy: 0 },
+}
+/**
+ * @description 对设置进行初始化
+ */
+export function configInit(defaultConfig: IConfig) {
+  let _defaultConfig: IConfig = defaultConfig
+  // 操作localStorage
+  let opLocalStorage = new operateLocalStorage()
+
+  // 循环遍历默认设置
+  for (let key in defaultConfig) {
+    // 如果默认设置的键值在lStorage有存
+    if (opLocalStorage.getItem(key)) {
+      // 判断内容是否是正常的设置情况
+      if (
+        (key == "themeState" || key == "emojiPickerState") &&
+        // @ts-ignore 这里他妈为什么会报错？？？？不合理啊？？？
+        normalConfigArr.includes(opLocalStorage.getItem(key).toString())
+      ) {
+        _defaultConfig[key as string] = opLocalStorage.getItem(key).toString()
+      } else {
+        // 否则进行设置存储初始化
+        opLocalStorage.setItem(key, defaultConfig[key])
+      }
+    } else {
+      opLocalStorage.setItem(key, defaultConfig[key])
+    }
+  }
+  return _defaultConfig
+}
+const configStore = new ConfigStore(configInit(defaultConfig))
+export const useConfig = () => configStore

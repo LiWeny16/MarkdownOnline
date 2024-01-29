@@ -171,6 +171,10 @@ const DrawerAppBar = observer((props: Props) => {
       <AppBar
         component="nav"
         enableColorOnDark={false}
+        sx={{
+          transition:
+            "background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+        }}
         // sx={{ bgcolor: "black" }}
       >
         <Toolbar>
@@ -183,8 +187,10 @@ const DrawerAppBar = observer((props: Props) => {
           </IconButton>
           <EditNoteIcon
             sx={{
-              color: theme.palette.mode=="light" ? "black" : "white",
+              color: theme.palette.mode == "light" ? "black" : "white",
               display: { xs: "none", md: "flex" },
+              transition:
+                "background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
               mr: 1,
             }}
           />
@@ -196,9 +202,10 @@ const DrawerAppBar = observer((props: Props) => {
             sx={{
               flexGrow: 1,
               display: { xs: "none", sm: "block" },
-              color: theme.palette.mode ==="light"
-                ? theme.palette.primary.contrastText
-                : theme.palette.secondary.contrastText,
+              color:
+                theme.palette.mode === "light"
+                  ? theme.palette.primary.contrastText
+                  : theme.palette.secondary.contrastText,
               fontFamily: "monospace",
               fontWeight: 700,
               letterSpacing: ".3rem",

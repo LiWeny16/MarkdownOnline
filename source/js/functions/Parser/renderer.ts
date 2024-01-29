@@ -4,10 +4,22 @@ import hljs from "@cdn-hljs"
 // import { marked } from "@cdn-marked"
 import { emojify, has } from "@cdn-node-emoji"
 import vconsole from "vconsole"
-
+// import emojiJson from "https://npm.onmicrosoft.cn/@emoji-mart/data@1.1.2/sets/14/native.json"
 //#region *********************renderer*********************
-
+// console.log(emojiJson);
 export const newRenderer = {
+  paragraph(text: any) {
+    return `<p class="line-hilight">${text}</p>`
+  },
+  heading(text: string, level: any) {
+    return `
+            <h${level}  class="line-hilight">
+              <a href="#">
+                <span class="header-link"></span>
+              </a>
+              ${text}
+            </h${level}>`
+  },
   code(code: string, lang: string, _escaped: boolean) {
     let finalCodeBlock
     if (lang == "js-run") {
@@ -229,7 +241,9 @@ export const imgExtension = {
     }
   },
 }
-
+/**
+ * @deprecated
+*/
 export const clueExtension = {
   extensions: [
     {

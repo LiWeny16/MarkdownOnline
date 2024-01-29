@@ -123,6 +123,7 @@ const TemporaryDrawer = observer((props: any) => {
                           <ul style={{margin:"2px"}}>
                             <li>按住Ctrl点击图片插入</li>
                             <li>双击图片放大预览</li>
+                            <li>按住Alt点击图片复制图片</li>
                           </ul>
                         </div>
                       }

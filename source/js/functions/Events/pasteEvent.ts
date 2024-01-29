@@ -24,12 +24,9 @@ export function monacoPasteEvent(
   editor: editor.IStandaloneCodeEditor,
   monaco: Monaco
 ) {
-  // editor.getDomNode()?.addEventListener("paste", (e) => {})
   editor.getContainerDomNode().addEventListener(
     "paste",
     (event) => {
-      // event.preventDefault()
-      event.stopPropagation()
       pic2base64(event).then((base64: any) => {
         if (base64) {
           let timeStamp = new Date().getTime()
@@ -59,8 +56,6 @@ export default function pasteEvent() {
 
 function pic2base64(e: ClipboardEvent) {
   return new Promise((resolve) => {
-    e.stopPropagation()
-    // e.preventDefault();
     // 阻止粘贴
     // 获取剪贴板信息
     var clipboardData = e.clipboardData || window.clipboardData
@@ -68,6 +63,8 @@ function pic2base64(e: ClipboardEvent) {
     for (var i = 0; i < items.length; i++) {
       var item = items[i]
       if (item.kind == "file") {
+        e.preventDefault()
+        e.stopPropagation()
         var pasteFile = item.getAsFile()
         var reader = new FileReader()
         reader.onload = function (event) {
