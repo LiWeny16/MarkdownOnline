@@ -9,6 +9,8 @@ import { createTheme, ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
 import { orange, green, grey, common, blue, pink } from "@mui/material/colors"
 import { getTheme } from "@App/config/change"
+import Box from "@mui/material/Box"
+import TB from "./Components/myCom/Layout/TB"
 const lightTheme = createTheme({
   palette: {
     primary: {
@@ -26,7 +28,7 @@ const lightTheme = createTheme({
 const darkTheme = createTheme({
   palette: {
     primary: {
-      main: blue[400],  
+      main: blue[400],
       contrastText: "wheat",
     },
     secondary: {
@@ -41,8 +43,10 @@ const App: any = observer(() => {
     <>
       <ThemeProvider theme={getTheme() === "light" ? lightTheme : darkTheme}>
         <CssBaseline />
-        <Header />
-        <Body />
+        <div className="FLEX COL">
+          <Header />
+          <Body />
+        </div>
       </ThemeProvider>
     </>
   )

@@ -27,7 +27,7 @@ import monacoMouseEvent from "@Func/Events/mouse/monacoMouse"
 // import errIntellisense from "@Func/Monaco/intellisense/error"
 // import monacoPalette from "@Func/Monaco/palette/palette"
 
-const version = "0.44.0"
+const version = "0.45.0"
 const cdnDomain = {
   unpkg: ["npm.onmicrosoft.cn", "unpkg.com"],
   jsDelivr: ["jsd.onmicrosoft.cn", "www.jsdelivr.com", "jsd.haorwen.tk"],
@@ -74,6 +74,7 @@ const files: any = {
 
 export default observer(function MonacoEditor() {
   const [resizableWidth, setResizableWidth] = React.useState(640)
+  const [resizableHeight, setResizableHeight] = React.useState(800)
   const handleResizeStop = () => {
     mdConverter()
   }
@@ -83,9 +84,12 @@ export default observer(function MonacoEditor() {
     wordWrap: "on",
     formatOnType: true,
     formatOnPaste: false,
+    // scrollBeyondLastLine:false,
+    // scrollBeyondLastColumn:10,
+    fontLigatures:true,
     autoSurround: "quotes",
     autoClosingQuotes: "always",
-    automaticLayout: true,
+    // automaticLayout: true,
     smoothScrolling: true,
     codeLens: false,
     pasteAs: { enabled: false, showPasteSelector: "never" },
@@ -119,12 +123,13 @@ export default observer(function MonacoEditor() {
     getDeviceTyByProportion() == "PC"
       ? setResizableWidth(document.getElementById("editor")!.clientWidth / 2)
       : 1
+    setResizableHeight(document.getElementById("editor")!.clientHeight)
     // monacoPasteEventNative(editor, monaco)
     monacoPasteEvent(editor, monaco)
     monacoKeyEvent(editor, monaco)
     monacoSnippets(editor, monaco)
     monacoFormat(editor, monaco)
-    monacoMouseEvent(editor,monaco)
+    monacoMouseEvent(editor, monaco)
     // monacoPalette(editor,monaco)
     // monacoKeyDownEvent()
     allInit()
@@ -133,14 +138,11 @@ export default observer(function MonacoEditor() {
   return (
     <>
       {/* <DraggableBox> */}
-      <div id="monaco-editor">
+      <div id="monaco-editor" style={{ height: "100%" }}>
         <ResizableBox
           className="custom-resizable"
-          //   handle={
-          //  <MyHandle />
-          //   }
           width={resizableWidth}
-          height={700}
+          height={resizableHeight}
           draggableOpts={{ grid: [5, 15] }}
           minConstraints={[100, 1800]}
           onResizeStop={handleResizeStop}
@@ -149,9 +151,9 @@ export default observer(function MonacoEditor() {
         >
           <Editor
             className="monaco-editor-inner"
-            height="100vh"
+            height="100%"
             width="100%"
-            theme={ getTheme() ==="light"?"vs-light": "vs-dark"}
+            theme={getTheme() === "light" ? "vs-light" : "vs-dark"}
             path={file.name}
             // language="markdown"
             defaultLanguage={file.language}

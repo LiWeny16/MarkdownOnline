@@ -61,12 +61,6 @@ const handleHomeClick = () => {
 
 const boxShadow =
   "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);"
-const theme = createTheme({
-  palette: {
-    primary: lime,
-    secondary: purple,
-  },
-})
 
 const drawerWidth = 240
 // const navItems = ["Home", "About3", "Contact"]
@@ -166,98 +160,102 @@ const DrawerAppBar = observer((props: Props) => {
   )
 
   return (
-    <Box sx={{ display: "flex", position: "relative", zIndex: 1 }}>
-      <CssBaseline />
-      <AppBar
-        component="nav"
-        enableColorOnDark={false}
-        sx={{
-          transition:
-            "background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-        }}
-        // sx={{ bgcolor: "black" }}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 200, display: { sm: "none" } }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <EditNoteIcon
-            sx={{
-              color: theme.palette.mode == "light" ? "black" : "white",
-              display: { xs: "none", md: "flex" },
-              transition:
-                "background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-              mr: 1,
-            }}
-          />
-          <Typography
-            variant="h1"
-            component="a"
-            fontFamily="monospace"
-            href="/"
-            sx={{
-              flexGrow: 1,
-              display: { xs: "none", sm: "block" },
-              color:
-                theme.palette.mode === "light"
-                  ? theme.palette.primary.contrastText
-                  : theme.palette.secondary.contrastText,
-              fontFamily: "monospace",
-              fontWeight: 700,
-              letterSpacing: ".3rem",
-              textDecoration: "none",
-            }}
-          >
-            <h1 style={{ fontSize: "28px" }}>Markdown+ Online View</h1>
-          </Typography>
-          <Box
-            sx={{ display: { xs: "none", sm: "flex", flexDirection: "row" } }}
-          >
-            <MyButton href="https://bigonion.cn" startIcon={<LinkIcon />}>
-              首页
-            </MyButton>
-            <MyButton
-              onClick={() => {
-                enObj.enAboutBox ? aboutBox() : undefined
-              }}
-              startIcon={<HelpOutlineIcon />}
-            >
-              关于
-            </MyButton>
-            {/* 更多 */}
-            <Menu />
-            <ImageManger />
-          </Box>
-        </Toolbar>
-      </AppBar>
-      <Box component="nav">
-        <Drawer
-          container={container}
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
+    <>
+      <div className="FLEX " style={{ flex: "0 0 10vh" }}>
+        <CssBaseline />
+        <AppBar
+          component="nav"
+          // enableColorOnDark={false}
           sx={{
-            display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-            },
+            position: "inherit",
+            justifyContent:"center",
+            zIndex: 100,
+            height: "8.7vh",
+            transition:
+              "background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
           }}
+          // sx={{ bgcolor: "black" }}
         >
-          {drawer}
-        </Drawer>
-      </Box>
-      <Box component="div" sx={{ p: 0 }}>
-        <Toolbar />
-      </Box>
-    </Box>
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 200, display: { sm: "none" } }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <EditNoteIcon
+              sx={{
+                color: theme.palette.mode == "light" ? "black" : "white",
+                display: { xs: "none", md: "flex" },
+                transition:
+                  "background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+                mr: 1,
+              }}
+            />
+            <Typography
+              variant="h1"
+              component="a"
+              fontFamily="monospace"
+              href="/"
+              sx={{
+                flexGrow: 1,
+                display: { xs: "none", sm: "block" },
+                color:
+                  theme.palette.mode === "light"
+                    ? theme.palette.primary.contrastText
+                    : theme.palette.secondary.contrastText,
+                fontFamily: "monospace",
+                fontWeight: 700,
+                letterSpacing: ".3rem",
+                textDecoration: "none",
+              }}
+            >
+              <h1 style={{ fontSize: "28px" }}>Markdown+ Online View</h1>
+            </Typography>
+            <Box
+              sx={{ display: { xs: "none", sm: "flex", flexDirection: "row" } }}
+            >
+              <MyButton href="https://bigonion.cn" startIcon={<LinkIcon />}>
+                首页
+              </MyButton>
+              <MyButton
+                onClick={() => {
+                  enObj.enAboutBox ? aboutBox() : undefined
+                }}
+                startIcon={<HelpOutlineIcon />}
+              >
+                关于
+              </MyButton>
+              {/* 更多 */}
+              <Menu />
+              <ImageManger />
+            </Box>
+          </Toolbar>
+        </AppBar>
+
+        <Box sx={{ display: { xs: "flex", sm: "none" } }} component="nav">
+          <Drawer
+            container={container}
+            variant="temporary"
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            ModalProps={{
+              keepMounted: true, // Better open performance on mobile.
+            }}
+            sx={{
+              display: { xs: "block", sm: "none" },
+              "& .MuiDrawer-paper": {
+                boxSizing: "border-box",
+                width: drawerWidth,
+              },
+            }}
+          >
+            {drawer}
+          </Drawer>
+        </Box>
+      </div>
+    </>
   )
 })
 export default DrawerAppBar

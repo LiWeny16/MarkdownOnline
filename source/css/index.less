@@ -15,7 +15,6 @@
 // @import url("https://jsd.onmicrosoft.cn/npm/github-markdown-css/github-markdown.min.css");
 // @import url("https://jsd.onmicrosoft.cn/npm/@highlightjs/cdn-assets@11.7.0/styles/default.min.css");
 
-
 .draggable-box {
   width: fit-content;
   // height: 60vh;
@@ -29,57 +28,48 @@
 .custom-resizable .react-resizable-handle {
   height: 100%;
   transform: translateX(1.3vw);
-  width: 1.3vw;
+  width: 0.9vw;
   border-right: black;
-  transition: 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transition: 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
   // background: skyblue !important;
 }
 .custom-resizable .react-resizable-handle:hover {
-  background-color: #ffddee !important;
+  background-color: #90CAF9 !important;
 }
 .react-resizable-handle-se {
   cursor: col-resize !important;
 }
-#topBox {
-  display: flex;
-  flex-direction: column;
-  #editor {
-    display: flex;
-    height: 92vh;
-    display: flex;
-    min-height: 600px;
-    width: 100%;
 
-    #view-area {
-      width: 100%;
-      overflow-y: auto;
-      height: 100%;
-    }
+// 主布局
 
-    #md-area {
-      padding: 26px 38px;
-      resize: horizontal;
-      background: white;
-      // border: 1px solid #9d9898;
-      /* width: 100%; */
-    }
-  }
+body {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+#view-area {
+  overflow-y: scroll;
+  width: 100%;
+}
+#editor {
+  height: 90vh;
 }
 
-#markdownParser {
-  display: flex;
-  justify-content: center;
-}
-
-.theme-light {
-  background: white;
-}
-.theme-dark {
-  background: #1e1e1e;
-}
-.monaco-editor-inner {
-  padding: 20px 0px 0px 0px;
-}
+// .theme-light {
+//   background: white;
+// }
+// .theme-dark {
+//   background: #1e1e1e;
+// }
+// .monaco-editor-inner {
+//   padding: 20px 0px 0px 0px;
+// }
 
 .img_resize_transition {
   transition: 0.4s;
@@ -173,20 +163,19 @@ pre code.hljs {
   padding: 5px !important;
 }
 
-// @region-end******************hljs
+// @endregion******************hljs
 
-
-.PhotoView-Slider__Backdrop{
+.PhotoView-Slider__Backdrop {
   background: rgba(24, 24, 24, 0.591) !important;
   // backdrop-filter: blur(5px);
 }
 
-.line-hilight:hover{
+.line-hilight:hover {
   background: #dedede;
   border-radius: 2.5px;
   transform: translateX(2px);
   padding-left: 5px;
 }
-.line-hilight{
+.line-hilight {
   transition: 0.3s;
 }

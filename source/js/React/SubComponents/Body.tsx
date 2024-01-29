@@ -20,32 +20,29 @@ function enEvents(doIt: boolean): void {
 }
 
 export default observer(function Body() {
-  // const image = useImage()
-  // let theme = useTheme()
   React.useEffect(() => {
     enEvents(true)
   }, [])
   return (
     <>
-      <div id="topBox">
+      <div id="bodyTopBox">
         <div
           id="editor"
-          className={getTheme() == "light" ? "theme-light" : "theme-dark"}
+          className={`${getTheme() == "light" ? "theme-light" : "theme-dark"} FLEX ROW`}
         >
           <MdArea />
           <article id="view-area-hidden" className="hidden-pre"></article>
           <article id="view-area" className={"markdown-body"}></article>
         </div>
-      </div>
-
-      <div id="aboutBox">
-        <div id="markdownParser">
-          <div id="aboutMd" className="aboutViewArea markdown-body">
-            <span></span>
+        <div id="aboutBox">
+          <div id="markdownParser">
+            <div id="aboutMd" className="aboutViewArea markdown-body">
+              <span></span>
+            </div>
           </div>
         </div>
+        <EmojiPicker open={getEmojiPickerState() === "on" ? true : false} />
       </div>
-      <EmojiPicker open={getEmojiPickerState() === "on" ? true : false} />
     </>
   )
 })

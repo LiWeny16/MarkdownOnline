@@ -26,7 +26,8 @@ export default observer(function EmojiPicker(props: any) {
   const [delayShowState, setDelayShowState] = React.useState<boolean>(false)
   function handleOnEmojiSelected(e: { shortcodes: string }) {
     // console.log(e);
-    insertTextMonacoAtCursor(e.shortcodes, true)
+    // @ts-ignore
+    insertTextMonacoAtCursor(e.native, true)
   }
   React.useEffect(() => {
     setShowState(props.open)

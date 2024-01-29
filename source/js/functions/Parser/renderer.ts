@@ -5,6 +5,35 @@ import hljs from "@cdn-hljs"
 import { emojify, has } from "@cdn-node-emoji"
 import vconsole from "vconsole"
 // import emojiJson from "https://npm.onmicrosoft.cn/@emoji-mart/data@1.1.2/sets/14/native.json"
+
+const newTokenizer = {
+  heading(_heading: any){
+    // console.log(heading);
+    // if(match){
+    //   return
+    // }
+    return false
+  },
+  codespan(src: string) {
+    const match = src.match(/^\&+([^\&\n]+?)\&+/)
+    if (match) {
+      return {
+        type: 'codespan',
+        raw: match[0],
+        text: match[1].trim()
+      };
+    }
+    // return false to use original codespan tokenizer
+    return false
+  },
+} // if (match) {
+//   return {
+//     type: 'codespan',
+//     raw: match[0],
+//     text: match[1].trim()
+//   };
+// }
+
 //#region *********************renderer*********************
 // console.log(emojiJson);
 export const newRenderer = {
@@ -12,6 +41,7 @@ export const newRenderer = {
     return `<p class="line-hilight">${text}</p>`
   },
   heading(text: string, level: any) {
+    // console.log("嘤嘤嘤");
     return `
             <h${level}  class="line-hilight">
               <a href="#">
@@ -178,7 +208,7 @@ export const markItExtension = {
       start(src: any) {
         return src.match(/@@/)?.index
       },
-      tokenizer(src: string, tokens: any) {
+      tokenizer(src: string, _tokens: any) {
         const match = src.match(regs.markHighlight)
         const text = match ? match[1] : ""
         if (match) {
@@ -215,9 +245,13 @@ export const markItExtension = {
 export const imgExtension = {
   name: "newRenderer",
   level: "block", // Signal that this extension should be run inline
+  tokenizer: newTokenizer,
   renderer: newRenderer,
   async: true, // needed to tell marked to return a promise
   async walkTokens(token: ImageToken) {
+    if (token.type === "heading") {
+      // console.log(token)
+    }
     if (token.type === "image") {
       const href = token.href
       // const title = token.title
@@ -243,7 +277,7 @@ export const imgExtension = {
 }
 /**
  * @deprecated
-*/
+ */
 export const clueExtension = {
   extensions: [
     {
