@@ -31,6 +31,7 @@
     "axios": "^1.6.5",
     "emoji-mart": "^5.5.2",
     "html2canvas": "^1.4.1",
+    "markdown-it": "^14.0.0",
     "marked": "^11.1.0",
     "mermaid": "^10.6.1",
     "mobx": "^6.10.2",
@@ -48,6 +49,7 @@
   },
   "devDependencies": {
     "@types/dom-to-image": "^2.6.6",
+    "@types/markdown-it": "^13.0.7",
     "@types/react": "^18.2.12",
     "@types/react-dom": "^18.2.5",
     "@types/react-resizable": "^3.0.7",

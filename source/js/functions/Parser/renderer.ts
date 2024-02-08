@@ -7,22 +7,29 @@ import vconsole from "vconsole"
 // import emojiJson from "https://npm.onmicrosoft.cn/@emoji-mart/data@1.1.2/sets/14/native.json"
 
 const newTokenizer = {
-  heading(_heading: any){
+  heading(src: any) {
     // console.log(heading);
-    // if(match){
-    //   return
+    const match = src.match(/^#{1,6}\s.*/)
+    // console.log(match)
+
+    // if (match) {
+    //   return {
+    //     type: "heading",
+    //     raw: match[0],
+    //     // text: match[1].trim(),
+    //   }
     // }
     return false
   },
   codespan(src: string) {
     const match = src.match(/^\&+([^\&\n]+?)\&+/)
-    if (match) {
-      return {
-        type: 'codespan',
-        raw: match[0],
-        text: match[1].trim()
-      };
-    }
+    // if (match) {
+    //   return {
+    //     type: "codespan",
+    //     raw: match[0],
+    //     text: match[1].trim(),
+    //   }
+    // }
     // return false to use original codespan tokenizer
     return false
   },
@@ -41,7 +48,7 @@ export const newRenderer = {
     return `<p class="line-hilight">${text}</p>`
   },
   heading(text: string, level: any) {
-    // console.log("嘤嘤嘤");
+    // console.log(text,level);
     return `
             <h${level}  class="line-hilight">
               <a href="#">
@@ -250,7 +257,7 @@ export const imgExtension = {
   async: true, // needed to tell marked to return a promise
   async walkTokens(token: ImageToken) {
     if (token.type === "heading") {
-      // console.log(token)
+      // console.log({token:token})
     }
     if (token.type === "image") {
       const href = token.href

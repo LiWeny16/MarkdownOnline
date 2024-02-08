@@ -25,7 +25,7 @@ export default observer(function Body() {
   }, [])
   return (
     <>
-      <div id="bodyTopBox">
+      <div style={{ marginTop: "1.3vh" }} id="bodyTopBox">
         <div
           id="editor"
           className={`${getTheme() == "light" ? "theme-light" : "theme-dark"} FLEX ROW`}

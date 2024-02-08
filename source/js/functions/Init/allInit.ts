@@ -23,11 +23,10 @@ import {
   NormalConfigArr,
 } from "@Root/js/React/Mobx/Config"
 
+// window.marked = marked
 class settingsClass {
   constructor() {}
   markedInit() {
-    marked.use()
-
     marked.use(
       {
         mangle: false,
@@ -35,6 +34,7 @@ class settingsClass {
         strict: false,
         extensions: [],
         async: true,
+        lineNumber:true
       },
       importUrlExtension,
       imgExtension,

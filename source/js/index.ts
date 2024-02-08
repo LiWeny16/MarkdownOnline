@@ -5,6 +5,8 @@
 // import { marked } from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
 import { marked } from "@cdn-marked"
 // import marked from "marked"
+// import remarkable from "remarkable"
+import markdownIt from "markdown-it"
 import mermaid from "@cdn-mermaid"
 // import mermaid from "mermaid"
 // import "https://cdn.bootcdn.net/ajax/libs/mermaid/10.2.0/mermaid.min.js"
@@ -21,9 +23,11 @@ import pageBreaker from "@Func/Parser/pageBreaker"
 import virtualFileSystem from "@Func/Parser/VFS"
 import "../css/index.less"
 // import "@arco-design/web-react/dist/css/arco.css"
-
+// console.log(markdownIt);
+// window.markdownIt = markdownIt()
 import { isSyntaxValid } from "@App/script.ts"
-import { readMemoryImg } from "@App/textMemory/memory"
+import { markdownitLineNumber } from "@Func/Parser/lineNumber"
+// import { readMemoryImg } from "@App/textMemory/memory"
 // import {
 //   headingRenderer,
 //   initTocs,
@@ -238,7 +242,17 @@ function latexParse(md: any) {
   })
 }
 async function markedParse(md: any) {
-  return await marked.parse(md)
+  md = await marked.parse(md)
+  return md
+  
+  // let markdownItParsed = markdownIt({
+  //   html: true,
+  //   linkify: true,
+  //   typographer: true,
+  //   breaks: true,
+  // }).use(markdownitLineNumber).render(md)
+ 
+  // return  markdownItParsed
 }
 // function getMdText() {
 //   return document.getElementById("md-area").value

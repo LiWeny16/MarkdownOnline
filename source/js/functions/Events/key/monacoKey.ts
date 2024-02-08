@@ -116,7 +116,7 @@ export default function monacoKeyEvent(
   editor.addAction({
     id: "insert.pageBreaker",
     label: "Insert A Page Breaker",
-    keybindings: [keyMap.pageBreaker],
+    keybindings: [],
     contextMenuGroupId: "navigation",
     contextMenuOrder: 0,
     run: () => {

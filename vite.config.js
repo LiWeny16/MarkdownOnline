@@ -24,8 +24,9 @@ export default defineConfig({
   resolve: {
     alias: {
       // "react":"https://esm.sh/react",
+      "markdownIt":"https://jsd.onmicrosoft.cn/npm/markdown-it@14.0.0/+esm",
       // "@gsap/react":"https://cdn.jsdelivr.net/npm/@gsap/react@2.1.0/+esm",
-      "@emoji-mart/data":"https://cdn.jsdelivr.net/npm/@emoji-mart/data@1.1.2/+esm",
+      "@emoji-mart/data":"https://jsd.onmicrosoft.cn/npm/@emoji-mart/data@1.1.2/+esm",
       "gsap":"https://jsd.onmicrosoft.cn/npm/gsap@3.12.5/+esm",
       "@cdn-emojilib":"https://jsd.onmicrosoft.cn/npm/emojilib@3.0.11/+esm",
       "@cdn-prettier": "https://jsd.onmicrosoft.cn/npm/prettier@3.2.4/+esm",
