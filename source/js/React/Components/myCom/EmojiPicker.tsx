@@ -19,13 +19,27 @@ import { isElementOverflow } from "@App/user/layout"
 // import { Fade } from "@mui/material"
 // import { Zoom } from "@mui/material"
 export default observer(function EmojiPicker(props: any) {
-  const _position = getContextMenuClickPosition()
+  const pickerHeight = 435
+  const pickerWidth = 352
+
+  const _position = handleOverflowPosition()
   const container = React.useRef()
   // const [targetNow, setTargetNow] = React.useState<boolean>(false)
   const [showState, setShowState] = React.useState<boolean>(false)
   const [delayShowState, setDelayShowState] = React.useState<boolean>(false)
+  function handleOverflowPosition() {
+    let _position = getContextMenuClickPosition()
+    // console.log(
+    //   _position.posy + pickerHeight > window.document.body.clientHeight
+    // )
+    // 如果超过加起来超过可视范围，则向上翻转
+    if (_position.posy + pickerHeight > window.document.body.clientHeight) {
+      _position.posy = window.document.body.clientHeight-pickerHeight
+      return _position
+    }
+    return _position
+  }
   function handleOnEmojiSelected(e: { shortcodes: string }) {
-    // console.log(e);
     // @ts-ignore
     insertTextMonacoAtCursor(e.native, true)
   }
@@ -64,18 +78,6 @@ export default observer(function EmojiPicker(props: any) {
     // let emojiDomNode = document.querySelector("em-emoji-picker") as HTMLElement
     // emojiDomNode.style.transition = "1s"
   }, [props.open])
-  // useGSAP(
-  //   (context, contextSafe) => {
-  //     // const onClick = contextSafe(() => {
-  //     //   gsap.to(container.current, { rotation: 0, duration: 0 })
-  //     // })
-  //     // container.current.addEventListener("click", onClick)
-  //     // return () => {
-  //     //   container.current.removeEventListener("click", onClick)
-  //     // }
-  //   },
-  //   { scope: container }
-  // ) // <-- scope is for selector text (optional)
 
   return (
     <>
@@ -111,8 +113,6 @@ export default observer(function EmojiPicker(props: any) {
       >
         <Box
           sx={{
-            // height: "435px",
-            // width:"352px",
             position: "absolute",
             top: _position.posy - window.document.body.clientHeight * 0.1,
             left: _position.posx + window.document.body.clientWidth * 0.02,

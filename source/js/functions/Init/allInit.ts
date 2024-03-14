@@ -1,13 +1,27 @@
 import hljs from "@cdn-hljs"
 import { marked } from "@cdn-marked"
 // import { marked } from "marked"
-import mermaid from "@cdn-mermaid"
+import mermaid from "mermaid"
+
 // import mermaid from "mermaid"
 import blankTextInit from "./blankTextInit"
 import { enObj, mdConverter } from "@Root/js"
+import markdownIt from "markdown-it"
+// import Token from "https://jsd.onmicrosoft.cn/npm/markdown-it@14.0.0/lib/token.mjs"
+// @ts-ignore
+import MarkdownItIncrementalDOM from "markdown-it-incremental-dom"
+import mdItMultimdTable from "markdown-it-multimd-table"
+import * as IncrementalDOM from "incremental-dom"
+// @ts-ignore
+import markdownItGithubToc from "markdown-it-github-toc"
+// @ts-ignore
+import { full as markdownItEmoji } from "markdown-it-emoji"
+// console.log(markdownItGithubToc);
+// import markdownItGithubToc from "markdown-it-github-toc"
 import { Notification } from "@arco-design/web-react"
 import kit from "@cdn-kit"
-import { triggerConverterEvent } from "@Func/Events/convert"
+import { Monaco } from "@monaco-editor/react"
+import { editor } from "monaco-editor"
 import {
   markItExtension,
   importUrlExtension,
@@ -22,8 +36,55 @@ import {
   IConfig,
   NormalConfigArr,
 } from "@Root/js/React/Mobx/Config"
+import { markdownitLineNumber } from "@Func/Parser/mdItPlugin/lineNumber"
+import markdownitFootNote from "markdown-it-footnote"
+import { myPlugin } from "@Func/Parser/mdItPlugin/alertBlock"
+import { imagePlugin } from "@Func/Parser/mdItPlugin/image"
+import { codePlugin } from "@Func/Parser/mdItPlugin/code"
+import { cluePlugin } from "@Func/Parser/mdItPlugin/clueParser"
+import preViewClickEvent from "@Func/Events/click/preClick"
+import markdownItLatex from "@Func/Parser/mdItPlugin/latex"
+// @ts-ignore
+import markdownItCodeCopy from "markdown-it-code-copy"
 
-// window.marked = marked
+/**
+ * @description markdownParser init plugin && settings
+ */
+export function markdownParser() {
+  let markdownItParser = markdownIt({
+    html: true,
+    linkify: true,
+    typographer: true,
+    breaks: true,
+  })
+    .use(markdownitLineNumber)
+    .use(myPlugin)
+    .use(imagePlugin)
+    .use(mdItMultimdTable, {
+      multiline: true,
+      rowspan: true,
+      headerless: true,
+      multibody: true,
+      aotolabel: true,
+    })
+    .use(codePlugin)
+    .use(cluePlugin)
+    .use(markdownitFootNote)
+    .use(markdownItGithubToc, {
+      anchorLinkSymbol: "",
+    })
+    .use(MarkdownItIncrementalDOM, IncrementalDOM)
+    .use(markdownItEmoji)
+    .use(markdownItLatex)
+    // .use(markdownItCodeCopy)
+  // .use(figure)
+
+  return markdownItParser
+}
+
+/**
+ * @description other libs init
+ */
 class settingsClass {
   constructor() {}
   markedInit() {
@@ -34,7 +95,7 @@ class settingsClass {
         strict: false,
         extensions: [],
         async: true,
-        lineNumber:true
+        lineNumber: true,
       },
       importUrlExtension,
       imgExtension,
@@ -45,8 +106,11 @@ class settingsClass {
     // marked.use({ renderer })
   }
   mermaidInit() {
+    mermaid.parseError = (e) => {}
     mermaid.initialize({
+      // er:()=>{},
       securityLevel: "loose",
+      logLevel: 4,
       startOnLoad: false,
       theme: "base",
       // gantt: { topPadding:0 , useMaxWidth: false},
@@ -74,10 +138,10 @@ class settingsClass {
  * @description 初始化配置和事件初始化
  * @returns {void}
  */
-export default function allInit(): void {
-  // let opLocalStorage = new operateLocalStorage()
-  // changeTheme(opLocalStorage.getItem("ide-theme"))
-
+export default function allInit(
+  editor: editor.IStandaloneCodeEditor = window.editor,
+  monaco: Monaco = window.monaco
+): void {
   /**@description Settings Init*/
   const settings = new settingsClass()
   settings.settingsAllInit()
@@ -88,18 +152,28 @@ export default function allInit(): void {
   }) //初始化输入区域
   Notification.success({
     title: "已更新到最新版本",
-    content: `当前版本:v1.5.1`,
+    content: `当前版本:v2.0.0`,
     position: "bottomRight",
   })
   kit.sleep(250).then(() => {
     Notification.info({
       title: "版本新增特性",
-      content: `1. LaTex公式智能提示 2. hljs性能优化`,
+      content: `1. 更新引擎为markdown-it 2. 更新双击右侧定位`,
       position: "bottomRight",
     })
+    kit.sleep(250).then(() => {
+      Notification.info({
+        title: "版本新增特性",
+        content: `3. 更新TOC、脚注 4. 局部diff渲染`,
+        position: "bottomRight",
+      })
+    })
   })
+ 
   // window.theme = "light"
   /***@description All Events */
+  window.deco = editor.createDecorationsCollection()
+  preViewClickEvent(editor, monaco, window.deco)
   // enObj.enMainConverter
   //   ? triggerConverterEvent()
   //   : console.log("converter if off") //按下写字板触发事件
@@ -110,6 +184,7 @@ export default function allInit(): void {
   // enObj.enPasteEvent ? pasteEvent() : console.log("Paste Event is off") //开启快捷键事件
 }
 
+// #region ********************config region***************************
 const normalConfigArr: NormalConfigArr = ["on", "off", "light", "dark"]
 const defaultConfig: IConfig = {
   themeState: "light",
@@ -147,3 +222,4 @@ export function configInit(defaultConfig: IConfig) {
 }
 const configStore = new ConfigStore(configInit(defaultConfig))
 export const useConfig = () => configStore
+// #endregion

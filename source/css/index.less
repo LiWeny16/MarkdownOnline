@@ -9,7 +9,7 @@
 @import url("https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.css");
 @import url("https://jsd.onmicrosoft.cn/npm/@arco-design/web-react@2.58.3/dist/css/arco.min.css");
 @import url("https://jsd.onmicrosoft.cn/npm/github-markdown-css/github-markdown.min.css");
-@import url("https://jsd.onmicrosoft.cn/npm/@highlightjs/cdn-assets@11.7.0/styles/default.min.css");
+// @import url("https://jsd.onmicrosoft.cn/npm/@highlightjs/cdn-assets@11.7.0/styles/default.min.css");
 
 // @import url("https://jsd.onmicrosoft.cn/npm/@arco-design/web-react@2.58.3/dist/css/arco.min.css");
 // @import url("https://jsd.onmicrosoft.cn/npm/github-markdown-css/github-markdown.min.css");
@@ -17,7 +17,7 @@
 
 .draggable-box {
   width: fit-content;
-  // height: 60vh;
+  // height: 60svh;
   background-color: rgb(0, 0, 0);
   position: absolute;
   user-select: none;
@@ -27,14 +27,14 @@
 
 .custom-resizable .react-resizable-handle {
   height: 100%;
-  transform: translateX(1.3vw);
-  width: 0.9vw;
+  transform: translateX(0.9svw);
+  width: 0.9svw;
   border-right: black;
   transition: 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
   // background: skyblue !important;
 }
 .custom-resizable .react-resizable-handle:hover {
-  background-color: #90CAF9 !important;
+  background-color: #90caf9 !important;
 }
 .react-resizable-handle-se {
   cursor: col-resize !important;
@@ -44,33 +44,39 @@
 
 body {
   margin: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100svw;
+  height: 100svh;
   overflow-x: hidden;
-  overflow-y: hidden;
-  
+  overflow-y: auto;
 }
 #root {
-  width: 100vw;
-  height: 100vh;
+  width: 100svw;
+  height: 100svh;
 }
 #view-area {
   overflow-y: scroll;
   width: 100%;
 }
 #editor {
-  height: 90vh;
+  height: 90svh;
 }
-
-// .theme-light {
-//   background: white;
-// }
-// .theme-dark {
-//   background: #1e1e1e;
-// }
-// .monaco-editor-inner {
-//   padding: 20px 0px 0px 0px;
-// }
+.HILIGHT-MONACO {
+  background-color: #fff7af;
+  animation-name: fadeOut;
+  animation-duration: 1300ms; /* 持续时间为 1 秒 */
+  animation-fill-mode: forwards; /* 保持动画结束时的状态 */
+}
+@keyframes fadeOut {
+  0% {
+    background-color: #fff7af;
+  }
+  50% {
+    background-color: #000000;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
 
 .img_resize_transition {
   transition: 0.4s;
@@ -87,8 +93,18 @@ tr:hover {
 @my hljs
 */
 .hljs {
+  .hljs-section,
+  .hljs-title {
+    color: #000000 !important;
+  }
+  .hljs-keyword {
+    color: #1160ff;
+  }
+  .hljs-string {
+    color: #a31515 !important;
+  }
   .hljs-comment {
-    color: #697070;
+    color: #2e7d49;
   }
 
   .hljs-punctuation,
@@ -117,17 +133,16 @@ tr:hover {
   .hljs-symbol,
   .hljs-template-variable,
   .hljs-variable {
-    color: #ff0000 !important;
+    color: #000000 !important;
   }
   .hljs-deletion,
   .hljs-number,
   .hljs-quote,
   .hljs-selector-class,
   .hljs-selector-id,
-  .hljs-string,
   .hljs-template-tag,
   .hljs-type {
-    color: #00a424 !important;
+    color: #007018 !important;
   }
 
   .hljs-literal {
@@ -152,7 +167,6 @@ tr:hover {
   .hljs-emphasis {
     font-style: italic;
   }
-
   .hljs-strong {
     font-weight: 700;
   }
@@ -179,4 +193,17 @@ pre code.hljs {
 }
 .line-hilight {
   transition: 0.3s;
+}
+
+// Markdown github
+.markdown-body .footnotes {
+  border-top: none !important;
+}
+
+.markdown-it-code-copy {
+  display: none;
+}
+
+.code-container:hover button.markdown-it-code-copy {
+  display: block;
 }

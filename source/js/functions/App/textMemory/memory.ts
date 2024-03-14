@@ -45,7 +45,11 @@ export function fillInMemoryImg(base64: string, timeStamp: number) {
     updateDB(db, "users_img", data)
   })
 }
-
+/**
+ * @description 读取image base64
+ * @param indexName 索引名
+ * @param indexValue 索引值
+*/
 export async function readMemoryImg(
   indexName: any,
   indexValue: any

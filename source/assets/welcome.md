@@ -1,11 +1,12 @@
-# "新一代的$“Markdown^+”$编辑器".RED 
+[TOC]
+
+# 新一代的$“Markdown”$编辑器
 
 # 你好，我是标题
 
 ## 你好，我是二级标题
 
 你好，我是正文  
-"你好,我是markdown扩展语法".RIGHT 
 
 我是表情包:sweat_smile::sweat_smile:
 
@@ -51,8 +52,7 @@ mindmap
       Mermaid
 ```
 
-```py
+```js
 // 我是代码
 print("Hello Markdown!")
-
 ```

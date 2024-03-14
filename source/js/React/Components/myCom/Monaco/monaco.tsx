@@ -24,6 +24,7 @@ import monacoFormat from "@Func/Monaco/format/format"
 import { getDeviceTyByProportion } from "@App/user/userAgent"
 import { getTheme } from "@App/config/change"
 import monacoMouseEvent from "@Func/Events/mouse/monacoMouse"
+import monacoClickEvent from "@Func/Events/click/monacoClick"
 // import errIntellisense from "@Func/Monaco/intellisense/error"
 // import monacoPalette from "@Func/Monaco/palette/palette"
 
@@ -77,30 +78,37 @@ export default observer(function MonacoEditor() {
   const [resizableHeight, setResizableHeight] = React.useState(800)
   const handleResizeStop = () => {
     mdConverter()
+    setTimeout(() => {
+      setEditorOptions((pre) => {
+        return { ...pre, minimap: { enabled: true } }
+      })
+    }, 300)
   }
 
-  const editorOptions: editor.IStandaloneEditorConstructionOptions = {
-    fontSize: 16, // 设置字体大小
-    wordWrap: "on",
-    formatOnType: true,
-    formatOnPaste: false,
-    // scrollBeyondLastLine:false,
-    // scrollBeyondLastColumn:10,
-    fontLigatures:true,
-    autoSurround: "quotes",
-    autoClosingQuotes: "always",
-    // automaticLayout: true,
-    smoothScrolling: true,
-    codeLens: false,
-    pasteAs: { enabled: false, showPasteSelector: "never" },
-    peekWidgetDefaultFocus: "tree",
-    cursorSmoothCaretAnimation: "explicit",
-    colorDecorators: true,
-    // dragAndDrop: true,
-    //   lightbulb: {
-    //     enabled: true, // 快速修复功能
-    //  },
-  }
+  const [editorOptions, setEditorOptions] =
+    useState<editor.IStandaloneEditorConstructionOptions>({
+      fontSize: 16, // 设置字体大小
+      wordWrap: "on",
+      formatOnType: true,
+      formatOnPaste: false,
+      // scrollBeyondLastLine:false,
+      // scrollBeyondLastColumn:10,
+      fontLigatures: true,
+      autoSurround: "quotes",
+      autoClosingQuotes: "always",
+      // automaticLayout: true,
+      smoothScrolling: true,
+      codeLens: false,
+      pasteAs: { enabled: false, showPasteSelector: "never" },
+      peekWidgetDefaultFocus: "tree",
+      cursorSmoothCaretAnimation: "explicit",
+      colorDecorators: true,
+      minimap: { enabled: true },
+      // dragAndDrop: true,
+      //   lightbulb: {
+      //     enabled: true, // 快速修复功能
+      //  },
+    })
   const [fileName, setFileName] = useState("index.md")
   // let previousValue = window.editor.getValue();
   const file = files[fileName]
@@ -130,29 +138,42 @@ export default observer(function MonacoEditor() {
     monacoSnippets(editor, monaco)
     monacoFormat(editor, monaco)
     monacoMouseEvent(editor, monaco)
+    monacoClickEvent(editor,monaco)
     // monacoPalette(editor,monaco)
     // monacoKeyDownEvent()
-    allInit()
+    allInit(editor, monaco)
     // errIntellisense()
   }
   return (
     <>
       {/* <DraggableBox> */}
-      <div id="monaco-editor" style={{ height: "100%" }}>
+      <div id="monaco-editor" style={{ width: resizableWidth, height: "100%" }}>
         <ResizableBox
           className="custom-resizable"
           width={resizableWidth}
           height={resizableHeight}
           draggableOpts={{ grid: [5, 15] }}
-          minConstraints={[100, 1800]}
+          minConstraints={[100, resizableHeight]}
           onResizeStop={handleResizeStop}
-          // maxConstraints={[3000, 1800]}
+          onResize={(e) => {
+            setEditorOptions((pre) => {
+              // pre.minimap=false
+              return { ...pre, minimap: { enabled: false } }
+            })
+            // if (e.x > document.getElementById("editor")!.clientWidth * 0.3) {
+              // @ts-ignore
+              setResizableWidth(e.x)
+            // }
+            // @ts-ignore
+          }}
+          // resizeHandles={(e)=>{}}
+          // maxConstraints={[1000, 1800]}
           axis="x"
         >
           <Editor
             className="monaco-editor-inner"
             height="100%"
-            width="100%"
+            width={resizableWidth}
             theme={getTheme() === "light" ? "vs-light" : "vs-dark"}
             path={file.name}
             // language="markdown"

@@ -41,7 +41,6 @@ import {
   envs,
 } from "./latexRules"
 
-
 // import emojilib from "@cdn-emojilib"
 export function monacoSnippets(
   editor: editor.IStandaloneCodeEditor,
@@ -263,6 +262,43 @@ export function monacoSnippets(
       }
     },
   })
+
+  /**
+   * @补全clue
+   */
+  monaco.languages.registerCompletionItemProvider("markdown", {
+    triggerCharacters: ["^"],
+    //@ts-ignore
+    provideCompletionItems: (model, position, context) => {
+      const textUntilPosition: string = model.getValueInRange({
+        startLineNumber: 1,
+        startColumn: 1,
+        endLineNumber: position.lineNumber,
+        endColumn: position.column,
+      })
+      if (isNeedToUseClueIntellisense(textUntilPosition)) {
+        let _suggestions = [
+          {
+            label: "RED",
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: "RED",
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: "RED...",
+          },
+          {
+            label: "PINK",
+            kind: monaco.languages.CompletionItemKind.Function,
+            insertText: "PINK",
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+            detail: "PINK...",
+          },
+        ]
+        return { suggestions: _suggestions }
+      }
+    },
+  })
 }
 //
 
@@ -293,4 +329,15 @@ export function isInLatexBlock(textUntilPosition: string): boolean {
       ? textUntilPosition.match(/\$/g)!.length % 2 === 1
       : false)
   )
+}
+
+export function isNeedToUseClueIntellisense(textUntilPosition: string) {
+  // console.log(textUntilPosition[textUntilPosition.length-1]);
+  if (
+    textUntilPosition[textUntilPosition.length - 1] === "^" 
+  ) {
+    return true
+  } else {
+    return false
+  }
 }

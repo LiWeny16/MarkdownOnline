@@ -2,7 +2,6 @@ import { defineConfig } from "vite"
 import viteCompression from "vite-plugin-compression"
 import react from "@vitejs/plugin-react"
 
-
 import { resolve } from "path"
 export default defineConfig({
   base: "./",
@@ -24,11 +23,23 @@ export default defineConfig({
   resolve: {
     alias: {
       // "react":"https://esm.sh/react",
-      "markdownIt":"https://jsd.onmicrosoft.cn/npm/markdown-it@14.0.0/+esm",
+      // "uslug":"https://cdn.jsdelivr.net/npm/uslug@1.0.4/+esm",
+      "markdown-it-emoji":
+        "https://jsd.onmicrosoft.cn/npm/markdown-it-emoji@3.0.0/+esm",
+      "markdown-it-footnote":
+        "https://jsd.onmicrosoft.cn/npm/markdown-it-footnote@4.0.0/+esm",
+      "markdown-it-multimd-table":
+        "https://jsd.onmicrosoft.cn/npm/markdown-it-multimd-table@4.2.3/+esm",
+      "incremental-dom":
+        "https://jsd.onmicrosoft.cn/npm/incremental-dom@0.7.0/+esm",
+      "markdown-it-github-toc":
+        "https://jsd.onmicrosoft.cn/npm/markdown-it-github-toc@3.2.4/src/index.js/+esm",
+      // "markdown-it":"https://jsd.onmicrosoft.cn/npm/markdown-it@14.0.0/+esm",
       // "@gsap/react":"https://cdn.jsdelivr.net/npm/@gsap/react@2.1.0/+esm",
-      "@emoji-mart/data":"https://jsd.onmicrosoft.cn/npm/@emoji-mart/data@1.1.2/+esm",
-      "gsap":"https://jsd.onmicrosoft.cn/npm/gsap@3.12.5/+esm",
-      "@cdn-emojilib":"https://jsd.onmicrosoft.cn/npm/emojilib@3.0.11/+esm",
+      "@emoji-mart/data":
+        "https://jsd.onmicrosoft.cn/npm/@emoji-mart/data@1.1.2/+esm",
+      gsap: "https://jsd.onmicrosoft.cn/npm/gsap@3.12.5/+esm",
+      "@cdn-emojilib": "https://jsd.onmicrosoft.cn/npm/emojilib@3.0.11/+esm",
       "@cdn-prettier": "https://jsd.onmicrosoft.cn/npm/prettier@3.2.4/+esm",
       "@cdn-prettier-plugins-markdown":
         "https://jsd.onmicrosoft.cn/npm/prettier@3.2.4/plugins/markdown.js/+esm",
@@ -40,10 +51,12 @@ export default defineConfig({
       axios: "https://jsd.onmicrosoft.cn/npm/axios@1.6.5/+esm",
       "@cdn-node-emoji": "https://jsd.onmicrosoft.cn/npm/node-emoji@2.1.3/+esm",
       "@cdn-marked": "https://npm.elemecdn.com/marked/lib/marked.esm.js",
+      mermaid:
+        "https://jsd.onmicrosoft.cn/npm/mermaid@10/dist/mermaid.esm.min.mjs",
       "@cdn-mermaid":
         "https://jsd.onmicrosoft.cn/npm/mermaid@10/dist/mermaid.esm.min.mjs",
       "@cdn-kit":
-        "https://npm.elemecdn.com/bigonion-kit@0.11.0/esm/esm-kit.mjs",
+        "https://jsd.onmicrosoft.cn/npm/bigonion-kit@0.12.3/esm/kit.min.js",
       "@cdn-hljs":
         "https://npm.elemecdn.com/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js",
       "@cdn-katex": "https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.js",

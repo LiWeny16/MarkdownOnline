@@ -30,7 +30,8 @@ import HomeIcon from "@mui/icons-material/Home"
 // import Stack from "@mui/material/"
 // import { alpha, styled } from "@mui/material/styles"
 // import Paper from "@mui/material/Paper"
-import { kit, enObj } from "@Root/js/index"
+import { enObj } from "@Root/js/index"
+import kit from "@cdn-kit"
 import MyButton from "../Components/myCom/CustomButton.tsx"
 import myPrint from "@App/export/myPrint.ts"
 import aboutBox from "@Func/Events/aboutBox.ts"
@@ -168,7 +169,7 @@ const DrawerAppBar = observer((props: Props) => {
           // enableColorOnDark={false}
           sx={{
             position: "inherit",
-            justifyContent:"center",
+            justifyContent: "center",
             zIndex: 100,
             height: "8.7vh",
             transition:

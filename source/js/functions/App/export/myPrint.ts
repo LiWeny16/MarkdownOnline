@@ -1,4 +1,5 @@
-import { kit } from "@Root/js/index"
+// import { kit } from "@Root/js/index"
+import kit from "@cdn-kit"
 
 export default function myPrint() {
   let printString = document.getElementById("view-area")!.innerHTML

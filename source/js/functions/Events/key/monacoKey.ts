@@ -31,7 +31,7 @@ export default function monacoKeyEvent(
   //   // precondition: 'isChrome == true',
   //   keybindings: [keyMap.save],
   //   run: () => {
-  //     // save()
+  //     save()
   //   },
   // })
   editor.addAction({
@@ -53,10 +53,13 @@ export default function monacoKeyEvent(
       // ctrl_R()
     },
   })
+  /**
+   * @description quotation
+  */
   editor.addAction({
     id: "fsKey4",
     label: "fsKey4",
-    keybindings: [keyMap.quotation],
+    keybindings: [],
     run: () => {
       insertQuotationInMonaco()
     },

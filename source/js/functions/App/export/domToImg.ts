@@ -1,4 +1,6 @@
-import { kit } from "@Root/js/index"
+// import { kit } from "@Root/js/index"
+import kit from "@cdn-kit"
+
 import html2canvas from "html2canvas"
 
 // var node = document.getElementById("view-area")!

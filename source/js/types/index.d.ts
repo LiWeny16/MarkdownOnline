@@ -38,6 +38,10 @@ declare module "*.mjs" {
   const mjs: any
   export default mjs
 }
+// declare module "markdown-it-incremental-dom" {
+//   const a: any
+//   export default a
+// }
 // declare module "kit" {
 //   const kit: any
 //   export default kit
@@ -71,11 +75,11 @@ declare module "vconsole" {
   export default vconsole
 }
 
-declare module "@cdn-prettier"{
+declare module "@cdn-prettier" {
   const prettier
   export default prettier
 }
-declare module "@cdn-prettier-plugins-markdown"{
+declare module "@cdn-prettier-plugins-markdown" {
   export default parseMd
 }
 
@@ -140,6 +144,9 @@ declare interface Window {
   monaco: any
   theme: string
   location: any
+  deco:any
+  katex:any
+  mermaid:any
 }
 
 interface HandleDBListFun {

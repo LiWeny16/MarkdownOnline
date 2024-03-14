@@ -33,10 +33,12 @@ code {
   color: RED;
 }
 .ERR {
-  color: rgb(204, 0, 0);
+  color: #cb0000 !important;
+  font-weight: bold !important;
 }
 .BLUE {
   color: BLUE;
+  background-color: blue;
 }
 .PINK {
   color: pink;
@@ -88,12 +90,19 @@ code {
 .JUS-CENTER {
   justify-content: center;
 }
+.JUS-CEN {
+  justify-content: center;
+}
+.ALI-CEN {
+  align-items: center;
+}
 .ALI-CENTER {
   align-items: center;
 }
 .JUS-RIGHT {
   justify-content: right;
 }
+
 .GRID4 p {
   display: grid;
   grid-template-columns: repeat(2, auto);
@@ -191,3 +200,4 @@ code {
   padding: 2vh;
   margin: 6px;
 }
+

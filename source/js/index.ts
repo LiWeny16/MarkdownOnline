@@ -1,17 +1,14 @@
-// import aboutBox from "./functions/Events/aboutBox"
-// import dragFileEvent from "./functions/Events/dragFile"
-// import pasteEvent from "./functions/Events/pasteEvent"
-// import welcomeText from "../assets/welcome.md?raw"
-// import { marked } from "https://npm.elemecdn.com/marked/lib/marked.esm.js"
-import { marked } from "@cdn-marked"
-// import marked from "marked"
-// import remarkable from "remarkable"
-import markdownIt from "markdown-it"
-import mermaid from "@cdn-mermaid"
+// @ts-ignore
+import MarkdownItIncrementalDOM from "markdown-it-incremental-dom"
+import * as IncrementalDOM from "incremental-dom"
+// import markdownIt from "markdown-it"
+// import Token from "https://jsd.onmicrosoft.cn/npm/markdown-it@14.0.0/lib/token.mjs";
+// import markdownItGithubToc from "markdown-it-github-toc"
+import { figure } from "@mdit/plugin-figure"
+import mermaid from "mermaid"
 // import mermaid from "mermaid"
 // import "https://cdn.bootcdn.net/ajax/libs/mermaid/10.2.0/mermaid.min.js"
 // import mermaid from "https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.esm.min.mjs"
-import kit from "@cdn-kit"
 // import hljs from "https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"
 import hljs from "@cdn-hljs"
 import "@cdn-katex"
@@ -20,26 +17,27 @@ import replaceAsync from "string-replace-async"
 import { getMdTextFromMonaco } from "@App/text/getMdText"
 // import { fillInMemoryImg, readMemoryImg } from "@App/textMemory/memory"
 import pageBreaker from "@Func/Parser/pageBreaker"
-import virtualFileSystem from "@Func/Parser/VFS"
 import "../css/index.less"
-// import "@arco-design/web-react/dist/css/arco.css"
-// console.log(markdownIt);
-// window.markdownIt = markdownIt()
+
+// const span = new Token("span_open","span",1)
+// console.log(span);
+
 import { isSyntaxValid } from "@App/script.ts"
-import { markdownitLineNumber } from "@Func/Parser/lineNumber"
-// import { readMemoryImg } from "@App/textMemory/memory"
-// import {
-//   headingRenderer,
-//   initTocs,
-//   markItExtension,
-// } from "@Func/Parser/renderer"
-// import regs from "@App/regs/regs"
-// import "https://unpkg.com/@highlightjs/cdn-assets@11.7.0/styles/default.min.css"
+import { markdownitLineNumber } from "@Func/Parser/mdItPlugin/lineNumber"
+import { myPlugin } from "@Func/Parser/mdItPlugin/alertBlock"
+import { markdownParser } from "@Func/Init/allInit"
+import virtualFileSystem from "@Func/Parser/VFS"
+import { readMemoryImg } from "@App/textMemory/memory"
+import markdownIt from "markdown-it"
+import prepareParser from "@Func/Parser/prepareParser/prepare"
+
+// @ts-ignore
+// window.md = markdownIt()
+// window.mermaid = mermaid
 /**
  * @description 拓展使能配置
- * @type {Boolean}
+ * @type Boolean
  */
-export { kit, marked, hljs }
 export const enObj = {
   //基础事件
   enMainConverter: true,
@@ -49,13 +47,12 @@ export const enObj = {
   enFastKey: true, //快捷键
   enScript: true, //允许脚本注入
   enHilightJs: true, //高亮代码
-  enClue: true, //clueCSS写法
+  enClue: false, //clueCSS写法
   enDragFile: true, //拖拽外部markdown
   enPasteEvent: true, //粘贴事件
   enVirtualFileSystem: false,
   enPageBreaker: true,
 }
-
 // 重写标题的渲染结果
 // marked.use({ renderer: headingRenderer })
 
@@ -64,35 +61,26 @@ export const enObj = {
  * @param {boolean} save
  */
 export async function mdConverter(save: boolean = true) {
-  //按键触发，主函数
   let view: any = getMdTextFromMonaco()
-  // let view:any = getMdText()
-  // console.log(view);
-  enObj.enClue ? (view = await clueParser(view)) : console.log("clue off")
-
-  enObj.enPageBreaker
-    ? (view = pageBreaker(view))
-    : console.log("page breaker off")
-  // enObj.enVirtualFileSystem
-  //   ? (view = await virtualFileSystem(view))
-  //   : console.log("VFS off")
-  view = await latexParse2(view)
-  view = await latexParse(view)
-  view = await markedParse(view)
+  // enObj.enClue ? (view = await clueParser(view)) : 1
+  enObj.enPageBreaker ? (view = pageBreaker(view)) : 1
+  // enObj.enVirtualFileSystem ? (view = await virtualFileSystem(view)) : 1
+  // view = await latexParse2(view)
+  // view = await latexParse(view)
   // enObj.enScript ? enableScript(view) : console.log("fast scripts off")
 
-  writeHiddenPre(view)
-  // save ? restoreText() : 1
-  await mermaid.run({
-    querySelector: ".language-mermaid",
-    suppressErrors: true,
-  })
-  writePre(readHiddenPre())
-  enObj.enHilightJs ? hljs.highlightAll() : console.log("hilight off")
+  /**
+   * @description 处理需要异步的信息
+   * */
+  let env = await prepareParser(view)
+
+  IncrementalDOM.patch(
+    document.getElementById("view-area") as HTMLElement,
+    // @ts-ignore
+    markdownParser().renderToIncrementalDOM(view, env)
+  )
+  enObj.enHilightJs ? hljs.highlightAll() : 1
 }
-/**
- * @description 初始化设置类
- */
 
 /**
  * @description clue CSS HTML
@@ -148,9 +136,7 @@ function clueParser(md: any) {
 
           parsedHTML = ``
         } else {
-          parsedHTML = `<div class="FLEX ${clueClass}">${await markedParse(
-            content
-          )}</div>`
+          parsedHTML = `<div class="FLEX ${clueClass}">${content}</div>`
         }
 
         return parsedHTML
@@ -241,19 +227,7 @@ function latexParse(md: any) {
     } else resolve(origin)
   })
 }
-async function markedParse(md: any) {
-  md = await marked.parse(md)
-  return md
-  
-  // let markdownItParsed = markdownIt({
-  //   html: true,
-  //   linkify: true,
-  //   typographer: true,
-  //   breaks: true,
-  // }).use(markdownitLineNumber).render(md)
- 
-  // return  markdownItParsed
-}
+
 // function getMdText() {
 //   return document.getElementById("md-area").value
 // }
@@ -264,6 +238,11 @@ function readHiddenPre() {
   return document.getElementById("view-area-hidden")!.innerHTML
 }
 function writePre(text: any) {
+  // let iframe = document.getElementById("view-area") as HTMLIFrameElement
+  // let doc = iframe.contentWindow?.document
+  // doc?.open()
+  // doc?.write(text)
+  // doc?.close()
   document.getElementById("view-area")!.innerHTML = text
 }
 

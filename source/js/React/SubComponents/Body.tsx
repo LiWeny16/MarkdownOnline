@@ -1,7 +1,7 @@
 import React from "react"
 
 // import fastKeyEvent from "@Root/js/functions/fastKey"
-import { kit, enObj } from "@Root/js/index"
+import { enObj } from "@Root/js/index"
 import fastKeyEvent from "@Func/Events/key/fastKey"
 // import pasteEvent, { monacoPasteEvent, monacoPasteEventNative } from "@Func/Events/pasteEvent"
 import dragFileEvent from "@Func/Events/dragFile"

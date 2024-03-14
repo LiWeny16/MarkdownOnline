@@ -1,6 +1,7 @@
-import {  kit, mdConverter } from "@Root/js/index"
+import { mdConverter } from "@Root/js/index"
 import allInit from "@Func/Init/allInit"
 import blankTextInit from "../Init/blankTextInit"
+import kit from "@cdn-kit"
 
 export default function dragFileEvent() {
   let dragBox = (document.getElementById("md-area") as HTMLInputElement) || null
