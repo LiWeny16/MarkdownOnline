@@ -50,13 +50,18 @@ body {
   height: 100svh;
   overflow-x: hidden;
   overflow-y: auto;
+  
+  // 隐藏全局滚动条
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 #root {
   width: 100svw;
   height: 100svh;
 }
 #view-area {
-  overflow-y: scroll;
+  overflow-y: auto;
   width: 100%;
 }
 #editor {
@@ -90,7 +95,7 @@ tr:hover {
   background: #fffdd6 !important;
 }
 
-// @region*********************hljs
+  // @region*********************hljs
 /**
 @my hljs
 */
