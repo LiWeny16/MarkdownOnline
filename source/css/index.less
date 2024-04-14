@@ -32,6 +32,8 @@
   border-right: black;
   transition: 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
   // background: skyblue !important;
+  // 提高优先级, 防止被覆盖无法拖动
+  z-index: 10;
 }
 .custom-resizable .react-resizable-handle:hover {
   background-color: #90caf9 !important;
@@ -196,6 +198,24 @@ pre code.hljs {
 }
 
 // Markdown github
+/* Markdown Compatibility - Markdown渲染补丁
+该补丁的作用是调整容器的显示, 让局部滚动条固定在页面右边, 而不是跟随内容区域的拖动而拖动.
+*/
+article.markdown-body {
+  max-width: none;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  
+  // 设置所有子节点的宽度, 以匹配之前的样式
+  // 即最小100px宽度, 最大980px宽度
+  & > * {
+    width: 100%;
+    min-width: 200px;
+    max-width: 980px;
+  }
+}
+
 .markdown-body .footnotes {
   border-top: none !important;
 }
