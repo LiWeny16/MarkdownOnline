@@ -25,7 +25,7 @@ import { getDeviceTyByProportion } from "@App/user/userAgent"
 import { getTheme } from "@App/config/change"
 import monacoMouseEvent from "@Func/Events/mouse/monacoMouse"
 import monacoClickEvent from "@Func/Events/click/monacoClick"
-import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight.ts"
+import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight.ts";
 // import errIntellisense from "@Func/Monaco/intellisense/error"
 // import monacoPalette from "@Func/Monaco/palette/palette"
 
@@ -137,16 +137,16 @@ export default observer(function MonacoEditor() {
    * @description do sth. after mounted.
    */
   function handleEditorDidMount(
-    editor: editor.IStandaloneCodeEditor,
-    monaco: Monaco
+      editor: editor.IStandaloneCodeEditor,
+      monaco: Monaco
   ) {
     // editorRef.current = editor
     // 暴露出去
     window.editor = editor
     window.monaco = monaco
     getDeviceTyByProportion() == "PC"
-      ? setResizableWidth(document.getElementById("editor")!.clientWidth / 2)
-      : 1
+        ? setResizableWidth(document.getElementById("editor")!.clientWidth / 2)
+        : 1
     setResizableHeight(document.getElementById("editor")!.clientHeight)
     // monacoPasteEventNative(editor, monaco)
     monacoInit(editor, monaco)
