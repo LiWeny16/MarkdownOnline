@@ -56,6 +56,8 @@ body {
 #view-area {
   overflow-y: scroll;
   width: 100%;
+  /* 设置 transform 让当前容器为包含块 */
+  transform: translateX(0);
 }
 #editor {
   height: 90svh;
@@ -206,4 +208,10 @@ pre code.hljs {
 
 .code-container:hover button.markdown-it-code-copy {
   display: block;
+}
+
+// LateX Compatibility - lateX补丁
+.katex span.katex-mathml {
+  // fix: `.katex .katex-mathml` not exist position config
+  top: 0;
 }
