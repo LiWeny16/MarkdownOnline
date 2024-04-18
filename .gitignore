@@ -29,3 +29,5 @@ learning/
 # BAT
 *.bat
 /.VSCodeCounter
+/backup
+backup/*
