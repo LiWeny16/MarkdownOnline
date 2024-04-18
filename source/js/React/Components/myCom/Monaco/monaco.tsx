@@ -25,6 +25,7 @@ import { getDeviceTyByProportion } from "@App/user/userAgent"
 import { getTheme } from "@App/config/change"
 import monacoMouseEvent from "@Func/Events/mouse/monacoMouse"
 import monacoClickEvent from "@Func/Events/click/monacoClick"
+import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight.ts";
 // import errIntellisense from "@Func/Monaco/intellisense/error"
 // import monacoPalette from "@Func/Monaco/palette/palette"
 
@@ -84,32 +85,32 @@ export default observer(function MonacoEditor() {
       })
     }, 300)
   }
-
+  
   const [editorOptions, setEditorOptions] =
-    useState<editor.IStandaloneEditorConstructionOptions>({
-      fontSize: 16, // 设置字体大小
-      wordWrap: "on",
-      formatOnType: true,
-      formatOnPaste: false,
-      // scrollBeyondLastLine:false,
-      // scrollBeyondLastColumn:10,
-      fontLigatures: true,
-      autoSurround: "quotes",
-      autoClosingQuotes: "always",
-      // automaticLayout: true,
-      smoothScrolling: true,
-      codeLens: false,
-      pasteAs: { enabled: false, showPasteSelector: "never" },
-      peekWidgetDefaultFocus: "tree",
-      cursorSmoothCaretAnimation: "explicit",
-      colorDecorators: true,
-      minimap: { enabled: true },
+      useState<editor.IStandaloneEditorConstructionOptions>({
+        fontSize: 16, // 设置字体大小
+        wordWrap: "on",
+        formatOnType: true,
+        formatOnPaste: false,
+        // scrollBeyondLastLine:false,
+        // scrollBeyondLastColumn:10,
+        fontLigatures: true,
+        autoSurround: "quotes",
+        autoClosingQuotes: "always",
+        // automaticLayout: true,
+        smoothScrolling: true,
+        codeLens: false,
+        pasteAs: { enabled: false, showPasteSelector: "never" },
+        peekWidgetDefaultFocus: "tree",
+        cursorSmoothCaretAnimation: "explicit",
+        colorDecorators: true,
+        minimap: { enabled: true },
       unicodeHighlight: { nonBasicASCII: false, ambiguousCharacters: false },
-      // dragAndDrop: true,
-      //   lightbulb: {
-      //     enabled: true, // 快速修复功能
-      //  },
-    })
+        // dragAndDrop: true,
+        //   lightbulb: {
+        //     enabled: true, // 快速修复功能
+        //  },
+      })
   const [fileName, setFileName] = useState("index.md")
   // let previousValue = window.editor.getValue();
   const file = files[fileName]
@@ -136,16 +137,16 @@ export default observer(function MonacoEditor() {
    * @description do sth. after mounted.
    */
   function handleEditorDidMount(
-    editor: editor.IStandaloneCodeEditor,
-    monaco: Monaco
+      editor: editor.IStandaloneCodeEditor,
+      monaco: Monaco
   ) {
     // editorRef.current = editor
     // 暴露出去
     window.editor = editor
     window.monaco = monaco
     getDeviceTyByProportion() == "PC"
-      ? setResizableWidth(document.getElementById("editor")!.clientWidth / 2)
-      : 1
+        ? setResizableWidth(document.getElementById("editor")!.clientWidth / 2)
+        : 1
     setResizableHeight(document.getElementById("editor")!.clientHeight)
     // monacoPasteEventNative(editor, monaco)
     monacoInit(editor, monaco)
@@ -159,51 +160,53 @@ export default observer(function MonacoEditor() {
     // monacoKeyDownEvent()
     allInit(editor, monaco)
     // errIntellisense()
+    // 动态改变编辑器高度
+    monacoResizeHeightEvent(setResizableHeight)
   }
   return (
-    <>
-      {/* <DraggableBox> */}
-      <div id="monaco-editor" style={{ width: resizableWidth, height: "100%" }}>
-        <ResizableBox
-          className="custom-resizable"
-          width={resizableWidth}
-          height={resizableHeight}
-          draggableOpts={{ grid: [5, 15] }}
-          minConstraints={[100, resizableHeight]}
-          onResizeStop={handleResizeStop}
-          onResize={(e) => {
-            setEditorOptions((pre) => {
-              // pre.minimap=false
-              return { ...pre, minimap: { enabled: false } }
-            })
-            // if (e.x > document.getElementById("editor")!.clientWidth * 0.3) {
-            // @ts-ignore
-            setResizableWidth(e.x)
-            // }
-            // @ts-ignore
-          }}
-          // resizeHandles={(e)=>{}}
-          // maxConstraints={[1000, 1800]}
-          axis="x"
-        >
-          <Editor
-            className="monaco-editor-inner"
-            height="100%"
-            width={resizableWidth}
-            theme={getTheme() === "light" ? "vs-light" : "vs-dark"}
-            path={file.name}
-            // language="markdown"
-            defaultLanguage={file.language}
-            defaultValue={file.value}
-            onMount={handleEditorDidMount}
-            onChange={handleOnChange}
-            options={editorOptions}
-            beforeMount={handleBeforeMount}
-          />
-        </ResizableBox>
-        {/* <div style={{width:size.width}}>2323</div> */}
-      </div>
-      {/* </DraggableBox> */}
-    </>
+      <>
+        {/* <DraggableBox> */}
+        <div id="monaco-editor" style={{ width: resizableWidth, height: "100%" }}>
+          <ResizableBox
+              className="custom-resizable"
+              width={resizableWidth}
+              height={resizableHeight}
+              draggableOpts={{ grid: [5, 15] }}
+              minConstraints={[100, resizableHeight]}
+              onResizeStop={handleResizeStop}
+              onResize={(e) => {
+                setEditorOptions((pre) => {
+                  // pre.minimap=false
+                  return { ...pre, minimap: { enabled: false } }
+                })
+                // if (e.x > document.getElementById("editor")!.clientWidth * 0.3) {
+              // @ts-ignore
+              setResizableWidth(e.x)
+                // }
+                // @ts-ignore
+              }}
+              // resizeHandles={(e)=>{}}
+              // maxConstraints={[1000, 1800]}
+              axis="x"
+          >
+            <Editor
+                className="monaco-editor-inner"
+                height="100%"
+                width={resizableWidth}
+                theme={getTheme() === "light" ? "vs-light" : "vs-dark"}
+                path={file.name}
+                // language="markdown"
+                defaultLanguage={file.language}
+                defaultValue={file.value}
+                onMount={handleEditorDidMount}
+                onChange={handleOnChange}
+                options={editorOptions}
+                beforeMount={handleBeforeMount}
+            />
+          </ResizableBox>
+          {/* <div style={{width:size.width}}>2323</div> */}
+        </div>
+        {/* </DraggableBox> */}
+      </>
   )
 })
