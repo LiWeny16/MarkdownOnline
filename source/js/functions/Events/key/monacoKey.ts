@@ -10,6 +10,7 @@ import kit from "@cdn-kit"
 import exeInsertPageBreakerAction from "./actions/pageBreaker"
 import exeLatexBlockAction from "./actions/latexBlock"
 import exeEmojiPickerAction from "./actions/emojiPicker"
+import exeSpeechPanelAction from "./actions/speechPanel"
 
 export default function monacoKeyEvent(
   editor: editor.IStandaloneCodeEditor,
@@ -24,6 +25,8 @@ export default function monacoKeyEvent(
     pageBreaker:
       monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.Enter,
     latexBlock: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyM,
+    voice2Words:
+      monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyV,
   }
   // editor.addAction({
   //   id: 'fsKey',
@@ -55,7 +58,7 @@ export default function monacoKeyEvent(
   })
   /**
    * @description quotation
-  */
+   */
   editor.addAction({
     id: "fsKey4",
     label: "fsKey4",
@@ -144,6 +147,15 @@ export default function monacoKeyEvent(
     contextMenuOrder: -100,
     run: () => {
       exeEmojiPickerAction(editor, monaco)
+    },
+  })
+  editor.addAction({
+    id: "insert.voice2words",
+    label: "Speech to text",
+    keybindings: [keyMap.voice2Words],
+    contextMenuGroupId: "navigation",
+    run: () => {
+      exeSpeechPanelAction(editor, monaco)
     },
   })
 }

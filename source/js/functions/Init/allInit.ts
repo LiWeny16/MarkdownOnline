@@ -29,7 +29,7 @@ import {
   imgExtension,
   emojiExtension,
 } from "@Func/Parser/renderer"
-import { changeTheme } from "@App/config/change"
+// import { changeTheme } from "@App/config/change"
 import operateLocalStorage from "@App/localStorage/localStorage"
 import {
   ConfigStore,
@@ -45,7 +45,7 @@ import { cluePlugin } from "@Func/Parser/mdItPlugin/clueParser"
 import preViewClickEvent from "@Func/Events/click/preClick"
 import markdownItLatex from "@Func/Parser/mdItPlugin/latex"
 // @ts-ignore
-import markdownItCodeCopy from "markdown-it-code-copy"
+// import markdownItCodeCopy from "markdown-it-code-copy"
 
 /**
  * @description markdownParser init plugin && settings
@@ -76,7 +76,7 @@ export function markdownParser() {
     .use(MarkdownItIncrementalDOM, IncrementalDOM)
     .use(markdownItEmoji)
     .use(markdownItLatex)
-    // .use(markdownItCodeCopy)
+  // .use(markdownItCodeCopy)
   // .use(figure)
 
   return markdownItParser
@@ -169,11 +169,20 @@ export default function allInit(
       })
     })
   })
- 
-  // window.theme = "light"
+
   /***@description All Events */
-  window.deco = editor.createDecorationsCollection()
   preViewClickEvent(editor, monaco, window.deco)
+  // 禁止滚动
+
+  /**
+   * @description 全局变量初始化
+   */
+  window.deco = editor.createDecorationsCollection()
+  window._speechData = {
+    processing: false,
+    speechResult: "",
+    speech:null
+  }
   // enObj.enMainConverter
   //   ? triggerConverterEvent()
   //   : console.log("converter if off") //按下写字板触发事件
@@ -189,7 +198,7 @@ const normalConfigArr: NormalConfigArr = ["on", "off", "light", "dark"]
 const defaultConfig: IConfig = {
   themeState: "light",
   emojiPickerState: "off",
-  contextMenuClickPosition: { posx: 0, posy: 0 },
+  contextMenuClickPosition: { posx: 20, posy: 20 },
 }
 /**
  * @description 对设置进行初始化

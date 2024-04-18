@@ -144,9 +144,14 @@ declare interface Window {
   monaco: any
   theme: string
   location: any
-  deco:any
-  katex:any
-  mermaid:any
+  deco: any
+  katex: any
+  mermaid: any
+  _speechData: {
+    processing: Boolean
+    speechResult: string
+    speech:any
+  }
 }
 
 interface HandleDBListFun {

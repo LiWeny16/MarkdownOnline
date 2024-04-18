@@ -1,7 +1,7 @@
 // import { allInit, enObj, fillInRemeText, kit } from "@Root/js/index.js"
 import save from "@App/save"
 import replaceSelection from "@App/text/replaceText"
-import sound from "@App/sound/sound"
+// import voice from "@App/voice/sound"
 // import qiniuFileAPI from "@App/qiniu/index"
 // import insertTextAtCursor from "@App/text/insertTextAtCursor"
 /**
@@ -37,12 +37,12 @@ function enableFastKeyEvent() {
       }
       // Ctrl + Alt + I
       if (e.key == "i" && e.altKey && e.ctrlKey) {
-        if (recState) {
-          _rec?.stop()
-        } else {
-          _rec = sound("zh-CN", true)
-        }
-        recState = !recState
+        // if (recState) {
+        //   _rec?.stop()
+        // } else {
+        //   _rec = voice("zh-CN", true)
+        // }
+        // recState = !recState
 
         // console.log(rec.recognition);
       }

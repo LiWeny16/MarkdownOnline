@@ -12,6 +12,8 @@ import { observer } from "mobx-react"
 import EmojiPicker from "@Com/myCom/EmojiPicker"
 import { configInit } from "@Func/Init/allInit"
 import { getEmojiPickerState, getTheme } from "@App/config/change"
+import LoadingButton from "../Components/Mui/progressButton"
+import CircularLoadingButton from "../Components/Mui/progressButton"
 
 function enEvents(doIt: boolean): void {
   if (doIt) {
@@ -43,6 +45,7 @@ export default observer(function Body() {
         </div>
         <EmojiPicker open={getEmojiPickerState() === "on" ? true : false} />
       </div>
+      {/* <CircularLoadingButton></CircularLoadingButton> */}
     </>
   )
 })
