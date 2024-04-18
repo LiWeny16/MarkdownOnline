@@ -5,6 +5,7 @@ import { editor } from "monaco-editor"
  * @param e HTMLelement
  * @param leftStr String
  * @param rightStr String
+ * @deprecated
  */
 export default function replaceSelection(e: any, leftStr: any, rightStr: any) {
   var start = e.selectionStart
@@ -27,6 +28,9 @@ export default function replaceSelection(e: any, leftStr: any, rightStr: any) {
   }
 }
 
+/**
+ * @description 替换选择的内容
+ */
 export function replaceMonacoSelection(newText: string = "nihao") {
   const _editor = window.editor // 假设你只有一个编辑器实例
   const currentSelection = _editor.getSelection()
@@ -37,6 +41,32 @@ export function replaceMonacoSelection(newText: string = "nihao") {
         currentSelection.startColumn,
         currentSelection.endLineNumber,
         currentSelection.endColumn
+      ),
+      text: newText,
+      forceMoveMarkers: true,
+    },
+  ])
+}
+
+/**
+ * @description 范围替换文本
+*/
+export function replaceMonacoInRange(
+  startLineNumber: number,
+  startColumn: number,
+  endLineNumber: number,
+  endColumn: number,
+  newText: string
+) {
+  const _editor = window.editor // 假设你只有一个编辑器实例
+  // const currentSelection = _editor.getSelection()
+  _editor.executeEdits("my-replace", [
+    {
+      range: new window.monaco.Range(
+        startLineNumber,
+        startColumn,
+        endLineNumber,
+        endColumn
       ),
       text: newText,
       forceMoveMarkers: true,

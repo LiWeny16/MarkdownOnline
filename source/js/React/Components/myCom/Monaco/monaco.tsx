@@ -104,6 +104,7 @@ export default observer(function MonacoEditor() {
       cursorSmoothCaretAnimation: "explicit",
       colorDecorators: true,
       minimap: { enabled: true },
+      unicodeHighlight: { nonBasicASCII: false, ambiguousCharacters: false },
       // dragAndDrop: true,
       //   lightbulb: {
       //     enabled: true, // 快速修复功能
@@ -115,6 +116,20 @@ export default observer(function MonacoEditor() {
   // const editorRef = useRef(null)
   function handleOnChange(e: any) {
     triggerConverterEvent(4)
+  }
+  function monacoInit(editor: editor.IStandaloneCodeEditor, monaco: Monaco) {
+    monaco.languages.setLanguageConfiguration("markdown", {
+      autoClosingPairs: [
+        { open: "{", close: "}" },
+        { open: "[", close: "]" },
+        { open: "(", close: ")" },
+        { open: '"', close: '"' },
+        { open: "'", close: "'", notIn: ["string", "comment"] },
+        { open: "`", close: "`", notIn: ["string", "comment"] },
+        { open: "/*", close: "*/", notIn: ["string"] },
+        { open: "？", close: "？", notIn: ["string", "comment"] }, // 添加此行，将字符"？"添加到自动关闭字符对中
+      ],
+    })
   }
   function handleBeforeMount() {}
   /**
@@ -133,12 +148,13 @@ export default observer(function MonacoEditor() {
       : 1
     setResizableHeight(document.getElementById("editor")!.clientHeight)
     // monacoPasteEventNative(editor, monaco)
+    monacoInit(editor, monaco)
     monacoPasteEvent(editor, monaco)
     monacoKeyEvent(editor, monaco)
     monacoSnippets(editor, monaco)
     monacoFormat(editor, monaco)
     monacoMouseEvent(editor, monaco)
-    monacoClickEvent(editor,monaco)
+    monacoClickEvent(editor, monaco)
     // monacoPalette(editor,monaco)
     // monacoKeyDownEvent()
     allInit(editor, monaco)
@@ -161,8 +177,8 @@ export default observer(function MonacoEditor() {
               return { ...pre, minimap: { enabled: false } }
             })
             // if (e.x > document.getElementById("editor")!.clientWidth * 0.3) {
-              // @ts-ignore
-              setResizableWidth(e.x)
+            // @ts-ignore
+            setResizableWidth(e.x)
             // }
             // @ts-ignore
           }}
