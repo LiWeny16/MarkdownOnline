@@ -25,7 +25,7 @@ import { getDeviceTyByProportion } from "@App/user/userAgent"
 import { getTheme } from "@App/config/change"
 import monacoMouseEvent from "@Func/Events/mouse/monacoMouse"
 import monacoClickEvent from "@Func/Events/click/monacoClick"
-import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight.ts"
+import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight.ts";
 // import errIntellisense from "@Func/Monaco/intellisense/error"
 // import monacoPalette from "@Func/Monaco/palette/palette"
 
@@ -164,49 +164,49 @@ export default observer(function MonacoEditor() {
     monacoResizeHeightEvent(setResizableHeight)
   }
   return (
-    <>
-      {/* <DraggableBox> */}
-      <div id="monaco-editor" style={{ width: resizableWidth, height: "100%" }}>
-        <ResizableBox
-          className="custom-resizable"
-          width={resizableWidth}
-          height={resizableHeight}
-          draggableOpts={{ grid: [5, 15] }}
-          minConstraints={[100, resizableHeight]}
-          onResizeStop={handleResizeStop}
-          onResize={(e) => {
-            setEditorOptions((pre) => {
-              // pre.minimap=false
-              return { ...pre, minimap: { enabled: false } }
-            })
-            // if (e.x > document.getElementById("editor")!.clientWidth * 0.3) {
-            // @ts-ignore
-            setResizableWidth(e.x)
-            // }
-            // @ts-ignore
-          }}
-          // resizeHandles={(e)=>{}}
-          // maxConstraints={[1000, 1800]}
-          axis="x"
-        >
-          <Editor
-            className="monaco-editor-inner"
-            height="100%"
-            width={resizableWidth}
-            theme={getTheme() === "light" ? "vs-light" : "vs-dark"}
-            path={file.name}
-            // language="markdown"
-            defaultLanguage={file.language}
-            defaultValue={file.value}
-            onMount={handleEditorDidMount}
-            onChange={handleOnChange}
-            options={editorOptions}
-            beforeMount={handleBeforeMount}
-          />
-        </ResizableBox>
-        {/* <div style={{width:size.width}}>2323</div> */}
-      </div>
-      {/* </DraggableBox> */}
-    </>
+      <>
+        {/* <DraggableBox> */}
+        <div id="monaco-editor" style={{ width: resizableWidth, height: "100%" }}>
+          <ResizableBox
+              className="custom-resizable"
+              width={resizableWidth}
+              height={resizableHeight}
+              draggableOpts={{ grid: [5, 15] }}
+              minConstraints={[100, resizableHeight]}
+              onResizeStop={handleResizeStop}
+              onResize={(e) => {
+                setEditorOptions((pre) => {
+                  // pre.minimap=false
+                  return { ...pre, minimap: { enabled: false } }
+                })
+                // if (e.x > document.getElementById("editor")!.clientWidth * 0.3) {
+                // @ts-ignore
+                setResizableWidth(e.x)
+                // }
+                // @ts-ignore
+              }}
+              // resizeHandles={(e)=>{}}
+              // maxConstraints={[1000, 1800]}
+              axis="x"
+          >
+            <Editor
+                className="monaco-editor-inner"
+                height="100%"
+                width={resizableWidth}
+                theme={getTheme() === "light" ? "vs-light" : "vs-dark"}
+                path={file.name}
+                // language="markdown"
+                defaultLanguage={file.language}
+                defaultValue={file.value}
+                onMount={handleEditorDidMount}
+                onChange={handleOnChange}
+                options={editorOptions}
+                beforeMount={handleBeforeMount}
+            />
+          </ResizableBox>
+          {/* <div style={{width:size.width}}>2323</div> */}
+        </div>
+        {/* </DraggableBox> */}
+      </>
   )
 })
