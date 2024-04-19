@@ -152,21 +152,14 @@ export default function allInit(
   }) //初始化输入区域
   Notification.success({
     title: "已更新到最新版本",
-    content: `当前版本:v2.0.0`,
+    content: `当前版本:v2.0.1`,
     position: "bottomRight",
   })
   kit.sleep(250).then(() => {
     Notification.info({
       title: "版本新增特性",
-      content: `1. 更新引擎为markdown-it 2. 更新双击右侧定位`,
+      content: `1. 修复溢出滚动条bug 2.新增语音识别`,
       position: "bottomRight",
-    })
-    kit.sleep(250).then(() => {
-      Notification.info({
-        title: "版本新增特性",
-        content: `3. 更新TOC、脚注 4. 局部diff渲染`,
-        position: "bottomRight",
-      })
     })
   })
 
