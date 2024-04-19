@@ -137,16 +137,16 @@ export default observer(function MonacoEditor() {
    * @description do sth. after mounted.
    */
   function handleEditorDidMount(
-      editor: editor.IStandaloneCodeEditor,
-      monaco: Monaco
+    editor: editor.IStandaloneCodeEditor,
+    monaco: Monaco
   ) {
     // editorRef.current = editor
     // 暴露出去
     window.editor = editor
     window.monaco = monaco
     getDeviceTyByProportion() == "PC"
-        ? setResizableWidth(document.getElementById("editor")!.clientWidth / 2)
-        : 1
+      ? setResizableWidth(document.getElementById("editor")!.clientWidth / 2)
+      : 1
     setResizableHeight(document.getElementById("editor")!.clientHeight)
     // monacoPasteEventNative(editor, monaco)
     monacoInit(editor, monaco)
@@ -164,49 +164,49 @@ export default observer(function MonacoEditor() {
     monacoResizeHeightEvent(setResizableHeight)
   }
   return (
-    <>
-      {/* <DraggableBox> */}
-      <div id="monaco-editor" style={{ width: resizableWidth, height: "100%" }}>
-        <ResizableBox
-          className="custom-resizable"
-          width={resizableWidth}
-          height={resizableHeight}
-          draggableOpts={{ grid: [5, 15] }}
-          minConstraints={[100, resizableHeight]}
-          onResizeStop={handleResizeStop}
-          onResize={(e) => {
-            setEditorOptions((pre) => {
-              // pre.minimap=false
-              return { ...pre, minimap: { enabled: false } }
-            })
-            // if (e.x > document.getElementById("editor")!.clientWidth * 0.3) {
-            // @ts-ignore
-            setResizableWidth(e.x)
-            // }
-            // @ts-ignore
-          }}
-          // resizeHandles={(e)=>{}}
-          // maxConstraints={[1000, 1800]}
-          axis="x"
-        >
-          <Editor
-            className="monaco-editor-inner"
-            height="100%"
-            width={resizableWidth}
-            theme={getTheme() === "light" ? "vs-light" : "vs-dark"}
-            path={file.name}
-            // language="markdown"
-            defaultLanguage={file.language}
-            defaultValue={file.value}
-            onMount={handleEditorDidMount}
-            onChange={handleOnChange}
-            options={editorOptions}
-            beforeMount={handleBeforeMount}
-          />
-        </ResizableBox>
-        {/* <div style={{width:size.width}}>2323</div> */}
-      </div>
-      {/* </DraggableBox> */}
-    </>
+      <>
+        {/* <DraggableBox> */}
+        <div id="monaco-editor" style={{ width: resizableWidth, height: "100%" }}>
+          <ResizableBox
+              className="custom-resizable"
+              width={resizableWidth}
+              height={resizableHeight}
+              draggableOpts={{ grid: [5, 15] }}
+              minConstraints={[100, resizableHeight]}
+              onResizeStop={handleResizeStop}
+              onResize={(e) => {
+                setEditorOptions((pre) => {
+                  // pre.minimap=false
+                  return { ...pre, minimap: { enabled: false } }
+                })
+                // if (e.x > document.getElementById("editor")!.clientWidth * 0.3) {
+                // @ts-ignore
+                setResizableWidth(e.x)
+                // }
+                // @ts-ignore
+              }}
+              // resizeHandles={(e)=>{}}
+              // maxConstraints={[1000, 1800]}
+              axis="x"
+          >
+            <Editor
+                className="monaco-editor-inner"
+                height="100%"
+                width={resizableWidth}
+                theme={getTheme() === "light" ? "vs-light" : "vs-dark"}
+                path={file.name}
+                // language="markdown"
+                defaultLanguage={file.language}
+                defaultValue={file.value}
+                onMount={handleEditorDidMount}
+                onChange={handleOnChange}
+                options={editorOptions}
+                beforeMount={handleBeforeMount}
+            />
+          </ResizableBox>
+          {/* <div style={{width:size.width}}>2323</div> */}
+        </div>
+        {/* </DraggableBox> */}
+      </>
   )
 })
