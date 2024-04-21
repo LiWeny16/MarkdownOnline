@@ -73,9 +73,10 @@ export function markdownParser() {
     .use(markdownItGithubToc, {
       anchorLinkSymbol: "",
     })
-    .use(MarkdownItIncrementalDOM, IncrementalDOM)
     .use(markdownItEmoji)
     .use(markdownItLatex)
+    .use(MarkdownItIncrementalDOM, IncrementalDOM)
+ 
   // .use(markdownItCodeCopy)
   // .use(figure)
 

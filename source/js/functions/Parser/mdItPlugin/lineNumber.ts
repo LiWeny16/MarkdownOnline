@@ -18,8 +18,10 @@ function markdownitLineNumber(md: MarkdownIt, option: any) {
     // console.log(slf)
     return slf.renderToken(tokens, idx, options)
   }
-  md.renderer.rules.paragraph_open = md.renderer.rules.heading_open =
-    injectLineNumbers
+  md.renderer.rules.paragraph_open =
+    md.renderer.rules.heading_open =
+    md.renderer.rules.table_open =
+      injectLineNumbers
 }
 
 export { markdownitLineNumber }

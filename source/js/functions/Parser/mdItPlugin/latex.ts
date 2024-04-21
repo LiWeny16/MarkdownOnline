@@ -206,11 +206,15 @@ export default function markdownItLatex(md: any, options: any) {
     return katexInline(tokens[idx].content)
   }
 
-  var katexBlock = function (latex: any) {
+  var katexBlock = function (latex: any, token: any) {
     options.displayMode = true
+    let line
+    if (token.map && token.level === 0) {
+      line = token.map![0]
+    }
     if (latex) {
       try {
-        return "<p>" + katex.renderToString(latex, options) + "</p>"
+        return `<p data-line=${String(line)}>` + katex.renderToString(latex, options) + "</p>"
       } catch (error) {
         // if(options.throwOnError){ console.log(error); }
         return latex
@@ -221,7 +225,7 @@ export default function markdownItLatex(md: any, options: any) {
   }
 
   var blockRenderer = function (tokens: any, idx: any) {
-    return katexBlock(tokens[idx].content) + "\n"
+    return katexBlock(tokens[idx].content, tokens[idx]) + "\n"
   }
 
   md.inline.ruler.after("escape", "math_inline", math_inline)
