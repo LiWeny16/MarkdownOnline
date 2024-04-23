@@ -11,12 +11,21 @@ export type MousePosition = {
   posx: number
   posy: number
 }
+export type Settings = {
+  basic: SettingsBasic
+  advanced: SettingsAd
+}
+type SettingsBasic = {
+  sycScroll: boolean
+}
+type SettingsAd = {}
 export interface IConfig {
   [key: string]: any
   //
   themeState: ThemeState
   emojiPickerState: EmojiPickerState
   contextMenuClickPosition: MousePosition
+  settingsConfig: Settings
 }
 // 对应用状态进行建模。
 
@@ -29,19 +38,23 @@ class ConfigStore {
   public themeState: ThemeState
   public emojiPickerState: EmojiPickerState
   public contextMenuClickPosition: MousePosition
+  public settingsConfig: Settings
   constructor({
     themeState,
     emojiPickerState,
     contextMenuClickPosition,
+    settingsConfig,
   }: IConfig) {
     makeAutoObservable(this, {
       themeState: observable,
       emojiPickerState: observable,
       contextMenuClickPosition: observable,
+      settingsConfig: observable,
     })
     this.themeState = themeState
     this.emojiPickerState = emojiPickerState
     this.contextMenuClickPosition = contextMenuClickPosition
+    this.settingsConfig = settingsConfig
   }
   /**
    * @description getAllConfig

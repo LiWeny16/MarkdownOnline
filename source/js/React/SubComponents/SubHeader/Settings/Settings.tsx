@@ -60,23 +60,23 @@ export default function Settings(props: any) {
           sx={{
             background: theme === "light" ? "#F8FAFB" : "",
             padding: "1rem",
-            height: "55vh",
+            height: "58vh",
             width: "60vw",
           }}
         >
           <IconBreadcrumbs></IconBreadcrumbs>
-          {/* <Divider sx={{ my: 0.5 }} /> */}
+          <Divider sx={{ my: 0.5 }} />
 
           <Box
             sx={{
-              height: "45vh",
+              height: "48vh",
               display: "flex",
-              background: theme === "light" ? "white" : "",
+              background: theme === "light" ? "#F8FAFB" : "",
               padding: "5px",
               flexDirection: "row",
               borderRradius: "50px",
               // background: "#ffffff",
-              boxShadow: theme === "light" ? "20px 20px 60px #d9d9d9,-20px -20px 60px #ffffff": "" ,
+              // boxShadow: theme === "light" ? "20px 20px 60px #d9d9d9,-20px -20px 60px #ffffff": "" ,
               borderRadius: "5px",
             }}
           >

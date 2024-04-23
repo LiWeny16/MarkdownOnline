@@ -76,7 +76,7 @@ export function markdownParser() {
     .use(markdownItEmoji)
     .use(markdownItLatex)
     .use(MarkdownItIncrementalDOM, IncrementalDOM)
- 
+
   // .use(markdownItCodeCopy)
   // .use(figure)
 
@@ -175,7 +175,7 @@ export default function allInit(
   window._speechData = {
     processing: false,
     speechResult: "",
-    speech:null
+    speech: null,
   }
   // enObj.enMainConverter
   //   ? triggerConverterEvent()
@@ -193,7 +193,9 @@ const defaultConfig: IConfig = {
   themeState: "light",
   emojiPickerState: "off",
   contextMenuClickPosition: { posx: 20, posy: 20 },
+  settingsConfig: { basic: { sycScroll: true }, advanced: {} },
 }
+
 /**
  * @description 对设置进行初始化
  */
@@ -208,10 +210,17 @@ export function configInit(defaultConfig: IConfig) {
     if (opLocalStorage.getItem(key)) {
       // 判断内容是否是正常的设置情况
       if (
-        (key == "themeState" || key == "emojiPickerState") &&
+        (key == "themeState" ||
+          key == "emojiPickerState" ||
+          key == "settingsConfig") &&
         // @ts-ignore 这里他妈为什么会报错？？？？不合理啊？？？
         normalConfigArr.includes(opLocalStorage.getItem(key).toString())
       ) {
+        if (key == "settingsConfig") {
+          _defaultConfig[key as string] = JSON.parse(
+            opLocalStorage.getItem(key).toString()
+          )
+        }
         _defaultConfig[key as string] = opLocalStorage.getItem(key).toString()
       } else {
         // 否则进行设置存储初始化

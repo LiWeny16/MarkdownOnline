@@ -72,7 +72,7 @@ export default function SettingsRoute() {
         className="transparent-scrollbar"
         sx={{
           overflow: "scroll",
-          flex: "0 0 36%",
+          flex: "0 0 30%",
           minHeight: 20,
           overflowX: "hidden",
           borderRight:"solid rgba(0, 0, 0, 0.12)",

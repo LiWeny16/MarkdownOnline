@@ -2,7 +2,7 @@
 
 import operateLocalStorage from "@App/localStorage/localStorage"
 import { useConfig } from "@Func/Init/allInit"
-import { IConfig } from "@Root/js/React/Mobx/Config"
+import { IConfig, Settings } from "@Root/js/React/Mobx/Config"
 
 let opLocalStorage = new operateLocalStorage()
 
@@ -41,6 +41,8 @@ export function getEmojiPickerState() {
 
 //#endregion *********************EmojiPicker******************
 
+//#region
+
 export function setContextMenuClickPosition(
   pos: IConfig["contextMenuClickPosition"]
 ) {
@@ -53,3 +55,15 @@ export function setContextMenuClickPosition(
 export function getContextMenuClickPosition() {
   return useConfig().contextMenuClickPosition
 }
+//#endregion
+
+//#region
+export function changeSettings(settings: Settings) {
+  // console.log(useConfig().getAllConfig())
+  useConfig().settingsConfig = settings
+  opLocalStorage.setItem("settingsConfig", JSON.stringify(settings))
+}
+export function getSettings() {
+  return useConfig().settingsConfig
+}
+//#endregion
