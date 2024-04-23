@@ -21,7 +21,7 @@ export default async function prepareParser(originalMd: string) {
     }
   }
   /**
-   * @description 渲染mermaid
+   * @description 渲染mermaid, 等待更新，全量渲染性能消耗巨大
    */
   async function prepareMermaid(mermaidToken: { content: any }) {
     let src = mermaidToken.content

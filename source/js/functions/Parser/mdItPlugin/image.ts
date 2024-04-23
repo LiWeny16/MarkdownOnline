@@ -6,7 +6,12 @@ let imagePlugin = function (md: MarkdownIt) {
   md.renderer.rules.image = function (tokens, idx, options, env, self) {
     const token = tokens[idx]
     const grammar = "#"
-
+    // let line
+    // if (tokens[idx].map && tokens[idx].level === 0) {
+    //   line = tokens[idx].map![0]
+    //   // tokens[idx].attrJoin("class", "line")
+    //   tokens[idx].attrSet("data-line", String(line))
+    // }
     let src = token.attrs![token.attrIndex("src")][1]
     let alt = token.content
     // console.log(alt.split("#"));

@@ -3,7 +3,11 @@ import { editor } from "monaco-editor"
 import insertTextAtCursor, {
   insertTextMonacoAtCursor,
 } from "@App/text/insertTextAtCursor"
-import { fillInMemoryImg, readMemoryImg } from "@App/textMemory/memory"
+import {
+  fillInMemoryImg,
+  fillInMemoryImgs,
+  readMemoryImg,
+} from "@App/textMemory/memory"
 // import { editor } from "monaco-editor"
 
 /**
@@ -27,12 +31,17 @@ export function monacoPasteEvent(
   editor.getContainerDomNode().addEventListener(
     "paste",
     (event) => {
-      pic2base64(event).then((base64: any) => {
-        if (base64) {
+      handlePasteEvent(event).then((base64Arr: any) => {
+        if (base64Arr) {
+          let insertImgText: string = ""
           let timeStamp = new Date().getTime()
-          let insertImg = `![我是图片](/vf/${timeStamp})`
-          fillInMemoryImg(base64, timeStamp)
-          insertTextMonacoAtCursor(insertImg, true)
+          console.log(base64Arr)
+          for (let i = 0; i <= base64Arr.length - 1; i++) {
+            console.log(i)
+            insertImgText += `![我是图片](/vf/${timeStamp + i})`
+          }
+          fillInMemoryImgs(base64Arr, timeStamp)
+          insertTextMonacoAtCursor(insertImgText, true)
         }
       })
     },
@@ -40,9 +49,12 @@ export function monacoPasteEvent(
   )
 }
 
+/**
+ * @deprecated
+ */
 export default function pasteEvent() {
   document.getElementById("md-area")!.addEventListener("paste", (e) => {
-    pic2base64(e).then((base64: any) => {
+    handlePasteEvent(e).then((base64: any) => {
       if (base64) {
         // console.log(base64)
         let timeStamp = new Date().getTime()
@@ -54,29 +66,41 @@ export default function pasteEvent() {
   })
 }
 
-function pic2base64(e: ClipboardEvent) {
+function handlePasteEvent(e: ClipboardEvent) {
   return new Promise((resolve) => {
-    // 阻止粘贴
-    // 获取剪贴板信息
-    var clipboardData = e.clipboardData || window.clipboardData
-    var items = clipboardData.items
-    for (var i = 0; i < items.length; i++) {
-      var item = items[i]
+    // 获取剪贴板
+    let clipboardData = e.clipboardData || window.clipboardData
+    let items = clipboardData.items
+    const itemsLength = items.length
+    let imageBase64Arr: any = []
+    for (let i = 0; i < items.length; i++) {
+      let item = items[i]
       if (item.kind == "file") {
         e.preventDefault()
         e.stopPropagation()
-        var pasteFile = item.getAsFile()
-        var reader = new FileReader()
+        let pasteFile = item.getAsFile()
+        let reader = new FileReader()
         reader.onload = function (event) {
-          // 将结果显示在<textarea>中
-          resolve(event.target!.result)
-          //  console.log(event.target.result);
+          imageBase64Arr.push(event.target!.result)
+          // console.log(event.target!.result)
+          // Resolve 只会传最后一次结果
+          if (i === itemsLength - 1) {
+            resolve(imageBase64Arr)
+          }
         }
         // 将文件读取为BASE64格式字符串
-        reader.readAsDataURL(pasteFile)
-        break
+        const fileType = pasteFile.type.split("/")[1]
+        if (
+          fileType === "png" ||
+          fileType === "jpg" ||
+          fileType === "jpeg" ||
+          fileType === "webp" ||
+          fileType === "svg"
+        ) {
+          reader.readAsDataURL(pasteFile)
+        } 
       } else {
-        resolve("")
+        resolve([])
       }
     }
   })

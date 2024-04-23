@@ -131,6 +131,18 @@ export default observer(function MonacoEditor() {
         { open: "？", close: "？", notIn: ["string", "comment"] }, // 添加此行，将字符"？"添加到自动关闭字符对中
       ],
     })
+    monaco.languages.setMonarchTokensProvider('markdown', {
+      tokenizer: {
+          root: [
+              [/\b(function|return|var)\b/, "keyword"],
+              [/[{}]/, "delimiter"],
+              [/[a-z_$][\w$]*/, "identifier"],
+              [/"[^"]*"/, "string"],
+              [/\d+/, "number"],
+              [/[$$$$]/, "annotation"],
+          ]
+      }
+  });
   }
   function handleBeforeMount() {}
   /**

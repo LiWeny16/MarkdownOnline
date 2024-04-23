@@ -23,6 +23,8 @@ import Dialog from "@mui/material/Dialog"
 // import { Message } from "@arco-design/web-react"
 // import { Notification } from "@arco-design/web-react"
 import SettingsLeft from "./Subsettings/SettingsLeft"
+import SettingsRight from "./Subsettings/SettingsRight"
+import SettingsTop from "./Subsettings/SettingsTop"
 // import SettingsTop from "./Subsettings/SettingsTop"
 export default function Settings(props: any) {
   let mailOptionsRef = React.useRef<any>()
@@ -43,6 +45,7 @@ export default function Settings(props: any) {
         onClose={handleCloseAll}
       >
         <SettingsLeft></SettingsLeft>
+        <SettingsTop></SettingsTop>
       </Dialog>
       {/* **************************** */}
       <SettingsIcon />
