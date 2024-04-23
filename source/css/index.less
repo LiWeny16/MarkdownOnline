@@ -50,12 +50,29 @@ body {
   height: 100svh;
   overflow-x: hidden;
   overflow-y: auto;
-  
+
   // 隐藏全局滚动条
   &::-webkit-scrollbar {
     display: none;
   }
 }
+
+// Scroll Bar
+.transparent-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: transparent;
+}
+
+.transparent-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.transparent-scrollbar::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
 #root {
   width: 100svw;
   height: 100svh;
@@ -98,7 +115,7 @@ tr:hover {
   background: #fffdd6 !important;
 }
 
-  // @region*********************hljs
+// @region*********************hljs
 /**
 @my hljs
 */
@@ -214,7 +231,7 @@ article.markdown-body {
   // display: flex;
   // flex-flow: column;
   // align-items: center;
-  
+
   // 设置所有子节点的宽度, 以匹配之前的样式
   // 即最小100px宽度, 最大980px宽度
   & > * {
@@ -222,7 +239,7 @@ article.markdown-body {
     min-width: 200px;
     max-width: 980px;
   }
-  
+
   // 防止代码块的高度发生异常
   pre {
     overflow: unset;
@@ -245,4 +262,28 @@ article.markdown-body {
 .katex span.katex-mathml {
   // fix: `.katex .katex-mathml` not exist position config
   top: 0;
+}
+
+
+// shadows
+:root {
+  --shadow-color: 0deg 0% 59%;
+  --shadow-elevation-low:
+    0.2px 0.2px 0.3px hsl(var(--shadow-color) / 0.6),
+    0.4px 0.3px 0.5px -2px hsl(var(--shadow-color) / 0.46),
+    1px 0.7px 1.1px -3.9px hsl(var(--shadow-color) / 0.31);
+  --shadow-elevation-medium:
+    0.2px 0.2px 0.3px hsl(var(--shadow-color) / 0.63),
+    0.6px 0.4px 0.7px -1.3px hsl(var(--shadow-color) / 0.52),
+    1.8px 1.3px 2px -2.6px hsl(var(--shadow-color) / 0.4),
+    4.8px 3.6px 5.4px -3.9px hsl(var(--shadow-color) / 0.29);
+  --shadow-elevation-high:
+    0.2px 0.2px 0.3px hsl(var(--shadow-color) / 0.59),
+    0.8px 0.6px 0.9px -0.6px hsl(var(--shadow-color) / 0.54),
+    1.6px 1.2px 1.8px -1.1px hsl(var(--shadow-color) / 0.48),
+    3.2px 2.4px 3.6px -1.7px hsl(var(--shadow-color) / 0.43),
+    5.9px 4.4px 6.7px -2.3px hsl(var(--shadow-color) / 0.37),
+    10.2px 7.7px 11.6px -2.8px hsl(var(--shadow-color) / 0.32),
+    16.6px 12.4px 18.8px -3.4px hsl(var(--shadow-color) / 0.26),
+    25.5px 19.1px 28.9px -3.9px hsl(var(--shadow-color) / 0.21);
 }

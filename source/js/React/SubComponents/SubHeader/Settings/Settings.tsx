@@ -22,11 +22,17 @@ import Dialog from "@mui/material/Dialog"
 // import { getRenderHTML } from "@App/text/getMdText"
 // import { Message } from "@arco-design/web-react"
 // import { Notification } from "@arco-design/web-react"
+import { useTheme } from "@mui/material/styles"
 import SettingsLeft from "./Subsettings/SettingsLeft"
 import SettingsRight from "./Subsettings/SettingsRight"
-import SettingsTop from "./Subsettings/SettingsTop"
-// import SettingsTop from "./Subsettings/SettingsTop"
+import SettingsRoute from "./Subsettings/SettingsRoute"
+import { Box, Divider, ThemeProvider } from "@mui/material"
+import IconBreadcrumbs from "./Subsettings/SettingsBread"
+import SettingsBody from "./Subsettings/SettingsBody"
+import { getTheme } from "@App/config/change"
 export default function Settings(props: any) {
+  const palette = useTheme().palette
+  const theme = getTheme()
   let mailOptionsRef = React.useRef<any>()
   let [mailSharePanelState, setMailSharePanelState] = React.useState(false)
   let handleCloseAll = (e: React.MouseEvent<HTMLElement>) => {
@@ -36,47 +42,51 @@ export default function Settings(props: any) {
     props.onClick(e)
     props.closeAll()
   }
+  React.useEffect(() => {
+    // console.log(theme)
+  })
   return (
     <>
       <Dialog
-        fullWidth={true}
-        maxWidth={"sm"}
+        fullScreen={false}
+        maxWidth={false}
         open={props.open}
         onClose={handleCloseAll}
+        sx={{
+          height: "100vh",
+        }}
       >
-        <SettingsLeft></SettingsLeft>
-        <SettingsTop></SettingsTop>
+        <Box
+          sx={{
+            background: theme === "light" ? "#F8FAFB" : "",
+            padding: "1rem",
+            height: "55vh",
+            width: "60vw",
+          }}
+        >
+          <IconBreadcrumbs></IconBreadcrumbs>
+          {/* <Divider sx={{ my: 0.5 }} /> */}
+
+          <Box
+            sx={{
+              height: "45vh",
+              display: "flex",
+              background: theme === "light" ? "white" : "",
+              padding: "5px",
+              flexDirection: "row",
+              borderRradius: "50px",
+              // background: "#ffffff",
+              boxShadow: theme === "light" ? "20px 20px 60px #d9d9d9,-20px -20px 60px #ffffff": "" ,
+              borderRadius: "5px",
+            }}
+          >
+            <SettingsRoute></SettingsRoute>
+            <SettingsBody></SettingsBody>
+          </Box>
+        </Box>
       </Dialog>
-      {/* **************************** */}
       <SettingsIcon />
       设置
-      {/* <StyledMenu
-        style={{ width: "fitContent" }}
-        anchorOrigin={{
-          vertical: -5,
-          horizontal: 12,
-        }}
-        // id="demo-customized-menu"
-        // MenuListProps={{
-        //   "aria-labelledby": "demo-customized-button",
-        // }}
-        elevation={24}
-        anchorEl={props.anchorEl}
-        open={props.open}
-        onClick={props.onClick}
-      >
-        <MenuItem
-          onClick={(e) => {
-            // console.log(mailCss);
-            e.stopPropagation()
-            setMailSharePanelState(true)
-          }}
-          disableRipple
-        >
-          <AttachEmailIcon />
-          详细设置
-        </MenuItem>
-      </StyledMenu> */}
     </>
   )
 }
