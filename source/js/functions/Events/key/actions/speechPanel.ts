@@ -1,4 +1,8 @@
-import { changeEmojiPickerState, getEmojiPickerState } from "@App/config/change"
+import {
+  changeEmojiPickerState,
+  getEmojiPickerState,
+  getSettings,
+} from "@App/config/change"
 import { insertTextMonacoAtCursor } from "@App/text/insertTextAtCursor"
 import {
   replaceMonacoInRange,
@@ -14,7 +18,7 @@ export default function exeSpeechPanelAction(
 ) {
   //   const currentPosition = editor.getPosition()
   //   const selection = editor.getSelection()
-
+  const speechLanguage = getSettings().basic.speechLanguage ?? "zh-CN"
   let speechCallBack = (textLength: any) => {
     insertTextMonacoAtCursor(window._speechData.speechResult, true)
   }
@@ -26,8 +30,11 @@ export default function exeSpeechPanelAction(
     window._speechData.speechResult = ""
   } else {
     window._speechData.processing = true
-    let { recognition } = speechRecognition("zh-CN", true, speechCallBack)
+    let { recognition } = speechRecognition(
+      speechLanguage,
+      true,
+      speechCallBack
+    )
     window._speechData.speech = recognition
   }
-
 }

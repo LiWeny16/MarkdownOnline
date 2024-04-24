@@ -12,11 +12,13 @@ export type MousePosition = {
   posy: number
 }
 export type Settings = {
+  [key: string]: any // 添加索引签名
   basic: SettingsBasic
   advanced: SettingsAd
 }
 type SettingsBasic = {
   sycScroll: boolean
+  speechLanguage: "zh-CN" | "en-US" | "ja-JP" | "yue-Hant-HK"
 }
 type SettingsAd = {}
 export interface IConfig {

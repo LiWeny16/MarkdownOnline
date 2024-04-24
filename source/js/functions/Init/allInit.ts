@@ -193,41 +193,55 @@ const defaultConfig: IConfig = {
   themeState: "light",
   emojiPickerState: "off",
   contextMenuClickPosition: { posx: 20, posy: 20 },
-  settingsConfig: { basic: { sycScroll: true }, advanced: {} },
+  settingsConfig: {
+    basic: { sycScroll: true, speechLanguage: "zh-CN" },
+    advanced: {},
+  },
 }
 
 /**
  * @description 对设置进行初始化
+ * @param defaultConfig 默认设置
  */
 export function configInit(defaultConfig: IConfig) {
+  function storeDefaultSettings(key: string) {
+    if (typeof _defaultConfig[key] === "object") {
+      opLocalStorage.setItem(key, JSON.stringify(_defaultConfig[key]))
+    } else {
+      opLocalStorage.setItem(key, _defaultConfig[key])
+    }
+  }
   let _defaultConfig: IConfig = defaultConfig
   // 操作localStorage
   let opLocalStorage = new operateLocalStorage()
 
   // 循环遍历默认设置
-  for (let key in defaultConfig) {
-    // 如果默认设置的键值在lStorage有存
+  for (let key in _defaultConfig) {
+    // 如果默认设置的键值在LocalStorage有存
     if (opLocalStorage.getItem(key)) {
-      // 判断内容是否是正常的设置情况
+      // 判断内容是否是正常的设置内容,并且哪些内容需要记忆
       if (
-        (key == "themeState" ||
-          key == "emojiPickerState" ||
-          key == "settingsConfig") &&
+        key == "themeState" ||
+        key == "emojiPickerState" ||
+        key == "settingsConfig"
         // @ts-ignore 这里他妈为什么会报错？？？？不合理啊？？？
-        normalConfigArr.includes(opLocalStorage.getItem(key).toString())
+        // normalConfigArr.includes(opLocalStorage.getItem(key).toString())
       ) {
-        if (key == "settingsConfig") {
+        if (typeof _defaultConfig[key] === "object") {
           _defaultConfig[key as string] = JSON.parse(
             opLocalStorage.getItem(key).toString()
           )
+        } else {
+          _defaultConfig[key as string] = opLocalStorage.getItem(key).toString()
         }
-        _defaultConfig[key as string] = opLocalStorage.getItem(key).toString()
       } else {
         // 否则进行设置存储初始化
-        opLocalStorage.setItem(key, defaultConfig[key])
+        storeDefaultSettings(key)
       }
-    } else {
-      opLocalStorage.setItem(key, defaultConfig[key])
+    }
+    // 如果完全没存，则存储默认设置
+    else {
+      storeDefaultSettings(key)
     }
   }
   return _defaultConfig

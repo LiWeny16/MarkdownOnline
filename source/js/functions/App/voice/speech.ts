@@ -1,8 +1,4 @@
-let speechRecognition = (
-  lang: string,
-  startIt = true,
-  callBack: Function
-) => {
+let speechRecognition = (lang: string, startIt = true, callBack: Function) => {
   // 创建语音识别对象
   const recognition = new webkitSpeechRecognition() || new SpeechRecognition()
   let recognizing: Boolean = false
@@ -16,8 +12,7 @@ let speechRecognition = (
     recognition.start()
   }
   recognition.onstart = () => {
- recognizing = true // 修改 recognizing 的值
-    
+    recognizing = true // 修改 recognizing 的值
   }
   // 监听识别结果
   recognition.onresult = (event: any) => {
@@ -38,11 +33,11 @@ let speechRecognition = (
 
   // 监听结束事件
   recognition.onend = () => {
-    console.log(recognizing);
+    console.log(recognizing)
     // 如果未主动停止语音识别，则重新开始语音识别
     if (recognizing) {
       recognition.start()
-    } 
+    }
   }
 
   // 添加主动结束方法
@@ -54,4 +49,10 @@ let speechRecognition = (
   return { recognition, recognizing: recognizing }
 }
 
+const speechLanguageMap: any = {
+  1: ["zh-CN", "普通话"],
+  2: ["en-US", "English"],
+  3: ["ja-JP", "日本語"],
+}
+export { speechLanguageMap }
 export default speechRecognition

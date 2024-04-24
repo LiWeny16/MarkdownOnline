@@ -3,6 +3,7 @@
 import operateLocalStorage from "@App/localStorage/localStorage"
 import { useConfig } from "@Func/Init/allInit"
 import { IConfig, Settings } from "@Root/js/React/Mobx/Config"
+import { toJS } from "mobx"
 
 let opLocalStorage = new operateLocalStorage()
 
@@ -58,12 +59,46 @@ export function getContextMenuClickPosition() {
 //#endregion
 
 //#region
-export function changeSettings(settings: Settings) {
-  // console.log(useConfig().getAllConfig())
-  useConfig().settingsConfig = settings
-  opLocalStorage.setItem("settingsConfig", JSON.stringify(settings))
+/**
+ * @description 更新设置
+ */
+export function changeSettings(newSettings: {
+  basic?: Partial<Settings["basic"]>
+  advanced?: Partial<Settings["advanced"]>
+}) {
+  const currentSettings = getSettings()
+  const updatedSettings = updateSettingsConfig(currentSettings, newSettings)
+  useConfig().settingsConfig = updatedSettings
+  opLocalStorage.setItem("settingsConfig", JSON.stringify(updatedSettings))
 }
+/**
+ * @description 读取设置
+ */
 export function getSettings() {
-  return useConfig().settingsConfig
+  return toJS(useConfig().settingsConfig)
+}
+/**
+ * @description 合并新设置和旧设置
+ */
+function updateSettingsConfig(
+  currentSettings: Settings,
+  newSettings: {
+    [key: string]: any // 添加索引签名
+    basic?: Partial<Settings["basic"]>
+    advanced?: Partial<Settings["advanced"]>
+  }
+) {
+  // 遍历新设置的每个键
+  for (const key in newSettings) {
+    if (key in currentSettings) {
+      // 如果键存在于当前设置中，则更新子对象
+      Object.assign(currentSettings[key], newSettings[key])
+    } else {
+      // 如果键不存在，则将新键添加到当前设置
+      currentSettings[key] = newSettings[key]
+    }
+  }
+
+  return currentSettings
 }
 //#endregion

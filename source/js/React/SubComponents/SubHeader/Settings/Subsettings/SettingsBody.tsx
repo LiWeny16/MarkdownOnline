@@ -1,11 +1,18 @@
-import { changeTheme, getTheme } from "@App/config/change"
+import {
+  changeSettings,
+  changeTheme,
+  getSettings,
+  getTheme,
+} from "@App/config/change"
 import SwitchTheme from "@Root/js/React/Components/myCom/Switches/SwitchTheme"
 import SwitchIOS from "@Root/js/React/Components/myCom/Switches/SwitchIOS"
 import { LightTooltip } from "@Root/js/React/Components/myCom/Tooltips"
 import { Box, Divider, MenuItem, Select, Typography } from "@mui/material"
 import React from "react"
+import { observer } from "mobx-react"
+import { speechLanguageMap } from "@App/voice/speech"
 
-export default function SettingsBody() {
+export default observer(function SettingsBody() {
   const theme = getTheme()
   const settingsBodyContentBoxStyle = {
     transition: "0.3s",
@@ -41,10 +48,8 @@ export default function SettingsBody() {
     fontWeight: 500,
     mb: "5px",
   }
-  const [themeState, setThemeState] = React.useState<boolean>(
-    // getTheme() === "dark" ? true : false
-    false
-  )
+  const [themeState, setThemeState] = React.useState<boolean>(false)
+
   function handleOnChangeThemeSwitch(e: any, b: any) {
     if (b) {
       changeTheme("dark")
@@ -55,7 +60,17 @@ export default function SettingsBody() {
     }
   }
   function handleOnChangeSyncScrollSwitch() {}
-  function handleSpeechLanguage() {}
+  function handleSpeechLanguage(e: any) {
+    // const speechLanguageMap: any = {
+    //   1: "zh-CN",
+    //   2: "en-US",
+    // }
+    // console.log(e.target.value, getSettings().basic)
+    changeSettings({
+      basic: { speechLanguage: e.target.value },
+    })
+    console.log(getSettings().basic.speechLanguage)
+  }
   /**
    * @description 初始化设置
    */
@@ -136,19 +151,25 @@ export default function SettingsBody() {
           </Typography>
           <Select
             // label={"语言"}
-            defaultValue={"1"}
+            defaultValue={getSettings().basic.speechLanguage ?? "zh-CN"}
             defaultChecked={true}
-            // defaultChecked={true}
             // value={clearOptions}
             fullWidth
             size="small"
             onChange={handleSpeechLanguage}
           >
-            <MenuItem value={"1"}> 中文</MenuItem>
-            <MenuItem value={"2"}>English</MenuItem>
+            <MenuItem value={speechLanguageMap["1"][0]}>
+              {speechLanguageMap["1"][1]}
+            </MenuItem>
+            <MenuItem value={speechLanguageMap["2"][0]}>
+              {speechLanguageMap["2"][1]}
+            </MenuItem>
+            <MenuItem value={speechLanguageMap["3"][0]}>
+              {speechLanguageMap["3"][1]}
+            </MenuItem>
           </Select>
         </Box>
       </Box>
     </>
   )
-}
+})
