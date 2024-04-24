@@ -57,6 +57,7 @@ const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
 
 const CustomTreeItem = React.forwardRef(
   (props: TreeItemProps, ref: React.Ref<HTMLLIElement>) => (
+    // @ts-ignore
     <StyledTreeItem
       {...props}
       slots={{ groupTransition: TransitionComponent, ...props.slots }}
@@ -75,12 +76,12 @@ export default function SettingsRoute() {
           flex: "0 0 30%",
           minHeight: 20,
           overflowX: "hidden",
-          borderRight:"solid rgba(0, 0, 0, 0.12)",
+          borderRight: "solid rgba(0, 0, 0, 0.12)",
         }}
       >
         <SimpleTreeView
           aria-label="customized"
-          defaultExpandedItems={["1"]}
+          defaultExpandedItems={["1_x"]}
           slots={{
             // expandIcon: AddBoxIcon,
             // collapseIcon: IndeterminateCheckBoxIcon,
@@ -98,35 +99,52 @@ export default function SettingsRoute() {
               // collapseIcon: IndeterminateCheckBoxIcon,
               endIcon: EditIcon,
             }}
-            itemId="1"
+            onClick={() => {
+              let targetElement = document.getElementById(
+                "settings_1_x"
+              ) as HTMLElement
+              targetElement.scrollIntoView()
+            }}
+            itemId="1_x"
             label="基础设置"
           >
             <CustomTreeItem
               slots={{
                 endIcon: ContrastIcon,
               }}
-              itemId="2"
+              onClick={() => {
+                let targetElement = document.getElementById(
+                  "settings_1_1"
+                ) as HTMLElement
+                targetElement.scrollIntoView()
+              }}
+              itemId="1_2"
               label="主题设置"
             />
             <CustomTreeItem
               slots={{
                 endIcon: EditIcon,
               }}
-              itemId="3"
+              onClick={() => {
+                let targetElement = document.getElementById(
+                  "settings_1_2"
+                ) as HTMLElement
+                targetElement.scrollIntoView()
+              }}
+              itemId="1_3"
               label="编辑器设置"
-              sx={{ fontSize: "0.5rem" }}
             />
-            <CustomTreeItem itemId="5" label="Mermaid设置" />
           </CustomTreeItem>
           {/* <Divider sx={{ my: 0.5 }} /> */}
-          <CustomTreeItem itemId="6" label="高级设置">
-            <CustomTreeItem itemId="7" label="导出设置" />
+          <CustomTreeItem itemId="2_x" label="高级设置">
+            <CustomTreeItem itemId="2_2" label="导出设置" />
+            <CustomTreeItem itemId="2_3" label="Mermaid设置" />
           </CustomTreeItem>
-          <CustomTreeItem itemId="8" label="高级设置">
-          <CustomTreeItem itemId="10" label="导出设置" />
-          <CustomTreeItem itemId="11" label="导出设置" />
-          <CustomTreeItem itemId="12" label="导出设置" />
-          </CustomTreeItem>
+          {/* <CustomTreeItem itemId="8" label="高级设置">
+            <CustomTreeItem itemId="10" label="导出设置" />
+            <CustomTreeItem itemId="11" label="导出设置" />
+            <CustomTreeItem itemId="12" label="导出设置" />
+          </CustomTreeItem> */}
         </SimpleTreeView>
       </Box>
     </>

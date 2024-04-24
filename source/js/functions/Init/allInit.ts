@@ -150,28 +150,28 @@ export default function allInit(
   /**@description Input Area Init*/
   blankTextInit().then(() => {
     mdConverter()
-  }) //初始化输入区域
-  Notification.success({
-    title: "已更新到最新版本",
-    content: `当前版本:v2.0.1`,
-    position: "bottomRight",
-  })
-  kit.sleep(250).then(() => {
-    Notification.info({
-      title: "版本新增特性",
-      content: `1. 修复溢出滚动条bug 2.新增语音识别`,
-      position: "bottomRight",
+    kit.sleep(100).then(() => {
+      Notification.success({
+        title: "已更新到最新版本",
+        content: `当前版本:v2.0.1`,
+        position: "bottomRight",
+      })
+      kit.sleep(1000).then(() => {
+        Notification.info({
+          title: "版本新增特性",
+          content: `1. 修复溢出滚动条bug 2.新增语音识别`,
+          position: "bottomRight",
+        })
+      })
     })
-  })
-
-  /***@description All Events */
-  preViewClickEvent(editor, monaco, window.deco)
-  // 禁止滚动
+  }) //初始化输入区域
 
   /**
    * @description 全局变量初始化
    */
   window.deco = editor.createDecorationsCollection()
+  preViewClickEvent(editor, monaco, window.deco)
+
   window._speechData = {
     processing: false,
     speechResult: "",
@@ -194,7 +194,7 @@ const defaultConfig: IConfig = {
   emojiPickerState: "off",
   contextMenuClickPosition: { posx: 20, posy: 20 },
   settingsConfig: {
-    basic: { sycScroll: true, speechLanguage: "zh-CN" },
+    basic: { syncScroll: true, speechLanguage: "zh-CN" },
     advanced: {},
   },
 }
@@ -227,12 +227,18 @@ export function configInit(defaultConfig: IConfig) {
         // @ts-ignore 这里他妈为什么会报错？？？？不合理啊？？？
         // normalConfigArr.includes(opLocalStorage.getItem(key).toString())
       ) {
-        if (typeof _defaultConfig[key] === "object") {
-          _defaultConfig[key as string] = JSON.parse(
-            opLocalStorage.getItem(key).toString()
-          )
-        } else {
-          _defaultConfig[key as string] = opLocalStorage.getItem(key).toString()
+        try {
+          if (typeof _defaultConfig[key] === "object") {
+            _defaultConfig[key as string] = JSON.parse(
+              opLocalStorage.getItem(key).toString()
+            )
+          } else {
+            _defaultConfig[key as string] = opLocalStorage
+              .getItem(key)
+              .toString()
+          }
+        } catch (err) {
+          storeDefaultSettings(key)
         }
       } else {
         // 否则进行设置存储初始化

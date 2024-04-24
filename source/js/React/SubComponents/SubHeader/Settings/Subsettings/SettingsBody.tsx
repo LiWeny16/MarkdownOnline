@@ -21,7 +21,8 @@ export default observer(function SettingsBody() {
     borderRadius: "3px",
     display: "flex",
     flexDirection: "column",
-    mt: "20px",
+    mt: "10px",
+    mb: "5px",
     ml: "0px",
     pl: "25px",
     "&::before": {
@@ -59,17 +60,23 @@ export default observer(function SettingsBody() {
       setThemeState(e.target.checked)
     }
   }
-  function handleOnChangeSyncScrollSwitch() {}
+  function handleOnChangeSyncScrollSwitch(_e: any, b: any) {
+    if (b) {
+      // 开
+      changeSettings({
+        basic: { syncScroll: true },
+      })
+    } else {
+      changeSettings({
+        basic: { syncScroll: false },
+      })
+    }
+  }
   function handleSpeechLanguage(e: any) {
-    // const speechLanguageMap: any = {
-    //   1: "zh-CN",
-    //   2: "en-US",
-    // }
-    // console.log(e.target.value, getSettings().basic)
     changeSettings({
       basic: { speechLanguage: e.target.value },
     })
-    console.log(getSettings().basic.speechLanguage)
+    // console.log(getSettings().basic.speechLanguage)
   }
   /**
    * @description 初始化设置
@@ -91,13 +98,18 @@ export default observer(function SettingsBody() {
           overflowY: "scroll",
         }}
       >
-        <Typography sx={{ fontSize: "30px", fontWeight: "700" }}>
+        {/* *************************基础设置****************************** */}
+        <Typography
+          id="settings_1_x"
+          sx={{ fontSize: "30px", fontWeight: "700" }}
+        >
           基础设置
         </Typography>
         <Divider></Divider>
         <Box sx={settingsBodyContentBoxStyle}>
           {/* <LightTooltip title="编辑器主题" placement="bottom"> */}
           <Typography
+            id="settings_1_1"
             sx={{
               fontSize: "0.89rem",
               fontWeight: 500,
@@ -110,8 +122,6 @@ export default observer(function SettingsBody() {
           </Typography>
           <SwitchTheme
             checked={themeState}
-            // defaultChecked={getTheme() === "dark" ? true : false}
-            // checked={}
             size="small"
             inputProps={{ "aria-label": "controlled" }}
             onChange={handleOnChangeThemeSwitch}
@@ -120,6 +130,7 @@ export default observer(function SettingsBody() {
         <Box sx={settingsBodyContentBoxStyle}>
           {/* <LightTooltip title="编辑器主题" placement="bottom"> */}
           <Typography
+            id="settings_1_2"
             sx={{
               fontSize: "0.89rem",
               fontWeight: 500,
@@ -128,11 +139,12 @@ export default observer(function SettingsBody() {
             Synchronous Scrolling
           </Typography>
           <Typography sx={ContentDescriptionTextStyle}>
-            同步滚动左边编辑区和预览区域
+            同步滚动左边编辑区和预览区域。(开发中)
           </Typography>
           <SwitchIOS
-            checked={themeState}
+            checked={getSettings().basic.syncScroll}
             size="small"
+            // value={getSettings().basic.syncScroll}
             inputProps={{ "aria-label": "controlled" }}
             onChange={handleOnChangeSyncScrollSwitch}
           ></SwitchIOS>
@@ -151,7 +163,7 @@ export default observer(function SettingsBody() {
           </Typography>
           <Select
             // label={"语言"}
-            defaultValue={getSettings().basic.speechLanguage ?? "zh-CN"}
+            value={getSettings().basic.speechLanguage ?? "zh-CN"}
             defaultChecked={true}
             // value={clearOptions}
             fullWidth
@@ -168,6 +180,62 @@ export default observer(function SettingsBody() {
               {speechLanguageMap["3"][1]}
             </MenuItem>
           </Select>
+        </Box>
+        {/* *************************高级设置****************************** */}
+        <Typography
+          id="settings_1_x"
+          sx={{ mt: "20px", fontSize: "30px", fontWeight: "700" }}
+        >
+          高级设置（施工中）
+        </Typography>
+        <Divider></Divider>
+
+        <Box sx={settingsBodyContentBoxStyle}>
+          {/* <LightTooltip title="编辑器主题" placement="bottom"> */}
+          <Typography
+            id="settings_1_1"
+            sx={{
+              fontSize: "0.89rem",
+              fontWeight: 500,
+            }}
+          >
+            Export Settings
+          </Typography>
+          <Typography sx={ContentDescriptionTextStyle}>
+            更改导出设置(施工中)
+          </Typography>
+          <SwitchIOS
+            disabled
+            // defaultValue={1}
+            // checked={getSettings().basic.syncScroll}
+            size="small"
+            inputProps={{ "aria-label": "controlled" }}
+            // onChange={handleOnChangeSyncScrollSwitch}
+          ></SwitchIOS>
+        </Box>
+
+        <Box sx={settingsBodyContentBoxStyle}>
+          {/* <LightTooltip title="编辑器主题" placement="bottom"> */}
+          <Typography
+            id="settings_1_1"
+            sx={{
+              fontSize: "0.89rem",
+              fontWeight: 500,
+            }}
+          >
+            Mermaid Configs
+          </Typography>
+          <Typography sx={ContentDescriptionTextStyle}>
+            更改Mermaid流程图的设置(施工中)
+          </Typography>
+          <SwitchIOS
+            disabled
+            // defaultValue={1}
+            // checked={getSettings().basic.syncScroll}
+            size="small"
+            inputProps={{ "aria-label": "controlled" }}
+            // onChange={handleOnChangeSyncScrollSwitch}
+          ></SwitchIOS>
         </Box>
       </Box>
     </>

@@ -23,8 +23,7 @@ import Dialog from "@mui/material/Dialog"
 // import { Message } from "@arco-design/web-react"
 // import { Notification } from "@arco-design/web-react"
 import { useTheme } from "@mui/material/styles"
-import SettingsLeft from "./Subsettings/SettingsLeft"
-import SettingsRight from "./Subsettings/SettingsRight"
+// import SettingsRight from "./Subsettings/SettingsRight"
 import SettingsRoute from "./Subsettings/SettingsRoute"
 import { Box, Divider, ThemeProvider } from "@mui/material"
 import IconBreadcrumbs from "./Subsettings/SettingsBread"
@@ -35,6 +34,7 @@ export default function Settings(props: any) {
   const theme = getTheme()
   let mailOptionsRef = React.useRef<any>()
   let [mailSharePanelState, setMailSharePanelState] = React.useState(false)
+  let [settingsRouter, setSettingsRouter] = React.useState("")
   let handleCloseAll = (e: React.MouseEvent<HTMLElement>) => {
     setMailSharePanelState(() => {
       return false

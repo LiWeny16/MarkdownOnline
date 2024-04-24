@@ -17,7 +17,7 @@ export type Settings = {
   advanced: SettingsAd
 }
 type SettingsBasic = {
-  sycScroll: boolean
+  syncScroll: boolean
   speechLanguage: "zh-CN" | "en-US" | "ja-JP" | "yue-Hant-HK"
 }
 type SettingsAd = {}
