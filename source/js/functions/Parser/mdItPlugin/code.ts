@@ -1,3 +1,4 @@
+import { getTheme } from "@App/config/change"
 import { ButtonComponent } from "@Root/js/React/Components/Mui/progressButton"
 import hljs from "@cdn-hljs"
 import MarkdownIt from "markdown-it/lib"
@@ -6,7 +7,6 @@ import { RenderRule } from "markdown-it/lib/renderer"
 const copyButtonStyle = `position: relative;
 top: 31px;
 left: 88%;`
-
 
 // function copyText(text: string) {
 //   navigator.clipboard
@@ -45,7 +45,7 @@ let codePlugin = function (md: MarkdownIt) {
         </div>`
       }
     } else if (hljs.getLanguage(language)) {
-      return `<pre data-line="${line}"><code class="language-${language}">${content}</code></pre>`
+      return `<pre data-line="${line}"><code class="language-${language} ${getTheme() === "light" ? "" : "hljs-dark"}">${content}</code></pre>`
     } else {
       return `<div class="code-container" data-line="${line}">
       <pre><code class="language-plaintext">${content}</code></pre>
@@ -58,4 +58,3 @@ let codePlugin = function (md: MarkdownIt) {
 
 export { codePlugin }
 // <div id="markdown-it-code-button">${ButtonComponent}</div>
-

@@ -1,19 +1,14 @@
 @import url("./print.less") print;
 @import url("./header.less");
 @import url("./response.less");
-// @import url("./githubMdCss.min.css");
-@import url("./clueParser.css");
+// @import url("./clueParser.css");
 @import url("./aboutBox.css");
 @import url("./body.less");
-// @import url("https://unpkg.com/@highlightjs/cdn-assets@11.6.0/styles/default.min.css");
+
+@import url("https://jsd.onmicrosoft.cn/npm/clue-parser@1.0.4/index.min.css");
+@import url("https://jsd.onmicrosoft.cn/npm/clue-parser@1.0.3/src/githubMd.min.css");
 @import url("https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.css");
 @import url("https://jsd.onmicrosoft.cn/npm/@arco-design/web-react@2.58.3/dist/css/arco.min.css");
-@import url("https://jsd.onmicrosoft.cn/npm/github-markdown-css/github-markdown.min.css");
-// @import url("https://jsd.onmicrosoft.cn/npm/@highlightjs/cdn-assets@11.7.0/styles/default.min.css");
-
-// @import url("https://jsd.onmicrosoft.cn/npm/@arco-design/web-react@2.58.3/dist/css/arco.min.css");
-// @import url("https://jsd.onmicrosoft.cn/npm/github-markdown-css/github-markdown.min.css");
-// @import url("https://jsd.onmicrosoft.cn/npm/@highlightjs/cdn-assets@11.7.0/styles/default.min.css");
 
 .draggable-box {
   width: fit-content;
@@ -119,7 +114,11 @@ tr:hover {
 /**
 @my hljs
 */
+
 .hljs {
+  pre code.hljs {
+    padding: 5px !important;
+  }
   .hljs-section,
   .hljs-title {
     color: #000000 !important;
@@ -201,10 +200,6 @@ tr:hover {
   /*  */
 }
 
-pre code.hljs {
-  padding: 5px !important;
-}
-
 // @endregion******************hljs
 
 .PhotoView-Slider__Backdrop {
@@ -264,3 +259,9 @@ article.markdown-body {
   top: 0;
 }
 
+// markdown 补丁
+.markdown-body {
+  pre {
+    padding: 14px !important;
+  }
+}

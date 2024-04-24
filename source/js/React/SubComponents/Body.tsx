@@ -34,7 +34,13 @@ export default observer(function Body() {
         >
           <MdArea />
           <article id="view-area-hidden" className="hidden-pre"></article>
-          <article id="view-area" className={"markdown-body"}></article>
+          <article
+            id="view-area"
+            className={
+              "markdown-body " +
+              `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}`
+            }
+          ></article>
         </div>
         <div id="aboutBox">
           <div id="markdownParser">

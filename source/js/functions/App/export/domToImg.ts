@@ -1,4 +1,5 @@
 // import { kit } from "@Root/js/index"
+import { getTheme } from "@App/config/change"
 import kit from "@cdn-kit"
 
 import html2canvas from "html2canvas"
@@ -11,7 +12,7 @@ export default function exportAsImage(
 ) {
   let printString = document.getElementById("view-area")!.innerHTML
   // console.log(printString)
-  window.document.body.innerHTML = `<div id="exportBox" style="width:64vw" class="markdown-body">${printString}</div>`
+  window.document.body.innerHTML = `<div id="exportBox" style="width:64vw" class="markdown-body markdown-body-${getTheme() === "light" ? "light" : "dark"}">${printString}</div>`
   kit.sleep(250).then(() => {
     // 使用 html2canvas 将 HTML 元素渲染为图像
     html2canvas(document.getElementById("exportBox")!, {
