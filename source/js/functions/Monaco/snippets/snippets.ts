@@ -39,7 +39,7 @@ import {
   symbolsAndPunctuation0,
   debugging0,
   envs,
-} from "./latexRules"
+} from "@cdn-latex-map"
 
 // import emojilib from "@cdn-emojilib"
 export function monacoSnippets(

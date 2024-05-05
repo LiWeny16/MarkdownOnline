@@ -31,45 +31,46 @@
 //   const getMdText: (id = "md-area") => string
 //   export default getMdText
 // }
-declare module "@App/db.js" {
-  /**
-   * 打开数据库
-   * @param {object} dbName 数据库的名字
-   * @param {string} storeName 仓库名称
-   * @param {string} version 数据库的版本
-   * @return {object} 该函数会返回一个数据库实例
-   */
-  const openDB: (name: string, version?: number) => Promise<any>
-  const getDataByIndex: any
-  const cursorGetDataByIndex: any
-  const addData: any
-  const getDataByKey: any
-  /**
-   * 通过游标读取数据
-   * @param {object} db 数据库实例
-   * @param {string} storeName 仓库名称
-   * @returns {Array} 读取的列表
-   */
-  const cursorGetData: any
-  /**
-   * 更新数据
-   * @param {db} db 数据库实例
-   * @param {string} storeName 仓库名称
-   * @param {object} data 数据
-   */
-  const updateDB: (db: Object, storeName: string, data: Object) => void
-  const deleteDBAll :any
-  export {
-    openDB,
-    getDataByIndex,
-    cursorGetDataByIndex,
-    addData,
-    getDataByKey,
-    cursorGetData,
-    updateDB,
-    deleteDBAll
-  }
-}
+
+// declare module "@App/db.js" {
+//   /**
+//    * 打开数据库
+//    * @param {object} dbName 数据库的名字
+//    * @param {string} storeName 仓库名称
+//    * @param {string} version 数据库的版本
+//    * @return {object} 该函数会返回一个数据库实例
+//    */
+//   const openDB: (name: string, version?: number) => Promise<any>
+//   const getDataByIndex: any
+//   const cursorGetDataByIndex: any
+//   const addData: any
+//   const getDataByKey: any
+//   /**
+//    * 通过游标读取数据
+//    * @param {object} db 数据库实例
+//    * @param {string} storeName 仓库名称
+//    * @returns {Array} 读取的列表
+//    */
+//   const cursorGetData: any
+//   /**
+//    * 更新数据
+//    * @param {db} db 数据库实例
+//    * @param {string} storeName 仓库名称
+//    * @param {object} data 数据
+//    */
+//   const updateDB: (db: Object, storeName: string, data: Object) => void
+//   const deleteDBAll :any
+//   export {
+//     openDB,
+//     getDataByIndex,
+//     cursorGetDataByIndex,
+//     addData,
+//     getDataByKey,
+//     cursorGetData,
+//     updateDB,
+//     deleteDBAll
+//   }
+// }
 
 declare var webkitSpeechRecognition: any;  
 declare var SpeechRecognition: any;  

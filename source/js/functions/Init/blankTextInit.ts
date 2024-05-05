@@ -1,12 +1,3 @@
-import {
-  openDB,
-  getDataByIndex,
-  cursorGetDataByIndex,
-  addData,
-  getDataByKey,
-  cursorGetData,
-  updateDB
-} from "@App/db.js"
 import welcomeText from "@Asset/welcome.md?raw"
 // import getMdText from "@App/text/getMdText"
 import { fillInMemoryText, readMemoryText } from "@App/textMemory/memory"

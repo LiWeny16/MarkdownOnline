@@ -6,7 +6,7 @@ import {
   getDataByKey,
   cursorGetData,
   updateDB,
-} from "@App/db.js"
+} from "@App/db"
 // import getMdText from "@App/text/getMdText"
 
 export function fillInMemoryText(md: MD) {
