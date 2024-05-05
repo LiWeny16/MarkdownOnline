@@ -4,7 +4,7 @@ import Collapse from "@mui/material/Collapse";
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { TreeItem, treeItemClasses, } from "@mui/x-tree-view/TreeItem";
-import { useSpring, animated } from "@react-spring/web";
+import { useSpring } from "@react-spring/web";
 // import AddBoxIcon from "@mui/icons-material/AddBox"
 // import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox"
 import ContrastIcon from "@mui/icons-material/Contrast";
@@ -18,7 +18,12 @@ function TransitionComponent(props) {
             transform: `translate3d(${props.in ? 0 : 20}px,0,0)`,
         },
     });
-    return (_jsx(animated.div, { style: style, children: _jsx(Collapse, { ...props }) }));
+    return (
+    // 这里太大了，不用了！
+    // <animated.div style={style}>
+    _jsx(Collapse, { ...props })
+    // </animated.div>
+    );
 }
 const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
     color: theme.palette.mode === "light"

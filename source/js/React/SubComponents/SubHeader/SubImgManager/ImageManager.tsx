@@ -109,12 +109,12 @@ const TemporaryDrawer = observer((props: any) => {
           image.hidden()
         }}
       >
-        <div style={{ height: "60vh" }}>
+        <div style={{ height: "60svh" }}>
           <div>
             <ThemeProvider theme={theme}>
               <MyBox>
                 <LR space={[90]}>
-                  <MyBox min={1} move={{ x: "5vw" }}>
+                  <MyBox min={1} move={{ x: "5svw" }}>
                     <p>图片管理器</p>
                     <Tooltip
                       title={
@@ -145,7 +145,7 @@ const TemporaryDrawer = observer((props: any) => {
             </ThemeProvider>
           </div>
 
-          <Divider style={{ marginBottom: "1.3vh" }} />
+          <Divider style={{ marginBottom: "1.3svh" }} />
           <Grid
             container
             rowSpacing={5}

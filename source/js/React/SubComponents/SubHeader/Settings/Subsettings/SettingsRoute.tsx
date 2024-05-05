@@ -24,9 +24,10 @@ function TransitionComponent(props: TransitionProps) {
   })
 
   return (
-    <animated.div style={style}>
-      <Collapse {...props} />
-    </animated.div>
+    // 这里太大了，不用了！
+    // <animated.div style={style}>
+    <Collapse {...props} />
+    // </animated.div>
   )
 }
 const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
