@@ -13,7 +13,24 @@ export default defineConfig({
         // 控制输出
         // 在rollup里面, hash代表将你的文件名和文件内容进行组合计算得来的结果
         assetFileNames: "[hash].[name].[ext]",
-        // external: ["react", "react-dom"],
+        manualChunks(id) {
+          if (id.includes("style.css")) {
+            // 需要单独分割那些资源 就写判断逻辑就行
+            return "src/style.css"
+          }
+          if (id.includes("HelloWorld.vue")) {
+            // 单独分割hello world.vue文件
+            return "src/components/HelloWorld.vue"
+          }
+          // // 最小化拆分包
+          if (id.includes("node_modules")) {
+            return id
+              .toString()
+              .split("node_modules/")[1]
+              .split("/")[0]
+              .toString()
+          }
+        },
       },
     },
     assetsInlineLimit: 4096000, // 4000kb  超过会以base64字符串显示
@@ -24,9 +41,12 @@ export default defineConfig({
     alias: {
       // "react":"https://esm.sh/react",
       // "uslug":"https://cdn.jsdelivr.net/npm/uslug@1.0.4/+esm",
-      "@cdn-Readme":"https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@V2.1.1/README.md",
-      "@cdn-indexedDb-lib":"https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@V2.1.1/@cdn/functions/App/db.min.js",
-      "@cdn-latex-map":"https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@main/@cdn/functions/Monaco/snippets/latexRules.min.js",
+      "@cdn-Readme":
+        "https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@V2.1.1/README.md",
+      "@cdn-indexedDb-lib":
+        "https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@V2.1.1/@cdn/functions/App/db.min.js",
+      "@cdn-latex-map":
+        "https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@main/@cdn/functions/Monaco/snippets/latexRules.min.js",
       "markdown-it-emoji":
         "https://jsd.onmicrosoft.cn/npm/markdown-it-emoji@3.0.0/+esm",
       "markdown-it-footnote":
