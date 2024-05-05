@@ -174,6 +174,10 @@ declare module "@cdn-indexedDb-lib" {
   }
 }
 
+declare module "@cdn-emoji-data" {
+  const e: any
+  export default e
+}
 declare module "@Root/js/functions/fastKey" {
   const aboutBox: any
   export default aboutBox

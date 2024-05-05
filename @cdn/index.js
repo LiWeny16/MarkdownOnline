@@ -21,7 +21,6 @@ import prepareParser from "@Func/Parser/prepareParser/prepare";
 // window.mermaid = mermaid
 /**
  * @description 拓展使能配置
- * @type Boolean
  */
 export const enObj = {
     //基础事件

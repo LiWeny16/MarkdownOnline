@@ -3,7 +3,6 @@ import "@cdn-katex";
 import "../css/index.less";
 /**
  * @description 拓展使能配置
- * @type Boolean
  */
 export declare const enObj: {
     enMainConverter: boolean;

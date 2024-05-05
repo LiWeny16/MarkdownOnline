@@ -1,15 +1,21 @@
 import { defineConfig } from "vite"
 import viteCompression from "vite-plugin-compression"
 import react from "@vitejs/plugin-react"
-
+import cdn from "vite-plugin-cdn-import"
+import { viteExternalsPlugin } from "vite-plugin-externals"
 import { resolve } from "path"
 export default defineConfig({
   base: "./",
   build: {
     rollupOptions: {
       // 配置rollup的一些构建策略
-      // external:["react","react-dom"],
+      external: ["react", "react-dom"],
       output: {
+        globals: {
+          react: "React",
+          "react-dom": "ReactDOM",
+          // "@mui/material": "MaterialUI",
+        },
         // 控制输出
         // 在rollup里面, hash代表将你的文件名和文件内容进行组合计算得来的结果
         assetFileNames: "[hash].[name].[ext]",
@@ -17,10 +23,6 @@ export default defineConfig({
           if (id.includes("style.css")) {
             // 需要单独分割那些资源 就写判断逻辑就行
             return "src/style.css"
-          }
-          if (id.includes("HelloWorld.vue")) {
-            // 单独分割hello world.vue文件
-            return "src/components/HelloWorld.vue"
           }
           // // 最小化拆分包
           if (id.includes("node_modules")) {
@@ -37,10 +39,17 @@ export default defineConfig({
     outDir: "docs", // 输出名称
     assetsDir: "static", // 静态资源目录
   },
+  optimizeDeps: {
+    include: ["react", "react-dom", "MaterialUI"],
+  },
   resolve: {
     alias: {
       // "react":"https://esm.sh/react",
-      // "uslug":"https://cdn.jsdelivr.net/npm/uslug@1.0.4/+esm",
+      // "uslug":"https://jsd.onmicrosoft.cn/npm/uslug@1.0.4/+esm",
+      "@arco-design/web-react":
+        "https://jsd.onmicrosoft.cn/npm/@arco-design/web-react@2.62.0/+esm",
+      "@cdn-emoji-data":
+        "https://jsd.onmicrosoft.cn/npm/@emoji-mart/data@1.2.1/+esm",
       "@cdn-Readme":
         "https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@V2.1.1/README.md",
       "@cdn-indexedDb-lib":
@@ -57,8 +66,6 @@ export default defineConfig({
         "https://jsd.onmicrosoft.cn/npm/incremental-dom@0.7.0/+esm",
       "markdown-it-github-toc":
         "https://jsd.onmicrosoft.cn/npm/markdown-it-github-toc@3.2.4/src/index.js/+esm",
-      // "markdown-it":"https://jsd.onmicrosoft.cn/npm/markdown-it@14.0.0/+esm",
-      // "@gsap/react":"https://cdn.jsdelivr.net/npm/@gsap/react@2.1.0/+esm",
       "@emoji-mart/data":
         "https://jsd.onmicrosoft.cn/npm/@emoji-mart/data@1.1.2/+esm",
       gsap: "https://jsd.onmicrosoft.cn/npm/gsap@3.12.5/+esm",
@@ -102,23 +109,13 @@ export default defineConfig({
 
   plugins: [
     viteCompression({
-      threshold: 256000, // 对大于 256kb 的文件进行压缩
+      threshold: 64000, // 对大于 32kb 的文件进行压缩
     }),
-    [react()],
-    // [vitePluginReactCdn()]
-    // importToCDN({
-    //   modules: [
-    //     {
-    //       name: "react",
-    //       var: "React",
-    //       path: `https://jsd.onmicrosoft.cn/npm/react@18.2.0/umd/react.production.min.js`,
-    //     },
-    //     // {
-    //     //   name: "react-dom",
-    //     //   var: "ReactDOM",
-    //     //   path: `umd/react-dom.production.min.js`,
-    //     // },
-    //   ],
-    // }),
+    [react({ jsxRuntime: "classic" })],
+    viteExternalsPlugin({
+      react: "React",
+      "react-dom": "ReactDOM",
+      // "@mui/material": "MaterialUI",
+    }),
   ],
 })
