@@ -30,7 +30,6 @@
     "@mui/icons-material": "^5.14.3",
     "@mui/material": "^5.14.5",
     "@mui/x-tree-view": "^7.3.0",
-    "@react-spring/web": "^9.7.3",
     "axios": "^1.6.5",
     "bigonion-kit": "0.12.3",
     "emoji-mart": "^5.5.2",
