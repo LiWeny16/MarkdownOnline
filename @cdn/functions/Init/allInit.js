@@ -121,13 +121,13 @@ export default function allInit(editor = window.editor, monaco = window.monaco) 
     /**@description Input Area Init*/
     blankTextInit().then(() => {
         mdConverter();
-        kit.sleep(100).then(() => {
+        kit.sleep(110).then(() => {
             Notification.success({
                 title: "已更新到最新版本",
-                content: `当前版本:v2.0.1`,
+                content: `当前版本:v2.1.1`,
                 position: "bottomRight",
             });
-            kit.sleep(1000).then(() => {
+            kit.sleep(780).then(() => {
                 Notification.info({
                     title: "版本新增特性",
                     content: `1. 修复溢出滚动条bug 2.新增语音识别`,

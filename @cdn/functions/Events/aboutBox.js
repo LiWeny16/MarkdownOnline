@@ -1,20 +1,27 @@
-import { marked } from "@cdn-marked";
 import svg_1 from "@Asset/img/aboutBox关闭.svg";
-import welcomeText from "@Asset/about.md?raw";
+// import welcomeText from "@Asset/about.md?raw"
+import { markdownParser } from "@Func/Init/allInit";
+let aboutMd;
 export default async () => {
     let shutDownSvg = `
 <div class="closeBox" id="closeAbout">
 <img id="closeAboutSvg" class="closeSvg" src=${svg_1} alt="">
 </div>
 `;
-    let aboutMd = welcomeText;
-    if (document.getElementById("aboutMd")) {
-        document.getElementById("aboutMd").innerHTML =
-            shutDownSvg + (await md2Html(aboutMd));
-    }
+    await fetch("https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@main/source/assets/about.md")
+        .then(async (response) => {
+        aboutMd = response.text();
+        if (document.getElementById("aboutMd")) {
+            document.getElementById("aboutMd").innerHTML =
+                shutDownSvg + md2Html(await aboutMd);
+        }
+    })
+        .catch((error) => {
+        console.error("Error fetching markdown:", error);
+    });
     function md2Html(md) {
         // console.log(md);
-        return marked.parse(md);
+        return markdownParser().render(md);
     }
     // event mount
     document.getElementById("closeAboutSvg").addEventListener("click", () => {

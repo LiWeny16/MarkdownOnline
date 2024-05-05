@@ -159,6 +159,21 @@ declare module "@cdn-latex-map" {
 //   const aboutBox: any
 //   export default aboutBox
 // }
+
+declare module "@cdn-indexedDb-lib" {
+  const aboutBox: any
+  export default aboutBox
+  export {
+    openDB,
+    getDataByIndex,
+    cursorGetDataByIndex,
+    addData,
+    getDataByKey,
+    cursorGetData,
+    updateDB,
+  }
+}
+
 declare module "@Root/js/functions/fastKey" {
   const aboutBox: any
   export default aboutBox

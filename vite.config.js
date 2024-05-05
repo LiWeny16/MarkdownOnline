@@ -24,6 +24,8 @@ export default defineConfig({
     alias: {
       // "react":"https://esm.sh/react",
       // "uslug":"https://cdn.jsdelivr.net/npm/uslug@1.0.4/+esm",
+      "@cdn-Readme":"https://cdn.jsdelivr.net/gh/LiWeny16/MarkdownOnline@V2.1.1/README.md",
+      "@cdn-indexedDb-lib":"https://cdn.jsdelivr.net/gh/LiWeny16/MarkdownOnline@V2.1.1/@cdn/functions/App/db.min.js",
       "@cdn-latex-map":"https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@main/@cdn/functions/Monaco/snippets/latexRules.min.js",
       "markdown-it-emoji":
         "https://jsd.onmicrosoft.cn/npm/markdown-it-emoji@3.0.0/+esm",

@@ -1,9 +1,9 @@
 /**
  * 打开数据库
- * @param {object} dbName 数据库的名字
- * @param {string} storeName 仓库名称
- * @param {string} version 数据库的版本
- * @return {object} 该函数会返回一个数据库实例
+ * @param object dbName 数据库的名字
+ * @param string storeName 仓库名称
+ * @param number version 数据库的版本
+ * @return object 该函数会返回一个数据库实例
  */
 export function openDB(dbName: string, version = 1) {
   return new Promise((resolve, reject) => {
@@ -51,12 +51,7 @@ export function openDB(dbName: string, version = 1) {
   })
 }
 
-/**
- * 新增数据
- * @param {object} db 数据库实例
- * @param {string} storeName 仓库名称
- * @param {string} data 数据
- */
+
 /**
  * 新增数据
  * @param db 数据库实例
@@ -82,9 +77,9 @@ export function addData(db: IDBDatabase, storeName: string, data: any): void {
 
 /**
  * 更新数据
- * @param {object} db 数据库实例
- * @param {string} storeName 仓库名称
- * @param {object} data 数据
+ * @param object db 数据库实例
+ * @param string storeName 仓库名称
+ * @param object data 数据
  */
 export function updateDB(db: IDBDatabase, storeName: string, data: any) {
   var request = db
@@ -102,9 +97,9 @@ export function updateDB(db: IDBDatabase, storeName: string, data: any) {
 }
 /**
  * 通过主键读取数据
- * @param {object} db 数据库实例
- * @param {string} storeName 仓库名称
- * @param {string} key 主键值
+ * @param object db 数据库实例
+ * @param string storeName 仓库名称
+ * @param string key 主键值
  */
 export function getDataByKey(db: IDBDatabase, storeName: string, key: string) {
   var store = db
@@ -156,10 +151,10 @@ export function cursorGetData(
 
 /**
  * 通过索引读取数据
- * @param {object} db 数据库实例
- * @param {string} storeName 仓库名称
- * @param {string} indexName 索引名称
- * @param {string} indexValue 索引值
+ * @param object db 数据库实例
+ * @param string storeName 仓库名称
+ * @param string indexName 索引名称
+ * @param string indexValue 索引值
  */
 export function getDataByIndex(
   db: IDBDatabase,
@@ -180,10 +175,10 @@ export function getDataByIndex(
 
 /**
  * 通过索引和游标查询记录
- * @param {object} db 数据库实例
- * @param {string} storeName 仓库名称
- * @param {string} indexName 索引名称
- * @param {string} indexValue 索引值
+ * @param object db 数据库实例
+ * @param string storeName 仓库名称
+ * @param string indexName 索引名称
+ * @param string indexValue 索引值
  */
 export function cursorGetDataByIndex(
   db: IDBDatabase,
@@ -216,12 +211,12 @@ export function cursorGetDataByIndex(
 
 /**
  * 通过索引和游标分页查询记录
- * @param {object} db 数据库实例
- * @param {string} storeName 仓库名称
- * @param {string} indexName 索引名称
- * @param {string} indexValue 索引值
- * @param {number} page 页码
- * @param {number} pageSize 查询条数
+ * @param object db 数据库实例
+ * @param string storeName 仓库名称
+ * @param string indexName 索引名称
+ * @param string indexValue 索引值
+ * @param number page 页码
+ * @param number pageSize 查询条数
  */
 export function cursorGetDataByIndexAndPage(
   db: IDBDatabase,
@@ -266,9 +261,9 @@ export function cursorGetDataByIndexAndPage(
 
 /**
  * 通过主键删除数据
- * @param {object} db 数据库实例
- * @param {string} storeName 仓库名称
- * @param {object} id 主键值
+ * @param object db 数据库实例
+ * @param string storeName 仓库名称
+ * @param object id 主键值
  */
 export function deleteDB(db: IDBDatabase, storeName: string, id: IDBValidKey) {
   var request = db
@@ -287,10 +282,10 @@ export function deleteDB(db: IDBDatabase, storeName: string, id: IDBValidKey) {
 
 /**
  * 通过索引和游标删除指定的数据
- * @param {object} db 数据库实例
- * @param {string} storeName 仓库名称
- * @param {string} indexName 索引名
- * @param {object} indexValue 索引值
+ * @param object db 数据库实例
+ * @param string storeName 仓库名称
+ * @param string indexName 索引名
+ * @param object indexValue 索引值
  */
 export function cursorDelete(
   db: IDBDatabase,
@@ -321,7 +316,7 @@ export function cursorDelete(
 
 /**
  * 删除数据库
- * @param {object} dbName 数据库名称
+ * @param object dbName 数据库名称
  */
 export function deleteDBAll(dbName: string) {
   // console.log(dbName)

@@ -1,4 +1,4 @@
-import { openDB, cursorGetDataByIndex, cursorGetData, updateDB, } from "@App/db";
+import { openDB, cursorGetDataByIndex, cursorGetData, updateDB, } from "@cdn-indexedDb-lib";
 // import getMdText from "@App/text/getMdText"
 export function fillInMemoryText(md) {
     openDB("md_content", 2).then((db) => {

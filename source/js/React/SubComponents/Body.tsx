@@ -4,16 +4,16 @@ import React from "react"
 import { enObj } from "@Root/js/index"
 import fastKeyEvent from "@Func/Events/key/fastKey"
 // import pasteEvent, { monacoPasteEvent, monacoPasteEventNative } from "@Func/Events/pasteEvent"
-import dragFileEvent from "@Func/Events/dragFile"
+// import dragFileEvent from "@Func/Events/dragFile"
 import MdArea from "./SubBody/MdArea"
 import { observer } from "mobx-react"
 // import { useImage } from "@Root/js/React/Mobx/Image.ts"
 // import { useTheme } from "@Root/js/React/Mobx/Theme"
 import EmojiPicker from "@Com/myCom/EmojiPicker"
-import { configInit } from "@Func/Init/allInit"
+// import { configInit } from "@Func/Init/allInit"
 import { getEmojiPickerState, getTheme } from "@App/config/change"
-import LoadingButton from "../Components/Mui/progressButton"
-import CircularLoadingButton from "../Components/Mui/progressButton"
+// import LoadingButton from "../Components/Mui/progressButton"
+// import CircularLoadingButton from "../Components/Mui/progressButton"
 
 function enEvents(doIt: boolean): void {
   if (doIt) {
@@ -44,9 +44,13 @@ export default observer(function Body() {
         </div>
         <div id="aboutBox">
           <div id="markdownParser">
-            <div id="aboutMd" className="aboutViewArea markdown-body">
-              <span></span>
-            </div>
+            <div
+              id="aboutMd"
+              className={
+                "aboutViewArea markdown-body " +
+                `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}`
+              }
+            ></div>
           </div>
         </div>
         <EmojiPicker open={getEmojiPickerState() === "on" ? true : false} />
