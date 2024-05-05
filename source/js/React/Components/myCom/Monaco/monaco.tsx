@@ -25,7 +25,7 @@ import { getDeviceTyByProportion } from "@App/user/userAgent"
 import { getTheme } from "@App/config/change"
 import monacoMouseEvent from "@Func/Events/mouse/monacoMouse"
 import monacoClickEvent from "@Func/Events/click/monacoClick"
-import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight.ts";
+import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight";
 // import errIntellisense from "@Func/Monaco/intellisense/error"
 // import monacoPalette from "@Func/Monaco/palette/palette"
 

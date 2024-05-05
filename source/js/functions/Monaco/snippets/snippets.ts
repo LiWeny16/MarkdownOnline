@@ -333,9 +333,7 @@ export function isInLatexBlock(textUntilPosition: string): boolean {
 
 export function isNeedToUseClueIntellisense(textUntilPosition: string) {
   // console.log(textUntilPosition[textUntilPosition.length-1]);
-  if (
-    textUntilPosition[textUntilPosition.length - 1] === "^" 
-  ) {
+  if (textUntilPosition[textUntilPosition.length - 1] === "^") {
     return true
   } else {
     return false

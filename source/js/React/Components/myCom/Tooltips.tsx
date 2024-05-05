@@ -4,7 +4,7 @@ import Button from "@mui/material/Button"
 import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip"
 import Typography from "@mui/material/Typography"
 
-const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
+const LightTooltip:any = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({
   [`& .${tooltipClasses.tooltip}`]: {
@@ -15,7 +15,7 @@ const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
   },
 }))
 
-let HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
+let HtmlTooltip:any = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
 ))(({ theme }) => ({
   [`& .${tooltipClasses.tooltip}`]: {

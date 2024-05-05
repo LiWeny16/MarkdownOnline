@@ -22,7 +22,7 @@ import "../css/index.less"
 // const span = new Token("span_open","span",1)
 // console.log(span);
 
-import { isSyntaxValid } from "@App/script.ts"
+import { isSyntaxValid } from "@App/script"
 import { markdownitLineNumber } from "@Func/Parser/mdItPlugin/lineNumber"
 import { myPlugin } from "@Func/Parser/mdItPlugin/alertBlock"
 import { markdownParser } from "@Func/Init/allInit"

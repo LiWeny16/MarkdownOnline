@@ -13,9 +13,9 @@
     // "declarationDir": "allTypes",
     /* Bundler mode */
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "isolatedModules": true,
-    "noEmit": true,
+    "noEmit": false,
     "jsx": "react-jsx",
     "useDefineForClassFields": true,
     "paths": {
@@ -34,8 +34,8 @@
       "@Css":["source/js/React/Css"],
       "@Css/*":["source/js/React/Css/*"],
       
-    }
-    // "outDir": "./"
+    },
+    "outDir": "./@cdn"
   },
 
   // 配置需要校验的文件

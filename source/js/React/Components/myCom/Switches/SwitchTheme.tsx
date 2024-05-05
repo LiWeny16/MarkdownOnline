@@ -6,7 +6,7 @@ import Switch, { SwitchProps } from "@mui/material/Switch"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 
-let MaterialUISwitch = styled(Switch)(({ theme }) => ({
+let MaterialUISwitch:any = styled(Switch)(({ theme }) => ({
   width: 62,
   height: 34,
   padding: 7,

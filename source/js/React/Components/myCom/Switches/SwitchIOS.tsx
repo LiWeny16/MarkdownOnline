@@ -2,7 +2,8 @@ import * as React from "react"
 import { styled } from "@mui/material/styles"
 import Switch, { SwitchProps } from "@mui/material/Switch"
 
-const IOSSwitch = styled((props: SwitchProps) => (
+// @ts-ignore
+const IOSSwitch:any = styled((props: SwitchProps) => (
   <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
 ))(({ theme }) => ({
   width: 42,

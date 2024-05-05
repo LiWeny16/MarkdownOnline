@@ -152,7 +152,7 @@ export default function Export(props: any) {
         elevation={24}
         anchorEl={props.anchorEl}
         open={props.open}
-        onClick={(e) => {
+        onClick={(e: any) => {
           closeExportMenu(e)
         }}
       >
