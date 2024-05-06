@@ -68,6 +68,7 @@ export default defineConfig({
         "https://jsd.onmicrosoft.cn/npm/markdown-it-github-toc@3.2.4/src/index.js/+esm",
       "@emoji-mart/data":
         "https://jsd.onmicrosoft.cn/npm/@emoji-mart/data@1.1.2/+esm",
+      "emoji-mart": "https://jsd.onmicrosoft.cn/npm/emoji-mart@5.6.0/+esm",
       gsap: "https://jsd.onmicrosoft.cn/npm/gsap@3.12.5/+esm",
       "@cdn-emojilib": "https://jsd.onmicrosoft.cn/npm/emojilib@3.0.11/+esm",
       "@cdn-prettier": "https://jsd.onmicrosoft.cn/npm/prettier@3.2.4/+esm",
@@ -118,6 +119,5 @@ export default defineConfig({
       // "@mui/material": "MaterialUI",
     }),
     [react({ jsxRuntime: "classic" })],
-
   ],
 })

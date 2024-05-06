@@ -39,9 +39,23 @@
     />
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-    <!-- <script src="./output/react-photo-view.umd.js"></script> -->
-    <script src="https://jsd.onmicrosoft.cn/npm/react@18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
-    <script src="https://jsd.onmicrosoft.cn/npm/react-dom@18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+    <!-- <script src="/@cdn/lib//react-photo-view.esm.js"></script> -->
+    <script
+      src="https://jsd.onmicrosoft.cn/npm/react@18.2.0/umd/react.production.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://jsd.onmicrosoft.cn/npm/react-dom@18.2.0/umd/react-dom.production.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://jsd.onmicrosoft.cn/npm/react@18.2.0/umd/react.production.min.js",
+          "react-dom": "https://jsd.onmicrosoft.cn/npm/react-dom@18.2.0/umd/react-dom.production.min.js"
+        }
+      }
+    </script>
     <!-- <script src="https://unpkg.com/@mui/material@5.15.16/umd/material-ui.production.min.js"></script> -->
   </head>
   <style>
@@ -61,14 +75,7 @@
       丰富的导出方式PDF、jpg、txt。数学公式, Latex公式也一并支持...
     </h1>
     <div id="root"></div>
-    <!-- <script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
-    <script>
-      // VConsole will be exported to `window.VConsole` by default.
-      
-    </script> -->
-    <script type="module" src="./source/js/React/index.tsx"></script>
 
-    <!-- <script type="module" src="./source/js/index.ts"></script> -->
+    <script type="module" src="./source/js/React/index.tsx"></script>
   </body>
-  <!-- <script src="https://unpkg.com/modern-screenshot"></script> -->
 </html>

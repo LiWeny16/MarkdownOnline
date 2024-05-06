@@ -1,14 +1,14 @@
 // import "https://jsd.onmicrosoft.cn//npm/react-photo-view@1.2.4/dist/react-photo-view.min.css"
-import { PhotoProvider, PhotoView } from "react-photo-view"
-// import { PhotoProvider, PhotoView } from "output\react-photo-view.umd.js"
+// import { PhotoProvider, PhotoView } from "react-photo-view"
+import { PhotoProvider, PhotoView } from "/@cdn/lib/react-photo-view/react-photo-view.module.js"
 import React from "react"
-import { readAllMemoryImg } from "@App/textMemory/memory"
+// import { readAllMemoryImg } from "@App/textMemory/memory"
 import Zoom from "@mui/material/Zoom"
 import Tooltip from "@mui/material/Tooltip"
 import insertTextAtCursor, {
   insertTextMonacoAtCursor,
 } from "@App/text/insertTextAtCursor"
-import kit from "@cdn-kit"
+// import kit from "@cdn-kit"
 import { writeClipboard } from "@App/text/clipboard"
 
 // 必须要转换forwarRef 不然MUI不接收

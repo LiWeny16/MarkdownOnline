@@ -7,16 +7,16 @@ export default {
   output: {
     file: "@cdn/lib/react-photo-view.esm.js", // 输出文件
     format: "esm", // UMD 格式
-    name: "ReactPhotoView", // 全局变量名称
+    // name: "ReactPhotoView", // 全局变量名称
     globals: {
-      react: "React",
-      "react-dom": "ReactDOM",
+      react: "React", // `import ... from 'react'` 被转换为全局变量 React
+      "react-dom": "ReactDOM", // `import ... from 'react-dom'` 被转换为全局变量 ReactDOM
     },
   },
   external: ["react", "react-dom"],
   plugins: [
     resolve(), // 解析 node_modules 中的模块
     commonjs(), // 转换 CJS 模块到 ESM
-    terser() // 压缩输出代码
+    // terser() // 压缩输出代码
   ],
 }
