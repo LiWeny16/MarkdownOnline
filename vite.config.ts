@@ -46,6 +46,9 @@ export default defineConfig({
     alias: {
       // "react":"https://esm.sh/react",
       // "uslug":"https://jsd.onmicrosoft.cn/npm/uslug@1.0.4/+esm",
+      // htmlparser2: "https://jsd.onmicrosoft.cn/npm/htmlparser2@9.1.0/+esm",
+      "react-photo-view":
+        "https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@V2.1.3/@cdn/lib/react-photo-view/react-photo-view.module.js",
       "@arco-design/web-react":
         "https://jsd.onmicrosoft.cn/npm/@arco-design/web-react@2.62.0/+esm",
       "@cdn-emoji-data":
@@ -56,6 +59,7 @@ export default defineConfig({
         "https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@V2.1.1/@cdn/functions/App/db.min.js",
       "@cdn-latex-map":
         "https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@main/@cdn/functions/Monaco/snippets/latexRules.min.js",
+      "markdown-it": "https://jsd.onmicrosoft.cn/npm/markdown-it@14.1.0/+esm",
       "markdown-it-emoji":
         "https://jsd.onmicrosoft.cn/npm/markdown-it-emoji@3.0.0/+esm",
       "markdown-it-footnote":

@@ -1,0 +1,1 @@
+import{Picker as r}from"https://jsd.onmicrosoft.cn/npm/emoji-mart@5.6.0/+esm";const u=window.React,c=window.React.useRef,f=window.React.useEffect;function s(t){const n=c(null),e=c(null);return e.current&&e.current.update(t),f(()=>(e.current=new r({...t,ref:n}),()=>{e.current=null}),[]),u.createElement("div",{ref:n})}export{s as $};

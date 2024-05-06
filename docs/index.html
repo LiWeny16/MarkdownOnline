@@ -39,12 +39,28 @@
     />
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-    <script src="https://jsd.onmicrosoft.cn/npm/react@18.2.0/umd/react.production.min.js" crossorigin="anonymous"></script>
-    <script src="https://jsd.onmicrosoft.cn/npm/react-dom@18.2.0/umd/react-dom.production.min.js" crossorigin="anonymous"></script>
+    <!-- <script src="/@cdn/lib//react-photo-view.esm.js"></script> -->
+    <script
+      src="https://jsd.onmicrosoft.cn/npm/react@18.2.0/umd/react.production.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://jsd.onmicrosoft.cn/npm/react-dom@18.2.0/umd/react-dom.production.min.js"
+      crossorigin="anonymous"
+    ></script>
+
     <!-- <script src="https://unpkg.com/@mui/material@5.15.16/umd/material-ui.production.min.js"></script> -->
-    <script type="module" crossorigin src="./static/index-7f3a22b1.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://jsd.onmicrosoft.cn/npm/react@18.2.0/umd/react.production.min.js",
+          "react-dom": "https://jsd.onmicrosoft.cn/npm/react-dom@18.2.0/umd/react-dom.production.min.js"
+        }
+      }
+    </script>
+    <script type="module" crossorigin src="./static/index-1a0a762d.js"></script>
     <link rel="modulepreload" crossorigin href="./static/react-dom-d3bdc6a0.js">
-    <link rel="modulepreload" crossorigin href="./static/react-3f121ed2.js">
+    <link rel="modulepreload" crossorigin href="./static/react-2b221fbb.js">
     <link rel="modulepreload" crossorigin href="./static/@babel-f8d566ba.js">
     <link rel="modulepreload" crossorigin href="./static/clsx-0839fdbe.js">
     <link rel="modulepreload" crossorigin href="./static/hoist-non-react-statics-3f8ebaa8.js">
@@ -54,29 +70,20 @@
     <link rel="modulepreload" crossorigin href="./static/react-transition-group-bc100b23.js">
     <link rel="modulepreload" crossorigin href="./static/@popperjs-f3391c26.js">
     <link rel="modulepreload" crossorigin href="./static/prop-types-7395632d.js">
-    <link rel="modulepreload" crossorigin href="./static/@mui-d5c7f6ed.js">
+    <link rel="modulepreload" crossorigin href="./static/@mui-0b9f4c92.js">
     <link rel="modulepreload" crossorigin href="./static/use-sync-external-store-b84fba6b.js">
     <link rel="modulepreload" crossorigin href="./static/mobx-react-lite-290ab4f8.js">
     <link rel="modulepreload" crossorigin href="./static/mobx-react-ed2466fd.js">
-    <link rel="modulepreload" crossorigin href="./static/mdurl-d7fdfec3.js">
-    <link rel="modulepreload" crossorigin href="./static/uc.micro-78e30319.js">
-    <link rel="modulepreload" crossorigin href="./static/entities-52510f6e.js">
-    <link rel="modulepreload" crossorigin href="./static/linkify-it-7ae06500.js">
-    <link rel="modulepreload" crossorigin href="./static/punycode.js-c41da3d1.js">
-    <link rel="modulepreload" crossorigin href="./static/markdown-it-6b60e067.js">
     <link rel="modulepreload" crossorigin href="./static/inherits-2c87d58f.js">
     <link rel="modulepreload" crossorigin href="./static/htmlparser2-b305cd15.js">
     <link rel="modulepreload" crossorigin href="./static/markdown-it-incremental-dom-c4f66209.js">
-    <link rel="modulepreload" crossorigin href="./static/react-photo-view-15a9a969.js">
     <link rel="modulepreload" crossorigin href="./static/state-local-dd516420.js">
     <link rel="modulepreload" crossorigin href="./static/@monaco-editor-38e7c7a5.js">
     <link rel="modulepreload" crossorigin href="./static/react-draggable-b033082a.js">
     <link rel="modulepreload" crossorigin href="./static/react-resizable-8f73e4ed.js">
-    <link rel="modulepreload" crossorigin href="./static/emoji-mart-029374f1.js">
-    <link rel="modulepreload" crossorigin href="./static/@emoji-mart-3805b488.js">
-    <link rel="stylesheet" href="./58f98891.react-photo-view.css">
+    <link rel="modulepreload" crossorigin href="./static/@emoji-mart-a8b676b0.js">
     <link rel="stylesheet" href="./f65e29ed.react-resizable.css">
-    <link rel="stylesheet" href="./82f2ac09.index.css">
+    <link rel="stylesheet" href="./3ece0c44.index.css">
   </head>
   <style>
     * {
@@ -95,14 +102,7 @@
       丰富的导出方式PDF、jpg、txt。数学公式, Latex公式也一并支持...
     </h1>
     <div id="root"></div>
-    <!-- <script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
-    <script>
-      // VConsole will be exported to `window.VConsole` by default.
-      
-    </script> -->
-    
 
-    <!-- <script type="module" src="./source/js/index.ts"></script> -->
+    
   </body>
-  <!-- <script src="https://unpkg.com/modern-screenshot"></script> -->
 </html>
