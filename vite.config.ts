@@ -47,6 +47,8 @@ export default defineConfig({
       // "react":"https://esm.sh/react",
       // "uslug":"https://jsd.onmicrosoft.cn/npm/uslug@1.0.4/+esm",
       // htmlparser2: "https://jsd.onmicrosoft.cn/npm/htmlparser2@9.1.0/+esm",
+      // "react-resizable":"https://cdn.jsdelivr.net/npm/react-resizable@3.0.5",
+      // "markdown-it-incremental-dom":"https://cdn.jsdelivr.net/npm/markdown-it-incremental-dom@2.1.0/+esm",
       "react-photo-view":
         "https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@V2.1.3/@cdn/lib/react-photo-view/react-photo-view.module.js",
       "@arco-design/web-react":
@@ -83,6 +85,8 @@ export default defineConfig({
         "https://jsd.onmicrosoft.cn/npm/string-replace-async@3.0.2/index.min.js",
       html2canvas: "https://jsd.onmicrosoft.cn/npm/html2canvas@1.4.1/+esm",
       mobx: "https://jsd.onmicrosoft.cn/npm/mobx@6.12.0/+esm",
+      // "mobx-react-lite":"https://cdn.jsdelivr.net/npm/mobx-react-lite@4.0.7/dist/mobxreactlite.esm.js",
+      // "mobx-react":"https://jsd.onmicrosoft.cn/npm/mobx-react@9.1.1/dist/mobxreact.esm.js",
       axios: "https://jsd.onmicrosoft.cn/npm/axios@1.6.5/+esm",
       "@cdn-node-emoji": "https://jsd.onmicrosoft.cn/npm/node-emoji@2.1.3/+esm",
       "@cdn-marked": "https://npm.elemecdn.com/marked/lib/marked.esm.js",

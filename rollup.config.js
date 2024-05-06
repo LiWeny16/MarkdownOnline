@@ -2,10 +2,18 @@ import resolve from "@rollup/plugin-node-resolve"
 import commonjs from "@rollup/plugin-commonjs"
 import { terser } from "rollup-plugin-terser"
 
+const inputArr = [
+  "node_modules/react-photo-view/dist/react-photo-view.module.js",
+  "node_modules/markdown-it-incremental-dom/lib/markdown-it-incremental-dom.js",
+]
+const outArr = [
+  "react-photo-view/react-photo-view.esm.js",
+  "markdown-it-incremental-dom/markdown-it-incremental-dom.esm.js",
+]
 export default {
-  input: "node_modules/react-photo-view/dist/react-photo-view.module.js", // 源文件
+  input: inputArr[1], // 源文件
   output: {
-    file: "@cdn/lib/react-photo-view.esm.js", // 输出文件
+    file: "@cdn/lib/" + outArr[1], // 输出文件
     format: "esm", // UMD 格式
     // name: "ReactPhotoView", // 全局变量名称
     globals: {

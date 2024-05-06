@@ -1,3 +1,5 @@
+import { Message } from "@arco-design/web-react"
+
 let speechRecognition = (lang: string, startIt = true, callBack: Function) => {
   // 创建语音识别对象
   const recognition = new webkitSpeechRecognition() || new SpeechRecognition()
@@ -27,8 +29,18 @@ let speechRecognition = (lang: string, startIt = true, callBack: Function) => {
   }
 
   // 监听错误事件
-  recognition.onerror = (event: any) => {
-    console.error(event.error)
+  recognition.onerror = function (event: any) {
+    if (event.error == "not-allowed") {
+      Message.error({
+        style: { position: "relative", zIndex: 1 },
+        content: "语音权限被拒绝，世界，拒绝了我...",
+        closable: true,
+        duration: 4500,
+        position: "top",
+      })
+    } else {
+      console.log("语音识别错误:", event.error)
+    }
   }
 
   // 监听结束事件

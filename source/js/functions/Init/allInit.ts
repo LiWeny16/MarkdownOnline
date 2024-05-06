@@ -10,6 +10,7 @@ import markdownIt from "markdown-it"
 // import Token from "https://jsd.onmicrosoft.cn/npm/markdown-it@14.0.0/lib/token.mjs"
 // @ts-ignore
 import MarkdownItIncrementalDOM from "markdown-it-incremental-dom"
+// import MarkdownItIncrementalDOM from "/@cdn/lib/markdown-it-incremental-dom/markdown-it-incremental-dom.esm.js"
 import mdItMultimdTable from "markdown-it-multimd-table"
 import * as IncrementalDOM from "incremental-dom"
 // @ts-ignore

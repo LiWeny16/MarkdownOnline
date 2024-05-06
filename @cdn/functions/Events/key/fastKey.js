@@ -1,5 +1,6 @@
 // import { allInit, enObj, fillInRemeText, kit } from "@Root/js/index.js"
 import save from "@App/save";
+import exeSyncScrollAction from "./actions/syncScroll";
 // import voice from "@App/voice/sound"
 // import qiniuFileAPI from "@App/qiniu/index"
 // import insertTextAtCursor from "@App/text/insertTextAtCursor"
@@ -17,8 +18,11 @@ function enableFastKeyEvent() {
             // insertTextAtCursor(editor,"    ")
         }
         // Ctrl + B 黑体
-        if (e.ctrlKey && e.key == "b") {
+        if (e.ctrlKey && e.key == "q") {
             // replaceSelection(editor, "**", "**")
+            e.stopPropagation(); //停止冒泡，向上传递事件
+            e.preventDefault();
+            exeSyncScrollAction(window.editor, window.monaco);
         }
         // Alt + C 中心
         if (e.key == "c" && e.altKey) {

@@ -44,7 +44,7 @@
     "source/js/types/*.d.ts",
     "source",
     "source/functions/*.ts"
-
+, "Layout"
     // "allTypes/*.d.ts",
   ],
 

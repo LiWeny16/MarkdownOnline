@@ -25,8 +25,10 @@ import { getTheme } from "@App/config/change";
 import monacoMouseEvent from "@Func/Events/mouse/monacoMouse";
 import monacoClickEvent from "@Func/Events/click/monacoClick";
 import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight";
+import monacoScrollEvent from "@Func/Events/scroll/monacoScroll";
 // import errIntellisense from "@Func/Monaco/intellisense/error"
 // import monacoPalette from "@Func/Monaco/palette/palette"
+// let ResizableBox = reactResize.ResizableBox
 const version = "0.45.0";
 const cdnDomain = {
     unpkg: ["npm.onmicrosoft.cn", "unpkg.com"],
@@ -126,7 +128,7 @@ export default observer(function MonacoEditor() {
                 { open: "？", close: "？", notIn: ["string", "comment"] }, // 添加此行，将字符"？"添加到自动关闭字符对中
             ],
         });
-        monaco.languages.setMonarchTokensProvider('markdown', {
+        monaco.languages.setMonarchTokensProvider("markdown", {
             tokenizer: {
                 root: [
                     [/\b(function|return|var)\b/, "keyword"],
@@ -135,8 +137,8 @@ export default observer(function MonacoEditor() {
                     [/"[^"]*"/, "string"],
                     [/\d+/, "number"],
                     [/[$$$$]/, "annotation"],
-                ]
-            }
+                ],
+            },
         });
     }
     function handleBeforeMount() { }
@@ -160,6 +162,7 @@ export default observer(function MonacoEditor() {
         monacoFormat(editor, monaco);
         monacoMouseEvent(editor, monaco);
         monacoClickEvent(editor, monaco);
+        monacoScrollEvent(editor, monaco);
         // monacoPalette(editor,monaco)
         // monacoKeyDownEvent()
         allInit(editor, monaco);

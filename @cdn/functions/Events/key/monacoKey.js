@@ -8,6 +8,7 @@ import exeInsertPageBreakerAction from "./actions/pageBreaker";
 import exeLatexBlockAction from "./actions/latexBlock";
 import exeEmojiPickerAction from "./actions/emojiPicker";
 import exeSpeechPanelAction from "./actions/speechPanel";
+import exeSyncScrollAction from "./actions/syncScroll";
 export default function monacoKeyEvent(editor, monaco) {
     const keyMap = {
         save: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
@@ -18,16 +19,8 @@ export default function monacoKeyEvent(editor, monaco) {
         pageBreaker: monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.Enter,
         latexBlock: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyM,
         voice2Words: monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyV,
+        syncScroll: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyQ,
     };
-    // editor.addAction({
-    //   id: 'fsKey',
-    //   label: 'fsKey',
-    //   // precondition: 'isChrome == true',
-    //   keybindings: [keyMap.save],
-    //   run: () => {
-    //     save()
-    //   },
-    // })
     editor.addAction({
         id: "fsKey2",
         label: "fsKey2",
@@ -148,6 +141,15 @@ export default function monacoKeyEvent(editor, monaco) {
         contextMenuGroupId: "navigation",
         run: () => {
             exeSpeechPanelAction(editor, monaco);
+        },
+    });
+    editor.addAction({
+        id: "command.syncScroll",
+        label: "同步滚动",
+        keybindings: [keyMap.syncScroll],
+        contextMenuGroupId: "navigation",
+        run: () => {
+            exeSyncScrollAction(editor, monaco);
         },
     });
 }
