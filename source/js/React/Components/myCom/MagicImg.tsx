@@ -1,5 +1,6 @@
-import "react-photo-view/dist/react-photo-view.css"
+// import "https://jsd.onmicrosoft.cn//npm/react-photo-view@1.2.4/dist/react-photo-view.min.css"
 import { PhotoProvider, PhotoView } from "react-photo-view"
+// import { PhotoProvider, PhotoView } from "output\react-photo-view.umd.js"
 import React from "react"
 import { readAllMemoryImg } from "@App/textMemory/memory"
 import Zoom from "@mui/material/Zoom"
