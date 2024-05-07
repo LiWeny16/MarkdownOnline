@@ -11,6 +11,9 @@ import { Box, Divider, MenuItem, Select, Typography } from "@mui/material"
 import React from "react"
 import { observer } from "mobx-react"
 import { speechLanguageMap } from "@App/voice/speech"
+import { normalMermaidTheme } from "@Func/Init/allInit"
+import mermaid from "mermaid"
+import { mdConverter } from "@Root/js"
 
 export default observer(function SettingsBody() {
   const theme = getTheme()
@@ -150,7 +153,7 @@ export default observer(function SettingsBody() {
       changeTheme("dark")
       setThemeState(e.target.checked)
       console.log(markdownBodyElement.style.cssText)
-      markdownBodyElement.style.cssText=""
+      markdownBodyElement.style.cssText = ""
       // for (let i in darkObject) {
       //   markdownBodyElement.style.setProperty(i, darkObject[i])
       // }
@@ -181,6 +184,15 @@ export default observer(function SettingsBody() {
       basic: { speechLanguage: e.target.value },
     })
     // console.log(getSettings().basic.speechLanguage)
+  }
+  function handleOnChangeMermaidTheme(e: any) {
+    changeSettings({
+      advanced: { mermaidTheme: e.target.value },
+    })
+    mermaid.init({
+      theme: e.target.value,
+    })
+    mdConverter()
   }
   /**
    * @description 初始化设置
@@ -274,15 +286,13 @@ export default observer(function SettingsBody() {
             size="small"
             onChange={handleSpeechLanguage}
           >
-            <MenuItem value={speechLanguageMap["1"][0]}>
-              {speechLanguageMap["1"][1]}
-            </MenuItem>
-            <MenuItem value={speechLanguageMap["2"][0]}>
-              {speechLanguageMap["2"][1]}
-            </MenuItem>
-            <MenuItem value={speechLanguageMap["3"][0]}>
-              {speechLanguageMap["3"][1]}
-            </MenuItem>
+            {speechLanguageMap.map((e, i) => {
+              return (
+                <MenuItem key={i} value={e[0]}>
+                  {e[1]}
+                </MenuItem>
+              )
+            })}
           </Select>
         </Box>
         {/* *************************高级设置****************************** */}
@@ -327,19 +337,24 @@ export default observer(function SettingsBody() {
               fontWeight: 500,
             }}
           >
-            Mermaid Configs
+            Mermaid Theme Configs
           </Typography>
           <Typography sx={ContentDescriptionTextStyle}>
-            更改Mermaid流程图的设置(施工中)
+            Mermaid流程图主题
           </Typography>
-          <SwitchIOS
-            disabled
-            // defaultValue={1}
-            // checked={getSettings().basic.syncScroll}
+          <Select
+            value={getSettings().advanced.mermaidTheme ?? "default"}
+            defaultChecked={true}
+            fullWidth
             size="small"
-            inputProps={{ "aria-label": "controlled" }}
-            // onChange={handleOnChangeSyncScrollSwitch}
-          ></SwitchIOS>
+            onChange={handleOnChangeMermaidTheme}
+          >
+            {normalMermaidTheme.map((e, i) => (
+              <MenuItem key={i} value={e}>
+                {e}
+              </MenuItem>
+            ))}
+          </Select>
         </Box>
       </Box>
     </>

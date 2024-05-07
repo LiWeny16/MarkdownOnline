@@ -18,7 +18,10 @@ type SettingsBasic = {
     syncScroll: boolean;
     speechLanguage: "zh-CN" | "en-US" | "ja-JP" | "yue-Hant-HK";
 };
-type SettingsAd = {};
+type SettingsAd = {
+    mermaidTheme: MermaidTheme;
+};
+type MermaidTheme = "default" | "forest" | "dark" | "neutral" | "null";
 export interface IConfig {
     [key: string]: any;
     themeState: ThemeState;

@@ -17,8 +17,8 @@ let speechRecognition = (lang, startIt = true, callBack) => {
     // 监听识别结果
     recognition.onresult = (event) => {
         let transcript = event.results[event.results.length - 1][0].transcript;
-        console.log(transcript, transcript.length); // 输出结果到控制台
-        // transcript = transcript.replace(/？/g, "?");
+        // console.log(transcript, transcript.length) // 输出结果到控制台
+        transcript = transcript.replace(/ /g, "");
         window._speechData.speechResult = transcript;
         callBack(transcript.length);
         if (recognizing === false) {
@@ -55,10 +55,12 @@ let speechRecognition = (lang, startIt = true, callBack) => {
     };
     return { recognition, recognizing: recognizing };
 };
-const speechLanguageMap = {
-    1: ["zh-CN", "普通话"],
-    2: ["en-US", "English"],
-    3: ["ja-JP", "日本語"],
-};
+const speechLanguageMap = [
+    ["zh-CN", "普通话"],
+    ["en-US", "English"],
+    ["ja-JP", "日本語"],
+    ["fr-ch", "法语（瑞士）"],
+    ["ko", "韩语"],
+];
 export { speechLanguageMap };
 export default speechRecognition;

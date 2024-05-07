@@ -11,6 +11,7 @@ export declare function markdownParser(): markdownIt;
  * @returns {void}
  */
 export default function allInit(editor?: editor.IStandaloneCodeEditor, monaco?: Monaco): void;
+export declare const normalMermaidTheme: string[];
 /**
  * @description 对设置进行初始化
  * @param defaultConfig 默认设置

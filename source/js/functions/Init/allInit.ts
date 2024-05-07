@@ -45,6 +45,7 @@ import { codePlugin } from "@Func/Parser/mdItPlugin/code"
 import { cluePlugin } from "@Func/Parser/mdItPlugin/clueParser"
 import preViewClickEvent from "@Func/Events/click/preClick"
 import markdownItLatex from "@Func/Parser/mdItPlugin/latex"
+import { getSettings } from "@App/config/change"
 // @ts-ignore
 // import markdownItCodeCopy from "markdown-it-code-copy"
 
@@ -114,11 +115,16 @@ class settingsClass {
       securityLevel: "loose",
       logLevel: 4,
       startOnLoad: false,
-      theme: "base",
+      theme: getSettings().advanced.mermaidTheme,
       // gantt: { topPadding:0 , useMaxWidth: false},
       // darkMode:true
     })
-    mermaid.mermaidAPI.initialize({ startOnLoad: false })
+    mermaid.mermaidAPI.initialize({
+      securityLevel: "loose",
+      logLevel: 4,
+      startOnLoad: false,
+      theme: getSettings().advanced.mermaidTheme,
+    })
   }
   hljsInit() {
     hljs.configure({
@@ -190,13 +196,15 @@ export default function allInit(
 
 // #region ********************config region***************************
 const normalConfigArr: NormalConfigArr = ["on", "off", "light", "dark"]
+const normalSettingsKey = ["mermaidTheme", "speechLanguage", "syncScroll"]
+export const normalMermaidTheme = ["default", "forest", "dark", "neutral"]
 const defaultConfig: IConfig = {
   themeState: "light",
   emojiPickerState: "off",
   contextMenuClickPosition: { posx: 20, posy: 20 },
   settingsConfig: {
     basic: { syncScroll: true, speechLanguage: "zh-CN" },
-    advanced: {},
+    advanced: { mermaidTheme: "default" },
   },
 }
 
@@ -230,6 +238,19 @@ export function configInit(defaultConfig: IConfig) {
       ) {
         try {
           if (typeof _defaultConfig[key] === "object") {
+            const storedSettings = JSON.parse(
+              opLocalStorage.getItem(key).toString()
+            )
+            for (let i in storedSettings) {
+              Object.keys(storedSettings[i]).forEach((e) => {
+                if (!normalSettingsKey.includes(e)) {
+                  storeDefaultSettings(key)
+                  return _defaultConfig
+                }
+              })
+            }
+            // console.log(storedSettings.basic)
+            // console.log(storedSettings.advanced)
             _defaultConfig[key as string] = JSON.parse(
               opLocalStorage.getItem(key).toString()
             )

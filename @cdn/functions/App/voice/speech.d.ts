@@ -2,6 +2,6 @@ declare let speechRecognition: (lang: string, startIt: boolean | undefined, call
     recognition: any;
     recognizing: Boolean;
 };
-declare const speechLanguageMap: any;
+declare const speechLanguageMap: string[][];
 export { speechLanguageMap };
 export default speechRecognition;

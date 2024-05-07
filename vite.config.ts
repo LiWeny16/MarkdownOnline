@@ -48,7 +48,6 @@ export default defineConfig({
       // "uslug":"https://jsd.onmicrosoft.cn/npm/uslug@1.0.4/+esm",
       // htmlparser2: "https://jsd.onmicrosoft.cn/npm/htmlparser2@9.1.0/+esm",
       // "react-resizable":"https://cdn.jsdelivr.net/npm/react-resizable@3.0.5",
-      // "markdown-it-incremental-dom":"https://cdn.jsdelivr.net/npm/markdown-it-incremental-dom@2.1.0/+esm",
       "react-photo-view":
         "https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@V2.1.3/@cdn/lib/react-photo-view/react-photo-view.module.js",
       "@arco-design/web-react":

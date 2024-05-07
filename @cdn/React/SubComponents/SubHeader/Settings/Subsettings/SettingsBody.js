@@ -6,6 +6,9 @@ import { Box, Divider, MenuItem, Select, Typography } from "@mui/material";
 import React from "react";
 import { observer } from "mobx-react";
 import { speechLanguageMap } from "@App/voice/speech";
+import { normalMermaidTheme } from "@Func/Init/allInit";
+import mermaid from "mermaid";
+import { mdConverter } from "@Root/js";
 export default observer(function SettingsBody() {
     const theme = getTheme();
     const settingsBodyContentBoxStyle = {
@@ -173,6 +176,15 @@ export default observer(function SettingsBody() {
         });
         // console.log(getSettings().basic.speechLanguage)
     }
+    function handleOnChangeMermaidTheme(e) {
+        changeSettings({
+            advanced: { mermaidTheme: e.target.value },
+        });
+        mermaid.init({
+            theme: e.target.value,
+        });
+        mdConverter();
+    }
     /**
      * @description 初始化设置
      */
@@ -198,13 +210,15 @@ export default observer(function SettingsBody() {
                             inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeSyncScrollSwitch })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { sx: {
                                 fontSize: "0.89rem",
                                 fontWeight: 500,
-                            }, children: "Speech To Text" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u9009\u62E9\u8BED\u97F3\u8F6C\u6587\u5B57\u7684\u8BC6\u522B\u8BED\u8A00" }), _jsxs(Select
+                            }, children: "Speech To Text" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u9009\u62E9\u8BED\u97F3\u8F6C\u6587\u5B57\u7684\u8BC6\u522B\u8BED\u8A00" }), _jsx(Select
                         // label={"语言"}
                         , { 
                             // label={"语言"}
                             value: getSettings().basic.speechLanguage ?? "zh-CN", defaultChecked: true, 
                             // value={clearOptions}
-                            fullWidth: true, size: "small", onChange: handleSpeechLanguage, children: [_jsx(MenuItem, { value: speechLanguageMap["1"][0], children: speechLanguageMap["1"][1] }), _jsx(MenuItem, { value: speechLanguageMap["2"][0], children: speechLanguageMap["2"][1] }), _jsx(MenuItem, { value: speechLanguageMap["3"][0], children: speechLanguageMap["3"][1] })] })] }), _jsx(Typography, { id: "settings_1_x", sx: { mt: "20px", fontSize: "30px", fontWeight: "700" }, children: "\u9AD8\u7EA7\u8BBE\u7F6E\uFF08\u65BD\u5DE5\u4E2D\uFF09" }), _jsx(Divider, {}), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { id: "settings_1_1", sx: {
+                            fullWidth: true, size: "small", onChange: handleSpeechLanguage, children: speechLanguageMap.map((e, i) => {
+                                return (_jsx(MenuItem, { value: e[0], children: e[1] }, i));
+                            }) })] }), _jsx(Typography, { id: "settings_1_x", sx: { mt: "20px", fontSize: "30px", fontWeight: "700" }, children: "\u9AD8\u7EA7\u8BBE\u7F6E\uFF08\u65BD\u5DE5\u4E2D\uFF09" }), _jsx(Divider, {}), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { id: "settings_1_1", sx: {
                                 fontSize: "0.89rem",
                                 fontWeight: 500,
                             }, children: "Export Settings" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u5BFC\u51FA\u8BBE\u7F6E(\u65BD\u5DE5\u4E2D)" }), _jsx(SwitchIOS, { disabled: true, 
@@ -213,8 +227,5 @@ export default observer(function SettingsBody() {
                             size: "small", inputProps: { "aria-label": "controlled" } })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { id: "settings_1_1", sx: {
                                 fontSize: "0.89rem",
                                 fontWeight: 500,
-                            }, children: "Mermaid Configs" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539Mermaid\u6D41\u7A0B\u56FE\u7684\u8BBE\u7F6E(\u65BD\u5DE5\u4E2D)" }), _jsx(SwitchIOS, { disabled: true, 
-                            // defaultValue={1}
-                            // checked={getSettings().basic.syncScroll}
-                            size: "small", inputProps: { "aria-label": "controlled" } })] })] }) }));
+                            }, children: "Mermaid Theme Configs" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "Mermaid\u6D41\u7A0B\u56FE\u4E3B\u9898" }), _jsx(Select, { value: getSettings().advanced.mermaidTheme ?? "default", defaultChecked: true, fullWidth: true, size: "small", onChange: handleOnChangeMermaidTheme, children: normalMermaidTheme.map((e, i) => (_jsx(MenuItem, { value: e, children: e }, i))) })] })] }) }));
 });
