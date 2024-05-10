@@ -61,5 +61,5 @@ export default function Share(props) {
                         // console.log(mailCss);
                         e.stopPropagation();
                         setMailSharePanelState(true);
-                    }, disableRipple: true, children: [_jsx(AttachEmailIcon, {}), "\u90AE\u7BB1\u5206\u4EAB"] }) })] }));
+                    }, disabled: true, disableRipple: true, children: [_jsx(AttachEmailIcon, {}), "\u90AE\u7BB1\u5206\u4EAB"] }) })] }));
 }

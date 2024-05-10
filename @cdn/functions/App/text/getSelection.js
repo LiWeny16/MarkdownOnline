@@ -1,3 +1,6 @@
+/**
+ * @description 获取选中的文本
+*/
 export default function getSelectionText(editor = window.editor) {
     const _editor = editor ?? window.editor;
     // 获取当前选中内容
@@ -16,6 +19,9 @@ export default function getSelectionText(editor = window.editor) {
     });
     return selectedText;
 }
+/**
+ * @description 判断selection是否为空
+*/
 export function selectionIsNull(editor = window.editor) {
     const _editor = editor ?? window.editor;
     // const position = window.editor.getPosition()

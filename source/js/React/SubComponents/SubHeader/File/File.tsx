@@ -66,6 +66,7 @@ const FileDrawer = observer(function FileDrawer() {
               {getSettings().basic.fileEditLocal ? editingFileName : ""}
             </Typography>
             <Button
+              sx={{ mb: "10px" }}
               onClick={async () => {
                 setEditingFileName(
                   (await fileManager.openSingleFile())?.name ?? ""
@@ -81,6 +82,8 @@ const FileDrawer = observer(function FileDrawer() {
               打开文件
             </Button>
             <Button
+              sx={{ mb: "10px" }}
+              variant="contained"
               onClick={() => {
                 fileManager.saveAsFile(getMdTextFromMonaco())
               }}

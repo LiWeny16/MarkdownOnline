@@ -15,6 +15,8 @@ import Export from "./Export/Export";
 import Settings from "./Settings/Settings";
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography, } from "@mui/material";
 import myPrint from "@App/export/myPrint";
+import FolderOpenOutlinedIcon from "@mui/icons-material/Folder";
+import { changeFileManagerState } from "@App/config/change";
 // import domtoimg from "@App/export/domToImg"
 const CustomizedMenus = observer(() => {
     const image = useImage();
@@ -75,17 +77,21 @@ const CustomizedMenus = observer(() => {
         handleCloseMenu();
         // 点击这个的时候 传递一个信号给另一个抽屉组件
     };
+    const handleFileManager = () => {
+        changeFileManagerState(true);
+        handleCloseMenu();
+    };
     return (_jsxs("div", { children: [_jsxs(Dialog, { open: modalState, onClose: () => {
                     setModalState(false);
-                }, children: [_jsx(DialogTitle, { children: _jsx(Typography, { variant: "h6", gutterBottom: true, children: "Ready To Export? You Have Not Saved Yet!" }) }), _jsx(DialogContent, { children: _jsx(DialogContentText, { children: _jsx(Typography, { variant: "body1", gutterBottom: true, children: "Once you have clicked the \"yes\" button, your text will be saved." }) }) }), _jsxs(DialogActions, { children: [_jsx(Button, { onClick: () => {
+                }, children: [_jsx(DialogTitle, { children: _jsx(Typography, { variant: "h6", gutterBottom: true, children: "\u786E\u5B9A\u5BFC\u51FA\u5417\uFF0C\u4F60\u8FD8\u6CA1\u6709\u4FDD\u5B58\u5462\uFF01" }) }), _jsx(DialogContent, { children: _jsx(DialogContentText, { children: _jsx(Typography, { variant: "body1", gutterBottom: true, children: "Once you have clicked the \"yes\" button, your text will be saved." }) }) }), _jsxs(DialogActions, { children: [_jsx(Button, { onClick: () => {
                                     setModalState(false);
                                     save();
                                     myPrint();
-                                }, children: "YES" }), _jsx(Button, { onClick: () => {
+                                }, children: "\u662F\u561F" }), _jsx(Button, { onClick: () => {
                                     setModalState(false);
-                                }, autoFocus: true, children: "NO" })] })] }), _jsx(MyButton, { open: open, endIcon: _jsx(MoreVertIcon, {}), onClick: handleClick, children: "更多" }), _jsxs(StyledMenu, { id: "demo-customized-menu", MenuListProps: {
+                                }, autoFocus: true, children: "\u8FBE\u54A9" })] })] }), _jsx(MyButton, { open: open, endIcon: _jsx(MoreVertIcon, {}), onClick: handleClick, children: "更多" }), _jsxs(StyledMenu, { id: "demo-customized-menu", MenuListProps: {
                     "aria-labelledby": "demo-customized-button",
-                }, elevation: 24, anchorEl: anchorEl, open: open, onClose: handleCloseMenu, children: [_jsxs(MenuItem, { onClick: handleImageManager, disableRipple: true, children: [_jsx(EditIcon, {}), "\u56FE\u7247\u7BA1\u7406\u5668"] }), _jsx(MenuItem, { onClick: (e) => {
+                }, elevation: 24, anchorEl: anchorEl, open: open, onClose: handleCloseMenu, children: [_jsxs(MenuItem, { onClick: handleImageManager, disableRipple: true, children: [_jsx(EditIcon, {}), "\u56FE\u7247\u7BA1\u7406\u5668"] }), _jsxs(MenuItem, { onClick: handleFileManager, disableRipple: true, children: [_jsx(FolderOpenOutlinedIcon, {}), "\u6587\u4EF6\u7BA1\u7406\u5668(\u5B9E\u9A8C\u6027)"] }), _jsx(MenuItem, { onClick: (e) => {
                             handleClick3(e);
                             // handleCloseMenu()s
                         }, disableRipple: true, children: _jsx(Export, { anchorEl: anchorEl3, open: open3, closeMenu: handleCloseMenu, closeExportMenu: handleCloseExport }) }), _jsx(Divider, { sx: { my: 0.5 } }), _jsx(MenuItem, { onClick: (e) => {
@@ -96,6 +102,6 @@ const CustomizedMenus = observer(() => {
                             // handleCloseMenu()
                         }, disableRipple: true, children: _jsx(Settings, { closeAll: handleCloseMenu, anchorEl: anchorEl4, open: open4, onClick: handleCloseSettings }) }), _jsxs(MenuItem, { onClick: () => {
                             handleCloseMenu();
-                        }, disableRipple: true, children: [_jsx(MoreHorizIcon, {}), "\u66F4\u591A(\u656C\u8BF7\u671F\u5F85)"] })] })] }));
+                        }, disableRipple: true, children: [_jsx(MoreHorizIcon, {}), "\u66F4\u591A(\u656C\u8BF7\u671F\u5F85)\u00A0\u00A0"] })] })] }));
 });
 export default CustomizedMenus;

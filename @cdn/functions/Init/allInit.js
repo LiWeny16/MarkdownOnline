@@ -22,7 +22,7 @@ import { Notification } from "@arco-design/web-react";
 import kit from "@cdn-kit";
 import { markItExtension, importUrlExtension, imgExtension, emojiExtension, } from "@Func/Parser/renderer";
 // import { changeTheme } from "@App/config/change"
-import operateLocalStorage from "@App/localStorage/localStorage";
+import OperateLocalStorage from "@App/localStorage/localStorage";
 import { ConfigStore, } from "@Root/js/React/Mobx/Config";
 import { markdownitLineNumber } from "@Func/Parser/mdItPlugin/lineNumber";
 import markdownitFootNote from "markdown-it-footnote";
@@ -144,6 +144,10 @@ export default function allInit(editor = window.editor, monaco = window.monaco) 
         });
     }); //初始化输入区域
     /**
+     * @description 全局事件初始化
+     */
+    window.onerror = () => { };
+    /**
      * @description 全局变量初始化
      */
     window.deco = editor.createDecorationsCollection();
@@ -163,18 +167,29 @@ export default function allInit(editor = window.editor, monaco = window.monaco) 
     // enObj.enPasteEvent ? pasteEvent() : console.log("Paste Event is off") //开启快捷键事件
 }
 // #region ********************config region***************************
-const normalConfigArr = ["on", "off", "light", "dark"];
-const normalSettingsKey = ["mermaidTheme", "speechLanguage", "syncScroll"];
-export const normalMermaidTheme = ["default", "forest", "dark", "neutral"];
 const defaultConfig = {
     themeState: "light",
+    fileManagerState: false,
     emojiPickerState: "off",
     contextMenuClickPosition: { posx: 20, posy: 20 },
     settingsConfig: {
-        basic: { syncScroll: true, speechLanguage: "zh-CN" },
+        basic: { syncScroll: false, speechLanguage: "zh-CN", fileEditLocal: true },
         advanced: { mermaidTheme: "default" },
     },
 };
+const normalConfigArr = ["on", "off", "light", "dark"];
+const normalSettingsKey = [
+    ...Object.keys(defaultConfig.settingsConfig.basic),
+    ...Object.keys(defaultConfig.settingsConfig.advanced),
+];
+Object.keys(defaultConfig.settingsConfig.advanced);
+export const normalMermaidTheme = ["default", "forest", "dark", "neutral"];
+export const normalMermaidThemeMap = [
+    `default (默认，才是最美的！)`,
+    `forest (说真的，很绿)`,
+    `dark (说真的，很黑)`,
+    `neutral (清心寡欲，出家必选)`,
+];
 /**
  * @description 对设置进行初始化
  * @param defaultConfig 默认设置
@@ -190,7 +205,7 @@ export function configInit(defaultConfig) {
     }
     let _defaultConfig = defaultConfig;
     // 操作localStorage
-    let opLocalStorage = new operateLocalStorage();
+    let opLocalStorage = new OperateLocalStorage();
     // 循环遍历默认设置
     for (let key in _defaultConfig) {
         // 如果默认设置的键值在LocalStorage有存
@@ -213,8 +228,6 @@ export function configInit(defaultConfig) {
                                 }
                             });
                         }
-                        // console.log(storedSettings.basic)
-                        // console.log(storedSettings.advanced)
                         _defaultConfig[key] = JSON.parse(opLocalStorage.getItem(key).toString());
                     }
                     else {
@@ -224,6 +237,7 @@ export function configInit(defaultConfig) {
                     }
                 }
                 catch (err) {
+                    console.log(err);
                     storeDefaultSettings(key);
                 }
             }

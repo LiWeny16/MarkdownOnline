@@ -18,8 +18,8 @@ export default function preViewClickEvent(editor, monaco, decorations = editor.c
         }
         // console.log(dataLineValue)
         if (dataLineValue) {
-            window.editor.setPosition({ lineNumber: dataLineValue + 1, column: 1 });
-            window.editor.revealLineInCenter(dataLineValue + 1);
+            editor.setPosition({ lineNumber: dataLineValue + 1, column: 1 });
+            editor.revealLineInCenter(dataLineValue + 1, 1);
             decorations.clear();
             decorations.set([
                 {

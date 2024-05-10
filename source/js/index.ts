@@ -21,7 +21,7 @@ import prepareParser from "@Func/Parser/prepareParser/prepare"
 
 // 异步函数用于加载 Pyodide 和 matplotlib
 async function loadPyodideAndPackages() {
-  let pyodide = await loadPyodide()
+  let pyodide = await window.loadPyodide()
   await pyodide.loadPackage(["matplotlib", "micropip"])
 
   // 使用 micropip 安装其他 Python 包

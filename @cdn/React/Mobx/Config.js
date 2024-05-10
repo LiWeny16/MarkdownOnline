@@ -4,8 +4,14 @@ import { makeAutoObservable, observable } from "mobx";
  * @description Config状态类
  */
 class ConfigStore {
-    constructor({ themeState, emojiPickerState, contextMenuClickPosition, settingsConfig, }) {
+    constructor({ themeState, fileManagerState, emojiPickerState, contextMenuClickPosition, settingsConfig, }) {
         Object.defineProperty(this, "themeState", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        Object.defineProperty(this, "fileManagerState", {
             enumerable: true,
             configurable: true,
             writable: true,
@@ -31,11 +37,13 @@ class ConfigStore {
         });
         makeAutoObservable(this, {
             themeState: observable,
+            fileManagerState: observable,
             emojiPickerState: observable,
             contextMenuClickPosition: observable,
             settingsConfig: observable,
         });
         this.themeState = themeState;
+        this.fileManagerState = fileManagerState;
         this.emojiPickerState = emojiPickerState;
         this.contextMenuClickPosition = contextMenuClickPosition;
         this.settingsConfig = settingsConfig;

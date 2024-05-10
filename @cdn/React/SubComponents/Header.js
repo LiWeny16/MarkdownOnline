@@ -39,6 +39,7 @@ import aboutBox from "@Func/Events/aboutBox";
 import { Message } from "@arco-design/web-react";
 import { observer } from "mobx-react";
 import { useTheme } from "@mui/material";
+import FileDrawer from "./SubHeader/File/File";
 const runTo = (url, delay) => {
     kit.sleep(delay).then(() => {
         window.location.href = url;
@@ -107,7 +108,7 @@ const DrawerAppBar = observer((props) => {
                                     textDecoration: "none",
                                 }, children: _jsx("h1", { style: { fontSize: "28px" }, children: "Markdown+ Online View" }) }), _jsxs(Box, { sx: { display: { xs: "none", sm: "flex", flexDirection: "row" } }, children: [_jsx(MyButton, { href: "https://bigonion.cn", startIcon: _jsx(LinkIcon, {}), children: "\u9996\u9875" }), _jsx(MyButton, { onClick: () => {
                                             enObj.enAboutBox ? aboutBox() : undefined;
-                                        }, startIcon: _jsx(HelpOutlineIcon, {}), children: "\u5173\u4E8E" }), _jsx(Menu, {}), _jsx(ImageManger, {})] })] }) }), _jsx(Box, { sx: { display: { xs: "flex", sm: "none" } }, component: "nav", children: _jsx(Drawer, { container: container, variant: "temporary", open: mobileOpen, onClose: handleDrawerToggle, ModalProps: {
+                                        }, startIcon: _jsx(HelpOutlineIcon, {}), children: "\u5173\u4E8E" }), _jsx(Menu, {}), _jsx(ImageManger, {}), _jsx(FileDrawer, {})] })] }) }), _jsx(Box, { sx: { display: { xs: "flex", sm: "none" } }, component: "nav", children: _jsx(Drawer, { container: container, variant: "temporary", open: mobileOpen, onClose: handleDrawerToggle, ModalProps: {
                             keepMounted: true, // Better open performance on mobile.
                         }, sx: {
                             display: { xs: "block", sm: "none" },

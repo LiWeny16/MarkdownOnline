@@ -1,13 +1,13 @@
 /**
  * @description 封装localStorage
  */
-class operateLocalStorage {
+class OperateLocalStorage {
     constructor() {
         Object.defineProperty(this, "version", {
             enumerable: true,
             configurable: true,
             writable: true,
-            value: "0.1"
+            value: "0.2"
         });
     }
     setItem(key, value) {
@@ -25,4 +25,4 @@ class operateLocalStorage {
         localStorage.removeItem(key);
     }
 }
-export default operateLocalStorage;
+export default OperateLocalStorage;

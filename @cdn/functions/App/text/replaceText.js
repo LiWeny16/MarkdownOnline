@@ -5,7 +5,7 @@
  * @param rightStr String
  * @deprecated
  */
-export default function replaceSelection(e, leftStr, rightStr) {
+function replaceSelection(e, leftStr, rightStr) {
     var start = e.selectionStart;
     var end = e.selectionEnd;
     // console.log(start, end)
@@ -28,7 +28,7 @@ export default function replaceSelection(e, leftStr, rightStr) {
 /**
  * @description 替换选择的内容
  */
-export function replaceMonacoSelection(newText = "nihao") {
+function replaceMonacoSelection(newText = "nihao") {
     const _editor = window.editor; // 假设你只有一个编辑器实例
     const currentSelection = _editor.getSelection();
     _editor.executeEdits("my-replace", [
@@ -41,8 +41,8 @@ export function replaceMonacoSelection(newText = "nihao") {
 }
 /**
  * @description 范围替换文本
-*/
-export function replaceMonacoInRange(startLineNumber, startColumn, endLineNumber, endColumn, newText) {
+ */
+function replaceMonacoInRange(startLineNumber, startColumn, endLineNumber, endColumn, newText) {
     const _editor = window.editor; // 假设你只有一个编辑器实例
     // const currentSelection = _editor.getSelection()
     _editor.executeEdits("my-replace", [
@@ -53,14 +53,25 @@ export function replaceMonacoInRange(startLineNumber, startColumn, endLineNumber
         },
     ]);
 }
-export function replaceMonacoAll(model, editor, newText = "") {
+/**
+ * @description 完全替换内容，不保留历史
+ */
+function replaceMonacoAllForce(editor, monaco, newContent) {
+    editor.setValue(newContent);
+}
+/**
+ * @description 替换全部文本，保留历史
+ */
+function replaceMonacoAll(monaco, editor, newContent = "") {
     const _editor = editor ?? window.editor; // 假设你只有一个编辑器实例
-    let allRange = model.getFullModelRange();
+    const allRange = monaco.editor.getEditors()[0].getModel().getFullModelRange();
     _editor.executeEdits("my-replace2", [
         {
             range: allRange,
-            text: newText,
+            text: newContent,
             forceMoveMarkers: true,
         },
     ]);
 }
+export default replaceSelection;
+export { replaceMonacoSelection, replaceMonacoInRange, replaceMonacoAllForce, replaceMonacoAll, };

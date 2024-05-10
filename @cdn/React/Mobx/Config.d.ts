@@ -17,6 +17,7 @@ export type Settings = {
 type SettingsBasic = {
     syncScroll: boolean;
     speechLanguage: "zh-CN" | "en-US" | "ja-JP" | "yue-Hant-HK";
+    fileEditLocal: boolean;
 };
 type SettingsAd = {
     mermaidTheme: MermaidTheme;
@@ -35,10 +36,11 @@ export interface IConfig {
 declare class ConfigStore {
     [key: string]: any;
     themeState: ThemeState;
+    fileManagerState: boolean;
     emojiPickerState: EmojiPickerState;
     contextMenuClickPosition: MousePosition;
     settingsConfig: Settings;
-    constructor({ themeState, emojiPickerState, contextMenuClickPosition, settingsConfig, }: IConfig);
+    constructor({ themeState, fileManagerState, emojiPickerState, contextMenuClickPosition, settingsConfig, }: IConfig);
     /**
      * @description getAllConfig
      */

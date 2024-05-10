@@ -103,7 +103,7 @@ const CustomizedMenus = observer(() => {
       >
         <DialogTitle>
           <Typography variant="h6" gutterBottom>
-            Ready To Export? You Have Not Saved Yet!
+            确定导出吗，你还没有保存呢！
           </Typography>
         </DialogTitle>
         <DialogContent>
@@ -121,7 +121,7 @@ const CustomizedMenus = observer(() => {
               myPrint()
             }}
           >
-            YES
+            是嘟
           </Button>
           <Button
             onClick={() => {
@@ -129,17 +129,11 @@ const CustomizedMenus = observer(() => {
             }}
             autoFocus
           >
-            NO
+            达咩
           </Button>
         </DialogActions>
       </Dialog>
-      <MyButton
-        open={open}
-        endIcon={<MoreVertIcon />}
-        onClick={handleClick}
-        // endIcon={<KeyboardArrowDownIcon />}
-        // style={{ fontFamily: "monospace" }}
-      >
+      <MyButton open={open} endIcon={<MoreVertIcon />} onClick={handleClick}>
         {"更多"}
       </MyButton>
 
@@ -156,12 +150,10 @@ const CustomizedMenus = observer(() => {
         <MenuItem onClick={handleImageManager} disableRipple>
           <EditIcon />
           图片管理器
-          {/* {imgManagerState ? <ImageManager /> : undefined} */}
         </MenuItem>
         <MenuItem onClick={handleFileManager} disableRipple>
           <FolderOpenOutlinedIcon />
           文件管理器(实验性)
-          {/* {imgManagerState ? <ImageManager /> : undefined} */}
         </MenuItem>
         <MenuItem
           onClick={(e) => {

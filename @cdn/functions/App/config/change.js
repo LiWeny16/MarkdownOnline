@@ -1,8 +1,8 @@
 // import { useConfig } from "@Root/js/React/Mobx/Config"
-import operateLocalStorage from "@App/localStorage/localStorage";
+import OperateLocalStorage from "@App/localStorage/localStorage";
 import { useConfig } from "@Func/Init/allInit";
 import { toJS } from "mobx";
-let opLocalStorage = new operateLocalStorage();
+let opLocalStorage = new OperateLocalStorage();
 //#region *********************Theme*********************
 export function changeTheme(mode) {
     // console.log(useConfig().getAllConfig())
@@ -49,7 +49,7 @@ export function getContextMenuClickPosition() {
 //#endregion
 //#region
 /**
- * @description 更新设置
+ * @description 更新设置,合并设置，存储到localStorage
  */
 export function changeSettings(newSettings) {
     const currentSettings = getSettings();
@@ -81,3 +81,11 @@ function updateSettingsConfig(currentSettings, newSettings) {
     return currentSettings;
 }
 //#endregion
+//#region *********************FileManager*********************
+export function changeFileManagerState(mode) {
+    useConfig().fileManagerState = mode;
+}
+export function getFileManagerState() {
+    return useConfig().fileManagerState;
+}
+//#endregion *********************FileManager******************

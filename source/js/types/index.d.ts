@@ -211,6 +211,7 @@ declare interface Window {
   deco: any
   katex: any
   mermaid: any
+  loadPyodide:any
   _speechData: {
     processing: Boolean
     speechResult: string

@@ -6,7 +6,7 @@ export declare function getEmojiPickerState(): import("@Root/js/React/Mobx/Confi
 export declare function setContextMenuClickPosition(pos: IConfig["contextMenuClickPosition"]): false | undefined;
 export declare function getContextMenuClickPosition(): import("@Root/js/React/Mobx/Config").MousePosition;
 /**
- * @description 更新设置
+ * @description 更新设置,合并设置，存储到localStorage
  */
 export declare function changeSettings(newSettings: {
     basic?: Partial<Settings["basic"]>;
@@ -16,3 +16,5 @@ export declare function changeSettings(newSettings: {
  * @description 读取设置
  */
 export declare function getSettings(): Settings;
+export declare function changeFileManagerState(mode: boolean): void;
+export declare function getFileManagerState(): boolean;

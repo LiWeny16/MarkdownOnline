@@ -9,6 +9,7 @@ import exeLatexBlockAction from "./actions/latexBlock";
 import exeEmojiPickerAction from "./actions/emojiPicker";
 import exeSpeechPanelAction from "./actions/speechPanel";
 import exeSyncScrollAction from "./actions/syncScroll";
+import exeFileManagerAction from "./actions/fileManager";
 export default function monacoKeyEvent(editor, monaco) {
     const keyMap = {
         save: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
@@ -20,6 +21,7 @@ export default function monacoKeyEvent(editor, monaco) {
         latexBlock: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyM,
         voice2Words: monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyV,
         syncScroll: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyQ,
+        fileManager: monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF,
     };
     editor.addAction({
         id: "fsKey2",
@@ -150,6 +152,15 @@ export default function monacoKeyEvent(editor, monaco) {
         contextMenuGroupId: "navigation",
         run: () => {
             exeSyncScrollAction(editor, monaco);
+        },
+    });
+    editor.addAction({
+        id: "command.fileManagerState",
+        label: "文件管理器",
+        keybindings: [keyMap.fileManager],
+        contextMenuGroupId: "navigation",
+        run: () => {
+            exeFileManagerAction(editor, monaco);
         },
     });
 }

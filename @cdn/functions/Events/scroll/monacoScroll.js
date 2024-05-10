@@ -47,19 +47,52 @@ function syncScroll(lineNumber) {
         return;
     }
     const elements = document.querySelectorAll("#view-area [data-line]");
-    let closestElement = null;
-    let closestDistance = Infinity;
+    let closestPrevElement = null;
+    let closestNextElement = null;
+    let closestPrevDistance = Infinity;
+    let closestNextDistance = Infinity;
+    let exactlyElement = null;
     elements.forEach((element) => {
         const line = parseInt(element.getAttribute("data-line") || "0", 10);
-        const distance = Math.abs(line - lineNumber);
-        if (distance < closestDistance) {
-            closestDistance = distance;
-            closestElement = element;
+        const distance = line - lineNumber;
+        if (distance == 0) {
+            exactlyElement = element;
+        }
+        else {
+            if (distance < 0 && Math.abs(distance) < closestPrevDistance) {
+                closestPrevDistance = Math.abs(distance);
+                closestPrevElement = element;
+            }
+            if (distance > 0 && distance < closestNextDistance) {
+                closestNextDistance = distance;
+                closestNextElement = element;
+            }
         }
     });
-    if (closestElement) {
+    if (exactlyElement) {
         viewArea.scrollTo({
-            top: closestElement.offsetTop,
+            top: exactlyElement.offsetTop,
+            behavior: "smooth",
+        });
+        return;
+    }
+    if (!closestNextElement) {
+        viewArea.scrollTo({
+            top: closestPrevElement.offsetTop,
+            behavior: "smooth",
+        });
+        return;
+    }
+    if (closestPrevElement && closestNextElement) {
+        const offsetPre = closestPrevElement.offsetTop;
+        const offsetNext = closestNextElement.offsetTop;
+        closestPrevDistance;
+        closestNextDistance;
+        const ratio = (lineNumber - (lineNumber - closestPrevDistance)) /
+            (closestNextDistance + closestPrevDistance);
+        const ratioDistance = (offsetNext - offsetPre) * ratio + offsetPre;
+        viewArea.scrollTo({
+            top: ratioDistance,
             behavior: "smooth",
         });
     }

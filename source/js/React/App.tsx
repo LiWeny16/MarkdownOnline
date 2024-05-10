@@ -5,7 +5,7 @@ import Header from "./SubComponents/Header"
 import Body from "./SubComponents/Body"
 import { observer } from "mobx-react"
 
-import { createTheme, ThemeProvider } from "@mui/material/styles"
+import { createTheme, ThemeOptions, ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
 import { orange, green, grey, common, blue, pink } from "@mui/material/colors"
 import { getTheme } from "@App/config/change"
@@ -13,7 +13,11 @@ import { Box } from "@mui/material"
 import kit from "bigonion-kit"
 // import Box from "@mui/material/Box"
 // import TB from "@Com/myCom/Layout/TB"
+const bothStyle: ThemeOptions = {
+  zIndex: { drawer: 1300, modal: 1200, appBar: 1200 },
+}
 const lightTheme = createTheme({
+  ...bothStyle,
   palette: {
     primary: {
       main: blue[200],
@@ -32,6 +36,7 @@ const lightTheme = createTheme({
 })
 
 const darkTheme = createTheme({
+  ...bothStyle,
   palette: {
     primary: {
       main: blue[400],
