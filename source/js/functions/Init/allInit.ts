@@ -31,7 +31,7 @@ import {
   emojiExtension,
 } from "@Func/Parser/renderer"
 // import { changeTheme } from "@App/config/change"
-import operateLocalStorage from "@App/localStorage/localStorage"
+import OperateLocalStorage from "@App/localStorage/localStorage"
 import {
   ConfigStore,
   IConfig,
@@ -174,6 +174,10 @@ export default function allInit(
   }) //初始化输入区域
 
   /**
+   * @description 全局事件初始化
+   */
+  window.onerror = () => {}
+  /**
    * @description 全局变量初始化
    */
   window.deco = editor.createDecorationsCollection()
@@ -195,18 +199,30 @@ export default function allInit(
 }
 
 // #region ********************config region***************************
-const normalConfigArr: NormalConfigArr = ["on", "off", "light", "dark"]
-const normalSettingsKey = ["mermaidTheme", "speechLanguage", "syncScroll"]
-export const normalMermaidTheme = ["default", "forest", "dark", "neutral"]
 const defaultConfig: IConfig = {
   themeState: "light",
+  fileManagerState: false,
   emojiPickerState: "off",
   contextMenuClickPosition: { posx: 20, posy: 20 },
   settingsConfig: {
-    basic: { syncScroll: true, speechLanguage: "zh-CN" },
+    basic: { syncScroll: false, speechLanguage: "zh-CN", fileEditLocal: true },
     advanced: { mermaidTheme: "default" },
   },
 }
+
+const normalConfigArr: NormalConfigArr = ["on", "off", "light", "dark"]
+const normalSettingsKey = [
+  ...Object.keys(defaultConfig.settingsConfig.basic),
+  ...Object.keys(defaultConfig.settingsConfig.advanced),
+]
+Object.keys(defaultConfig.settingsConfig.advanced)
+export const normalMermaidTheme = ["default", "forest", "dark", "neutral"]
+export const normalMermaidThemeMap = [
+  `default (默认，才是最美的！)`,
+  `forest (说真的，很绿)`,
+  `dark (说真的，很黑)`,
+  `neutral (清心寡欲，出家必选)`,
+]
 
 /**
  * @description 对设置进行初始化
@@ -222,7 +238,7 @@ export function configInit(defaultConfig: IConfig) {
   }
   let _defaultConfig: IConfig = defaultConfig
   // 操作localStorage
-  let opLocalStorage = new operateLocalStorage()
+  let opLocalStorage = new OperateLocalStorage()
 
   // 循环遍历默认设置
   for (let key in _defaultConfig) {
@@ -249,8 +265,6 @@ export function configInit(defaultConfig: IConfig) {
                 }
               })
             }
-            // console.log(storedSettings.basic)
-            // console.log(storedSettings.advanced)
             _defaultConfig[key as string] = JSON.parse(
               opLocalStorage.getItem(key).toString()
             )
@@ -260,6 +274,7 @@ export function configInit(defaultConfig: IConfig) {
               .toString()
           }
         } catch (err) {
+          console.log(err)
           storeDefaultSettings(key)
         }
       } else {

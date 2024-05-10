@@ -2,6 +2,7 @@
 import save from "@App/save"
 import replaceSelection from "@App/text/replaceText"
 import exeSyncScrollAction from "./actions/syncScroll"
+import exeFileManagerAction from "./actions/fileManager"
 // import voice from "@App/voice/sound"
 // import qiniuFileAPI from "@App/qiniu/index"
 // import insertTextAtCursor from "@App/text/insertTextAtCursor"
@@ -14,20 +15,18 @@ function enableFastKeyEvent() {
   document.addEventListener(
     "keydown",
     (e) => {
-      // let editor = document.getElementById("md-area")
-
-      // TAB
-      if (e.key == "Tab") {
-        e.preventDefault()
-        // insertTextAtCursor(editor,"    ")
-      }
-      // Ctrl + B 黑体
+      // Ctrl + Q
       if (e.ctrlKey && e.key == "q") {
         // replaceSelection(editor, "**", "**")
         e.stopPropagation() //停止冒泡，向上传递事件
         e.preventDefault()
 
         exeSyncScrollAction(window.editor, window.monaco)
+      }
+      if (e.ctrlKey && (e.altKey || e.shiftKey) && e.key == "f") {
+        e.stopPropagation() //停止冒泡，向上传递事件
+        e.preventDefault()
+        exeFileManagerAction(window.editor, window.monaco)
       }
       // Alt + C 中心
       if (e.key == "c" && e.altKey) {

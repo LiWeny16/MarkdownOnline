@@ -39,14 +39,14 @@ export default function IconBreadcrumbs() {
           href="/material-ui/getting-started/installation/"
         >
           <WhatshotIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-          Core
+          Basic
         </Link>
         <Typography
           sx={{ display: "flex", alignItems: "center" }}
           color="text.primary"
         >
           <GrainIcon sx={{ mr: 0.5 }} fontSize="inherit" />
-          Breadcrumb
+          Theme
         </Typography>
       </Breadcrumbs>
     </Box>

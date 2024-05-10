@@ -1,30 +1,34 @@
-// import {
-//   openDB,
-//   getDataByIndex,
-//   cursorGetDataByIndex,
-//   addData,
-//   getDataByKey,
-//   cursorGetData,
-//   updateDB
-// } from "@App/db.js"
 import { Message } from "@arco-design/web-react"
-import  { getMdTextFromMonaco } from "@App/text/getMdText"
+import { getMdTextFromMonaco } from "@App/text/getMdText"
 import {
   fillInMemoryText,
   readMemoryText,
   readMemoryImg,
 } from "@App/textMemory/memory"
-export default function save(editor=null ,message = true) {
+import { FileManager } from "./fileSystem/file"
+import { getSettings } from "./config/change"
+export default async function save(editor = null, message = true) {
   let text = getMdTextFromMonaco()
+  let infoMsg = ""
   if (message && text != "null") {
+    fillInMemoryText(text)
+    if (getSettings().basic.fileEditLocal) {
+      const fileManager = new FileManager(window._fileHandle)
+      if (await fileManager.saveFileSilently(text)) {
+        infoMsg = "成功保存到本地！"
+      } else {
+        infoMsg = "成功保存到浏览器！(未打开本地文件)"
+      }
+    } else {
+      infoMsg = "成功保存到浏览器！"
+    }
     Message.success({
       style: { position: "relative", zIndex: 1 },
-      content: "保存成功!",
+      content: infoMsg,
       closable: true,
       duration: 2500,
       position: "top",
     })
-    fillInMemoryText(text)
   } else {
     save()
   }

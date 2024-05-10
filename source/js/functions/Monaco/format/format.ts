@@ -30,7 +30,7 @@ export default function monacoFormat(
           //     text: parsedMd,
           //   },
           // ])
-          replaceMonacoAll(model, editor, parsedMd)
+          replaceMonacoAll(window.monaco, editor, parsedMd)
           editor.setPosition(currentPosition)
         })
       return []

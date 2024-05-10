@@ -42,6 +42,7 @@ import { Message } from "@arco-design/web-react"
 import { useImage } from "@Root/js/React/Mobx/Image"
 import { observer } from "mobx-react"
 import { useTheme } from "@mui/material"
+import FileDrawer from "./SubHeader/File/File"
 
 interface Props {
   /**
@@ -228,9 +229,9 @@ const DrawerAppBar = observer((props: Props) => {
               >
                 关于
               </MyButton>
-              {/* 更多 */}
               <Menu />
               <ImageManger />
+              <FileDrawer />
             </Box>
           </Toolbar>
         </AppBar>

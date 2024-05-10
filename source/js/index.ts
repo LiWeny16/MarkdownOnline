@@ -1,15 +1,6 @@
 // @ts-ignore
-import MarkdownItIncrementalDOM from "markdown-it-incremental-dom"
+// import MarkdownItIncrementalDOM from "markdown-it-incremental-dom"
 import * as IncrementalDOM from "incremental-dom"
-// import markdownIt from "markdown-it"
-// import Token from "https://jsd.onmicrosoft.cn/npm/markdown-it@14.0.0/lib/token.mjs";
-// import markdownItGithubToc from "markdown-it-github-toc"
-import { figure } from "@mdit/plugin-figure"
-import mermaid from "mermaid"
-// import mermaid from "mermaid"
-// import "https://cdn.bootcdn.net/ajax/libs/mermaid/10.2.0/mermaid.min.js"
-// import mermaid from "https://cdn.bootcdn.net/ajax/libs/mermaid/10.4.0/mermaid.esm.min.mjs"
-// import hljs from "https://unpkg.com/@highlightjs/cdn-assets@11.6.0/highlight.min.js"
 import hljs from "@cdn-hljs"
 import "@cdn-katex"
 // import {katex} from "https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.js"
@@ -19,21 +10,68 @@ import { getMdTextFromMonaco } from "@App/text/getMdText"
 import pageBreaker from "@Func/Parser/pageBreaker"
 import "../css/index.less"
 
-// const span = new Token("span_open","span",1)
-// console.log(span);
-
 import { isSyntaxValid } from "@App/script"
-import { markdownitLineNumber } from "@Func/Parser/mdItPlugin/lineNumber"
-import { myPlugin } from "@Func/Parser/mdItPlugin/alertBlock"
 import { markdownParser } from "@Func/Init/allInit"
-import virtualFileSystem from "@Func/Parser/VFS"
-import { readMemoryImg } from "@App/textMemory/memory"
-import markdownIt from "markdown-it"
 import prepareParser from "@Func/Parser/prepareParser/prepare"
-
 // @ts-ignore
-// window.md = markdownIt()
 // window.mermaid = mermaid
+
+// import "https://jsd.onmicrosoft.cn/pyodide/v0.24.1/full/pyodide.js"
+// import { toJS } from "mobx"
+
+// 异步函数用于加载 Pyodide 和 matplotlib
+async function loadPyodideAndPackages() {
+  let pyodide = await loadPyodide()
+  await pyodide.loadPackage(["matplotlib", "micropip"])
+
+  // 使用 micropip 安装其他 Python 包
+  await pyodide.runPythonAsync(`
+    import micropip
+    await micropip.install('matplotlib')
+  `)
+
+  return pyodide
+}
+
+// 执行 Python 代码并生成图表
+async function runPythonCode() {
+  let pyodide = await loadPyodideAndPackages()
+
+  let pythonCode = `
+  import matplotlib.pyplot as plt
+  from js import document
+  from io import BytesIO
+  import base64
+  
+  # 创建图形
+  fig, ax = plt.subplots()
+  ax.plot([0, 1, 2, 3], [0, 1, 4, 9])
+  ax.set_title("Sample Plot")
+  
+  # 将图形保存到一个 BytesIO 对象中，并转换成 Base64 编码的 PNG 图片
+  buf = BytesIO()
+  plt.savefig(buf, format='png')
+  buf.seek(0)
+  img_base64 = base64.b64encode(buf.read()).decode('utf-8')
+  
+  # 使用 JavaScript 将图像显示在 HTML 中
+  img_html = f"<img src='data:image/png;base64,{img_base64}' />"
+  document.body.innerHTML += img_html
+  `
+
+  // 执行 Python 代码并获取 Base64 图像字符串
+  // let plot_base64 = await pyodide.runPythonAsync(pythonCode)
+
+  // 将 Base64 编码的图像插入 HTML 中
+  // let img = document.createElement("img")
+  // img.src = "data:image/png;base64," + plot_base64
+  // console.log(img)
+  // console.log(plot_base64);
+}
+
+// 运行 Python 代码
+// runPythonCode()
+
 /**
  * @description 拓展使能配置
  */
@@ -63,11 +101,6 @@ export async function mdConverter(save: boolean = true) {
   let view: any = getMdTextFromMonaco()
   // enObj.enClue ? (view = await clueParser(view)) : 1
   enObj.enPageBreaker ? (view = pageBreaker(view)) : 1
-  // enObj.enVirtualFileSystem ? (view = await virtualFileSystem(view)) : 1
-  // view = await latexParse2(view)
-  // view = await latexParse(view)
-  // enObj.enScript ? enableScript(view) : console.log("fast scripts off")
-
   /**
    * @description 处理需要异步的信息
    * */
@@ -145,7 +178,7 @@ function clueParser(md: any) {
     resolve(md)
   })
 }
-
+/**@deprecated*/
 function latexParse2(md: any, center = true) {
   md = md.replace(/\n/g, "<!br") //暂时替代换行符号
   return new Promise((resolve) => {
@@ -237,11 +270,6 @@ function readHiddenPre() {
   return document.getElementById("view-area-hidden")!.innerHTML
 }
 function writePre(text: any) {
-  // let iframe = document.getElementById("view-area") as HTMLIFrameElement
-  // let doc = iframe.contentWindow?.document
-  // doc?.open()
-  // doc?.write(text)
-  // doc?.close()
   document.getElementById("view-area")!.innerHTML = text
 }
 

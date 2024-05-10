@@ -39,7 +39,14 @@
     />
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-    <!-- <script src="/@cdn/lib//react-photo-view.esm.js"></script> -->
+    <!-- <link
+      rel="stylesheet"
+      href="https://pyscript.net/releases/2024.1.1/core.css"
+    />
+    <script
+      type="module"
+      src="https://pyscript.net/releases/2024.1.1/core.js"
+    ></script> -->
     <script
       src="https://jsd.onmicrosoft.cn/npm/react@18.2.0/umd/react.production.min.js"
       crossorigin="anonymous"
@@ -48,26 +55,8 @@
       src="https://jsd.onmicrosoft.cn/npm/react-dom@18.2.0/umd/react-dom.production.min.js"
       crossorigin="anonymous"
     ></script>
-    <script type="importmap">
-      {
-        "imports": {
-          "react": "https://jsd.onmicrosoft.cn/npm/react@18.2.0/umd/react.production.min.js",
-          "react-dom": "https://jsd.onmicrosoft.cn/npm/react-dom@18.2.0/umd/react-dom.production.min.js"
-        }
-      }
-    </script>
-    <!-- <script src="https://unpkg.com/@mui/material@5.15.16/umd/material-ui.production.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/pyodide/v0.25.1/full/pyodide.js"></script> -->
   </head>
-  <style>
-    * {
-      font-size: inherit;
-    }
-
-    body {
-      margin: 0 !important;
-    }
-  </style>
-
   <body>
     <h1 style="display: none">
       简约、极速的markdown在线编辑,支持markdown在线预览,markdown基础语法和拓展语法,代码高亮,emoji文本,截图插入。
@@ -75,7 +64,10 @@
       丰富的导出方式PDF、jpg、txt。数学公式, Latex公式也一并支持...
     </h1>
     <div id="root"></div>
+    <div id="plot"></div>
 
+    <!-- <div id="plot"></div> -->
+    <!-- <script type="py" src="./main.py" config="./a.toml"></script> -->
     <script type="module" src="./source/js/React/index.tsx"></script>
   </body>
 </html>

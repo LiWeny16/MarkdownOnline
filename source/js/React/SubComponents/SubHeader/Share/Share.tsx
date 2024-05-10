@@ -113,6 +113,8 @@ export default function Share(props: any) {
             e.stopPropagation()
             setMailSharePanelState(true)
           }}
+          disabled
+
           disableRipple
         >
           <AttachEmailIcon />

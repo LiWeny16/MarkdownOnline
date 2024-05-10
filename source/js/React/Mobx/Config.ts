@@ -19,6 +19,7 @@ export type Settings = {
 type SettingsBasic = {
   syncScroll: boolean
   speechLanguage: "zh-CN" | "en-US" | "ja-JP" | "yue-Hant-HK"
+  fileEditLocal: boolean
 }
 type SettingsAd = {
   mermaidTheme: MermaidTheme
@@ -41,22 +42,26 @@ class ConfigStore {
   // 字符串索引签名
   [key: string]: any
   public themeState: ThemeState
+  public fileManagerState: boolean
   public emojiPickerState: EmojiPickerState
   public contextMenuClickPosition: MousePosition
   public settingsConfig: Settings
   constructor({
     themeState,
+    fileManagerState,
     emojiPickerState,
     contextMenuClickPosition,
     settingsConfig,
   }: IConfig) {
     makeAutoObservable(this, {
       themeState: observable,
+      fileManagerState: observable,
       emojiPickerState: observable,
       contextMenuClickPosition: observable,
       settingsConfig: observable,
     })
     this.themeState = themeState
+    this.fileManagerState = fileManagerState
     this.emojiPickerState = emojiPickerState
     this.contextMenuClickPosition = contextMenuClickPosition
     this.settingsConfig = settingsConfig

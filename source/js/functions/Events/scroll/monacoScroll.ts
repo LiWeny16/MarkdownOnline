@@ -61,22 +61,53 @@ function syncScroll(lineNumber: number) {
   const elements = document.querySelectorAll<HTMLElement>(
     "#view-area [data-line]"
   )
-  let closestElement: HTMLElement | null = null
-  let closestDistance = Infinity
-
+  let closestPrevElement: HTMLElement | null = null
+  let closestNextElement: HTMLElement | null = null
+  let closestPrevDistance = Infinity
+  let closestNextDistance = Infinity
+  let exactlyElement: HTMLElement | null = null
   elements.forEach((element) => {
     const line = parseInt(element.getAttribute("data-line") || "0", 10)
-    const distance = Math.abs(line - lineNumber)
-
-    if (distance < closestDistance) {
-      closestDistance = distance
-      closestElement = element
+    const distance = line - lineNumber
+    if (distance == 0) {
+      exactlyElement = element
+    } else {
+      if (distance < 0 && Math.abs(distance) < closestPrevDistance) {
+        closestPrevDistance = Math.abs(distance)
+        closestPrevElement = element
+      }
+      if (distance > 0 && distance < closestNextDistance) {
+        closestNextDistance = distance
+        closestNextElement = element
+      }
     }
   })
 
-  if (closestElement) {
+  if (exactlyElement) {
     viewArea.scrollTo({
-      top: (closestElement as HTMLElement).offsetTop,
+      top: (exactlyElement! as HTMLElement).offsetTop,
+      behavior: "smooth",
+    })
+    return
+  }
+  if (!closestNextElement) {
+    viewArea.scrollTo({
+      top: (closestPrevElement! as HTMLElement).offsetTop,
+      behavior: "smooth",
+    })
+    return
+  }
+  if (closestPrevElement && closestNextElement) {
+    const offsetPre = (closestPrevElement as HTMLElement).offsetTop
+    const offsetNext = (closestNextElement as HTMLElement).offsetTop
+    closestPrevDistance
+    closestNextDistance
+    const ratio =
+      (lineNumber - (lineNumber - closestPrevDistance)) /
+      (closestNextDistance + closestPrevDistance)
+    const ratioDistance = (offsetNext - offsetPre) * ratio + offsetPre
+    viewArea.scrollTo({
+      top: ratioDistance,
       behavior: "smooth",
     })
   }

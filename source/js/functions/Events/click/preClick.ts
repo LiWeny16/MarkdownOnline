@@ -5,7 +5,7 @@ import { editor } from "monaco-editor"
 export default function preViewClickEvent(
   editor: editor.IStandaloneCodeEditor,
   monaco: Monaco,
-  decorations=editor.createDecorationsCollection()
+  decorations = editor.createDecorationsCollection()
 ) {
   document
     .getElementById("view-area")!
@@ -27,9 +27,8 @@ export default function preViewClickEvent(
       }
       // console.log(dataLineValue)
       if (dataLineValue) {
-        window.editor.setPosition({ lineNumber: dataLineValue + 1, column: 1 })
-
-        window.editor.revealLineInCenter(dataLineValue + 1)
+        editor.setPosition({ lineNumber: dataLineValue + 1, column: 1 })
+        editor.revealLineInCenter(dataLineValue + 1, 1)
         decorations.clear()
         decorations.set([
           {

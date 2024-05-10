@@ -23,6 +23,8 @@ import {
 } from "@mui/material"
 import { deleteDBAll } from "@App/db.js"
 import myPrint from "@App/export/myPrint"
+import FolderOpenOutlinedIcon from "@mui/icons-material/Folder"
+import { changeFileManagerState, getFileManagerState } from "@App/config/change"
 // import domtoimg from "@App/export/domToImg"
 
 const CustomizedMenus = observer(() => {
@@ -86,6 +88,10 @@ const CustomizedMenus = observer(() => {
     image.display()
     handleCloseMenu()
     // 点击这个的时候 传递一个信号给另一个抽屉组件
+  }
+  const handleFileManager = () => {
+    changeFileManagerState(true)
+    handleCloseMenu()
   }
   return (
     <div>
@@ -152,6 +158,11 @@ const CustomizedMenus = observer(() => {
           图片管理器
           {/* {imgManagerState ? <ImageManager /> : undefined} */}
         </MenuItem>
+        <MenuItem onClick={handleFileManager} disableRipple>
+          <FolderOpenOutlinedIcon />
+          文件管理器(实验性)
+          {/* {imgManagerState ? <ImageManager /> : undefined} */}
+        </MenuItem>
         <MenuItem
           onClick={(e) => {
             handleClick3(e)
@@ -204,7 +215,7 @@ const CustomizedMenus = observer(() => {
           disableRipple
         >
           <MoreHorizIcon />
-          更多(敬请期待)
+          更多(敬请期待)&nbsp;&nbsp;
         </MenuItem>
       </StyledMenu>
     </div>

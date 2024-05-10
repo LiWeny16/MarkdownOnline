@@ -3,6 +3,7 @@
     // TypeScript 默认会把代码编译为 ECMAScript 3
     // esnext 表示仅仅校验转换 TypeScript 类型，不进行语法编译
     "module": "esnext",
+    "lib": ["DOM", "ESNext"],
     "target": "ES2020",
     "skipLibCheck": true,
     "baseUrl": "./",
@@ -29,25 +30,25 @@
       "@Root/*": ["./source/*"],
       "@Com": ["./source/js/React/Components"],
       "@Com/*": ["./source/js/React/Components/*"],
-      "@Mobx":["source/js/React/Mobx"],
-      "@Mobx/*":["source/js/React/Mobx/*"],
-      "@Css":["source/js/React/Css"],
-      "@Css/*":["source/js/React/Css/*"],
-      
+      "@Mobx": ["source/js/React/Mobx"],
+      "@Mobx/*": ["source/js/React/Mobx/*"],
+      "@Css": ["source/js/React/Css"],
+      "@Css/*": ["source/js/React/Css/*"],
     },
-    "outDir": "./@cdn"
+    "outDir": "./@cdn",
   },
 
   // 配置需要校验的文件
   "include": [
     "src/**/*.ts",
     "source/js/types/*.d.ts",
+    "source/js/types/external/*.d.ts",
     "source",
-    "source/functions/*.ts"
-, "Layout"
+    "source/functions/*.ts",
+    "Layout",
     // "allTypes/*.d.ts",
   ],
 
   // 排除不需要 TypeScript 校验的文件
-  "exclude": ["node_modules", "docs"]
+  "exclude": ["node_modules", "docs"],
 }

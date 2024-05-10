@@ -1,4 +1,5 @@
 // import { editor } from "monaco-editor";
+// import ShowSaveFilePicker from "./external/file"
 
 type EnObjType = {
   enMainConverter: boolean
@@ -215,8 +216,18 @@ declare interface Window {
     speechResult: string
     speech: any
   }
-}
+  showOpenFilePicker: Promise<FileSystemDirectoryHandle> | any
+  showDirectoryPicker: FileSystemDirectoryHandle
+  showSaveFilePicker(
+    options?: SaveFilePickerOptions
+  ): Promise<FileSystemFileHandle>
 
+  _fileHandle: FileSystemFileHandle
+  _temp: any
+}
+interface a extends ShowSaveFilePicker {}
 interface HandleDBListFun {
   (List: string): void
 }
+declare var webkitSpeechRecognition: any
+declare var SpeechRecognition: any

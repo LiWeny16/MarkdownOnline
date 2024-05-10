@@ -8,24 +8,6 @@ const copyButtonStyle = `position: relative;
 top: 31px;
 left: 88%;`
 
-// function copyText(text: string) {
-//   navigator.clipboard
-//     .writeText(text)
-//     .then(() => {
-//       console.log("已复制到剪贴板")
-//     })
-//     .catch(() => {
-//       const e = document.createElement("textarea")
-//       document.body.appendChild(e)
-//       e.innerHTML = text
-//       e.select()
-//       if (document.execCommand("copy")) {
-//         document.execCommand("copy")
-//       }
-//       document.body.removeChild(e)
-//       console.log("复制成功")
-//     })
-// }
 
 let codePlugin = function (md: MarkdownIt) {
   const oldRender = md.renderer.rules.code_block!

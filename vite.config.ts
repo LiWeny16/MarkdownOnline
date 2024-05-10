@@ -93,6 +93,8 @@ export default defineConfig({
         "https://jsd.onmicrosoft.cn/npm/mermaid@10/dist/mermaid.esm.min.mjs",
       "@cdn-mermaid":
         "https://jsd.onmicrosoft.cn/npm/mermaid@10/dist/mermaid.esm.min.mjs",
+      "bigonion-kit":
+        "https://jsd.onmicrosoft.cn/npm/bigonion-kit@0.12.3/esm/kit.min.js",
       "@cdn-kit":
         "https://jsd.onmicrosoft.cn/npm/bigonion-kit@0.12.3/esm/kit.min.js",
       "@cdn-hljs":

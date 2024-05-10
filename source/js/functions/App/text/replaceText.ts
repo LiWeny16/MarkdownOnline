@@ -1,3 +1,4 @@
+import { Monaco } from "@monaco-editor/react"
 import { editor } from "monaco-editor"
 
 /**
@@ -7,7 +8,7 @@ import { editor } from "monaco-editor"
  * @param rightStr String
  * @deprecated
  */
-export default function replaceSelection(e: any, leftStr: any, rightStr: any) {
+function replaceSelection(e: any, leftStr: any, rightStr: any) {
   var start = e.selectionStart
   var end = e.selectionEnd
   // console.log(start, end)
@@ -31,7 +32,7 @@ export default function replaceSelection(e: any, leftStr: any, rightStr: any) {
 /**
  * @description 替换选择的内容
  */
-export function replaceMonacoSelection(newText: string = "nihao") {
+function replaceMonacoSelection(newText: string = "nihao") {
   const _editor = window.editor // 假设你只有一个编辑器实例
   const currentSelection = _editor.getSelection()
   _editor.executeEdits("my-replace", [
@@ -50,8 +51,8 @@ export function replaceMonacoSelection(newText: string = "nihao") {
 
 /**
  * @description 范围替换文本
-*/
-export function replaceMonacoInRange(
+ */
+function replaceMonacoInRange(
   startLineNumber: number,
   startColumn: number,
   endLineNumber: number,
@@ -73,19 +74,38 @@ export function replaceMonacoInRange(
     },
   ])
 }
-
-export function replaceMonacoAll(
-  model: editor.ITextModel,
+/**
+ * @description 完全替换内容，不保留历史
+ */
+function replaceMonacoAllForce(
   editor: editor.IStandaloneCodeEditor,
-  newText: string = ""
+  monaco: Monaco,
+  newContent: string
+) {
+  editor.setValue(newContent)
+}
+/**
+ * @description 替换全部文本，保留历史
+ */
+function replaceMonacoAll(
+  monaco: Monaco,
+  editor: editor.IStandaloneCodeEditor,
+  newContent: string = ""
 ) {
   const _editor = editor ?? window.editor // 假设你只有一个编辑器实例
-  let allRange = model.getFullModelRange()
+  const allRange = monaco.editor.getEditors()[0].getModel()!.getFullModelRange()
   _editor.executeEdits("my-replace2", [
     {
       range: allRange,
-      text: newText,
+      text: newContent,
       forceMoveMarkers: true,
     },
   ])
+}
+export default replaceSelection
+export {
+  replaceMonacoSelection,
+  replaceMonacoInRange,
+  replaceMonacoAllForce,
+  replaceMonacoAll,
 }

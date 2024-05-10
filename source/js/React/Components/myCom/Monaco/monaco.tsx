@@ -157,6 +157,11 @@ export default observer(function MonacoEditor() {
     // 暴露出去
     window.editor = editor
     window.monaco = monaco
+    /**
+     * @description allInit
+    */
+    allInit(editor, monaco)
+
     getDeviceTyByProportion() == "PC"
       ? setResizableWidth(document.getElementById("editor")!.clientWidth / 2)
       : 1
@@ -172,7 +177,6 @@ export default observer(function MonacoEditor() {
     monacoScrollEvent(editor, monaco)
     // monacoPalette(editor,monaco)
     // monacoKeyDownEvent()
-    allInit(editor, monaco)
     // errIntellisense()
     // 动态改变编辑器高度
     monacoResizeHeightEvent(setResizableHeight)
