@@ -109,6 +109,7 @@ export default defineConfig({
       "@Com": resolve(__dirname, "./source/js/React/Components"),
       "@Mobx": resolve(__dirname, "./source/js/React/Mobx"),
       "@Css": resolve(__dirname, "./source/css"),
+      "@Plugins": resolve(__dirname, "./source/js/functions/Plugins"),
       // "@arco-design/web-react":"https://jsd.onmicrosoft.cn/npm/@arco-design/web-react@2.59.0/dist/arco.min.js"
       // "mobx":"https://jsd.onmicrosoft.cn/npm/mobx-react@9.1.0/dist/mobxreact.esm.js"
     },

@@ -19,6 +19,5 @@ export declare const enObj: {
 };
 /**
  * @description 循环执行触发主解析事件流
- * @param {boolean} save
  */
-export declare function mdConverter(save?: boolean): Promise<void>;
+export declare function mdConverter(fully?: boolean): Promise<void>;

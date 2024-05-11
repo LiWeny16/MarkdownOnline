@@ -14,53 +14,7 @@ import { markdownParser } from "@Func/Init/allInit";
 import prepareParser from "@Func/Parser/prepareParser/prepare";
 // @ts-ignore
 // window.mermaid = mermaid
-// import "https://jsd.onmicrosoft.cn/pyodide/v0.24.1/full/pyodide.js"
-// import { toJS } from "mobx"
-// 异步函数用于加载 Pyodide 和 matplotlib
-async function loadPyodideAndPackages() {
-    let pyodide = await window.loadPyodide();
-    await pyodide.loadPackage(["matplotlib", "micropip"]);
-    // 使用 micropip 安装其他 Python 包
-    await pyodide.runPythonAsync(`
-    import micropip
-    await micropip.install('matplotlib')
-  `);
-    return pyodide;
-}
-// 执行 Python 代码并生成图表
-async function runPythonCode() {
-    let pyodide = await loadPyodideAndPackages();
-    let pythonCode = `
-  import matplotlib.pyplot as plt
-  from js import document
-  from io import BytesIO
-  import base64
-  
-  # 创建图形
-  fig, ax = plt.subplots()
-  ax.plot([0, 1, 2, 3], [0, 1, 4, 9])
-  ax.set_title("Sample Plot")
-  
-  # 将图形保存到一个 BytesIO 对象中，并转换成 Base64 编码的 PNG 图片
-  buf = BytesIO()
-  plt.savefig(buf, format='png')
-  buf.seek(0)
-  img_base64 = base64.b64encode(buf.read()).decode('utf-8')
-  
-  # 使用 JavaScript 将图像显示在 HTML 中
-  img_html = f"<img src='data:image/png;base64,{img_base64}' />"
-  document.body.innerHTML += img_html
-  `;
-    // 执行 Python 代码并获取 Base64 图像字符串
-    // let plot_base64 = await pyodide.runPythonAsync(pythonCode)
-    // 将 Base64 编码的图像插入 HTML 中
-    // let img = document.createElement("img")
-    // img.src = "data:image/png;base64," + plot_base64
-    // console.log(img)
-    // console.log(plot_base64);
-}
-// 运行 Python 代码
-// runPythonCode()
+// let pythonInWeb = new PythonInWeb(window.loadPyodide())
 /**
  * @description 拓展使能配置
  */
@@ -83,9 +37,8 @@ export const enObj = {
 // marked.use({ renderer: headingRenderer })
 /**
  * @description 循环执行触发主解析事件流
- * @param {boolean} save
  */
-export async function mdConverter(save = true) {
+export async function mdConverter(fully = false) {
     let view = getMdTextFromMonaco();
     // enObj.enClue ? (view = await clueParser(view)) : 1
     enObj.enPageBreaker ? (view = pageBreaker(view)) : 1;
@@ -93,9 +46,14 @@ export async function mdConverter(save = true) {
      * @description 处理需要异步的信息
      * */
     let env = await prepareParser(view);
-    IncrementalDOM.patch(document.getElementById("view-area"), 
-    // @ts-ignore
-    markdownParser().renderToIncrementalDOM(view, env));
+    if (fully) {
+        document.getElementById("view-area").innerHTML = markdownParser().render(view, env);
+    }
+    else {
+        IncrementalDOM.patch(document.getElementById("view-area"), 
+        // @ts-ignore
+        markdownParser().renderToIncrementalDOM(view, env));
+    }
     enObj.enHilightJs ? hljs.highlightAll() : 1;
 }
 /**

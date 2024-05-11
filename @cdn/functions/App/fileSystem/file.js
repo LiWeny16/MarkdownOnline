@@ -40,7 +40,7 @@ export class FileManager {
         }
         catch (error) {
             console.error("Error opening file:", error);
-            throw Error;
+            return null;
         }
     }
     /**

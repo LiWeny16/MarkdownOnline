@@ -83,7 +83,7 @@ const DrawerAppBar = observer((props) => {
                             }, children: [_jsx(ListItemAvatar, { children: _jsx(Avatar, { children: _jsx(InfoIcon, {}) }) }), _jsx(ListItemText, { primary: "About", secondary: "" })] }) })] })] })
     // </ThemeProvider>
     );
-    return (_jsx(_Fragment, { children: _jsxs("div", { className: "FLEX ", style: { flex: "0 0 8.7vh" }, children: [_jsx(CssBaseline, {}), _jsx(AppBar, { component: "nav", 
+    return (_jsx(_Fragment, { children: _jsxs("div", { className: "FLEX header-app-bar", style: { flex: "0 0 8.7vh" }, children: [_jsx(CssBaseline, {}), _jsx(AppBar, { component: "nav", 
                     // enableColorOnDark={false}
                     sx: {
                         position: "inherit",

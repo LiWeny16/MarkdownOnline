@@ -1,30 +1,18 @@
 import { changeSettings, getSettings } from "@App/config/change";
-import { Message } from "@arco-design/web-react";
+import alertUseArco from "@App/message/alert";
 export default function exeSyncScrollAction(editor, monaco) {
     if (getSettings().basic.syncScroll) {
         /**
          * @description 关闭同步滚动
          */
-        Message.success({
-            style: { position: "relative", zIndex: 1 },
-            content: "同步滚动已关闭 🧐 ",
-            closable: true,
-            duration: 2000,
-            position: "top",
-        });
+        alertUseArco("同步滚动已关闭 🧐 ", 2000);
         changeSettings({ basic: { syncScroll: false } });
     }
     else {
         /**
          * @description 开启同步滚动
          */
-        Message.success({
-            style: { position: "relative", zIndex: 1 },
-            content: "同步滚动已开启 😍 ",
-            closable: true,
-            duration: 2000,
-            position: "top",
-        });
+        alertUseArco("同步滚动已开启 😍 ", 2000);
         const currentScrollTop = editor.getScrollTop();
         // 设置新的滚动位置，向下移动 offset 的量
         editor.setScrollTop(currentScrollTop + 0.3);

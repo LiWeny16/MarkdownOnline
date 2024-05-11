@@ -1,17 +1,21 @@
-@import url("./print.less") print;
-@import url("./header.less");
-@import url("./response.less");
-// @import url("./clueParser.css");
-@import url("./aboutBox.css");
-@import url("./body.less");
+@import url("./ui/print/print.css");
+@import url("./ui/base/header.less");
+@import url("./ui/base/response.less");
+@import url("./ui/base/aboutBox.css");
+@import url("./ui/base/body.less");
+@import url("./ui/base/scrollBar.less");
+
+@import url("./markdown/code.patch.less");
+@import url("./markdown/latex.patch.less");
+@import url("./markdown/table.less");
+
+@import url("./lib/hljs.user.less");
 
 @import url("https://jsd.onmicrosoft.cn/npm/clue-parser@1.0.4/index.min.css");
 @import url("https://jsd.onmicrosoft.cn/npm/clue-parser@1.0.3/src/githubMd.min.css");
 @import url("https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.css");
 @import url("https://jsd.onmicrosoft.cn/npm/@arco-design/web-react@2.58.3/dist/css/arco.min.css");
 @import url("https://jsd.onmicrosoft.cn//npm/react-photo-view@1.2.4/dist/react-photo-view.min.css");
-
-
 
 .draggable-box {
   width: fit-content;
@@ -55,22 +59,6 @@ body {
   }
 }
 
-// Scroll Bar
-.transparent-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-  background-color: transparent;
-}
-
-.transparent-scrollbar::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 4px;
-}
-
-.transparent-scrollbar::-webkit-scrollbar-track {
-  background-color: transparent;
-}
-
 #root {
   width: 100svw;
   height: 100svh;
@@ -106,104 +94,6 @@ body {
 .img_resize_transition {
   transition: 0.4s;
 }
-tr {
-  transition: 0.3s !important;
-}
-tr:hover {
-  background: #fffdd6 !important;
-}
-
-// @region*********************hljs
-/**
-@my hljs
-*/
-
-.hljs {
-  pre code.hljs {
-    padding: 5px !important;
-  }
-  // .hljs-section,
-  // .hljs-title {
-  //   color: #000000 !important;
-  // }
-  .hljs-keyword {
-    color: #1160ff;
-  }
-  .hljs-string {
-    color: #a31515 !important;
-  }
-  .hljs-comment {
-    color: #2e7d49;
-  }
-
-  .hljs-punctuation,
-  .hljs-tag {
-    color: #444a;
-  }
-
-  .hljs-tag .hljs-attr,
-  .hljs-tag .hljs-name {
-    color: #444;
-  }
-
-  .hljs-attribute,
-  .hljs-doctag,
-  .hljs-keyword,
-  .hljs-meta .hljs-keyword,
-  .hljs-name,
-  .hljs-selector-tag {
-    font-weight: 700;
-  }
-  .hljs-link,
-  .hljs-operator,
-  .hljs-regexp,
-  .hljs-selector-attr,
-  .hljs-selector-pseudo,
-  .hljs-symbol,
-  .hljs-template-variable,
-  .hljs-variable {
-    color: #000000 !important;
-  }
-  .hljs-deletion,
-  .hljs-number,
-  .hljs-quote,
-  .hljs-selector-class,
-  .hljs-selector-id,
-  .hljs-template-tag,
-  .hljs-type {
-    color: #007018 !important;
-  }
-
-  .hljs-literal {
-    color: #695;
-  }
-
-  .hljs-addition,
-  .hljs-built_in,
-  .hljs-bullet,
-  .hljs-code {
-    color: #397300;
-  }
-
-  .hljs-meta {
-    color: #1f7199;
-  }
-
-  .hljs-meta .hljs-string {
-    color: #38a;
-  }
-
-  .hljs-emphasis {
-    font-style: italic;
-  }
-  .hljs-strong {
-    font-weight: 700;
-  }
-
-  /*  */
-}
-
-// @endregion******************hljs
 
 .PhotoView-Slider__Backdrop {
   background: rgba(24, 24, 24, 0.591) !important;
@@ -218,53 +108,4 @@ tr:hover {
 }
 .line-hilight {
   transition: 0.3s;
-}
-
-// Markdown github
-/* Markdown Compatibility - Markdown渲染补丁
-该补丁的作用是调整容器的显示, 让局部滚动条固定在页面右边, 而不是跟随内容区域的拖动而拖动.
-*/
-article.markdown-body {
-  max-width: none;
-  // display: flex;
-  // flex-flow: column;
-  // align-items: center;
-
-  // 设置所有子节点的宽度, 以匹配之前的样式
-  // 即最小100px宽度, 最大980px宽度
-  & > * {
-    width: 100%;
-    min-width: 200px;
-    max-width: 980px;
-  }
-
-  // 防止代码块的高度发生异常
-  pre {
-    overflow: unset;
-  }
-}
-
-.markdown-body .footnotes {
-  border-top: none !important;
-}
-
-.markdown-it-code-copy {
-  display: none;
-}
-
-.code-container:hover button.markdown-it-code-copy {
-  display: block;
-}
-
-// LateX Compatibility - lateX补丁
-.katex span.katex-mathml {
-  // fix: `.katex .katex-mathml` not exist position config
-  top: 0;
-}
-
-// markdown 补丁
-.markdown-body {
-  pre {
-    padding: 14px !important;
-  }
 }

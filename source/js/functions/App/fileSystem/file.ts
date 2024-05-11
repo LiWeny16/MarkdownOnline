@@ -1,4 +1,5 @@
 import OperateLocalStorage from "@App/localStorage/localStorage"
+import alertUseArco from "@App/message/alert"
 
 const supportFileTypes = [".md", ".py", ".js", ".ts"]
 
@@ -32,12 +33,11 @@ export class FileManager {
           },
         ],
       })
-
       window._fileHandle = this.fileHandle!
       return this.fileHandle
     } catch (error) {
       console.error("Error opening file:", error)
-      throw Error
+      return null
     }
   }
 

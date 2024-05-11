@@ -16,6 +16,7 @@ import { useTheme } from "@mui/material/styles"
 import React from "react"
 import SwitchIOS from "@Root/js/React/Components/myCom/Switches/SwitchIOS"
 import MyPaper from "@Root/js/React/Components/myCom/Paper"
+import alertUseArco from "@App/message/alert"
 
 const fileManager = new FileManager()
 let _t: NodeJS.Timeout | null
@@ -29,14 +30,14 @@ const FileDrawer = observer(function FileDrawer() {
     changeSettings({
       basic: { fileEditLocal: i },
     })
-    if (i) {
-      // 监听本地文件改动
-      _t = setInterval(async () => {
-        const content = await fileManager.readFile()
-      }, 1000)
-    } else {
-      _t = null
-    }
+    // if (i) {
+    //   // 监听本地文件改动
+    //   _t = setInterval(async () => {
+    //     const content = await fileManager.readFile()
+    //   }, 1000)
+    // } else {
+    //   _t = null
+    // }
   }
   return (
     <>
@@ -68,12 +69,23 @@ const FileDrawer = observer(function FileDrawer() {
             <Button
               sx={{ mb: "10px" }}
               onClick={async () => {
-                setEditingFileName(
-                  (await fileManager.openSingleFile())?.name ?? ""
-                )
-                const content = await fileManager.readFile()
-                if (content) {
-                  replaceMonacoAll(window.monaco, window.editor, content)
+                try {
+                  const fileHandle = await fileManager.openSingleFile()
+                  setEditingFileName(fileHandle?.name ?? "")
+                  if (fileHandle) {
+                    alertUseArco("正在打开本地文件，别急，你给我等会😅")
+                    const content = await fileManager.readFile()
+                    if (content) {
+                      replaceMonacoAll(window.monaco, window.editor, content)
+                      alertUseArco(`打开${fileHandle?.name}成功！😀`)
+                    }
+                  } else {
+                    alertUseArco("左顾右盼，活在梦幻?", 2500, {
+                      kind: "warning",
+                    })
+                  }
+                } catch (error) {
+                  alertUseArco("尼玛的报错乐🤣", 2000, { kind: "error" })
                 }
               }}
               variant="contained"

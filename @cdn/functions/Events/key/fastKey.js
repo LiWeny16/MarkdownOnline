@@ -36,18 +36,8 @@ function enableFastKeyEvent() {
         }
         // Ctrl + Alt + I
         if (e.key == "i" && e.altKey && e.ctrlKey) {
-            // if (recState) {
-            //   _rec?.stop()
-            // } else {
-            //   _rec = voice("zh-CN", true)
-            // }
-            // recState = !recState
-            // console.log(rec.recognition);
         }
         if (e.key == "o" && e.altKey && e.ctrlKey) {
-            // let rec = sound("zh-CN")
-            // qiniuFileAPI()
-            // console.log(rec.recognition)
         }
     }, true);
 }

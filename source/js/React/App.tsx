@@ -66,7 +66,7 @@ const App: any = observer(() => {
     <>
       <ThemeProvider theme={getTheme() === "light" ? lightTheme : darkTheme}>
         <CssBaseline />
-        <Box className="FLEX COL">
+        <Box className="FLEX COL App-top">
           <Header />
           <Body />
         </Box>

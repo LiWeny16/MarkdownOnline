@@ -1,0 +1,45 @@
+@media print {
+  @page {
+    size: A4 portrait;
+  }
+  ::-webkit-scrollbar {
+    height: 0;
+    width: 0;
+    color: transparent;
+  }
+  #bodyTopBox {
+    margin-top: 0 !important;
+  }
+
+  .arco-notification,
+  .arco-notification-success,
+  .arco-notification-info,
+  .header-app-bar,
+  #monaco-editor,
+  #aboutMd,
+  #md-area,
+  #header,
+  #headerInner,
+  .MuiDrawer-root,
+  .MuiDrawer-modal,
+  .MuiModal-root,
+  .arco-message-wrapper,
+  .arco-message-wrapper-top {
+    display: none !important;
+  }
+  #editor {
+    height: 100% !important ;
+  }
+  #view-area {
+    display: block !important;
+    margin: 0;
+    border: none !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* s */
+  /* .App-top{
+      flex-direction: column;
+    } */
+}

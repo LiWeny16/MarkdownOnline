@@ -8,7 +8,6 @@ const copyButtonStyle = `position: relative;
 top: 31px;
 left: 88%;`
 
-
 let codePlugin = function (md: MarkdownIt) {
   const oldRender = md.renderer.rules.code_block!
   md.renderer.rules.fence = function (tokens, idx, options, env, self) {
@@ -27,7 +26,7 @@ let codePlugin = function (md: MarkdownIt) {
         </div>`
       }
     } else if (hljs.getLanguage(language)) {
-      return `<pre data-line="${line}"><code class="language-${language} ${getTheme() === "light" ? "" : "hljs-dark"}">${content}</code></pre>`
+      return `<pre class="language-code" data-line="${line}"><code class="language-${language} ${getTheme() === "light" ? "" : "hljs-dark"}">${content}</code></pre>`
     } else {
       return `<div class="code-container" data-line="${line}">
       <pre><code class="language-plaintext">${content}</code></pre>

@@ -7,28 +7,27 @@ import {
 } from "@App/textMemory/memory"
 import { FileManager } from "./fileSystem/file"
 import { getSettings } from "./config/change"
+import alertUseArco from "./message/alert"
 export default async function save(editor = null, message = true) {
   let text = getMdTextFromMonaco()
   let infoMsg = ""
   if (message && text != "null") {
-    fillInMemoryText(text)
-    if (getSettings().basic.fileEditLocal) {
-      const fileManager = new FileManager(window._fileHandle)
-      if (await fileManager.saveFileSilently(text)) {
-        infoMsg = "成功保存到本地！"
+    try {
+      fillInMemoryText(text)
+      if (getSettings().basic.fileEditLocal) {
+        const fileManager = new FileManager(window._fileHandle)
+        if (await fileManager.saveFileSilently(text)) {
+          infoMsg = "成功保存到本地！🎉"
+        } else {
+          infoMsg = "成功保存到浏览器！🎉(未打开本地文件)"
+        }
       } else {
-        infoMsg = "成功保存到浏览器！(未打开本地文件)"
+        infoMsg = "成功保存到浏览器！🎉"
       }
-    } else {
-      infoMsg = "成功保存到浏览器！"
+      alertUseArco(infoMsg)
+    } catch (error) {
+      alertUseArco("你竟敢拒绝我。", 2500, { kind: "error" })
     }
-    Message.success({
-      style: { position: "relative", zIndex: 1 },
-      content: infoMsg,
-      closable: true,
-      duration: 2500,
-      position: "top",
-    })
   } else {
     save()
   }

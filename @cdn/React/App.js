@@ -60,6 +60,6 @@ const App = observer(() => {
     }
     `);
     });
-    return (_jsx(_Fragment, { children: _jsxs(ThemeProvider, { theme: getTheme() === "light" ? lightTheme : darkTheme, children: [_jsx(CssBaseline, {}), _jsxs(Box, { className: "FLEX COL", children: [_jsx(Header, {}), _jsx(Body, {})] })] }) }));
+    return (_jsx(_Fragment, { children: _jsxs(ThemeProvider, { theme: getTheme() === "light" ? lightTheme : darkTheme, children: [_jsx(CssBaseline, {}), _jsxs(Box, { className: "FLEX COL App-top", children: [_jsx(Header, {}), _jsx(Body, {})] })] }) }));
 });
 export default App;

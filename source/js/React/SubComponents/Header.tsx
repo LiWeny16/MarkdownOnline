@@ -163,7 +163,7 @@ const DrawerAppBar = observer((props: Props) => {
 
   return (
     <>
-      <div className="FLEX " style={{ flex: "0 0 8.7vh" }}>
+      <div className="FLEX header-app-bar" style={{ flex: "0 0 8.7vh" }}>
         <CssBaseline />
         <AppBar
           component="nav"

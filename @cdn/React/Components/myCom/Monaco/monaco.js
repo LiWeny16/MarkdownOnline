@@ -77,7 +77,7 @@ export default observer(function MonacoEditor() {
     const [resizableWidth, setResizableWidth] = React.useState(640);
     const [resizableHeight, setResizableHeight] = React.useState(800);
     const handleResizeStop = () => {
-        mdConverter();
+        mdConverter(true);
         setTimeout(() => {
             setEditorOptions((pre) => {
                 return { ...pre, minimap: { enabled: true } };
@@ -152,7 +152,7 @@ export default observer(function MonacoEditor() {
         window.monaco = monaco;
         /**
          * @description allInit
-        */
+         */
         allInit(editor, monaco);
         getDeviceTyByProportion() == "PC"
             ? setResizableWidth(document.getElementById("editor").clientWidth / 2)

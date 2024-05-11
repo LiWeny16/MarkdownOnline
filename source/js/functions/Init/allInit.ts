@@ -1,24 +1,18 @@
 import hljs from "@cdn-hljs"
 import { marked } from "@cdn-marked"
 // import { marked } from "marked"
-import mermaid from "mermaid"
-
-// import mermaid from "mermaid"
+import mermaid, { MermaidConfig } from "mermaid"
 import blankTextInit from "./blankTextInit"
-import { enObj, mdConverter } from "@Root/js"
+import { mdConverter } from "@Root/js"
 import markdownIt from "markdown-it"
-// import Token from "https://jsd.onmicrosoft.cn/npm/markdown-it@14.0.0/lib/token.mjs"
 // @ts-ignore
 import MarkdownItIncrementalDOM from "markdown-it-incremental-dom"
-// import MarkdownItIncrementalDOM from "/@cdn/lib/markdown-it-incremental-dom/markdown-it-incremental-dom.esm.js"
 import mdItMultimdTable from "markdown-it-multimd-table"
 import * as IncrementalDOM from "incremental-dom"
 // @ts-ignore
 import markdownItGithubToc from "markdown-it-github-toc"
 // @ts-ignore
 import { full as markdownItEmoji } from "markdown-it-emoji"
-// console.log(markdownItGithubToc);
-// import markdownItGithubToc from "markdown-it-github-toc"
 import { Notification } from "@arco-design/web-react"
 import kit from "@cdn-kit"
 import { Monaco } from "@monaco-editor/react"
@@ -26,11 +20,9 @@ import { editor } from "monaco-editor"
 import {
   markItExtension,
   importUrlExtension,
-  newRenderer,
   imgExtension,
   emojiExtension,
 } from "@Func/Parser/renderer"
-// import { changeTheme } from "@App/config/change"
 import OperateLocalStorage from "@App/localStorage/localStorage"
 import {
   ConfigStore,
@@ -46,9 +38,7 @@ import { cluePlugin } from "@Func/Parser/mdItPlugin/clueParser"
 import preViewClickEvent from "@Func/Events/click/preClick"
 import markdownItLatex from "@Func/Parser/mdItPlugin/latex"
 import { getSettings } from "@App/config/change"
-// @ts-ignore
-// import markdownItCodeCopy from "markdown-it-code-copy"
-
+import CodePlugin from "@Plugins/code"
 /**
  * @description markdownParser init plugin && settings
  */
@@ -84,7 +74,6 @@ export function markdownParser() {
 
   return markdownItParser
 }
-
 /**
  * @description other libs init
  */
@@ -105,26 +94,24 @@ class settingsClass {
       markItExtension,
       emojiExtension
     )
-
-    // marked.use({ renderer })
   }
   mermaidInit() {
+    const mermaidConfig: MermaidConfig = {
+      securityLevel: "loose",
+      logLevel: 4,
+      startOnLoad: false,
+      gantt: {
+        fontSize:19,
+        sectionFontSize:"16",
+        numberSectionStyles:10,
+        useMaxWidth:true
+
+      },
+      theme: getSettings().advanced.mermaidTheme,
+    }
     mermaid.parseError = (e) => {}
-    mermaid.initialize({
-      // er:()=>{},
-      securityLevel: "loose",
-      logLevel: 4,
-      startOnLoad: false,
-      theme: getSettings().advanced.mermaidTheme,
-      // gantt: { topPadding:0 , useMaxWidth: false},
-      // darkMode:true
-    })
-    mermaid.mermaidAPI.initialize({
-      securityLevel: "loose",
-      logLevel: 4,
-      startOnLoad: false,
-      theme: getSettings().advanced.mermaidTheme,
-    })
+    mermaid.initialize(mermaidConfig)
+    mermaid.mermaidAPI.initialize(mermaidConfig)
   }
   hljsInit() {
     hljs.configure({
@@ -155,47 +142,44 @@ export default function allInit(
   settings.settingsAllInit()
 
   /**@description Input Area Init*/
-  blankTextInit().then(() => {
-    mdConverter()
-    kit.sleep(110).then(() => {
-      Notification.success({
-        title: "已更新到最新版本",
-        content: `当前版本:v2.1.1`,
-        position: "bottomRight",
-      })
-      kit.sleep(780).then(() => {
-        Notification.info({
-          title: "版本新增特性",
-          content: `1. 修复溢出滚动条bug 2.新增语音识别`,
-          position: "bottomRight",
-        })
-      })
+  blankTextInit().then(async () => {
+    /**
+     * @description 这之后全部 md都解析完成到 html
+     */
+    await mdConverter()
+
+    await kit.sleep(110)
+    Notification.success({
+      title: "已更新到最新版本",
+      content: `当前版本:v2.1.1`,
+      position: "bottomRight",
+    })
+    await kit.sleep(780)
+    Notification.info({
+      title: "版本新增特性",
+      content: `1. 修复溢出滚动条bug 2.新增语音识别`,
+      position: "bottomRight",
     })
   }) //初始化输入区域
 
   /**
-   * @description 全局事件初始化
-   */
-  window.onerror = () => {}
-  /**
    * @description 全局变量初始化
    */
   window.deco = editor.createDecorationsCollection()
-  preViewClickEvent(editor, monaco, window.deco)
 
   window._speechData = {
     processing: false,
     speechResult: "",
     speech: null,
   }
-  // enObj.enMainConverter
-  //   ? triggerConverterEvent()
-  //   : console.log("converter if off") //按下写字板触发事件
-  // enObj.enPdfExport ? exportToPdfEvent() : console.log("pdf export is off") //导出PDF
-  // enObj.enDragFile ? dragFileEvent() : console.log("dragFile is off") //开启拖拽事件
-  // enObj.enAboutBox ? aboutBox() : console.log("aboutBox is off")
-  // enObj.enFastKey ? enableFastKeyEvent() : console.log("fastKey is off") //开启快捷键事件
-  // enObj.enPasteEvent ? pasteEvent() : console.log("Paste Event is off") //开启快捷键事件
+  /**
+   * @description 全局事件初始化
+   */
+  preViewClickEvent(editor, monaco, window.deco)
+  kit.sleep(5000).then(() => {
+    // const codePlugin = new CodePlugin()
+    // codePlugin.addButtonsToCodeBlocks()
+  })
 }
 
 // #region ********************config region***************************

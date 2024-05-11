@@ -22,7 +22,7 @@ let codePlugin = function (md) {
             }
         }
         else if (hljs.getLanguage(language)) {
-            return `<pre data-line="${line}"><code class="language-${language} ${getTheme() === "light" ? "" : "hljs-dark"}">${content}</code></pre>`;
+            return `<pre class="language-code" data-line="${line}"><code class="language-${language} ${getTheme() === "light" ? "" : "hljs-dark"}">${content}</code></pre>`;
         }
         else {
             return `<div class="code-container" data-line="${line}">

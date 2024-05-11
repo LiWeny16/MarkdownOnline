@@ -1,4 +1,4 @@
-import { Message } from "@arco-design/web-react";
+import alertUseArco from "@App/message/alert";
 let speechRecognition = (lang, startIt = true, callBack) => {
     // 创建语音识别对象
     const recognition = new webkitSpeechRecognition() || new SpeechRecognition();
@@ -28,13 +28,7 @@ let speechRecognition = (lang, startIt = true, callBack) => {
     // 监听错误事件
     recognition.onerror = function (event) {
         if (event.error == "not-allowed") {
-            Message.error({
-                style: { position: "relative", zIndex: 1 },
-                content: "语音权限被拒绝，世界，拒绝了我...",
-                closable: true,
-                duration: 4500,
-                position: "top",
-            });
+            alertUseArco("语音权限被拒绝，世界，拒绝了我...", 4500);
         }
         else {
             console.log("语音识别错误:", event.error);
