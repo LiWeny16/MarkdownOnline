@@ -13,7 +13,6 @@ import * as IncrementalDOM from "incremental-dom";
 import markdownItGithubToc from "markdown-it-github-toc";
 // @ts-ignore
 import { full as markdownItEmoji } from "markdown-it-emoji";
-import { Notification } from "@arco-design/web-react";
 import kit from "@cdn-kit";
 import { markItExtension, importUrlExtension, imgExtension, emojiExtension, } from "@Func/Parser/renderer";
 import OperateLocalStorage from "@App/localStorage/localStorage";
@@ -23,10 +22,11 @@ import markdownitFootNote from "markdown-it-footnote";
 import { myPlugin } from "@Func/Parser/mdItPlugin/alertBlock";
 import { imagePlugin } from "@Func/Parser/mdItPlugin/image";
 import { codePlugin } from "@Func/Parser/mdItPlugin/code";
-import { cluePlugin } from "@Func/Parser/mdItPlugin/clueParser";
+import { cluePlugin, customAlignPlugin, customAlignPluginHeading, } from "@Func/Parser/mdItPlugin/clueParser";
 import preViewClickEvent from "@Func/Events/click/preClick";
 import markdownItLatex from "@Func/Parser/mdItPlugin/latex";
 import { getSettings } from "@App/config/change";
+import noteUseArco from "@App/message/note";
 /**
  * @description markdownParser init plugin && settings
  */
@@ -38,6 +38,10 @@ export function markdownParser() {
         breaks: true,
     })
         .use(markdownitLineNumber)
+        .use(markdownItGithubToc, {
+        anchorLinkSymbol: "",
+        anchorLinkBefore: false,
+    })
         .use(myPlugin)
         .use(imagePlugin)
         .use(mdItMultimdTable, {
@@ -50,9 +54,8 @@ export function markdownParser() {
         .use(codePlugin)
         .use(cluePlugin)
         .use(markdownitFootNote)
-        .use(markdownItGithubToc, {
-        anchorLinkSymbol: "",
-    })
+        .use(customAlignPlugin)
+        .use(customAlignPluginHeading)
         .use(markdownItEmoji)
         .use(markdownItLatex)
         .use(MarkdownItIncrementalDOM, IncrementalDOM);
@@ -84,7 +87,7 @@ class settingsClass {
                 fontSize: 19,
                 sectionFontSize: "16",
                 numberSectionStyles: 10,
-                useMaxWidth: true
+                useMaxWidth: true,
             },
             theme: getSettings().advanced.mermaidTheme,
         };
@@ -111,7 +114,7 @@ class settingsClass {
  * @description 初始化配置和事件初始化
  * @returns {void}
  */
-export default function allInit(editor = window.editor, monaco = window.monaco) {
+export default function allInit(editor = window.editor, monaco = window.monaco, handleCloseLoading) {
     /**@description Settings Init*/
     const settings = new settingsClass();
     settings.settingsAllInit();
@@ -121,19 +124,16 @@ export default function allInit(editor = window.editor, monaco = window.monaco) 
          * @description 这之后全部 md都解析完成到 html
          */
         await mdConverter();
+        if (handleCloseLoading) {
+            handleCloseLoading();
+        }
         await kit.sleep(110);
-        Notification.success({
-            title: "已更新到最新版本",
-            content: `当前版本:v2.1.1`,
-            position: "bottomRight",
-        });
+        noteUseArco("已更新到最新版本", "当前版本:v2.2.0");
         await kit.sleep(780);
-        Notification.info({
-            title: "版本新增特性",
-            content: `1. 修复溢出滚动条bug 2.新增语音识别`,
-            position: "bottomRight",
+        noteUseArco("版本新增特性", `文件管理器`, {
+            kind: "info",
         });
-    }); //初始化输入区域
+    });
     /**
      * @description 全局变量初始化
      */
@@ -147,10 +147,10 @@ export default function allInit(editor = window.editor, monaco = window.monaco) 
      * @description 全局事件初始化
      */
     preViewClickEvent(editor, monaco, window.deco);
-    kit.sleep(5000).then(() => {
-        // const codePlugin = new CodePlugin()
-        // codePlugin.addButtonsToCodeBlocks()
-    });
+    // kit.sleep(5000).then(() => {
+    // const codePlugin = new CodePlugin()
+    // codePlugin.addButtonsToCodeBlocks()
+    // })
 }
 // #region ********************config region***************************
 const defaultConfig = {

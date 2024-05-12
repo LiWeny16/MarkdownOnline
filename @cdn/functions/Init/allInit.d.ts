@@ -10,7 +10,7 @@ export declare function markdownParser(): markdownIt;
  * @description 初始化配置和事件初始化
  * @returns {void}
  */
-export default function allInit(editor?: editor.IStandaloneCodeEditor, monaco?: Monaco): void;
+export default function allInit(editor?: editor.IStandaloneCodeEditor, monaco?: Monaco, handleCloseLoading?: any): void;
 export declare const normalMermaidTheme: string[];
 export declare const normalMermaidThemeMap: string[];
 /**

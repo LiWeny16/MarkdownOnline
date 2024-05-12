@@ -1,6 +1,4 @@
 import save, { isSaved } from "@App/save"
-import { insertQuotationInMonaco } from "@App/text/insertTextAtCursor"
-import getCommandPaletteText from "@App/text/palette"
 import { Monaco } from "@monaco-editor/react"
 import { editor } from "monaco-editor"
 import exeTableAction from "./actions/table"
@@ -13,15 +11,25 @@ import exeEmojiPickerAction from "./actions/emojiPicker"
 import exeSpeechPanelAction from "./actions/speechPanel"
 import exeSyncScrollAction from "./actions/syncScroll"
 import exeFileManagerAction from "./actions/fileManager"
+import exeBoldAction from "./actions/markdownTextFastKey/bold"
+import exeAlignRightAction from "./actions/markdownTextFastKey/right"
+import exeAlignCenterAction from "./actions/markdownTextFastKey/center"
 
 export default function monacoKeyEvent(
   editor: editor.IStandaloneCodeEditor,
   monaco: Monaco
 ) {
+  // // 假设你已经有了 Monaco Editor 实例的引用，名为 editor
+  // const actions = window.editor.getActions()
+
+  // actions.forEach((action) => {
+  //   // 对每个动作移除其快捷键绑定
+  //   console.log(action);
+  //   // editor._standaloneKeybindingService.addDynamicKeybinding("-" + action.id)
+  // })
+
   const keyMap = {
     save: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS,
-    left: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyL,
-    right: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyR,
     quotation: monaco.KeyMod.Shift | monaco.KeyCode.Quote,
     format: monaco.KeyMod.Shift | monaco.KeyCode.KeyF,
     pageBreaker:
@@ -32,58 +40,47 @@ export default function monacoKeyEvent(
     syncScroll: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyQ,
     fileManager:
       monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF,
+    markdownTextEditFastKey: {
+      bold: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyB,
+      italics: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyI,
+      underline: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyU,
+      alignCenter: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyE,
+      alignRight: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyR,
+    },
   }
-  editor.addAction({
-    id: "fsKey2",
-    label: "fsKey2",
-    keybindings: [],
-    run: (e) => {
-      editor.getAction("editor.action.formatDocument")!.run() //格式化
-    },
-  })
-  editor.addAction({
-    id: "fsKey3",
-    label: "fsKey3",
-    // precondition: 'isChrome == true',
-    keybindings: [keyMap.left],
-    // contextMenuGroupId: "navigation",
-    // contextMenuOrder: 1.5,
-    run: () => {
-      // ctrl_R()
-    },
-  })
   /**
    * @description quotation
    */
+  // editor.addAction({
+  //   id: "fsKey4",
+  //   label: "fsKey4",
+  //   keybindings: [],
+  //   run: () => {
+  //     insertQuotationInMonaco()
+  //   },
+  // })
   editor.addAction({
-    id: "fsKey4",
-    label: "fsKey4",
+    id: "show.emojiPicker",
+    label: "打开表情包超市 🤪",
     keybindings: [],
+    contextMenuGroupId: "navigation",
+    contextMenuOrder: -100,
     run: () => {
-      insertQuotationInMonaco()
+      exeEmojiPickerAction(editor, monaco)
     },
   })
   editor.addAction({
-    id: "table-any",
-    label: "table#x#x",
+    id: "insert.tableAny",
+    label: "插入任意行和列,格式: table#x#x",
     keybindings: [],
     run: () => {
       exeTableAction()
     },
   })
-  editor.addAction({
-    id: "reload",
-    label: "Reload Markdown Online View+",
-    keybindings: [],
-    contextMenuGroupId: "navigation",
-    // contextMenuOrder: 1,
-    run: () => {
-      window.location.reload()
-    },
-  })
+
   editor.addAction({
     id: "reload-no-cache",
-    label: "Reload Markdown Online View+ (With No Cache)",
+    label: "强制刷新Markdown在线",
     keybindings: [],
     run: () => {
       //@ts-ignore
@@ -92,7 +89,7 @@ export default function monacoKeyEvent(
   })
   editor.addAction({
     id: "export.asPDF",
-    label: "Export AS PDF",
+    label: "保存并导出为PDF",
     keybindings: [],
     contextMenuGroupId: "navigation",
     contextMenuOrder: 0,
@@ -109,7 +106,7 @@ export default function monacoKeyEvent(
   })
   editor.addAction({
     id: "export.asImg",
-    label: "Export As Image",
+    label: "作为PNG格式的图片导出",
     keybindings: [],
     run: () => {
       exportAsImage()
@@ -117,7 +114,7 @@ export default function monacoKeyEvent(
   })
   editor.addAction({
     id: "insert.pageBreaker",
-    label: "Insert A Page Breaker",
+    label: "插入一个分页符",
     keybindings: [],
     contextMenuGroupId: "navigation",
     contextMenuOrder: 0,
@@ -127,7 +124,7 @@ export default function monacoKeyEvent(
   })
   editor.addAction({
     id: "insert.latexBlock",
-    label: "Insert A Latex Block",
+    label: "插入一个LaTex语法块",
     keybindings: [keyMap.latexBlock],
     contextMenuGroupId: "navigation",
     contextMenuOrder: 0,
@@ -135,28 +132,20 @@ export default function monacoKeyEvent(
       exeLatexBlockAction(editor, monaco)
     },
   })
-  editor.addAction({
-    id: "show.emojiPicker",
-    label: "Show Emoji Picker 🤪",
-    keybindings: [],
-    contextMenuGroupId: "navigation",
-    contextMenuOrder: -100,
-    run: () => {
-      exeEmojiPickerAction(editor, monaco)
-    },
-  })
+
   editor.addAction({
     id: "insert.voice2words",
-    label: "Speech to text",
+    label: "语音转文字...嘟...喂...听得见吗....",
     keybindings: [keyMap.voice2Words],
     contextMenuGroupId: "navigation",
+    contextMenuOrder: 1,
     run: () => {
       exeSpeechPanelAction(editor, monaco)
     },
   })
   editor.addAction({
     id: "command.syncScroll",
-    label: "同步滚动",
+    label: "同步滚动 (开启/关闭)",
     keybindings: [keyMap.syncScroll],
     contextMenuGroupId: "navigation",
     run: () => {
@@ -165,13 +154,48 @@ export default function monacoKeyEvent(
   })
   editor.addAction({
     id: "command.fileManagerState",
-    label: "文件管理器",
+    label: "文件管理器 (开启/关闭)",
     keybindings: [keyMap.fileManager],
     contextMenuGroupId: "navigation",
     run: () => {
       exeFileManagerAction(editor, monaco)
     },
   })
+  editor.addAction({
+    id: "insert.bold",
+    label: "加粗文本",
+    keybindings: [keyMap.markdownTextEditFastKey.bold],
+    contextMenuGroupId: "navigation",
+    run: () => {
+      exeBoldAction(editor, monaco)
+    },
+  })
+  editor.addAction({
+    id: "insert.alignRight",
+    label: "文本居右",
+    keybindings: [keyMap.markdownTextEditFastKey.alignRight],
+    contextMenuGroupId: "navigation",
+    run: () => {
+      exeAlignRightAction(editor, monaco)
+    },
+  })
+  editor.addAction({
+    id: "insert.alignCenter",
+    label: "文本居中",
+    keybindings: [keyMap.markdownTextEditFastKey.alignCenter],
+    contextMenuGroupId: "navigation",
+    run: () => {
+      exeAlignCenterAction(editor, monaco)
+    },
+  })
+  editor.addAction({
+    id: "reload",
+    label: "重新加载窗口(Reload Window)",
+    keybindings: [],
+    contextMenuGroupId: "navigation",
+    contextMenuOrder: 100,
+    run: () => {
+      window.location.reload()
+    },
+  })
 }
-
-function ctrl_R() {}

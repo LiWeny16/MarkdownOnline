@@ -96,8 +96,8 @@ code {
 .ALI-CEN {
   align-items: center;
 }
-.ALI-CENTER {
-  align-items: center;
+.ALI-RIGHT {
+  align-items: right;
 }
 .JUS-RIGHT {
   justify-content: right;
@@ -173,6 +173,9 @@ code {
   text-align: right;
   justify-content: right;
 }
+.R > * {
+  text-align: right;
+}
 .L {
   text-align: left;
   justify-content: left;
@@ -180,6 +183,9 @@ code {
 .C {
   text-align: center;
   justify-content: center;
+}
+.C * {
+  text-align: center;
 }
 .RIGHT {
   justify-content: right;
@@ -200,4 +206,3 @@ code {
   padding: 2vh;
   margin: 6px;
 }
-

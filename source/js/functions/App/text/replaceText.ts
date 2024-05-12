@@ -59,7 +59,7 @@ function replaceMonacoInRange(
   endColumn: number,
   newText: string
 ) {
-  const _editor = window.editor // 假设你只有一个编辑器实例
+  const _editor = window.editor 
   // const currentSelection = _editor.getSelection()
   _editor.executeEdits("my-replace", [
     {

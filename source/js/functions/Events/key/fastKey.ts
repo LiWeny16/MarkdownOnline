@@ -10,41 +10,31 @@ import exeFileManagerAction from "./actions/fileManager"
  * @description 使能快捷键
  */
 function enableFastKeyEvent() {
-  let recState = false
-  let _rec: any
   document.addEventListener(
     "keydown",
     (e) => {
-      // Ctrl + Q
+      // 同步滚动
       if (e.ctrlKey && e.key == "q") {
-        // replaceSelection(editor, "**", "**")
         e.stopPropagation() //停止冒泡，向上传递事件
         e.preventDefault()
-
         exeSyncScrollAction(window.editor, window.monaco)
       }
+      // 文件管理器
       if (e.ctrlKey && (e.altKey || e.shiftKey) && e.key == "f") {
         e.stopPropagation() //停止冒泡，向上传递事件
         e.preventDefault()
         exeFileManagerAction(window.editor, window.monaco)
       }
-      // Alt + C 中心
-      if (e.key == "c" && e.altKey) {
-        // replaceSelection(editor, "<center>", "</center>")
-      }
-      //  Ctrl+ S 保存
+      //  保存
       if (e.ctrlKey && e.key == "s") {
         e.stopPropagation() //停止冒泡，向上传递事件
         e.preventDefault()
-
         save()
       }
-      // Ctrl + Alt + I
-      if (e.key == "i" && e.altKey && e.ctrlKey) {
-
-      }
-      if (e.key == "o" && e.altKey && e.ctrlKey) {
-
+      if (e.ctrlKey && e.key == "b") {
+        // e.stopPropagation() //停止冒泡，向上传递事件
+        // e.preventDefault()
+        // save()
       }
     },
     true

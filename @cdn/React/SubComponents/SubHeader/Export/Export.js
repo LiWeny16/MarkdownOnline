@@ -20,7 +20,7 @@ import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import Box from "@mui/material/Box";
-import { Notification } from "@arco-design/web-react";
+import noteUseArco from "@App/message/note";
 export default function Export(props) {
     let closeExportMenu = props.closeExportMenu;
     let closeMenu = props.closeMenu;
@@ -47,9 +47,8 @@ export default function Export(props) {
         let clear = clearOptions;
         exportAsImage(clear ?? 4, name ?? "md_snapshot.png");
         props.closeMenu(e);
-        Notification.success({
-            title: "导出成功！",
-            content: `Beta版本,请勿重复尝试`,
+        noteUseArco("导出成功！", `Beta版本`, {
+            kind: "info",
             position: "topRight",
         });
     };

@@ -9,7 +9,7 @@ import { createTheme, ThemeOptions, ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
 import { orange, green, grey, common, blue, pink } from "@mui/material/colors"
 import { getTheme } from "@App/config/change"
-import { Box } from "@mui/material"
+import { Backdrop, Box, CircularProgress } from "@mui/material"
 import kit from "bigonion-kit"
 // import Box from "@mui/material/Box"
 // import TB from "@Com/myCom/Layout/TB"
@@ -54,6 +54,7 @@ const darkTheme = createTheme({
   },
 })
 const App: any = observer(() => {
+
   React.useEffect(() => {
     kit.addStyle(`
     ::selection {
@@ -61,7 +62,8 @@ const App: any = observer(() => {
       background-color: ${getTheme() === "light" ? "#add6ff" : "#636363"};
     }
     `)
-  })
+    // handleCloseLoading()
+  }, [])
   return (
     <>
       <ThemeProvider theme={getTheme() === "light" ? lightTheme : darkTheme}>
