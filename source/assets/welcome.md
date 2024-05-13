@@ -4,13 +4,18 @@
 
 # 你好，我是标题
 
+1. 注意：在新的一行打一个斜杠字符：“/”，即可看到所有提示！
+2. 鼠标右键也可发现新大陆
+3. 导出在右上角更多里
+4. 快捷键完备，试着按下Ctrl+E/Ctrl+B/Ctrl+U/Ctrl+I/Ctrl+1-4等等吧！
+
 ## 你好，我是二级标题
 
 你好，我是正文  
 
 我是表情包:sweat_smile::sweat_smile:
 
-你好,我是LATEX
+你好,我是带语法提示的LaTex！
 
 $$
 \lambda+1=\lambda^3-1
@@ -30,27 +35,6 @@ $$
 
 我是分页器:|---|
 
-我是mermaid**流程图表**
-
-```mermaid
-mindmap
-  root((mindmap))
-    Origins
-      Long history
-      ::icon(fa fa-book)
-      Popularisation
-        British popular psychology author Tony Buzan
-    Research
-      On effectiveness<br/>and features
-      On Automatic creation
-        Uses
-            Creative techniques
-            Strategic planning
-            Argument mapping
-    Tools
-      Pen and paper
-      Mermaid
-```
 
 ```js
 // 我是代码

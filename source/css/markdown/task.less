@@ -1,0 +1,46 @@
+/* 隐藏原生复选框 */
+.custom-checkbox input {
+  visibility: hidden;
+  position: absolute;
+}
+
+/* 创建一个新的方框来替代复选框的外观 */
+.custom-checkbox .checkmark {
+  position: relative;
+  top: 0;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #eee;
+  border: 1px solid #ddd;
+  display: inline-block;
+}
+
+/* 当复选框被勾选时改变背景和图标颜色 */
+.custom-checkbox input:checked + .checkmark {
+  background-color: #2196f3;
+  border-color: #2196f3;
+}
+
+/* 创建勾选标记的样式 */
+.custom-checkbox .checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* 当input被勾选时显示勾选标记 */
+.custom-checkbox input:checked + .checkmark:after {
+  display: block;
+}
+
+/* 自定义勾选标记的样式 */
+.custom-checkbox .checkmark:after {
+  left: 7px;
+  top: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}

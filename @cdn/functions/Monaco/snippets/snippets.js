@@ -2,10 +2,11 @@ import { accents1, delimiters0, delimeterSizing0, greekLetters0, otherLetters0, 
 // import emojilib from "@cdn-emojilib"
 export function monacoSnippets(editor, monaco) {
     /**
-     * @补全table等
+     * @补全普通提示，采用“/”触发提示
      *
      */
     monaco.languages.registerCompletionItemProvider("markdown", {
+        triggerCharacters: ["/"],
         //@ts-ignore
         provideCompletionItems: (model, position, context) => {
             const textUntilPosition = model.getValueInRange({
@@ -14,17 +15,17 @@ export function monacoSnippets(editor, monaco) {
                 endLineNumber: position.lineNumber,
                 endColumn: position.column,
             });
+            const rangeWithFirstLetter = {
+                startLineNumber: position.lineNumber,
+                startColumn: position.column - 1, // 包括"/"字符
+                endLineNumber: position.lineNumber,
+                endColumn: position.column,
+            };
             if (!isInLatexBlock(textUntilPosition) && position.column === 2) {
                 let _suggestions = [
                     {
-                        label: "clg",
-                        kind: monaco.languages.CompletionItemKind.Function,
-                        insertText: "console.log(${1:val})",
-                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        detail: "调试...",
-                    },
-                    {
-                        label: "code",
+                        label: "/code (代码块)",
+                        detail: "插入一段代码块",
                         kind: monaco.languages.CompletionItemKind.Function,
                         insertText: `
 \`\`\`\${1:js}
@@ -32,10 +33,21 @@ export function monacoSnippets(editor, monaco) {
 \`\`\`
 `,
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        detail: "code",
+                        sortText: "0",
+                        range: rangeWithFirstLetter,
                     },
                     {
-                        label: "table 2x2",
+                        label: "/image (图片)",
+                        detail: "插入图片",
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        insertText: `![\${1:}](\${2:})`,
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        sortText: "1",
+                        range: rangeWithFirstLetter,
+                    },
+                    {
+                        label: "/table-2x2 (表格)",
+                        detail: "插入一个2行2列的表格",
                         kind: monaco.languages.CompletionItemKind.Function,
                         insertText: `
 |\${1:}    |\${1:}     |
@@ -43,10 +55,12 @@ export function monacoSnippets(editor, monaco) {
 |\${1:}    |\${1:}     |
 `,
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        detail: "table 2x2",
+                        sortText: "2",
+                        range: rangeWithFirstLetter,
                     },
                     {
-                        label: "table 2x4",
+                        label: "/table-2x4 (表格)",
+                        detail: "插入一个2行4列的表格",
                         kind: monaco.languages.CompletionItemKind.Function,
                         insertText: `
 |\${1:}    |\${1:}    |\${1:}    |\${1:}    |
@@ -54,40 +68,147 @@ export function monacoSnippets(editor, monaco) {
 |\${1:}    |\${1:}    |\${1:}    |\${1:}    |
 `,
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        detail: "table 2x4",
+                        sortText: "3",
+                        range: rangeWithFirstLetter,
                     },
                     {
-                        label: "ignore",
+                        label: "/latex-block (公式块)",
+                        detail: "创建一个LaTex公式块",
                         kind: monaco.languages.CompletionItemKind.Field,
-                        insertText: `<!-- prettier-ignore -->`,
-                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        detail: "ignore prettier",
-                    },
-                    {
-                        label: "ignore-block",
-                        kind: monaco.languages.CompletionItemKind.Field,
-                        insertText: `<!-- prettier-ignore-start -->
-\${1:}
-<!-- prettier-ignore-end -->`,
-                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        detail: "ignore block",
-                    },
-                    {
-                        label: "latex-block",
-                        kind: monaco.languages.CompletionItemKind.Field,
+                        sortText: "4",
+                        range: rangeWithFirstLetter,
                         insertText: `\$\$
 \${1:}
 \$\$
 `,
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        detail: "Create A LaTex Block",
                     },
                     {
-                        label: "latex-inline",
-                        kind: monaco.languages.CompletionItemKind.Field,
-                        insertText: `\$\${1:}\$`,
+                        label: "/list-in-order (有序列表)",
+                        detail: "创建有序列表",
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        sortText: "5",
+                        range: rangeWithFirstLetter,
+                        insertText: `
+1. \${1:}
+2. \${2:}
+3. \${3:}
+`,
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        detail: "Create A LaTex Inline",
+                    },
+                    {
+                        label: "/page-breaker (分页符)",
+                        detail: "插入一个分页符",
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        sortText: "6",
+                        range: rangeWithFirstLetter,
+                        insertText: `
+|---|
+`,
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    },
+                    {
+                        label: "/mermaid-flowChart (流程图)",
+                        detail: "插入mermaid流程图",
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        sortText: "7",
+                        range: rangeWithFirstLetter,
+                        insertText: `
+\`\`\`mermaid
+flowchart TB
+Start --> Stop
+\`\`\`
+`,
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    },
+                    {
+                        label: "/mermaid-pie-chart (饼图)",
+                        detail: "插入mermaid饼图",
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        sortText: "8",
+                        range: rangeWithFirstLetter,
+                        insertText: `
+\`\`\`mermaid
+pie title \${1:Pets adopted by volunteers}
+    "Dogs" : 386
+    "Cats" : 85
+    "Rats" : 15
+\`\`\`
+`,
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    },
+                    {
+                        label: "/mermaid-mind-map (思维导图)",
+                        detail: "插入mermaid思维导图",
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        sortText: "9",
+                        range: rangeWithFirstLetter,
+                        insertText: `
+\`\`\`mermaid
+mindmap
+Root
+    A
+      B
+      C
+\`\`\`
+`,
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    },
+                    {
+                        label: "/mermaid-time-line (时间线图)",
+                        detail: "插入mermaid时间线图",
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        sortText: "a1",
+                        range: rangeWithFirstLetter,
+                        insertText: `
+\`\`\`mermaid
+timeline
+    title History of Social Media Platform
+    2002 : LinkedIn
+    2004 : Facebook
+         : Google
+    2005 : Youtube
+    2006 : Twitter
+\`\`\`
+`,
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    },
+                    {
+                        label: "/mermaid-sequence (序列图)",
+                        detail: "插入mermaid序列图",
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        sortText: "a2",
+                        range: rangeWithFirstLetter,
+                        insertText: `
+\`\`\`mermaid
+sequenceDiagram
+    Alice->>+John: Hello John, how are you?
+    Alice->>+John: John, can you hear me?
+    John-->>-Alice: Hi Alice, I can hear you!
+    John-->>-Alice: I feel great!
+\`\`\`
+`,
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                    },
+                    {
+                        label: "/prettier-ignore (忽略格式化行)",
+                        detail: "下一行不进行prettier格式化",
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        insertText: `<!-- prettier-ignore -->`,
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        range: rangeWithFirstLetter,
+                        sortText: "b1",
+                    },
+                    {
+                        label: "/prettier-ignore-block (忽略格式化块)",
+                        detail: "忽略prettier格式化块",
+                        kind: monaco.languages.CompletionItemKind.Function,
+                        insertText: `<!-- prettier-ignore-start -->
+\${1:}
+<!-- prettier-ignore-end -->`,
+                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                        range: rangeWithFirstLetter,
+                        sortText: "b2",
                     },
                 ];
                 return { suggestions: _suggestions };

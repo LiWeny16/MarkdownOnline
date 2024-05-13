@@ -2276,6 +2276,11 @@ markdown-it-multimd-table@^4.2.3:
   resolved "https://registry.npmmirror.com/markdown-it-multimd-table/-/markdown-it-multimd-table-4.2.3.tgz"
   integrity sha512-KepCr2OMJqm7IT6sOIbuqHGe+NERhgy66XMrc5lo6dHW7oaPzMDtYwR1EGwK16/blb6mCSg4jqityOe0o/H7HA==
 
+markdown-it-task-lists@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.npmmirror.com/markdown-it-task-lists/-/markdown-it-task-lists-2.1.1.tgz#f68f4d2ac2bad5a2c373ba93081a1a6848417088"
+  integrity sha512-TxFAc76Jnhb2OUu+n3yz9RMu4CwGfaT788br6HhEDlvWfdeJcLUsxk1Hgw2yJio0OXsxv7pyIPmvECY7bMbluA==
+
 markdown-it@^14.0.0:
   version "14.0.0"
   resolved "https://registry.npmmirror.com/markdown-it/-/markdown-it-14.0.0.tgz"

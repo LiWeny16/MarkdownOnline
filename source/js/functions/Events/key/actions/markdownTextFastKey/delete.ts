@@ -2,7 +2,7 @@
 import { Monaco } from "@monaco-editor/react"
 import { editor } from "monaco-editor"
 
-export default function exeBoldAction(
+export default function exeDeleteLinection(
   editor: editor.IStandaloneCodeEditor,
   monaco: Monaco
 ) {
@@ -10,14 +10,14 @@ export default function exeBoldAction(
   const model = editor.getModel()!;
   let selectedText = model.getValueInRange(selection);
   let newText;
-  let isBold = selectedText.startsWith("**") && selectedText.endsWith("**");
+  let isBold = selectedText.startsWith("~~") && selectedText.endsWith("~~");
 
   if (isBold) {
     // 如果已经加粗，则去除加粗
     newText = selectedText.slice(2, -2);
   } else {
     // 如果未加粗，则添加加粗
-    newText = `**${selectedText}**`;
+    newText = `~~${selectedText}~~`;
   }
 
   var range = new monaco.Range(

@@ -12,6 +12,9 @@ import * as IncrementalDOM from "incremental-dom"
 // @ts-ignore
 import markdownItGithubToc from "markdown-it-github-toc"
 // @ts-ignore
+import markdownItTaskLists from "markdown-it-task-lists"
+
+// @ts-ignore
 import { full as markdownItEmoji } from "markdown-it-emoji"
 import { Notification } from "@arco-design/web-react"
 import kit from "@cdn-kit"
@@ -75,6 +78,7 @@ export function markdownParser() {
     .use(customAlignPluginHeading)
     .use(markdownItEmoji)
     .use(markdownItLatex)
+    .use(markdownItTaskLists)
     .use(MarkdownItIncrementalDOM, IncrementalDOM)
 
   // .use(markdownItCodeCopy)

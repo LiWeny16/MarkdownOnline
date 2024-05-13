@@ -21,6 +21,7 @@ function markdownitLineNumber(md: MarkdownIt, option: any) {
   md.renderer.rules.paragraph_open =
     md.renderer.rules.heading_open =
     md.renderer.rules.table_open =
+    md.renderer.rules.bullet_list_open =
       injectLineNumbers
 }
 

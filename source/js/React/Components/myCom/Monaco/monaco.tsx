@@ -179,6 +179,7 @@ export default observer(function MonacoEditor() {
     monacoPasteEvent(editor, monaco)
     monacoKeyEvent(editor, monaco)
     monacoSnippets(editor, monaco)
+    // monacoSnippetsDidInsertEvent(editor,monaco)
     monacoFormat(editor, monaco)
     monacoMouseEvent(editor, monaco)
     monacoClickEvent(editor, monaco)

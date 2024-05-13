@@ -14,6 +14,10 @@ import exeFileManagerAction from "./actions/fileManager"
 import exeBoldAction from "./actions/markdownTextFastKey/bold"
 import exeAlignRightAction from "./actions/markdownTextFastKey/right"
 import exeAlignCenterAction from "./actions/markdownTextFastKey/center"
+import exeItalicsAction from "./actions/markdownTextFastKey/italics"
+import exeUnderlineAction from "./actions/markdownTextFastKey/underline"
+import exeDeleteLinection from "./actions/markdownTextFastKey/delete"
+import exeHeadingAction from "./actions/markdownTextFastKey/headings"
 
 export default function monacoKeyEvent(
   editor: editor.IStandaloneCodeEditor,
@@ -46,6 +50,11 @@ export default function monacoKeyEvent(
       underline: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyU,
       alignCenter: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyE,
       alignRight: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyR,
+      deleteLine: monaco.KeyMod.CtrlCmd | monaco.KeyCode.Backquote,
+      h1: monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit1,
+      h2: monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit2,
+      h3: monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit3,
+      h4: monaco.KeyMod.CtrlCmd | monaco.KeyCode.Digit4,
     },
   }
   /**
@@ -186,6 +195,62 @@ export default function monacoKeyEvent(
     contextMenuGroupId: "navigation",
     run: () => {
       exeAlignCenterAction(editor, monaco)
+    },
+  })
+  editor.addAction({
+    id: "insert.italics",
+    label: "斜体",
+    keybindings: [keyMap.markdownTextEditFastKey.italics],
+    run: () => {
+      exeItalicsAction(editor, monaco)
+    },
+  })
+  editor.addAction({
+    id: "insert.underline",
+    label: "下划线",
+    keybindings: [keyMap.markdownTextEditFastKey.underline],
+    run: () => {
+      exeUnderlineAction(editor, monaco)
+    },
+  })
+  editor.addAction({
+    id: "insert.deleteLine",
+    label: "删除线",
+    keybindings: [keyMap.markdownTextEditFastKey.deleteLine],
+    run: () => {
+      exeDeleteLinection(editor, monaco)
+    },
+  })
+  editor.addAction({
+    id: "insert.h1",
+    label: "标题1",
+    keybindings: [keyMap.markdownTextEditFastKey.h1],
+    run: () => {
+      exeHeadingAction(editor,monaco,1)
+    },
+  })
+  editor.addAction({
+    id: "insert.h2",
+    label: "标题2",
+    keybindings: [keyMap.markdownTextEditFastKey.h2],
+    run: () => {
+      exeHeadingAction(editor,monaco,2)
+    },
+  })
+  editor.addAction({
+    id: "insert.h3",
+    label: "标题3",
+    keybindings: [keyMap.markdownTextEditFastKey.h3],
+    run: () => {
+      exeHeadingAction(editor,monaco,3)
+    },
+  })
+  editor.addAction({
+    id: "insert.h4",
+    label: "标题4",
+    keybindings: [keyMap.markdownTextEditFastKey.h4],
+    run: () => {
+      exeHeadingAction(editor,monaco,4)
     },
   })
   editor.addAction({

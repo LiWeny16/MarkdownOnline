@@ -67,6 +67,8 @@ export default defineConfig({
         "https://jsd.onmicrosoft.cn/npm/markdown-it-footnote@4.0.0/+esm",
       "markdown-it-multimd-table":
         "https://jsd.onmicrosoft.cn/npm/markdown-it-multimd-table@4.2.3/+esm",
+      "markdown-it-task-lists":
+        "https://jsd.onmicrosoft.cn/npm/@hackmd/markdown-it-task-lists@2.1.4/+esm",
       "incremental-dom":
         "https://jsd.onmicrosoft.cn/npm/incremental-dom@0.7.0/+esm",
       "markdown-it-github-toc":

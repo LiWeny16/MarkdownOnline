@@ -13,6 +13,7 @@ function markdownitLineNumber(md, option) {
     md.renderer.rules.paragraph_open =
         md.renderer.rules.heading_open =
             md.renderer.rules.table_open =
-                injectLineNumbers;
+                md.renderer.rules.bullet_list_open =
+                    injectLineNumbers;
 }
 export { markdownitLineNumber };
