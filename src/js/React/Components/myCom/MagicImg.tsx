@@ -62,39 +62,40 @@ function MagicImg(props: MagicImgOptions, ref: any) {
         style={mergeProps.style}
       >
         {
-          <PhotoProvider>
-            <PhotoView triggers={["onDoubleClick"]} src={mergeProps.src}>
-              <Tooltip
-                placement="right"
-                TransitionComponent={Zoom}
-                arrow
-                title="按住Ctrl点击插入"
-              >
-                <img
-                  onMouseEnter={() => {
-                    setHasHover(true)
-                  }}
-                  onMouseLeave={() => {
-                    setHasHover(false)
-                  }}
-                  onClick={(e: React.MouseEvent<HTMLElement>) => {
-                    handleOnClick(e)
-                  }}
-                  style={{
-                    width: "70%",
-                    transition: " 0.2s ease-in-out",
-                    borderRadius: "5px",
-                    transform: hasHover ? "translate(0px, -2px)" : "",
-                    boxShadow: hasHover
-                      ? "1vh 2vh 21px rgb(79 79 79)"
-                      : "rgb(216 216 216) 1vh 2vh 21px",
-                  }}
-                  src={mergeProps.src}
-                  alt="error"
-                />
-              </Tooltip>
-            </PhotoView>
-          </PhotoProvider>
+          <Tooltip
+            placement="right"
+            TransitionComponent={Zoom}
+            arrow
+            title="按住Ctrl点击插入"
+          >
+            <img
+              onMouseEnter={() => {
+                setHasHover(true)
+              }}
+              onMouseLeave={() => {
+                setHasHover(false)
+              }}
+              onClick={(e: React.MouseEvent<HTMLElement>) => {
+                handleOnClick(e)
+              }}
+              style={{
+                width: "70%",
+                transition: " 0.2s ease-in-out",
+                borderRadius: "5px",
+                transform: hasHover ? "translate(0px, -2px)" : "",
+                boxShadow: hasHover
+                  ? "1vh 2vh 21px rgb(79 79 79)"
+                  : "rgb(216 216 216) 1vh 2vh 21px",
+              }}
+              src={mergeProps.src}
+              alt="error"
+            />
+          </Tooltip>
+          // <PhotoProvider>
+          //   <PhotoView triggers={["onDoubleClick"]} src={mergeProps.src}>
+
+          //   </PhotoView>
+          // </PhotoProvider>
         }
       </div>
     </>

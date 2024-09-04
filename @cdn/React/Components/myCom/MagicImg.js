@@ -1,5 +1,4 @@
 import { jsx as _jsx, Fragment as _Fragment } from "react/jsx-runtime";
-import { PhotoProvider, PhotoView } from "react-photo-view";
 import React from "react";
 import Zoom from "@mui/material/Zoom";
 import Tooltip from "@mui/material/Tooltip";
@@ -41,21 +40,21 @@ function MagicImg(props, ref) {
                         : "rgb(216 216 216) 1vh 2vh 21px",
                 }, src: mergeProps.src, alt: "error" }) }));
     }
-    return (_jsx(_Fragment, { children: _jsx("div", { ...mergeProps, ...props, ref: ref, className: mergeProps.className, style: mergeProps.style, children: _jsx(PhotoProvider, { children: _jsx(PhotoView, { triggers: ["onDoubleClick"], src: mergeProps.src, children: _jsx(Tooltip, { placement: "right", TransitionComponent: Zoom, arrow: true, title: "\u6309\u4F4FCtrl\u70B9\u51FB\u63D2\u5165", children: _jsx("img", { onMouseEnter: () => {
-                                setHasHover(true);
-                            }, onMouseLeave: () => {
-                                setHasHover(false);
-                            }, onClick: (e) => {
-                                handleOnClick(e);
-                            }, style: {
-                                width: "70%",
-                                transition: " 0.2s ease-in-out",
-                                borderRadius: "5px",
-                                transform: hasHover ? "translate(0px, -2px)" : "",
-                                boxShadow: hasHover
-                                    ? "1vh 2vh 21px rgb(79 79 79)"
-                                    : "rgb(216 216 216) 1vh 2vh 21px",
-                            }, src: mergeProps.src, alt: "error" }) }) }) }) }) }));
+    return (_jsx(_Fragment, { children: _jsx("div", { ...mergeProps, ...props, ref: ref, className: mergeProps.className, style: mergeProps.style, children: _jsx(Tooltip, { placement: "right", TransitionComponent: Zoom, arrow: true, title: "\u6309\u4F4FCtrl\u70B9\u51FB\u63D2\u5165", children: _jsx("img", { onMouseEnter: () => {
+                        setHasHover(true);
+                    }, onMouseLeave: () => {
+                        setHasHover(false);
+                    }, onClick: (e) => {
+                        handleOnClick(e);
+                    }, style: {
+                        width: "70%",
+                        transition: " 0.2s ease-in-out",
+                        borderRadius: "5px",
+                        transform: hasHover ? "translate(0px, -2px)" : "",
+                        boxShadow: hasHover
+                            ? "1vh 2vh 21px rgb(79 79 79)"
+                            : "rgb(216 216 216) 1vh 2vh 21px",
+                    }, src: mergeProps.src, alt: "error" }) }) }) }));
 }
 const basicImg = () => { };
 // top: -25vh;
