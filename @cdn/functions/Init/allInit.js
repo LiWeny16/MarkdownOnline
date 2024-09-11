@@ -25,6 +25,7 @@ import preViewClickEvent from "@Func/Events/click/preClick";
 import markdownItLatex from "@Func/Parser/mdItPlugin/latex";
 import { getSettings } from "@App/config/change";
 import noteUseArco from "@App/message/note";
+import { mergeObjects } from "@App/basic/basic";
 /**
  * @description markdownParser init plugin && settings
  */
@@ -104,9 +105,20 @@ class settingsClass {
  * @returns {void}
  */
 export default function allInit(editor = window.editor, monaco = window.monaco, handleCloseLoading) {
-    /**@description Settings Init*/
+    /**@description Third Party Settings Init*/
     const settings = new settingsClass();
     settings.settingsAllInit();
+    /**
+     * @description Style init
+     */
+    kit.addStyle(`
+    .markdown-body p,
+    .markdown-body ol,
+    .markdown-body li,
+    .markdown-body div {
+        font-size: ${getSettings().basic.fontSize}px;
+    }
+      `, "fontSizeStyle");
     /**@description Input Area Init*/
     blankTextInit().then(async () => {
         /**
@@ -147,7 +159,12 @@ const defaultConfig = {
     emojiPickerState: "off",
     contextMenuClickPosition: { posx: 20, posy: 20 },
     settingsConfig: {
-        basic: { syncScroll: false, speechLanguage: "zh-CN", fileEditLocal: true },
+        basic: {
+            fontSize: 16,
+            syncScroll: false,
+            speechLanguage: "zh-CN",
+            fileEditLocal: true,
+        },
         advanced: { mermaidTheme: "default" },
     },
 };
@@ -156,7 +173,7 @@ const normalSettingsKey = [
     ...Object.keys(defaultConfig.settingsConfig.basic),
     ...Object.keys(defaultConfig.settingsConfig.advanced),
 ];
-Object.keys(defaultConfig.settingsConfig.advanced);
+// Object.keys(defaultConfig.settingsConfig.advanced)
 export const normalMermaidTheme = ["default", "forest", "dark", "neutral"];
 export const normalMermaidThemeMap = [
     `default (默认，才是最美的！)`,
@@ -193,15 +210,22 @@ export function configInit(defaultConfig) {
             ) {
                 try {
                     if (typeof _defaultConfig[key] === "object") {
+                        // 以下为settingConfig设置内容
                         const storedSettings = JSON.parse(opLocalStorage.getItem(key).toString());
                         for (let i in storedSettings) {
                             Object.keys(storedSettings[i]).forEach((e) => {
+                                // console.log(e);
                                 if (!normalSettingsKey.includes(e)) {
+                                    console.warn("abnormal key");
                                     storeDefaultSettings(key);
                                     return _defaultConfig;
                                 }
                             });
                         }
+                        // console.log(_defaultConfig[key as string])
+                        // 如果都是正常的key 融合即可
+                        console.log(mergeObjects(defaultConfig[key], JSON.parse(opLocalStorage.getItem(key).toString())));
+                        opLocalStorage.setItem(key, JSON.stringify(mergeObjects(defaultConfig[key], JSON.parse(opLocalStorage.getItem(key).toString()))));
                         _defaultConfig[key] = JSON.parse(opLocalStorage.getItem(key).toString());
                     }
                     else {
@@ -211,17 +235,19 @@ export function configInit(defaultConfig) {
                     }
                 }
                 catch (err) {
-                    console.log(err);
+                    console.warn("reset settings 1");
                     storeDefaultSettings(key);
                 }
             }
             else {
                 // 否则进行设置存储初始化
+                console.info("reset settings don't need to save");
                 storeDefaultSettings(key);
             }
         }
         // 如果完全没存，则存储默认设置
         else {
+            console.warn("reset settings 3");
             storeDefaultSettings(key);
         }
     }

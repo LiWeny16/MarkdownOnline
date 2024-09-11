@@ -20,6 +20,7 @@ type SettingsBasic = {
   syncScroll: boolean
   speechLanguage: "zh-CN" | "en-US" | "ja-JP" | "yue-Hant-HK"
   fileEditLocal: boolean
+  fontSize:number
 }
 type SettingsAd = {
   mermaidTheme: MermaidTheme

@@ -13,16 +13,10 @@ import {
 // import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox"
 import ContrastIcon from "@mui/icons-material/Contrast"
 import EditIcon from "@mui/icons-material/Edit"
+import MicIcon from "@mui/icons-material/Mic"
 import { styled, alpha } from "@mui/material/styles"
 import { Box, Divider } from "@mui/material"
 function TransitionComponent(props: TransitionProps) {
-  // const style = useSpring({
-  //   to: {
-  //     opacity: props.in ? 1 : 0,
-  //     transform: `translate3d(${props.in ? 0 : 20}px,0,0)`,
-  //   },
-  // })
-
   return (
     // 这里太大了，不用了！
     // <animated.div style={style}>
@@ -68,6 +62,10 @@ const CustomTreeItem = React.forwardRef(
 )
 
 export default function SettingsRoute() {
+  function linkToView(id: string) {
+    let targetElement = document.getElementById(id) as HTMLElement
+    targetElement.scrollIntoView()
+  }
   return (
     <>
       <Box
@@ -82,7 +80,7 @@ export default function SettingsRoute() {
       >
         <SimpleTreeView
           aria-label="customized"
-          defaultExpandedItems={["1_x"]}
+          defaultExpandedItems={["1_x", "2_x"]}
           slots={{
             // expandIcon: AddBoxIcon,
             // collapseIcon: IndeterminateCheckBoxIcon,
@@ -101,10 +99,7 @@ export default function SettingsRoute() {
               endIcon: EditIcon,
             }}
             onClick={() => {
-              let targetElement = document.getElementById(
-                "settings_1_x"
-              ) as HTMLElement
-              targetElement.scrollIntoView()
+              linkToView("settings_1_x")
             }}
             itemId="1_x"
             label="基础设置"
@@ -114,12 +109,9 @@ export default function SettingsRoute() {
                 endIcon: ContrastIcon,
               }}
               onClick={() => {
-                let targetElement = document.getElementById(
-                  "settings_1_1"
-                ) as HTMLElement
-                targetElement.scrollIntoView()
+                linkToView("settings_1_1")
               }}
-              itemId="1_2"
+              itemId="1_1"
               label="主题设置"
             />
             <CustomTreeItem
@@ -127,25 +119,48 @@ export default function SettingsRoute() {
                 endIcon: EditIcon,
               }}
               onClick={() => {
+                linkToView("settings_1_2")
+              }}
+              itemId="1_2"
+              label="编辑器设置"
+            />
+            <CustomTreeItem
+              slots={{
+                endIcon: MicIcon,
+              }}
+              onClick={() => {
                 let targetElement = document.getElementById(
-                  "settings_1_2"
+                  "settings_1_3"
                 ) as HTMLElement
                 targetElement.scrollIntoView()
               }}
               itemId="1_3"
-              label="编辑器设置"
+              label="语音转文字"
             />
           </CustomTreeItem>
           {/* <Divider sx={{ my: 0.5 }} /> */}
-          <CustomTreeItem itemId="2_x" label="高级设置">
-            <CustomTreeItem itemId="2_2" label="导出设置" />
-            <CustomTreeItem itemId="2_3" label="Mermaid设置" />
+          <CustomTreeItem
+            onClick={() => {
+              linkToView("settings_2_x")
+            }}
+            itemId="2_x"
+            label="高级设置"
+          >
+            <CustomTreeItem
+              onClick={() => {
+                linkToView("settings_2_1")
+              }}
+              itemId="2_1"
+              label="导出设置"
+            />
+            <CustomTreeItem
+              onClick={() => {
+                linkToView("settings_2_2")
+              }}
+              itemId="2_2"
+              label="Mermaid设置"
+            />
           </CustomTreeItem>
-          {/* <CustomTreeItem itemId="8" label="高级设置">
-            <CustomTreeItem itemId="10" label="导出设置" />
-            <CustomTreeItem itemId="11" label="导出设置" />
-            <CustomTreeItem itemId="12" label="导出设置" />
-          </CustomTreeItem> */}
         </SimpleTreeView>
       </Box>
     </>

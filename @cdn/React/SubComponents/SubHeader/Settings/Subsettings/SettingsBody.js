@@ -9,6 +9,7 @@ import { speechLanguageMap } from "@App/voice/speech";
 import { normalMermaidTheme, normalMermaidThemeMap } from "@Func/Init/allInit";
 import mermaid from "mermaid";
 import { mdConverter } from "@Root/js";
+import kit from "@cdn-kit";
 export default observer(function SettingsBody() {
     const theme = getTheme();
     const muiTheme = useTheme();
@@ -79,7 +80,23 @@ export default observer(function SettingsBody() {
         changeSettings({
             basic: { speechLanguage: e.target.value },
         });
-        // console.log(getSettings().basic.speechLanguage)
+    }
+    function handleOnChangeFontSize(e) {
+        // console.log(getSettings().basic.fontSize)
+        changeSettings({
+            basic: { fontSize: e.target.value },
+        });
+        if (document.getElementsByClassName("fontSizeStyle")) {
+            kit.removeAddedStyle("fontSizeStyle");
+            kit.addStyle(`
+      .markdown-body p,
+      .markdown-body ol,
+      .markdown-body li,
+      .markdown-body div {
+          font-size: ${getSettings().basic.fontSize}px;
+      }
+        `, "fontSizeStyle");
+        }
     }
     function handleOnChangeMermaidTheme(e) {
         changeSettings({
@@ -104,15 +121,16 @@ export default observer(function SettingsBody() {
                 fontSize: "0.89rem",
                 maxHight: "200px",
                 overflowY: "scroll",
-            }, children: [_jsx(Typography, { id: "settings_1_x", sx: { fontSize: "30px", fontWeight: "700" }, children: "\u57FA\u7840\u8BBE\u7F6E" }), _jsx(Divider, {}), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { id: "settings_1_1", sx: {
+            }, children: [_jsx(Typography, { id: "settings_1_x", sx: { fontSize: "30px", fontWeight: "700" }, children: "\u57FA\u7840\u8BBE\u7F6E" }), _jsx(Divider, {}), _jsxs(Box, { id: "settings_1_1", sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { sx: {
                                 fontSize: "0.89rem",
                                 fontWeight: 500,
-                            }, children: "Theme" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u7F16\u8F91\u5668\u7684\u4E3B\u9898" }), _jsx(SwitchTheme, { checked: themeState, size: "small", inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeThemeSwitch })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { id: "settings_1_2", sx: {
-                                    fontSize: "0.89rem",
-                                    fontWeight: 500,
-                                }, children: "Synchronous Scrolling" }) }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u540C\u6B65\u6EDA\u52A8\u5DE6\u8FB9\u7F16\u8F91\u533A\u548C\u9884\u89C8\u533A\u57DF\u3002(\u5F00\u53D1\u4E2D)" }), _jsx(SwitchIOS, { checked: getSettings().basic.syncScroll, size: "small", 
-                            // value={getSettings().basic.syncScroll}
-                            inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeSyncScrollSwitch })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { sx: {
+                            }, children: "Theme" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u7F16\u8F91\u5668\u7684\u4E3B\u9898" }), _jsx(SwitchTheme, { checked: themeState, size: "small", inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeThemeSwitch })] }), _jsxs(Box, { id: "settings_1_2", children: [_jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {
+                                            fontSize: "0.89rem",
+                                            fontWeight: 500,
+                                        }, children: "Font Size" }) }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u6E32\u67D3\u540E\u6587\u5B57\u5B57\u4F53\u5927\u5C0F" }), _jsxs(Select, { value: getSettings().basic.fontSize, defaultChecked: true, fullWidth: true, size: "small", onChange: handleOnChangeFontSize, children: [_jsx(MenuItem, { value: 9, children: "9 px" }), _jsx(MenuItem, { value: 11, children: "11px" }), _jsx(MenuItem, { value: 13, children: "13px" }), _jsx(MenuItem, { value: 15, children: "15px" }), _jsx(MenuItem, { value: 16, children: "16px" }), _jsx(MenuItem, { value: 17, children: "17px" }), _jsx(MenuItem, { value: 19, children: "19px" }), _jsx(MenuItem, { value: 21, children: "21px" }), _jsx(MenuItem, { value: 23, children: "23px" }), _jsx(MenuItem, { value: 25, children: "25px" })] })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {
+                                            fontSize: "0.89rem",
+                                            fontWeight: 500,
+                                        }, children: "Synchronous Scrolling" }) }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u540C\u6B65\u6EDA\u52A8\u5DE6\u8FB9\u7F16\u8F91\u533A\u548C\u9884\u89C8\u533A\u57DF\u3002" }), _jsx(SwitchIOS, { checked: getSettings().basic.syncScroll, size: "small", inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeSyncScrollSwitch })] })] }), _jsxs(Box, { id: "settings_1_3", sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { sx: {
                                 fontSize: "0.89rem",
                                 fontWeight: 500,
                             }, children: "Speech To Text" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u9009\u62E9\u8BED\u97F3\u8F6C\u6587\u5B57\u7684\u8BC6\u522B\u8BED\u8A00" }), _jsx(Select
@@ -123,13 +141,10 @@ export default observer(function SettingsBody() {
                             // value={clearOptions}
                             fullWidth: true, size: "small", onChange: handleSpeechLanguage, children: speechLanguageMap.map((e, i) => {
                                 return (_jsx(MenuItem, { value: e[0], children: e[1] }, i));
-                            }) })] }), _jsx(Typography, { id: "settings_1_x", sx: { mt: "20px", fontSize: "30px", fontWeight: "700" }, children: "\u9AD8\u7EA7\u8BBE\u7F6E\uFF08\u65BD\u5DE5\u4E2D\uFF09" }), _jsx(Divider, {}), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { id: "settings_1_1", sx: {
+                            }) })] }), _jsx(Typography, { id: "settings_2_x", sx: { mt: "20px", fontSize: "30px", fontWeight: "700" }, children: "\u9AD8\u7EA7\u8BBE\u7F6E\uFF08\u65BD\u5DE5\u4E2D\uFF09" }), _jsx(Divider, {}), _jsxs(Box, { id: "settings_2_1", sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { sx: {
                                 fontSize: "0.89rem",
                                 fontWeight: 500,
-                            }, children: "Export Settings" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u5BFC\u51FA\u8BBE\u7F6E(\u65BD\u5DE5\u4E2D)" }), _jsx(SwitchIOS, { disabled: true, 
-                            // defaultValue={1}
-                            // checked={getSettings().basic.syncScroll}
-                            size: "small", inputProps: { "aria-label": "controlled" } })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { id: "settings_1_1", sx: {
+                            }, children: "Export Settings" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u5BFC\u51FA\u8BBE\u7F6E(\u65BD\u5DE5\u4E2D)" }), _jsx(SwitchIOS, { disabled: true, size: "small", inputProps: { "aria-label": "controlled" } })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { id: "settings_2_2", sx: {
                                 fontSize: "0.89rem",
                                 fontWeight: 500,
                             }, children: "Mermaid Theme Configs" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "Mermaid\u6D41\u7A0B\u56FE\u4E3B\u9898" }), _jsx(Select, { value: getSettings().advanced.mermaidTheme ?? "default", defaultChecked: true, fullWidth: true, size: "small", 

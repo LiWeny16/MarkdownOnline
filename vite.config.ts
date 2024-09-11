@@ -126,7 +126,7 @@ export default defineConfig({
       "@cdn-mermaid":
         "https://cdn.jsdmirror.com/npm/mermaid@10/dist/mermaid.esm.min.mjs",
       "@cdn-kit":
-        "https://cdn.jsdmirror.com/npm/bigonion-kit@0.12.3/esm/kit.min.js",
+        "https://cdn.jsdmirror.com/npm/bigonion-kit@0.12.6/esm/kit.min.js",
       "@cdn-hljs":
         "https://cdn.jsdmirror.com/npm/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js",
       "@cdn-katex":

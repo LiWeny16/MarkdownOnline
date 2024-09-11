@@ -22,6 +22,7 @@ import { normalMermaidTheme, normalMermaidThemeMap } from "@Func/Init/allInit"
 import mermaid from "mermaid"
 import { mdConverter } from "@Root/js"
 import ShortcutExample from "@Root/js/React/Components/Mui/keyboard"
+import kit from "@cdn-kit"
 
 export default observer(function SettingsBody() {
   const theme = getTheme()
@@ -94,7 +95,26 @@ export default observer(function SettingsBody() {
     changeSettings({
       basic: { speechLanguage: e.target.value },
     })
-    // console.log(getSettings().basic.speechLanguage)
+  }
+  function handleOnChangeFontSize(e: any) {
+    // console.log(getSettings().basic.fontSize)
+    changeSettings({
+      basic: { fontSize: e.target.value },
+    })
+    if (document.getElementsByClassName("fontSizeStyle")) {
+      kit.removeAddedStyle("fontSizeStyle")
+      kit.addStyle(
+        `
+      .markdown-body p,
+      .markdown-body ol,
+      .markdown-body li,
+      .markdown-body div {
+          font-size: ${getSettings().basic.fontSize}px;
+      }
+        `,
+        "fontSizeStyle"
+      )
+    }
   }
   function handleOnChangeMermaidTheme(e: any) {
     changeSettings({
@@ -133,10 +153,9 @@ export default observer(function SettingsBody() {
           基础设置
         </Typography>
         <Divider></Divider>
-        <Box sx={settingsBodyContentBoxStyle}>
+        <Box id="settings_1_1" sx={settingsBodyContentBoxStyle}>
           {/* <LightTooltip title="编辑器主题" placement="bottom"> */}
           <Typography
-            id="settings_1_1"
             sx={{
               fontSize: "0.89rem",
               fontWeight: 500,
@@ -154,33 +173,63 @@ export default observer(function SettingsBody() {
             onChange={handleOnChangeThemeSwitch}
           ></SwitchTheme>
         </Box>
-        <Box sx={settingsBodyContentBoxStyle}>
-          {/* <LightTooltip title="编辑器主题" placement="bottom"> */}
-          <Box className="FLEX ROW">
-            <Typography
-              id="settings_1_2"
-              sx={{
-                fontSize: "0.89rem",
-                fontWeight: 500,
-              }}
-            >
-              Synchronous Scrolling
+        <Box id="settings_1_2">
+          <Box sx={settingsBodyContentBoxStyle}>
+            <Box className="FLEX ROW">
+              <Typography
+                sx={{
+                  fontSize: "0.89rem",
+                  fontWeight: 500,
+                }}
+              >
+                Font Size
+              </Typography>
+            </Box>
+            <Typography sx={ContentDescriptionTextStyle}>
+              更改渲染后文字字体大小
             </Typography>
-            {/* <ShortcutExample></ShortcutExample> */}
+            <Select
+              value={getSettings().basic.fontSize}
+              defaultChecked={true}
+              fullWidth
+              size="small"
+              onChange={handleOnChangeFontSize}
+            >
+              <MenuItem value={9}>9 px</MenuItem>
+              <MenuItem value={11}>11px</MenuItem>
+              <MenuItem value={13}>13px</MenuItem>
+              <MenuItem value={15}>15px</MenuItem>
+              <MenuItem value={16}>16px</MenuItem>
+              <MenuItem value={17}>17px</MenuItem>
+              <MenuItem value={19}>19px</MenuItem>
+              <MenuItem value={21}>21px</MenuItem>
+              <MenuItem value={23}>23px</MenuItem>
+              <MenuItem value={25}>25px</MenuItem>
+            </Select>
           </Box>
-
-          <Typography sx={ContentDescriptionTextStyle}>
-            同步滚动左边编辑区和预览区域。(开发中)
-          </Typography>
-          <SwitchIOS
-            checked={getSettings().basic.syncScroll}
-            size="small"
-            // value={getSettings().basic.syncScroll}
-            inputProps={{ "aria-label": "controlled" }}
-            onChange={handleOnChangeSyncScrollSwitch}
-          ></SwitchIOS>
+          <Box sx={settingsBodyContentBoxStyle}>
+            <Box className="FLEX ROW">
+              <Typography
+                sx={{
+                  fontSize: "0.89rem",
+                  fontWeight: 500,
+                }}
+              >
+                Synchronous Scrolling
+              </Typography>
+            </Box>
+            <Typography sx={ContentDescriptionTextStyle}>
+              同步滚动左边编辑区和预览区域。
+            </Typography>
+            <SwitchIOS
+              checked={getSettings().basic.syncScroll}
+              size="small"
+              inputProps={{ "aria-label": "controlled" }}
+              onChange={handleOnChangeSyncScrollSwitch}
+            ></SwitchIOS>
+          </Box>
         </Box>
-        <Box sx={settingsBodyContentBoxStyle}>
+        <Box id="settings_1_3" sx={settingsBodyContentBoxStyle}>
           <Typography
             sx={{
               fontSize: "0.89rem",
@@ -212,17 +261,15 @@ export default observer(function SettingsBody() {
         </Box>
         {/* *************************高级设置****************************** */}
         <Typography
-          id="settings_1_x"
+          id="settings_2_x"
           sx={{ mt: "20px", fontSize: "30px", fontWeight: "700" }}
         >
           高级设置（施工中）
         </Typography>
         <Divider></Divider>
 
-        <Box sx={settingsBodyContentBoxStyle}>
-          {/* <LightTooltip title="编辑器主题" placement="bottom"> */}
+        <Box id="settings_2_1" sx={settingsBodyContentBoxStyle}>
           <Typography
-            id="settings_1_1"
             sx={{
               fontSize: "0.89rem",
               fontWeight: 500,
@@ -235,18 +282,14 @@ export default observer(function SettingsBody() {
           </Typography>
           <SwitchIOS
             disabled
-            // defaultValue={1}
-            // checked={getSettings().basic.syncScroll}
             size="small"
             inputProps={{ "aria-label": "controlled" }}
-            // onChange={handleOnChangeSyncScrollSwitch}
           ></SwitchIOS>
         </Box>
 
         <Box sx={settingsBodyContentBoxStyle}>
-          {/* <LightTooltip title="编辑器主题" placement="bottom"> */}
           <Typography
-            id="settings_1_1"
+            id="settings_2_2"
             sx={{
               fontSize: "0.89rem",
               fontWeight: 500,
