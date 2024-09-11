@@ -46,10 +46,10 @@ export default function Settings(props) {
                 }, children: _jsxs(Box, { sx: {
                         background: theme === "light" ? "#F8FAFB" : "",
                         padding: "1rem",
-                        height: "58vh",
-                        width: "60vw",
+                        height: "68vh",
+                        width: "70vw",
                     }, children: [_jsx(IconBreadcrumbs, {}), _jsx(Divider, { sx: { my: 0.5 } }), _jsxs(Box, { sx: {
-                                height: "48vh",
+                                height: "58vh",
                                 display: "flex",
                                 background: theme === "light" ? "#F8FAFB" : "",
                                 padding: "5px",

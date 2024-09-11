@@ -60,8 +60,8 @@ export default function Settings(props: any) {
           sx={{
             background: theme === "light" ? "#F8FAFB" : "",
             padding: "1rem",
-            height: "58vh",
-            width: "60vw",
+            height: "68vh",
+            width: "70vw",
           }}
         >
           <IconBreadcrumbs></IconBreadcrumbs>
@@ -69,7 +69,7 @@ export default function Settings(props: any) {
 
           <Box
             sx={{
-              height: "48vh",
+              height: "58vh",
               display: "flex",
               background: theme === "light" ? "#F8FAFB" : "",
               padding: "5px",

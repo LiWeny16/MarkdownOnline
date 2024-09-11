@@ -19,6 +19,7 @@ type SettingsBasic = {
     speechLanguage: "zh-CN" | "en-US" | "ja-JP" | "yue-Hant-HK";
     fileEditLocal: boolean;
     fontSize: number;
+    editorAutoWrap: boolean;
 };
 type SettingsAd = {
     mermaidTheme: MermaidTheme;

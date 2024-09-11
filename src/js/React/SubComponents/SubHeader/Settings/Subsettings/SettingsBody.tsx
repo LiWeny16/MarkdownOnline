@@ -116,6 +116,15 @@ export default observer(function SettingsBody() {
       )
     }
   }
+  function handleOnChangeEditorAutoWrap(e: any) {
+    // console.log(getSettings().basic.fontSize)
+    changeSettings({
+      basic: { editorAutoWrap: e.target.value === 1 ? true : false },
+    })
+    window.editor.updateOptions({
+      wordWrap: getSettings().basic.editorAutoWrap ? "on" : "off",
+    })
+  }
   function handleOnChangeMermaidTheme(e: any) {
     changeSettings({
       advanced: { mermaidTheme: e.target.value },
@@ -173,7 +182,7 @@ export default observer(function SettingsBody() {
             onChange={handleOnChangeThemeSwitch}
           ></SwitchTheme>
         </Box>
-        <Box id="settings_1_2">
+        <Box sx={settingsBodyContentBoxStyle} id="settings_1_2">
           <Box sx={settingsBodyContentBoxStyle}>
             <Box className="FLEX ROW">
               <Typography
@@ -207,6 +216,7 @@ export default observer(function SettingsBody() {
               <MenuItem value={25}>25px</MenuItem>
             </Select>
           </Box>
+
           <Box sx={settingsBodyContentBoxStyle}>
             <Box className="FLEX ROW">
               <Typography
@@ -227,6 +237,31 @@ export default observer(function SettingsBody() {
               inputProps={{ "aria-label": "controlled" }}
               onChange={handleOnChangeSyncScrollSwitch}
             ></SwitchIOS>
+          </Box>
+          <Box sx={settingsBodyContentBoxStyle}>
+            <Box className="FLEX ROW">
+              <Typography
+                sx={{
+                  fontSize: "0.89rem",
+                  fontWeight: 500,
+                }}
+              >
+                Editor Auto Wrap
+              </Typography>
+            </Box>
+            <Typography sx={ContentDescriptionTextStyle}>
+              是否开启编辑器自动换行
+            </Typography>
+            <Select
+              value={getSettings().basic.editorAutoWrap ? 1 : 0}
+              defaultChecked={true}
+              fullWidth
+              size="small"
+              onChange={handleOnChangeEditorAutoWrap}
+            >
+              <MenuItem value={1}>On</MenuItem>
+              <MenuItem value={0}>OFF</MenuItem>
+            </Select>
           </Box>
         </Box>
         <Box id="settings_1_3" sx={settingsBodyContentBoxStyle}>

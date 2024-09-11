@@ -160,6 +160,7 @@ const defaultConfig = {
     contextMenuClickPosition: { posx: 20, posy: 20 },
     settingsConfig: {
         basic: {
+            editorAutoWrap: true,
             fontSize: 16,
             syncScroll: false,
             speechLanguage: "zh-CN",
@@ -214,7 +215,6 @@ export function configInit(defaultConfig) {
                         const storedSettings = JSON.parse(opLocalStorage.getItem(key).toString());
                         for (let i in storedSettings) {
                             Object.keys(storedSettings[i]).forEach((e) => {
-                                // console.log(e);
                                 if (!normalSettingsKey.includes(e)) {
                                     console.warn("abnormal key");
                                     storeDefaultSettings(key);
@@ -222,9 +222,7 @@ export function configInit(defaultConfig) {
                                 }
                             });
                         }
-                        // console.log(_defaultConfig[key as string])
                         // 如果都是正常的key 融合即可
-                        console.log(mergeObjects(defaultConfig[key], JSON.parse(opLocalStorage.getItem(key).toString())));
                         opLocalStorage.setItem(key, JSON.stringify(mergeObjects(defaultConfig[key], JSON.parse(opLocalStorage.getItem(key).toString()))));
                         _defaultConfig[key] = JSON.parse(opLocalStorage.getItem(key).toString());
                     }
@@ -241,7 +239,7 @@ export function configInit(defaultConfig) {
             }
             else {
                 // 否则进行设置存储初始化
-                console.info("reset settings don't need to save");
+                // console.info("reset settings don't need to save")
                 storeDefaultSettings(key);
             }
         }
