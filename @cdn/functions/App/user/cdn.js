@@ -73,6 +73,9 @@ export async function loadScripts() {
                 script.src = tag.src.replace("fastly.jsdelivr.net", cdnDomain);
                 script.crossOrigin = tag.crossorigin || "";
                 script.onload = () => resolve();
+                script.className = "scriptScript";
+                script.async = false; //ensure the scripts are loaded in sequence
+                script.defer = true;
                 script.onerror = () => reject(new Error(`Failed to load script: ${tag.src}`));
                 document.head.appendChild(script);
             });
