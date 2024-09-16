@@ -4,7 +4,7 @@ import Editor, { loader, Monaco } from "@monaco-editor/react"
 // import DraggableBox from "@Com/myCom/DragBox"
 // import { getMdTextFromMonaco } from "@App/text/getMdText"
 // import * as monaco from "monaco-editor"
-import allInit from "@Func/Init/allInit"
+import allInit, { waitForVariable } from "@Func/Init/allInit"
 import { monacoPasteEvent } from "@Func/Events/pasteEvent"
 import { editor } from "monaco-editor"
 import { triggerConverterEvent } from "@Func/Events/convert"
@@ -28,6 +28,7 @@ import monacoClickEvent from "@Func/Events/click/monacoClick"
 import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight"
 import monacoScrollEvent from "@Func/Events/scroll/monacoScroll"
 import { Backdrop, CircularProgress } from "@mui/material"
+import { pollVariables } from "@App/basic/basic"
 const version = "0.45.0"
 loader.config({
   paths: {
@@ -151,22 +152,29 @@ export default observer(function MonacoEditor() {
     /**
      * @description allInit
      */
-    allInit(editor, monaco, handleCloseLoading)
-
-    monacoInit(editor, monaco)
-    monacoPasteEvent(editor, monaco)
-    monacoKeyEvent(editor, monaco)
-    monacoSnippets(editor, monaco)
-    // monacoSnippetsDidInsertEvent(editor,monaco)
-    monacoFormat(editor, monaco)
-    monacoMouseEvent(editor, monaco)
-    monacoClickEvent(editor, monaco)
-    monacoScrollEvent(editor, monaco)
-    // monacoPalette(editor,monaco)
-    // monacoKeyDownEvent()
-    // errIntellisense()
-    // 动态改变编辑器高度
-    monacoResizeHeightEvent(setResizableHeight)
+    pollVariables([
+      "markdownitIncrementalDOM",
+      "katex",
+      "IncrementalDOM",
+      "React",
+      "ReactDOM",
+    ]).then(() => {
+      allInit(editor, monaco, handleCloseLoading)
+      monacoInit(editor, monaco)
+      monacoPasteEvent(editor, monaco)
+      monacoKeyEvent(editor, monaco)
+      monacoSnippets(editor, monaco)
+      // monacoSnippetsDidInsertEvent(editor,monaco)
+      monacoFormat(editor, monaco)
+      monacoMouseEvent(editor, monaco)
+      monacoClickEvent(editor, monaco)
+      monacoScrollEvent(editor, monaco)
+      // monacoPalette(editor,monaco)
+      // monacoKeyDownEvent()
+      // errIntellisense()
+      // 动态改变编辑器高度
+      monacoResizeHeightEvent(setResizableHeight)
+    })
   }
   return (
     <>

@@ -3,8 +3,6 @@ import mermaid from "mermaid";
 import blankTextInit from "./blankTextInit";
 import { mdConverter } from "@Root/js";
 import markdownIt from "markdown-it";
-// @ts-ignore
-import markdownItIncrementalDOM from "markdown-it-incremental-dom"; //from CDN
 import mdItMultimdTable from "markdown-it-multimd-table";
 // @ts-ignore
 import markdownItGithubToc from "markdown-it-github-toc";
@@ -30,6 +28,7 @@ import { mergeObjects } from "@App/basic/basic";
  * @description markdownParser init plugin && settings
  */
 export function markdownParser() {
+    // console.log(window.katex)
     let markdownItParser = markdownIt({
         html: true,
         linkify: true,
@@ -56,12 +55,18 @@ export function markdownParser() {
         .use(customAlignPlugin)
         .use(customAlignPluginHeading)
         .use(markdownItEmoji)
-        .use(markdownItLatex)
         .use(markdownItTaskLists)
-        .use(markdownItIncrementalDOM);
-    // .use(markdownItIncrementalDOM, IncrementalDOM)
-    // .use(markdownItCodeCopy)
-    // .use(figure)
+        .use(markdownItLatex)
+        .use(window.markdownitIncrementalDOM);
+    // if (window.katex) {
+    // markdownItParser.use(markdownItLatex)
+    // console.log(markdownItParser.inline.ruler.getRules(""))
+    // }
+    // if (window.markdownitIncrementalDOM) {
+    //   markdownItParser.use(window.markdownitIncrementalDOM)
+    // }
+    // @ts-ignore
+    // window.markdownItParser = markdownItParser
     return markdownItParser;
 }
 /**
@@ -101,6 +106,23 @@ class settingsClass {
     }
 }
 /**
+ * @description 负责查询需要的全局变量从而开始渲染
+ */
+export function waitForVariable(variableName, callback, interval = 100) {
+    const intervalId = setInterval(async () => {
+        // @ts-ignore
+        if (window[variableName]) {
+            clearInterval(intervalId);
+            try {
+                await callback();
+            }
+            catch (error) {
+                console.error("Error in async callback:", error);
+            }
+        }
+    }, interval);
+}
+/**
  * @description 初始化配置和事件初始化
  * @returns {void}
  */
@@ -124,7 +146,7 @@ export default function allInit(editor = window.editor, monaco = window.monaco, 
         /**
          * @description 这之后全部 md都解析完成到 html
          */
-        await mdConverter();
+        await mdConverter(false);
         if (handleCloseLoading) {
             handleCloseLoading();
         }

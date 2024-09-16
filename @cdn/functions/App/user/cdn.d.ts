@@ -7,3 +7,4 @@ export declare function testCdns(): Promise<void>;
  * @returns {Promise<void>} 在所有脚本加载成功后返回 Promise。
  */
 export declare function loadScripts(): Promise<void>;
+export declare function preload(): Promise<void>;

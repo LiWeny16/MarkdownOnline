@@ -1,6 +1,10 @@
+/**
+ * @description 失败的设计，如果全部采用传统模式，那么ok没问题
+ * 但一旦使用了import模式，这个index的存在就是定时炸弹
+ */
 // @ts-ignore
 // import MarkdownItIncrementalDOM from "markdown-it-incremental-dom"
-import * as IncrementalDOM from "incremental-dom";
+// import * as IncrementalDOM from "incremental-dom"
 import hljs from "@cdn-hljs";
 // import "@cdn-katex"
 import { getMdTextFromMonaco } from "@App/text/getMdText";
@@ -47,17 +51,20 @@ export const enObj = {
  */
 export async function mdConverter(fully = false) {
     let view = getMdTextFromMonaco();
-    // enObj.enClue ? (view = await clueParser(view)) : 1
     enObj.enPageBreaker ? (view = pageBreaker(view)) : 1;
     /**
      * @description 处理需要异步的信息
      * */
     let env = await prepareParser(view);
-    if (fully) {
+    // console.log(markdownParser().renderer.rules)
+    // console.log(markdownParser().render(view, env))
+    if (fully || !window.IncrementalDOM) {
         document.getElementById("view-area").innerHTML = markdownParser().render(view, env);
     }
     else {
-        IncrementalDOM.patch(document.getElementById("view-area"), 
+        // console.log(markdownParser().renderer.rules["math_block"])
+        // console.log(markdownParser().render(view, env))
+        window.IncrementalDOM.patch(document.getElementById("view-area"), 
         // @ts-ignore
         markdownParser().renderToIncrementalDOM(view, env));
     }

@@ -21,3 +21,33 @@ export function mergeObjects(oldObj, newObj) {
     }
     return oldObj;
 }
+// 轮询检测函数，如果所有变量都存在则resolve
+export function pollVariables(variableNames) {
+    return new Promise((resolve) => {
+        let attempts = 0;
+        const doPoll = () => {
+            let allExist = true;
+            for (const name of variableNames) {
+                if (typeof window[name] === "undefined") {
+                    allExist = false;
+                    break;
+                }
+            }
+            if (allExist) {
+                resolve();
+            }
+            else {
+                attempts++;
+                let timeout = 1000; // 默认间隔为1000ms
+                if (attempts <= 5) {
+                    timeout = 30; // 前5次轮询，间隔30ms
+                }
+                else if (attempts <= 10) {
+                    timeout = 50; // 6-10次轮询，间隔50ms
+                }
+                setTimeout(doPoll, timeout);
+            }
+        };
+        doPoll();
+    });
+}

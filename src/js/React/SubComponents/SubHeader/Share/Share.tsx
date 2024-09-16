@@ -21,6 +21,7 @@ import CloudMail from "@App/share/CloudMail"
 import { getRenderHTML } from "@App/text/getMdText"
 import { Message } from "@arco-design/web-react"
 import { Notification } from "@arco-design/web-react"
+import ChatIcon from "@mui/icons-material/Chat"
 // import FormDialog from "@Com/myCom/Dialog"
 export default function Share(props: any) {
   let mailOptionsRef = React.useRef<any>()
@@ -40,9 +41,8 @@ export default function Share(props: any) {
       {
         to: mailTo,
         subject: "Mailed from Markdown Online+",
-        html:
-          `<div class="markdown-body">${getRenderHTML()}</div>` ,
-          // `<style>${mailCss + katexCss + hljsCss}</style>`,
+        html: `<div class="markdown-body">${getRenderHTML()}</div>`,
+        // `<style>${mailCss + katexCss + hljsCss}</style>`,
         raw: 0,
       }
     )
@@ -58,6 +58,11 @@ export default function Share(props: any) {
       position: "topRight",
     })
     props.closAll()
+  }
+  const handleAppClick = (urlScheme: string) => (e: any) => {
+    e.stopPropagation()
+    window.location.href = urlScheme
+    // setMailSharePanelState(true)
   }
   return (
     <>
@@ -109,16 +114,33 @@ export default function Share(props: any) {
       >
         <MenuItem
           onClick={(e) => {
-            // console.log(mailCss);
             e.stopPropagation()
             setMailSharePanelState(true)
           }}
           disabled
-
           disableRipple
         >
           <AttachEmailIcon />
           邮箱分享
+        </MenuItem>
+        {/* 打开微信应用 */}
+        <MenuItem onClick={handleAppClick("weixin://dl/scan")} disableRipple>
+          <ChatIcon />
+          WeChat
+        </MenuItem>
+        <MenuItem onClick={handleAppClick("tg://")} disableRipple>
+          <ChatIcon />
+          Telegram
+        </MenuItem>
+        {/* 打开邮箱客户端 */}
+        <MenuItem
+          onClick={handleAppClick(
+            "mailto:bigonion@bigonion.cn?subject=你的主题&body=你的邮件内容"
+          )}
+          disableRipple
+        >
+          <AttachEmailIcon />
+          Email
         </MenuItem>
       </StyledMenu>
     </>

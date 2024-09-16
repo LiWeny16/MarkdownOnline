@@ -7,6 +7,10 @@ import { ConfigStore, IConfig } from "@Root/js/React/Mobx/Config";
  */
 export declare function markdownParser(): markdownIt;
 /**
+ * @description 负责查询需要的全局变量从而开始渲染
+ */
+export declare function waitForVariable(variableName: string, callback: () => void | Promise<void>, interval?: number): void;
+/**
  * @description 初始化配置和事件初始化
  * @returns {void}
  */

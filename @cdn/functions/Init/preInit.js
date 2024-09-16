@@ -1,6 +1,7 @@
-import cdnInit, { testCdns } from "@App/user/cdn";
+import cdnInit, { loadScripts, preload, testCdns } from "@App/user/cdn";
 (async function preInit() {
     await cdnInit();
     await testCdns();
-    // await loadScripts()
+    await preload();
+    await loadScripts();
 })();

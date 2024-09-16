@@ -5,47 +5,27 @@
  * @param number version 数据库的版本
  * @return object 该函数会返回一个数据库实例
  */
-export function openDB(dbName, version = 1) {
+export function openDB(dbName, version = 1, onUpgradeNeeded) {
     return new Promise((resolve, reject) => {
-        //  兼容浏览器
         var indexedDB = window.indexedDB ||
             window.mozIndexedDB ||
             window.webkitIndexedDB ||
             window.msIndexedDB;
         let db;
-        // 打开数据库，若没有则会创建
         const request = indexedDB.open(dbName, version);
-        // 数据库打开成功回调
         request.onsuccess = function (event) {
-            db = event.target.result; // 数据库对象
+            db = event.target.result;
             resolve(db);
         };
-        // 数据库打开失败的回调
         request.onerror = function (event) {
             console.log("数据库打开报错");
+            reject(event);
         };
-        // 数据库有更新时候的回调
         request.onupgradeneeded = function (event) {
-            // 数据库创建或升级的时候会触发,比success先执行
-            console.log("onupgradeneeded");
-            db = event.target.result; // 数据库对象
-            // 创建存储库
-            let objectStore_md = db.createObjectStore("users_md", {
-                keyPath: "uuid", // 这是主键
-                // autoIncrement: true // 实现自增
-            });
-            let objectStore_img = db.createObjectStore("users_img", {
-                keyPath: "uuid", // 这是主键
-                // autoIncrement: true // 实现自增
-            });
-            // 创建索引，在后面查询数据的时候可以根据索引查
-            objectStore_md.createIndex("uuid", "uuid", { unique: true });
-            objectStore_md.createIndex("contentText", "contentText", {
-                unique: false,
-            });
-            // objectStore.createIndex("age", "age", { unique: false })
-            objectStore_img.createIndex("uuid", "uuid", { unique: true });
-            objectStore_img.createIndex("imgBase64", "imgBase64", { unique: false });
+            db = event.target.result;
+            if (onUpgradeNeeded) {
+                onUpgradeNeeded(db, event);
+            }
         };
     });
 }
@@ -76,16 +56,19 @@ export function addData(db, storeName, data) {
  * @param object data 数据
  */
 export function updateDB(db, storeName, data) {
-    var request = db
-        .transaction([storeName], "readwrite") // 事务对象
-        .objectStore(storeName) // 仓库对象
-        .put(data);
-    request.onsuccess = function () {
-        console.log("数据更新成功");
-    };
-    request.onerror = function () {
-        console.log("数据更新失败");
-    };
+    return new Promise((resolve, reject) => {
+        var request = db
+            .transaction([storeName], "readwrite") // 事务对象
+            .objectStore(storeName) // 仓库对象
+            .put(data);
+        request.onsuccess = function () {
+            // console.log("数据更新成功")
+            resolve();
+        };
+        request.onerror = function (event) {
+            // console.log("数据更新失败")
+        };
+    });
 }
 /**
  * 通过主键读取数据
@@ -94,17 +77,18 @@ export function updateDB(db, storeName, data) {
  * @param string key 主键值
  */
 export function getDataByKey(db, storeName, key) {
-    var store = db
-        .transaction(storeName, "readwrite") // 事务
-        .objectStore(storeName); // 仓库对象
-    var request = store.get(key); // 通过主键获取数据
-    // getAll 也可以获取全部
-    request.onerror = function (event) {
-        console.log("事务失败");
-    };
-    request.onsuccess = function (event) {
-        console.log("主键查询结果: ", request.result);
-    };
+    return new Promise((resolve, reject) => {
+        const store = db.transaction(storeName, "readonly").objectStore(storeName);
+        const request = store.get(key);
+        request.onerror = function (event) {
+            // console.log("db failed")
+            reject(event);
+        };
+        request.onsuccess = function (event) {
+            // console.log("主键查询结果: ", request.result)
+            resolve(request.result);
+        };
+    });
 }
 /**
  * 通过游标读取数据

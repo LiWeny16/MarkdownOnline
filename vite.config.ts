@@ -19,15 +19,15 @@ export default defineConfig({
       external: [
         "react",
         "react-dom",
-        "markdown-it-incremental-dom",
-        "IncrementalDOM",
+        // "markdown-it-incremental-dom",
+        // "IncrementalDOM",
       ],
       output: {
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
-          "markdown-it-incremental-dom": "markdownitIncrementalDOM",
-          "incremental-dom": "IncrementalDOM",
+          // "markdown-it-incremental-dom": "markdownitIncrementalDOM",
+          // "incremental-dom": "IncrementalDOM",
         },
         // 控制输出
         // 在rollup里面, hash代表将你的文件名和文件内容进行组合计算得来的结果
@@ -78,12 +78,13 @@ export default defineConfig({
     viteExternalsPlugin({
       react: "React",
       "react-dom": "ReactDOM",
-      "markdown-it-incremental-dom": "markdownitIncrementalDOM",
-      "incremental-dom": "IncrementalDOM",
+      // "markdown-it-incremental-dom": "markdownitIncrementalDOM",
+      // "incremental-dom": "IncrementalDOM",
     }),
     [react({ jsxRuntime: "classic" })],
-    dynamicImport(/* options */),
+    // dynamicImport(/* options */),
     retryImportPlugin({
+   
       gsap: "https://cdn.jsdmirror.com/npm/gsap@3.12/+esm",
       "react-photo-view":
         "https://cdn.jsdmirror.com/npm/react-photo-view-cdn@0.0.1/esm/react-photo-view.module.js",
@@ -129,8 +130,8 @@ export default defineConfig({
         "https://cdn.jsdmirror.com/npm/bigonion-kit@0.12.6/esm/kit.min.js",
       "@cdn-hljs":
         "https://cdn.jsdmirror.com/npm/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js",
-      "@cdn-katex":
-        "https://cdn.jsdmirror.com/npm/katex@0.16.7/dist/katex.min.js",
+      // "@cdn-katex":
+      //   "https://cdn.jsdmirror.com/npm/katex@0.16.7/dist/katex.min.js",
     }),
   ],
 })

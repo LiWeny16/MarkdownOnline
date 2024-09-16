@@ -209,6 +209,9 @@ declare interface Window {
   katex: any
   mermaid: any
   loadPyodide: any
+  Babel: any
+  markdownitIncrementalDOM: any
+  IncrementalDOM: any
   _deco: any
   _prepareCacheData: IPrePare
   _speechData: {

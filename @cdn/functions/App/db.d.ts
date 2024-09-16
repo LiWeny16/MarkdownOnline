@@ -5,7 +5,7 @@
  * @param number version 数据库的版本
  * @return object 该函数会返回一个数据库实例
  */
-export declare function openDB(dbName: string, version?: number): Promise<unknown>;
+export declare function openDB(dbName: string, version?: number, onUpgradeNeeded?: (db: IDBDatabase, event: IDBVersionChangeEvent) => void): Promise<IDBDatabase>;
 /**
  * 新增数据
  * @param db 数据库实例
@@ -19,14 +19,14 @@ export declare function addData(db: IDBDatabase, storeName: string, data: any): 
  * @param string storeName 仓库名称
  * @param object data 数据
  */
-export declare function updateDB(db: IDBDatabase, storeName: string, data: any): void;
+export declare function updateDB(db: IDBDatabase, storeName: string, data: any): Promise<void>;
 /**
  * 通过主键读取数据
  * @param object db 数据库实例
  * @param string storeName 仓库名称
  * @param string key 主键值
  */
-export declare function getDataByKey(db: IDBDatabase, storeName: string, key: string): void;
+export declare function getDataByKey(db: IDBDatabase, storeName: string, key: string): Promise<any>;
 /**
  * 通过游标读取数据
  * @param db 数据库实例

@@ -47,9 +47,7 @@ export default async function prepareParser(originalMd: string) {
    * 和mermaid不同，只有envCache被外部改变才会改变，也就是说python完全按照envCache当前值来渲染，预渲染并不会改变
    * 结果，因为**只有**按下运行按钮的时候，代码才会运行，与mermaid渲染逻辑略有区别，但总体结构设计基本一致。
    */
-  async function prepareCode(imageToken: { content: any }) {
-    let src = imageToken.content
-  }
+
   let imageTokens: any = [] //用于保存提前解析出的图片token
   let mermaidTokens: any = []
   let codeTokens: any = []

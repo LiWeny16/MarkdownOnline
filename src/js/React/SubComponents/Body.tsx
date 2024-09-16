@@ -1,27 +1,20 @@
 import React from "react"
 
-import { enObj } from "@Root/js/index"
 import fastKeyEvent from "@Func/Events/key/fastKey"
 import MdArea from "./SubBody/MdArea"
 import { observer } from "mobx-react"
-import EmojiPicker from "@Com/myCom/EmojiPicker"
 import { getEmojiPickerState, getTheme } from "@App/config/change"
 import { Suspense } from "react"
 
 // 使用 React.lazy 懒加载组件
 const LazyEmojiPicker = React.lazy(() => import("@Com/myCom/EmojiPicker"))
-function enEvents(doIt: boolean): void {
-  if (doIt) {
-    enObj.enFastKey ? fastKeyEvent() : undefined
-  }
-}
 
 export default observer(function Body() {
   const [content, setContent] = React.useState("")
   const articleRef = React.useRef(null)
 
   React.useEffect(() => {
-    enEvents(true)
+    fastKeyEvent()
   }, [])
   return (
     <>

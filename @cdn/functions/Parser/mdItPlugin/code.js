@@ -1,10 +1,5 @@
 import { getTheme } from "@App/config/change";
-// import { ButtonComponent } from "@Root/js/React/Components/Mui/progressButton"
 import hljs from "@cdn-hljs";
-// import { RenderRule } from "markdown-it/lib/renderer"
-// const copyButtonStyle = `position: relative;
-// top: 31px;
-// left: 88%;`
 let codePlugin = function (md) {
     const oldRender = md.renderer.rules.code_block;
     md.renderer.rules.fence = function (tokens, idx, options, env, self) {

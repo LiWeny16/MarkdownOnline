@@ -19,6 +19,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import CloudMail from "@App/share/CloudMail";
 import { getRenderHTML } from "@App/text/getMdText";
 import { Notification } from "@arco-design/web-react";
+import ChatIcon from "@mui/icons-material/Chat";
 // import FormDialog from "@Com/myCom/Dialog"
 export default function Share(props) {
     let mailOptionsRef = React.useRef();
@@ -52,14 +53,18 @@ export default function Share(props) {
         });
         props.closAll();
     };
-    return (_jsxs(_Fragment, { children: [_jsxs(Dialog, { fullWidth: true, maxWidth: "sm", open: mailSharePanelState, onClose: handleCloseAll, children: [_jsx(DialogTitle, { children: "\u795E\u5947\u90AE\u7BB1" }), _jsxs(DialogContent, { children: [_jsxs(DialogContentText, { children: ["\u8BF7\u8F93\u5165\u4F60\u8981\u53D1\u9001\u5230\u7684\u90AE\u7BB1", _jsx("br", {})] }), _jsx(TextField, { inputRef: mailOptionsRef, autoFocus: true, margin: "dense", id: "name", label: "Email Address", type: "email", fullWidth: true, variant: "standard" })] }), _jsxs(DialogActions, { children: [_jsx(Button, { onClick: handleCloseAll, children: "\u53D6\u6D88" }), _jsx(Button, { onClick: handleSendMail, children: "\u53D1\u9001" })] })] }), _jsx(ArchiveIcon, {}), "\u5206\u4EAB(\u5F00\u53D1\u4E2D)", _jsx(StyledMenu, { style: { width: "fitContent" }, anchorOrigin: {
+    const handleAppClick = (urlScheme) => (e) => {
+        e.stopPropagation();
+        window.location.href = urlScheme;
+        // setMailSharePanelState(true)
+    };
+    return (_jsxs(_Fragment, { children: [_jsxs(Dialog, { fullWidth: true, maxWidth: "sm", open: mailSharePanelState, onClose: handleCloseAll, children: [_jsx(DialogTitle, { children: "\u795E\u5947\u90AE\u7BB1" }), _jsxs(DialogContent, { children: [_jsxs(DialogContentText, { children: ["\u8BF7\u8F93\u5165\u4F60\u8981\u53D1\u9001\u5230\u7684\u90AE\u7BB1", _jsx("br", {})] }), _jsx(TextField, { inputRef: mailOptionsRef, autoFocus: true, margin: "dense", id: "name", label: "Email Address", type: "email", fullWidth: true, variant: "standard" })] }), _jsxs(DialogActions, { children: [_jsx(Button, { onClick: handleCloseAll, children: "\u53D6\u6D88" }), _jsx(Button, { onClick: handleSendMail, children: "\u53D1\u9001" })] })] }), _jsx(ArchiveIcon, {}), "\u5206\u4EAB(\u5F00\u53D1\u4E2D)", _jsxs(StyledMenu, { style: { width: "fitContent" }, anchorOrigin: {
                     vertical: -5,
                     horizontal: 12,
                 }, id: "demo-customized-menu", MenuListProps: {
                     "aria-labelledby": "demo-customized-button",
-                }, elevation: 24, anchorEl: props.anchorEl, open: props.open, onClick: props.onClick, children: _jsxs(MenuItem, { onClick: (e) => {
-                        // console.log(mailCss);
-                        e.stopPropagation();
-                        setMailSharePanelState(true);
-                    }, disabled: true, disableRipple: true, children: [_jsx(AttachEmailIcon, {}), "\u90AE\u7BB1\u5206\u4EAB"] }) })] }));
+                }, elevation: 24, anchorEl: props.anchorEl, open: props.open, onClick: props.onClick, children: [_jsxs(MenuItem, { onClick: (e) => {
+                            e.stopPropagation();
+                            setMailSharePanelState(true);
+                        }, disabled: true, disableRipple: true, children: [_jsx(AttachEmailIcon, {}), "\u90AE\u7BB1\u5206\u4EAB"] }), _jsxs(MenuItem, { onClick: handleAppClick("weixin://dl/scan"), disableRipple: true, children: [_jsx(ChatIcon, {}), "WeChat"] }), _jsxs(MenuItem, { onClick: handleAppClick("tg://"), disableRipple: true, children: [_jsx(ChatIcon, {}), "Telegram"] }), _jsxs(MenuItem, { onClick: handleAppClick("mailto:bigonion@bigonion.cn?subject=你的主题&body=你的邮件内容"), disableRipple: true, children: [_jsx(AttachEmailIcon, {}), "Email"] })] })] }));
 }

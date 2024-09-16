@@ -9,7 +9,6 @@ for rendering output.
 /*jslint node: true */
 // Test if potential opening or closing delimieter
 // Assumes that there is a "$" at state.src[pos]
-const katex = window.katex;
 function isValidDelim(state, pos) {
     var prevChar, nextChar, max = state.posMax, can_open = true, can_close = true;
     prevChar = pos > 0 ? state.src.charCodeAt(pos - 1) : -1;
@@ -149,7 +148,7 @@ export default function markdownItLatex(md, options) {
         // console.log(latex);
         if (latex) {
             try {
-                return katex.renderToString(latex, options);
+                return window.katex.renderToString(latex, options);
             }
             catch (error) {
                 // if(options.throwOnError){ console.log(error); }
@@ -171,7 +170,9 @@ export default function markdownItLatex(md, options) {
         }
         if (latex) {
             try {
-                return `<p data-line=${String(line)}>` + katex.renderToString(latex, options) + "</p>";
+                return (`<p data-line=${String(line)}>` +
+                    window.katex.renderToString(latex, options) +
+                    "</p>");
             }
             catch (error) {
                 // if(options.throwOnError){ console.log(error); }
