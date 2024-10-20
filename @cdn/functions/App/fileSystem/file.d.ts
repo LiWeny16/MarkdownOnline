@@ -15,7 +15,7 @@ export declare class FileManager {
      * @description 读取文件内容
      * @returns 内容，如果没有打开则为undefined
      */
-    readFile(): Promise<string | undefined>;
+    readFile(fileHandle: FileSystemFileHandle): Promise<string | undefined>;
     /**
      * @description 静默保存文件
      */

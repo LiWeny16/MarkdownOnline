@@ -300,6 +300,7 @@ export default function FileExplorer(props: { fileDirectoryArr: any }) {
       sx={{
         height: "fit-content",
         flexGrow: 1,
+        userSelect: "none",
         maxWidth: 400,
         overflowY: "auto",
       }}

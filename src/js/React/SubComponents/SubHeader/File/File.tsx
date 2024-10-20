@@ -4,24 +4,33 @@ import {
   getFileManagerState,
   getSettings,
 } from "@App/config/change"
-import { FileManager } from "@App/fileSystem/file"
+import { FileFolderManager, FileManager } from "@App/fileSystem/file"
 import { getMdTextFromMonaco } from "@App/text/getMdText"
 import { replaceMonacoAll, replaceMonacoAllForce } from "@App/text/replaceText"
-import IOSSwitch from "@Root/js/React/Components/myCom/Switches/SwitchIOS"
-import { Box, Button, Divider, ThemeProvider, Typography } from "@mui/material"
+import {
+  Box,
+  Button,
+  Divider,
+  IconButton,
+  Stack,
+  SvgIcon,
+  ThemeProvider,
+  Tooltip,
+  Typography,
+} from "@mui/material"
 import Drawer from "@mui/material/Drawer"
 import { observer } from "mobx-react"
 import { useTheme } from "@mui/material/styles"
-
 import React from "react"
 import SwitchIOS from "@Root/js/React/Components/myCom/Switches/SwitchIOS"
-import MyPaper from "@Root/js/React/Components/myCom/Paper"
 import alertUseArco from "@App/message/alert"
-import { FileFolderManager } from "@App/fileSystem/file"
-import RenamableSimpleTreeView from "./SubFile.tsx/FileFolder"
-import FileManagment from "./SubFile.tsx/FileManager"
 import FileExplorer from "./SubFile.tsx/FileManager"
-
+import FolderIcon from "@mui/icons-material/Folder"
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline"
+import SaveAltIcon from "@mui/icons-material/SaveAlt"
+import FileCopyIcon from "@mui/icons-material/FileCopy"
+import Zoom from "@mui/material/Zoom"
+import ScrollableBox from "@Root/js/React/Components/myCom/Layout/ScrollBox"
 const fileManager = new FileManager()
 let _t: NodeJS.Timeout | null
 const FileDrawer = observer(function FileDrawer() {
@@ -35,15 +44,59 @@ const FileDrawer = observer(function FileDrawer() {
     changeSettings({
       basic: { fileEditLocal: i },
     })
-    // if (i) {
-    //   // 监听本地文件改动
-    //   _t = setInterval(async () => {
-    //     const content = await fileManager.readFile()
-    //   }, 1000)
-    // } else {
-    //   _t = null
-    // }
   }
+  /**
+   * @description 打开单个文件
+   */
+  const onClickOpenSingleFile = async () => {
+    try {
+      // 调用 openSingleFile 方法从文件管理器中打开单个文件
+      const fileHandle = await fileManager.openSingleFile()
+      if (!fileHandle) {
+        // 如果没有文件被选中，显示提示消息
+        alertUseArco("左顾右盼，活在梦幻?", 2500, {
+          kind: "warning",
+        })
+        return
+      }
+
+      // {id: '1.umd-kit-old.js', label: 'umd-kit-old.js', fileType: 'file'}
+      // 更新编辑文件名
+      setEditingFileName(fileHandle.name)
+
+      // 显示正在打开文件的提示
+      alertUseArco("正在打开本地文件，别急，你给我等会😅")
+
+      // 读取文件内容
+      const content = await fileManager.readFile(fileHandle)
+      if (content) {
+        // 使用 Monaco 编辑器显示文件内容
+        replaceMonacoAll(window.monaco, window.editor, content)
+        alertUseArco(`打开${fileHandle.name}成功！😀`)
+      } else {
+        // 如果内容为空，显示警告消息
+        alertUseArco("文件内容为空", 2500, {
+          kind: "warning",
+        })
+      }
+    } catch (error) {
+      // 错误处理
+      console.error("Error opening file:", error)
+      alertUseArco("尼玛的报错乐🤣", 2000, { kind: "error" })
+    }
+  }
+  const onClickOpenFolder = async () => {
+    let fileFolderManager = new FileFolderManager()
+    const directoryHandle = await fileFolderManager.openDirectory()
+    if (directoryHandle) {
+      setFileDirectoryArr(
+        await fileFolderManager.readDirectoryAsArray(directoryHandle)
+      )
+      console.log(await fileFolderManager.readDirectoryAsArray(directoryHandle))
+      // fileFolderManager.createNewFolder(directoryHandle, "test2")
+    }
+  }
+  const startButtonStyle = { width: "53%", height: "6svh", mb: "10px" }
   return (
     <>
       <Drawer
@@ -58,82 +111,72 @@ const FileDrawer = observer(function FileDrawer() {
       >
         <Box
           sx={{
-            padding: "20px",
-            width: "26svw",
+            overflow: "hidden",
+            background: theme.palette.mode === "light" ? "#F9F9F9" : "dark",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "stretch",
             height: "100svh",
-            flexDirection: "column",
           }}
         >
-          <Box className={"FLEX COL"}>
-            <FileExplorer fileDirectoryArr={fileDirectoryArr} />
-            <Typography>
-              {getSettings().basic.fileEditLocal ? editingFileName : ""}
-            </Typography>
-            <Button
-              sx={{ mb: "10px" }}
-              onClick={async () => {
-                try {
-                  const fileHandle = await fileManager.openSingleFile()
-                  setEditingFileName(fileHandle?.name ?? "")
-                  if (fileHandle) {
-                    alertUseArco("正在打开本地文件，别急，你给我等会😅")
-                    const content = await fileManager.readFile()
-                    if (content) {
-                      replaceMonacoAll(window.monaco, window.editor, content)
-                      alertUseArco(`打开${fileHandle?.name}成功！😀`)
-                    }
-                  } else {
-                    alertUseArco("左顾右盼，活在梦幻?", 2500, {
-                      kind: "warning",
-                    })
-                  }
-                } catch (error) {
-                  alertUseArco("尼玛的报错乐🤣", 2000, { kind: "error" })
-                }
-              }}
-              variant="contained"
-              color="primary"
-            >
-              打开文件
-            </Button>
-            <Button
-              sx={{ mb: "10px" }}
-              variant="contained"
-              disabled
-              color="primary"
-              onClick={async () => {
-                // let fileFolderManager = new FileFolderManager()
-                // const directoryHandle = await fileFolderManager.openDirectory()
-                // if (directoryHandle) {
-                //   setFileDirectoryArr(
-                //     await fileFolderManager.readDirectoryAsArray(
-                //       directoryHandle
-                //     )
-                //   )
-                //   console.log(
-                //     await fileFolderManager.readDirectoryAsArray(
-                //       directoryHandle
-                //     )
-                //   )
-                //   // fileFolderManager.createNewFolder(directoryHandle, "test2")
-                // }
+          <Box
+            sx={{
+              width: "4.6svw",
+              height: "100svh",
+              display: "flex",
+              background:
+                theme.palette.mode === "light" ? "#eeeeee" : "#414141",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Stack
+              sx={{
+                width: 60, // 调整宽度以适应你的设计
+                height: "100vh", // 满屏高度
+                alignItems: "center", // 中心对齐图标
+                paddingTop: 2, // 顶部间隔
               }}
             >
-              打开文件夹
-            </Button>
-            <Button
-              sx={{ mb: "10px" }}
-              variant="contained"
-              onClick={() => {
-                fileManager.saveAsFile(getMdTextFromMonaco())
+              {/* 打开文件 */}
+              <SquareClickIconButton
+                icon={<FileCopyIcon />}
+                onClick={onClickOpenSingleFile}
+                tooltipText="打开文件 ✨"
+              />
+
+              {/* 打开文件夹 */}
+              <SquareClickIconButton
+                tooltipText="打开文件夹 💦"
+                icon={<FolderIcon />}
+                onClick={onClickOpenFolder}
+              />
+
+              {/* 另存为 */}
+              <SquareClickIconButton
+                tooltipText="另存为 🎁"
+                icon={<SaveAltIcon />}
+                onClick={() => fileManager.saveAsFile(getMdTextFromMonaco())}
+              />
+            </Stack>
+          </Box>
+          <Box
+            sx={{
+              width: "23svw",
+              height: "100svh",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <Box
+              sx={{
+                width: "23svw",
+                height: "10svh",
+                alignItems: "center",
               }}
+              className={"FLEX COW ALI-CEN JUS-CEN"}
             >
-              另存为
-            </Button>
-            <Box className={"FLEX COW ALI-CEN"}>
               <Typography
                 sx={{ mr: "10px", fontSize: "17px" }}
                 color={theme.palette.info.contrastText}
@@ -148,6 +191,63 @@ const FileDrawer = observer(function FileDrawer() {
                 onChange={handleOnChangeFileEditLocalSwitch}
               ></SwitchIOS>
             </Box>
+            <Box
+              className={"FLEX ALI-CEN JUS-CEN"}
+              sx={{
+                display: "flex",
+                height: "98%",
+                alignContent: "center",
+                justifyContent: "center",
+                marginBottom: "20svh",
+              }}
+            >
+              {fileDirectoryArr.length != 0 ? (
+                <>
+                  <ScrollableBox sx={{ width: "100%", height: "100%" }}>
+                    <FileExplorer fileDirectoryArr={fileDirectoryArr} />
+                  </ScrollableBox>
+                </>
+              ) : (
+                <>
+                  <FileExplorer fileDirectoryArr={fileDirectoryArr} />
+                  <Box
+                    className={"FLEX COL ALI-CEN JUS-CEN"}
+                    sx={{
+                      width: "100%",
+                    }}
+                  >
+                    <Typography>
+                      {getSettings().basic.fileEditLocal ? editingFileName : ""}
+                    </Typography>
+                    <Button
+                      sx={startButtonStyle}
+                      onClick={onClickOpenSingleFile}
+                      variant="contained"
+                      color="primary"
+                    >
+                      打开文件
+                    </Button>
+                    <Button
+                      sx={startButtonStyle}
+                      variant="contained"
+                      color="primary"
+                      onClick={onClickOpenFolder}
+                    >
+                      打开文件夹
+                    </Button>
+                    <Button
+                      sx={startButtonStyle}
+                      variant="contained"
+                      onClick={() => {
+                        fileManager.saveAsFile(getMdTextFromMonaco())
+                      }}
+                    >
+                      另存为
+                    </Button>
+                  </Box>
+                </>
+              )}
+            </Box>
           </Box>
         </Box>
       </Drawer>
@@ -155,3 +255,57 @@ const FileDrawer = observer(function FileDrawer() {
   )
 })
 export default FileDrawer
+interface SquareClickIconButtonProps {
+  icon: React.ReactElement<typeof SvgIcon>
+  onClick: () => void // 点击事件处理函数
+  tooltipText?: string // 可选的字符串，用于 Tooltip
+}
+function SquareClickIconButton({
+  icon,
+  onClick,
+  tooltipText,
+}: SquareClickIconButtonProps) {
+  const theme = useTheme() // 使用主题钩子获取当前主题
+
+  // 创建Button组件
+  const button = (
+    <Button
+      sx={{
+        width: "4.6svw", // 设置按钮的固定宽度
+        height: "4.6svw", // 设置按钮的固定高度
+        backgroundColor: "transparent", // 初始背景颜色
+        "&:hover": {
+          backgroundColor: theme.palette.action.hover, // 悬浮时背景色
+          borderRadius: "0", // 按钮圆角
+        },
+        "& .MuiTouchRipple-rippleVisible": {
+          animation:
+            "MuiTouchRipple-keyframes-enter 550ms cubic-bezier(0.4, 0, 0.2, 1)",
+          transform: "scale(3)", // 放大波纹效果
+        },
+        "& .MuiTouchRipple-child": {
+          backgroundColor: theme.palette.primary.main, // 自定义波纹颜色
+        },
+      }}
+      onClick={onClick} // 点击事件处理
+      color="inherit"
+    >
+      {icon}
+    </Button>
+  )
+
+  // 根据tooltipText的值决定是否使用Tooltip
+  return tooltipText ? (
+    <Tooltip
+      sx={{ whiteSpace: "normal" }}
+      TransitionComponent={Zoom}
+      enterDelay={200}
+      placement="left"
+      title={tooltipText}
+    >
+      {button}
+    </Tooltip>
+  ) : (
+    button
+  )
+}

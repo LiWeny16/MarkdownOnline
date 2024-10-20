@@ -47,7 +47,7 @@ export class FileManager {
      * @description 读取文件内容
      * @returns 内容，如果没有打开则为undefined
      */
-    async readFile() {
+    async readFile(fileHandle) {
         if (!this.fileHandle) {
             return;
         }

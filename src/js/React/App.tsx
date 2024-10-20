@@ -1,6 +1,6 @@
 import React from "react"
 import Header from "./SubComponents/Header"
-
+// Import the functions you need from the SDKs you need
 import Body from "./SubComponents/Body"
 import { observer } from "mobx-react"
 
@@ -10,6 +10,8 @@ import { green, blue } from "@mui/material/colors"
 import { getTheme } from "@App/config/change"
 import { Box } from "@mui/material"
 import kit from "bigonion-kit"
+// import { getTextFB } from "@App/share/firebase"
+// console.log(getTextFB);
 const bothStyle: ThemeOptions = {
   zIndex: { drawer: 1300, modal: 1200, appBar: 1200 },
 }

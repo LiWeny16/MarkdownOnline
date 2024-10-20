@@ -179,6 +179,7 @@ export default function FileExplorer(props) {
     return (_jsx(RichTreeView, { items: props.fileDirectoryArr ?? ITEMS, "aria-label": "file explorer", defaultExpandedItems: ["1", "1.1"], defaultSelectedItems: "1.1", sx: {
             height: "fit-content",
             flexGrow: 1,
+            userSelect: "none",
             maxWidth: 400,
             overflowY: "auto",
         }, slots: { item: CustomTreeItem } }));
