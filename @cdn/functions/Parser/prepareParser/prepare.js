@@ -1,3 +1,4 @@
+import { FileFolderManager } from "@App/fileSystem/file";
 import { readMemoryImg } from "@App/memory/memory";
 import { markdownParser } from "@Func/Init/allInit";
 import kit from "@cdn-kit";
@@ -17,6 +18,12 @@ export default async function prepareParser(originalMd) {
             return await readMemoryImg("uuid", parseInt(imgId)).then((e) => {
                 return e[0].imgBase64;
             });
+        }
+        else if (src.startsWith("./")) {
+            const folderManager = new FileFolderManager();
+            if (folderManager.getTopDirectoryHandle()) {
+                return await folderManager.readFileContent(folderManager.getTopDirectoryHandle(), src.slice(2), true);
+            }
         }
     }
     /**
@@ -52,6 +59,9 @@ export default async function prepareParser(originalMd) {
     let md = markdownParser();
     md.renderer.rules.image = function (tokens, idx) {
         if (tokens[idx].attrGet("src")?.startsWith("/vf/")) {
+            imageTokens.push(tokens[idx]); //存储图片token以供后续处理
+        }
+        else if (tokens[idx].attrGet("src")?.startsWith("./")) {
             imageTokens.push(tokens[idx]); //存储图片token以供后续处理
         }
         return "";

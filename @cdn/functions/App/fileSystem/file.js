@@ -1,24 +1,82 @@
-const supportFileTypes = [".md", ".py", ".js", ".ts"];
+import alertUseArco from "@App/message/alert";
+// 基础扩展名数组（不包含点号）
+export const supportFileTypes = [
+    "md",
+    "txt",
+    "go",
+    "java",
+    "kt",
+    "py",
+    "js",
+    "ts",
+    "html",
+    "css",
+    "c",
+    "cpp",
+    "json",
+    "mjs",
+    "jsx",
+    "tsx",
+    "ps1",
+    "cmd",
+    "xsl",
+    "toml",
+    "ipynb",
+    "makefile",
+    "yml",
+];
+// 包含点号的扩展名数组
+export const supportFileTypes2 = supportFileTypes.map((ext) => `.${ext}`);
+// 定义支持的文件扩展名列表
+export const supportedImageExtensions = [
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+    "bmp",
+    "webp",
+    "svg",
+];
+class FileState {
+}
+// 0 is single file, 1 is folder
+Object.defineProperty(FileState, "fileState", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: 0
+});
+Object.defineProperty(FileState, "fileHandle", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: null
+});
 /**
  * @description 文件管理类
  */
-export class FileManager {
+export class FileManager extends FileState {
     /**
      * @description 构造函数
      */
     constructor(fileHandle) {
-        Object.defineProperty(this, "fileHandle", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: null
-        });
-        if (fileHandle) {
-            this.fileHandle = fileHandle;
-        }
-        else {
-            this.fileHandle = window._fileHandle;
-        }
+        super();
+    }
+    // Getter for fileState
+    get fileState() {
+        return FileState.fileState;
+    }
+    // Setter for fileState
+    set fileState(state) {
+        FileState.fileState = state;
+    }
+    // Getter for fileHandle
+    get fileHandle() {
+        return FileState.fileHandle;
+    }
+    // Setter for fileHandle
+    set fileHandle(handle) {
+        FileState.fileHandle = handle;
     }
     /**
      * @description 打开单个文件并获取句柄
@@ -31,11 +89,11 @@ export class FileManager {
                 types: [
                     {
                         description: "Text Files",
-                        accept: { "text/plain": supportFileTypes },
+                        accept: { "text/plain": supportFileTypes2 },
                     },
                 ],
             });
-            window._fileHandle = this.fileHandle;
+            this.fileState = 0;
             return this.fileHandle;
         }
         catch (error) {
@@ -81,7 +139,7 @@ export class FileManager {
                     {
                         description: "Text Files",
                         accept: {
-                            "text/plain": supportFileTypes,
+                            "text/plain": supportFileTypes2,
                         },
                     },
                 ],
@@ -99,8 +157,9 @@ export class FileManager {
 /**
  * @description 处理文件夹类
  */
-export class FileFolderManager {
+export class FileFolderManager extends FileState {
     constructor(directoryHandle) {
+        super();
         Object.defineProperty(this, "topDirectoryHandle", {
             enumerable: true,
             configurable: true,
@@ -113,14 +172,24 @@ export class FileFolderManager {
             writable: true,
             value: void 0
         });
-        if (directoryHandle) {
-            this.topDirectoryHandle = directoryHandle;
-            this.currentDirectoryHandle = directoryHandle;
-        }
-        else {
-            this.topDirectoryHandle = window._directoryHandle;
-            this.currentDirectoryHandle = window._directoryHandle;
-        }
+        this.topDirectoryHandle = directoryHandle || window._directoryHandle;
+        this.currentDirectoryHandle = this.topDirectoryHandle;
+    }
+    // Getter for fileState
+    get fileState() {
+        return FileState.fileState;
+    }
+    // Setter for fileState
+    set fileState(state) {
+        FileState.fileState = state;
+    }
+    // Getter for fileHandle
+    get fileHandle() {
+        return FileState.fileHandle;
+    }
+    // Setter for fileHandle
+    set fileHandle(handle) {
+        FileState.fileHandle = handle;
     }
     getTopDirectoryHandle() {
         return this.topDirectoryHandle;
@@ -137,6 +206,7 @@ export class FileFolderManager {
             const directoryHandle = await window.showDirectoryPicker();
             // console.log("Directory selected:", directoryHandle)
             this.topDirectoryHandle = directoryHandle;
+            this.fileState = 1;
             this.currentDirectoryHandle = directoryHandle;
             window._directoryHandle = directoryHandle;
             return directoryHandle;
@@ -148,43 +218,55 @@ export class FileFolderManager {
     }
     async readDirectoryAsArray(directoryHandle) {
         // 递归函数来读取和处理子目录及文件
-        async function processEntry(entryHandle, idPrefix) {
-            const id = `${idPrefix}.${entryHandle.name}`;
-            // 检查是目录还是文件
+        async function processEntry(entryHandle, path, idParts) {
+            const name = entryHandle.name;
+            const currentPath = path ? `${path}/${name}` : name;
+            const id = idParts.join(".");
             if (entryHandle.kind === "file") {
-                const file = await entryHandle.getFile();
-                // 这里返回文件的信息，可以根据文件类型设置 fileType
                 return {
                     id: id,
-                    label: entryHandle.name,
-                    // fileType 需要根据实际的文件类型来设置，这里假设全部为文件
+                    label: name,
                     fileType: "file",
+                    path: currentPath,
                 };
             }
             else if (entryHandle.kind === "directory") {
-                // 处理目录
-                const entries = [];
+                const children = [];
+                let index = 1;
+                // 将 entries 转换为数组并排序，以保持顺序一致
+                const entriesArray = [];
                 for await (const [childName, childHandle] of entryHandle.entries()) {
-                    // 迭代处理子目录及文件，递归调用
-                    const childEntry = await processEntry(childHandle, id);
-                    entries.push(childEntry);
+                    entriesArray.push([childName, childHandle]);
+                }
+                entriesArray.sort((a, b) => a[0].localeCompare(b[0]));
+                for (const [childName, childHandle] of entriesArray) {
+                    const childIdParts = [...idParts, index.toString()];
+                    const childEntry = await processEntry(childHandle, currentPath, childIdParts);
+                    children.push(childEntry);
+                    index++;
                 }
                 return {
                     id: id,
-                    label: entryHandle.name,
-                    children: entries,
-                    fileType: "folder", // 标记为文件夹
+                    label: name,
+                    children: children,
+                    fileType: "folder",
+                    path: currentPath,
                 };
             }
         }
-        // 父目录的 ID 从 1 开始
         const topLevelEntries = [];
-        let prefixCounter = 1;
+        let index = 1;
+        // 将顶级 entries 转换为数组并排序
+        const topEntriesArray = [];
         for await (const [name, handle] of directoryHandle.entries()) {
-            // 对于每个顶级子项，调用 processEntry 并传递正确的 ID 前缀
-            const entry = await processEntry(handle, prefixCounter.toString());
+            topEntriesArray.push([name, handle]);
+        }
+        topEntriesArray.sort((a, b) => a[0].localeCompare(b[0]));
+        for (const [name, handle] of topEntriesArray) {
+            const idParts = [index.toString()];
+            const entry = await processEntry(handle, "", idParts);
             topLevelEntries.push(entry);
-            prefixCounter++;
+            index++;
         }
         return topLevelEntries;
     }
@@ -203,6 +285,65 @@ export class FileFolderManager {
         }
         // 返回表示目录结构的对象
         return directoryObj;
+    }
+    async readFileContent(directoryHandle, filePath, isImg = false) {
+        try {
+            // 将文件路径拆分为各个部分
+            const pathParts = filePath.split("/");
+            let currentHandle = directoryHandle;
+            // 递归遍历目录以找到目标文件
+            for (let i = 0; i < pathParts.length - 1; i++) {
+                const part = pathParts[i];
+                currentHandle = await currentHandle.getDirectoryHandle(part);
+            }
+            // 获取文件名
+            const fileName = pathParts[pathParts.length - 1];
+            // 检查文件扩展名
+            const fileExtension = fileName.split(".").pop()?.toLowerCase();
+            if (!fileExtension) {
+                throw new Error("无法识别文件扩展名。");
+            }
+            // 获取文件句柄
+            const fileHandle = await currentHandle.getFileHandle(fileName);
+            // 检查文件类型是否支持
+            if (isImg) {
+                // 处理图片文件
+                if (!supportedImageExtensions.includes(fileExtension)) {
+                    alertUseArco(`文件扩展名 .${fileExtension} 不被支持为图片文件。`, 1000, {
+                        kind: "error",
+                    });
+                    throw new Error(`文件扩展名 .${fileExtension} 不被支持为图片文件。`);
+                }
+                // 不修改 this.fileHandle，保持之前的状态
+            }
+            else {
+                // 处理文本文件
+                if (!supportFileTypes.includes(fileExtension)) {
+                    alertUseArco(`文件扩展名 .${fileExtension} 不被支持为文本文件。`, 1000, {
+                        kind: "error",
+                    });
+                    throw new Error(`文件扩展名 .${fileExtension} 不被支持为文本文件。`);
+                }
+                // 更新共享的 fileHandle
+                this.fileHandle = fileHandle;
+            }
+            // 读取文件内容
+            const file = await fileHandle.getFile();
+            if (isImg) {
+                // 将文件读取为 Base64
+                const arrayBuffer = await file.arrayBuffer();
+                const base64String = await this.arrayBufferToBase64(arrayBuffer, file.type);
+                return base64String;
+            }
+            else {
+                // 读取文本内容
+                return await file.text();
+            }
+        }
+        catch (error) {
+            console.error("读取文件时出错:", error);
+            throw new Error("未找到文件或读取文件时出错。");
+        }
     }
     /**
      * @description 检查该目录是否存在，如果存在那么设置当前目录为该目录的句柄
@@ -305,6 +446,21 @@ export class FileFolderManager {
         catch (error) {
             console.error("Error writing Base64 image file:", error);
         }
+    }
+    // 辅助函数：将 ArrayBuffer 转换为 Base64
+    async arrayBufferToBase64(buffer, mimeType) {
+        return new Promise((resolve, reject) => {
+            const blob = new Blob([buffer], { type: mimeType });
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64data = reader.result;
+                resolve(base64data);
+            };
+            reader.onerror = (error) => {
+                reject(error);
+            };
+            reader.readAsDataURL(blob);
+        });
     }
     async copyDirectory(sourceHandle, destinationHandle) {
         const newDirHandle = await destinationHandle.getDirectoryHandle(sourceHandle.name, { create: true });

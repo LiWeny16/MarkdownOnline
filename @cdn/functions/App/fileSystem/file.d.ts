@@ -1,12 +1,22 @@
+export declare const supportFileTypes: string[];
+export declare const supportFileTypes2: string[];
+export declare const supportedImageExtensions: string[];
+declare class FileState {
+    static fileState: 0 | 1;
+    static fileHandle: FileSystemFileHandle | null;
+}
 /**
  * @description 文件管理类
  */
-export declare class FileManager {
-    fileHandle: FileSystemFileHandle | null;
+export declare class FileManager extends FileState {
     /**
      * @description 构造函数
      */
     constructor(fileHandle?: FileSystemFileHandle | null);
+    get fileState(): 0 | 1;
+    set fileState(state: 0 | 1);
+    get fileHandle(): FileSystemFileHandle | null;
+    set fileHandle(handle: FileSystemFileHandle | null);
     /**
      * @description 打开单个文件并获取句柄
      */
@@ -28,10 +38,14 @@ export declare class FileManager {
 /**
  * @description 处理文件夹类
  */
-export declare class FileFolderManager {
+export declare class FileFolderManager extends FileState {
     protected topDirectoryHandle: FileSystemDirectoryHandle | undefined;
     protected currentDirectoryHandle: FileSystemDirectoryHandle | undefined;
     constructor(directoryHandle?: FileSystemDirectoryHandle);
+    get fileState(): 0 | 1;
+    set fileState(state: 0 | 1);
+    get fileHandle(): FileSystemFileHandle | null;
+    set fileHandle(handle: FileSystemFileHandle | null);
     getTopDirectoryHandle(): FileSystemDirectoryHandle | undefined;
     getCurrentDirectoryHandle(): FileSystemDirectoryHandle | undefined;
     /**
@@ -40,6 +54,7 @@ export declare class FileFolderManager {
     openDirectory(): Promise<FileSystemDirectoryHandle | null>;
     readDirectoryAsArray(directoryHandle: FileSystemDirectoryHandle): Promise<any[]>;
     listDirectoryAsObject(directoryHandle: any): Promise<any>;
+    readFileContent(directoryHandle: FileSystemDirectoryHandle, filePath: string, isImg?: boolean): Promise<string>;
     /**
      * @description 检查该目录是否存在，如果存在那么设置当前目录为该目录的句柄
      */
@@ -53,5 +68,7 @@ export declare class FileFolderManager {
      * @description 以base64写入文件
      */
     writeBase64ImageFile(directoryHandle: FileSystemDirectoryHandle, fileName: string, base64Data: string): Promise<void>;
+    private arrayBufferToBase64;
     private copyDirectory;
 }
+export {};

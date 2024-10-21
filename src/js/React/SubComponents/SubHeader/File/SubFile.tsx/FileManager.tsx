@@ -27,6 +27,7 @@ import {
 import { TreeItem2Icon } from "@mui/x-tree-view/TreeItem2Icon"
 import { TreeItem2Provider } from "@mui/x-tree-view/TreeItem2Provider"
 import { TreeViewBaseItem } from "@mui/x-tree-view/models"
+import { mdConverter } from "@Root/js"
 
 type FileType =
   | "image"
@@ -233,64 +234,106 @@ const getIconFromFileType = (fileType: FileType) => {
 
 interface CustomTreeItemProps
   extends Omit<UseTreeItem2Parameters, "rootRef">,
-    Omit<React.HTMLAttributes<HTMLLIElement>, "onFocus"> {}
+    Omit<React.HTMLAttributes<HTMLLIElement>, "onFocus"> {
+  folderManager: any
+  fillText: any
+}
 
-const CustomTreeItem = React.forwardRef(function CustomTreeItem(
-  props: CustomTreeItemProps,
-  ref: React.Ref<HTMLLIElement>
-) {
-  const { id, itemId, label, disabled, children, ...other } = props
+const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
+  function CustomTreeItem(props, ref) {
+    const {
+      fillText,
+      folderManager,
+      id,
+      itemId,
+      label,
+      disabled,
+      children,
+      ...other
+    } = props
+    const {
+      getRootProps,
+      getContentProps,
+      getIconContainerProps,
+      getLabelProps,
+      getGroupTransitionProps,
+      status,
+      publicAPI,
+    } = useTreeItem2({ id, itemId, children, label, disabled, rootRef: ref })
 
-  const {
-    getRootProps,
-    getContentProps,
-    getIconContainerProps,
-    getLabelProps,
-    getGroupTransitionProps,
-    status,
-    publicAPI,
-  } = useTreeItem2({ id, itemId, children, label, disabled, rootRef: ref })
+    let item = publicAPI.getItem(itemId)
+    const expandable = isExpandable(children)
+    let icon
+    if (expandable) {
+      icon = FolderRounded
+    } else if (item.fileType) {
+      icon = getIconFromFileType(item.fileType)
+    }
 
-  const item = publicAPI.getItem(itemId)
-  const expandable = isExpandable(children)
-  let icon
-  if (expandable) {
-    icon = FolderRounded
-  } else if (item.fileType) {
-    icon = getIconFromFileType(item.fileType)
-  }
+    // Function to handle click events on folder/file
+    const handleClickFolderFile = async (
+      _event: React.MouseEvent<HTMLDivElement, MouseEvent>
+    ) => {
+      if (item.fileType === "file" && folderManager.fileState === 1) {
+        try {
+          let content = await folderManager.readFileContent(
+            folderManager.getTopDirectoryHandle(),
+            item.path
+          )
+          fillText(content, item.label)
+          await mdConverter(false)
+        } catch (error) {
+          console.error("Error reading file content:", error)
+        }
+      }
+    }
 
-  return (
-    <TreeItem2Provider itemId={itemId}>
-      <StyledTreeItemRoot {...getRootProps(other)}>
-        <CustomTreeItemContent
-          {...getContentProps({
-            className: clsx("content", {
-              "Mui-expanded": status.expanded,
-              "Mui-selected": status.selected,
-              "Mui-focused": status.focused,
-              "Mui-disabled": status.disabled,
-            }),
-          })}
-        >
-          <TreeItem2IconContainer {...getIconContainerProps()}>
-            <TreeItem2Icon status={status} />
-          </TreeItem2IconContainer>
-
-          <CustomLabel
-            {...getLabelProps({
-              icon,
-              expandable: expandable && status.expanded,
+    return (
+      <TreeItem2Provider itemId={itemId}>
+        <StyledTreeItemRoot {...getRootProps(other)}>
+          <CustomTreeItemContent
+            {...getContentProps({
+              className: clsx("content", {
+                "Mui-expanded": status.expanded,
+                "Mui-selected": status.selected,
+                "Mui-focused": status.focused,
+                "Mui-disabled": status.disabled,
+              }),
             })}
-          />
-        </CustomTreeItemContent>
-        {children && <TransitionComponent {...getGroupTransitionProps()} />}
-      </StyledTreeItemRoot>
-    </TreeItem2Provider>
-  )
-})
+          >
+            <TreeItem2IconContainer {...getIconContainerProps()}>
+              <TreeItem2Icon status={status} />
+            </TreeItem2IconContainer>
 
-export default function FileExplorer(props: { fileDirectoryArr: any }) {
+            <CustomLabel
+              // @ts-ignore
+              onClick={handleClickFolderFile}
+              {...getLabelProps({
+                icon,
+                expandable: expandable && status.expanded,
+              })}
+            />
+          </CustomTreeItemContent>
+          {children && <TransitionComponent {...getGroupTransitionProps()} />}
+        </StyledTreeItemRoot>
+      </TreeItem2Provider>
+    )
+  }
+)
+
+export default function FileExplorer(props: {
+  fileDirectoryArr: any
+  folderManager: any
+  fillText: Function
+}) {
+  // 使用函数来传递 folderManager 到 CustomTreeItem
+  const WrappedCustomTreeItem = (itemProps: any) => (
+    <CustomTreeItem
+      {...itemProps}
+      fillText={props.fillText}
+      folderManager={props.folderManager}
+    />
+  )
   return (
     <RichTreeView
       items={props.fileDirectoryArr ?? ITEMS}
@@ -304,7 +347,7 @@ export default function FileExplorer(props: { fileDirectoryArr: any }) {
         maxWidth: 400,
         overflowY: "auto",
       }}
-      slots={{ item: CustomTreeItem }}
+      slots={{ item: WrappedCustomTreeItem }}
     />
   )
 }

@@ -1,3 +1,4 @@
+import { FileFolderManager } from "@App/fileSystem/file"
 import MarkdownIt from "markdown-it/lib"
 import { RenderRule } from "markdown-it/lib/renderer"
 
@@ -6,21 +7,16 @@ let imagePlugin = function (md: MarkdownIt) {
   md.renderer.rules.image = function (tokens, idx, options, env, self) {
     const token = tokens[idx]
     const grammar = "#"
-    // let line
-    // if (tokens[idx].map && tokens[idx].level === 0) {
-    //   line = tokens[idx].map![0]
-    //   // tokens[idx].attrJoin("class", "line")
-    //   tokens[idx].attrSet("data-line", String(line))
-    // }
     let src = token.attrs![token.attrIndex("src")][1]
     let alt = token.content
-    // console.log(alt.split("#"));
 
     if (token && token.attrGet("src")?.startsWith("/vf/")) {
       if (env.vfImgSrcArr) {
         // token.attrSet("src", env.vfImgSrcArr[env.vfImgSeq++])
         src = env.vfImgSrcArr[env.vfImgSeq++]
       }
+    } else if (token && token.attrGet("src")?.startsWith("./")) {
+      src = env.vfImgSrcArr[env.vfImgSeq++]
     }
     let width = "auto" // 宽度
     let style = "" // 样式

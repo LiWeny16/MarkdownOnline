@@ -12,5 +12,7 @@ declare module "react" {
 }
 export default function FileExplorer(props: {
     fileDirectoryArr: any;
+    folderManager: any;
+    fillText: Function;
 }): import("react/jsx-runtime").JSX.Element;
 export {};

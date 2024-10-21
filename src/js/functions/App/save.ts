@@ -5,7 +5,7 @@ import {
   readMemoryText,
   readMemoryImg,
 } from "@App/memory/memory"
-import { FileManager } from "./fileSystem/file"
+import { FileFolderManager, FileManager } from "./fileSystem/file"
 import { getSettings } from "./config/change"
 import alertUseArco from "./message/alert"
 export default async function save(editor = null, message = true) {
@@ -15,7 +15,10 @@ export default async function save(editor = null, message = true) {
     try {
       fillInMemoryText(text)
       if (getSettings().basic.fileEditLocal) {
-        const fileManager = new FileManager(window._fileHandle)
+        let fileManager = new FileManager()
+        console.log(fileManager.fileHandle);
+        // let folderManager = new FileFolderManager()
+        // console.log(fileManager.fileState);
         if (await fileManager.saveFileSilently(text)) {
           infoMsg = "成功保存到本地！🎉"
         } else {

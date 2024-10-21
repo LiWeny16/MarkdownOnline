@@ -7,7 +7,7 @@ import { Box, Button, Stack, Tooltip, Typography, } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import { observer } from "mobx-react";
 import { useTheme } from "@mui/material/styles";
-import React from "react";
+import React, { useState } from "react";
 import SwitchIOS from "@Root/js/React/Components/myCom/Switches/SwitchIOS";
 import alertUseArco from "@App/message/alert";
 import FileExplorer from "./SubFile.tsx/FileManager";
@@ -16,14 +16,24 @@ import SaveAltIcon from "@mui/icons-material/SaveAlt";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
 import Zoom from "@mui/material/Zoom";
 import ScrollableBox from "@Root/js/React/Components/myCom/Layout/ScrollBox";
+import { PushPin as PushPinIcon, PushPinOutlined as PushPinOutlinedIcon, } from "@mui/icons-material";
 const fileManager = new FileManager();
+const folderManager = new FileFolderManager();
 let _t;
 const FileDrawer = observer(function FileDrawer() {
     const [fileDirectoryArr, setFileDirectoryArr] = React.useState([]);
     const [editingFileName, setEditingFileName] = React.useState("");
+    const [isPinned, setIsPinned] = useState(false);
     const theme = useTheme();
+    const fillText = (content, fileName) => {
+        // 使用 Monaco 编辑器显示文件内容
+        replaceMonacoAll(window.monaco, window.editor, content);
+        alertUseArco(`打开${fileName}成功！😀`);
+    };
     const toggleDrawer = (newOpen) => () => {
-        changeFileManagerState(newOpen);
+        if (!isPinned) {
+            changeFileManagerState(newOpen);
+        }
     };
     const handleOnChangeFileEditLocalSwitch = (_e, i) => {
         changeSettings({
@@ -38,30 +48,25 @@ const FileDrawer = observer(function FileDrawer() {
             // 调用 openSingleFile 方法从文件管理器中打开单个文件
             const fileHandle = await fileManager.openSingleFile();
             if (!fileHandle) {
-                // 如果没有文件被选中，显示提示消息
+                // 如果没有文件被选中，显示错误提示消息
                 alertUseArco("左顾右盼，活在梦幻?", 2500, {
                     kind: "warning",
                 });
                 return;
             }
-            // {id: '1.umd-kit-old.js', label: 'umd-kit-old.js', fileType: 'file'}
-            // 更新编辑文件名
             setEditingFileName(fileHandle.name);
+            setFileDirectoryArr([
+                {
+                    id: "1." + fileHandle.name,
+                    label: fileHandle.name,
+                    fileType: fileHandle.kind,
+                },
+            ]);
             // 显示正在打开文件的提示
             alertUseArco("正在打开本地文件，别急，你给我等会😅");
             // 读取文件内容
             const content = await fileManager.readFile(fileHandle);
-            if (content) {
-                // 使用 Monaco 编辑器显示文件内容
-                replaceMonacoAll(window.monaco, window.editor, content);
-                alertUseArco(`打开${fileHandle.name}成功！😀`);
-            }
-            else {
-                // 如果内容为空，显示警告消息
-                alertUseArco("文件内容为空", 2500, {
-                    kind: "warning",
-                });
-            }
+            fillText(content, fileHandle.name);
         }
         catch (error) {
             // 错误处理
@@ -70,7 +75,7 @@ const FileDrawer = observer(function FileDrawer() {
         }
     };
     const onClickOpenFolder = async () => {
-        let fileFolderManager = new FileFolderManager();
+        let fileFolderManager = folderManager;
         const directoryHandle = await fileFolderManager.openDirectory();
         if (directoryHandle) {
             setFileDirectoryArr(await fileFolderManager.readDirectoryAsArray(directoryHandle));
@@ -103,7 +108,7 @@ const FileDrawer = observer(function FileDrawer() {
                                 height: "100vh", // 满屏高度
                                 alignItems: "center", // 中心对齐图标
                                 paddingTop: 2, // 顶部间隔
-                            }, children: [_jsx(SquareClickIconButton, { icon: _jsx(FileCopyIcon, {}), onClick: onClickOpenSingleFile, tooltipText: "\u6253\u5F00\u6587\u4EF6 \u2728" }), _jsx(SquareClickIconButton, { tooltipText: "\u6253\u5F00\u6587\u4EF6\u5939 \uD83D\uDCA6", icon: _jsx(FolderIcon, {}), onClick: onClickOpenFolder }), _jsx(SquareClickIconButton, { tooltipText: "\u53E6\u5B58\u4E3A \uD83C\uDF81", icon: _jsx(SaveAltIcon, {}), onClick: () => fileManager.saveAsFile(getMdTextFromMonaco()) })] }) }), _jsxs(Box, { sx: {
+                            }, children: [_jsx(SquareClickIconButton, { icon: isPinned ? (_jsx(PushPinIcon, { sx: { transform: "rotate(45deg)" } })) : (_jsx(PushPinOutlinedIcon, { sx: { transform: "rotate(45deg)" } })), onClick: () => setIsPinned(!isPinned), tooltipText: "\u56FA\u5B9A\uFF01\uD83E\uDDF7" }), _jsx(SquareClickIconButton, { icon: _jsx(FileCopyIcon, {}), onClick: onClickOpenSingleFile, tooltipText: "\u6253\u5F00\u6587\u4EF6 \uD83D\uDCC1" }), _jsx(SquareClickIconButton, { tooltipText: "\u6253\u5F00\u6587\u4EF6\u5939 \uD83D\uDCC2", icon: _jsx(FolderIcon, {}), onClick: onClickOpenFolder }), _jsx(SquareClickIconButton, { tooltipText: "\u53E6\u5B58\u4E3A \uD83D\uDCD1", icon: _jsx(SaveAltIcon, {}), onClick: () => fileManager.saveAsFile(getMdTextFromMonaco()) })] }) }), _jsxs(Box, { sx: {
                             width: "23svw",
                             height: "100svh",
                             display: "flex",
@@ -120,11 +125,11 @@ const FileDrawer = observer(function FileDrawer() {
                                     alignContent: "center",
                                     justifyContent: "center",
                                     marginBottom: "20svh",
-                                }, children: fileDirectoryArr.length != 0 ? (_jsx(_Fragment, { children: _jsx(ScrollableBox, { sx: { width: "100%", height: "100%" }, children: _jsx(FileExplorer, { fileDirectoryArr: fileDirectoryArr }) }) })) : (_jsxs(_Fragment, { children: [_jsx(FileExplorer, { fileDirectoryArr: fileDirectoryArr }), _jsxs(Box, { className: "FLEX COL ALI-CEN JUS-CEN", sx: {
-                                                width: "100%",
-                                            }, children: [_jsx(Typography, { children: getSettings().basic.fileEditLocal ? editingFileName : "" }), _jsx(Button, { sx: startButtonStyle, onClick: onClickOpenSingleFile, variant: "contained", color: "primary", children: "\u6253\u5F00\u6587\u4EF6" }), _jsx(Button, { sx: startButtonStyle, variant: "contained", color: "primary", onClick: onClickOpenFolder, children: "\u6253\u5F00\u6587\u4EF6\u5939" }), _jsx(Button, { sx: startButtonStyle, variant: "contained", onClick: () => {
-                                                        fileManager.saveAsFile(getMdTextFromMonaco());
-                                                    }, children: "\u53E6\u5B58\u4E3A" })] })] })) })] })] }) }) }));
+                                }, children: fileDirectoryArr.length != 0 ? (_jsx(_Fragment, { children: _jsx(ScrollableBox, { sx: { width: "100%", height: "100%" }, children: _jsx(FileExplorer, { folderManager: folderManager, fillText: fillText, fileDirectoryArr: fileDirectoryArr }) }) })) : (_jsx(_Fragment, { children: _jsxs(Box, { className: "FLEX COL ALI-CEN JUS-CEN", sx: {
+                                            width: "100%",
+                                        }, children: [_jsx(Typography, { children: getSettings().basic.fileEditLocal ? editingFileName : "" }), _jsx(Button, { sx: startButtonStyle, onClick: onClickOpenSingleFile, variant: "contained", color: "primary", children: "\u6253\u5F00\u6587\u4EF6" }), _jsx(Button, { sx: startButtonStyle, variant: "contained", color: "primary", onClick: onClickOpenFolder, children: "\u6253\u5F00\u6587\u4EF6\u5939" }), _jsx(Button, { sx: startButtonStyle, variant: "contained", onClick: () => {
+                                                    fileManager.saveAsFile(getMdTextFromMonaco());
+                                                }, children: "\u53E6\u5B58\u4E3A" })] }) })) })] })] }) }) }));
 });
 export default FileDrawer;
 function SquareClickIconButton({ icon, onClick, tooltipText, }) {

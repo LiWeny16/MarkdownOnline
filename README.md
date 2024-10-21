@@ -1,4 +1,9 @@
 # Markdown Online View+
+
+[English Version](./README-EN.md)
+
+## 起源
+<a><img src="https://img.shields.io/badge/Github-v3.0.0-c.svg" alt="example"></a> <a><img src="https://img.shields.io/badge/LICENSE-MIT-pink.svg" alt="example"></a>
 本项目起源于三年前和舍友的一次调侃，导火索是Typora正式收费那会，
 
 我说，“这b项目有什么难的，做呗。”他说，“你就做吧，谅你也做不出个什么破玩意！”（纯属玩笑）
@@ -20,9 +25,9 @@
 &nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;如果你想写一段代码区，在word里会比较难实现，但是在markdown里，你只需要用两个```包裹住代码即可
 
 ````js
-;```js
+ ```js
     alert("welcome to markdown")
-    ```
+ ```
 ````
 
 如果你还不了解什么是markdown语法，那请[点我了解markdown语法](https://markdown.com.cn/intro.html)
@@ -69,14 +74,14 @@
 - v0.x.x 懒得写，更新N个特性了已经
 - v1.x 懒
 - v2.x 。。。
+- v3.0.0 更新完整版文件管理器，支持文件夹！
 
 ## 开源协议
 
 /_  
 \* @Author Bigonion  
 \* @Copyright 2022© 至今  
-_/  
-
+_/
 
 <center>
 
@@ -111,5 +116,3 @@ _/
 感谢以下开源项目对本项目做出的贡献：
 
 [Reliance Report](/public/LICENSES/report.md)
-
-

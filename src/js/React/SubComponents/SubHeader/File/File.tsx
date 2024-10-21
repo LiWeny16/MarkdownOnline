@@ -21,7 +21,7 @@ import {
 import Drawer from "@mui/material/Drawer"
 import { observer } from "mobx-react"
 import { useTheme } from "@mui/material/styles"
-import React from "react"
+import React, { useState } from "react"
 import SwitchIOS from "@Root/js/React/Components/myCom/Switches/SwitchIOS"
 import alertUseArco from "@App/message/alert"
 import FileExplorer from "./SubFile.tsx/FileManager"
@@ -31,14 +31,28 @@ import SaveAltIcon from "@mui/icons-material/SaveAlt"
 import FileCopyIcon from "@mui/icons-material/FileCopy"
 import Zoom from "@mui/material/Zoom"
 import ScrollableBox from "@Root/js/React/Components/myCom/Layout/ScrollBox"
+
+import {
+  PushPin as PushPinIcon,
+  PushPinOutlined as PushPinOutlinedIcon,
+} from "@mui/icons-material"
 const fileManager = new FileManager()
+const folderManager = new FileFolderManager()
 let _t: NodeJS.Timeout | null
 const FileDrawer = observer(function FileDrawer() {
   const [fileDirectoryArr, setFileDirectoryArr] = React.useState<any>([])
   const [editingFileName, setEditingFileName] = React.useState("")
+  const [isPinned, setIsPinned] = useState(false)
   const theme = useTheme()
+  const fillText = (content: string | undefined, fileName: string) => {
+    // 使用 Monaco 编辑器显示文件内容
+    replaceMonacoAll(window.monaco, window.editor, content)
+    alertUseArco(`打开${fileName}成功！😀`)
+  }
   const toggleDrawer = (newOpen: boolean) => () => {
-    changeFileManagerState(newOpen)
+    if (!isPinned) {
+      changeFileManagerState(newOpen)
+    }
   }
   const handleOnChangeFileEditLocalSwitch = (_e: Event, i: boolean) => {
     changeSettings({
@@ -53,32 +67,25 @@ const FileDrawer = observer(function FileDrawer() {
       // 调用 openSingleFile 方法从文件管理器中打开单个文件
       const fileHandle = await fileManager.openSingleFile()
       if (!fileHandle) {
-        // 如果没有文件被选中，显示提示消息
+        // 如果没有文件被选中，显示错误提示消息
         alertUseArco("左顾右盼，活在梦幻?", 2500, {
           kind: "warning",
         })
         return
       }
-
-      // {id: '1.umd-kit-old.js', label: 'umd-kit-old.js', fileType: 'file'}
-      // 更新编辑文件名
       setEditingFileName(fileHandle.name)
-
+      setFileDirectoryArr([
+        {
+          id: "1." + fileHandle.name,
+          label: fileHandle.name,
+          fileType: fileHandle.kind,
+        },
+      ])
       // 显示正在打开文件的提示
       alertUseArco("正在打开本地文件，别急，你给我等会😅")
-
       // 读取文件内容
       const content = await fileManager.readFile(fileHandle)
-      if (content) {
-        // 使用 Monaco 编辑器显示文件内容
-        replaceMonacoAll(window.monaco, window.editor, content)
-        alertUseArco(`打开${fileHandle.name}成功！😀`)
-      } else {
-        // 如果内容为空，显示警告消息
-        alertUseArco("文件内容为空", 2500, {
-          kind: "warning",
-        })
-      }
+      fillText(content, fileHandle.name)
     } catch (error) {
       // 错误处理
       console.error("Error opening file:", error)
@@ -86,7 +93,7 @@ const FileDrawer = observer(function FileDrawer() {
     }
   }
   const onClickOpenFolder = async () => {
-    let fileFolderManager = new FileFolderManager()
+    let fileFolderManager = folderManager
     const directoryHandle = await fileFolderManager.openDirectory()
     if (directoryHandle) {
       setFileDirectoryArr(
@@ -139,23 +146,35 @@ const FileDrawer = observer(function FileDrawer() {
                 paddingTop: 2, // 顶部间隔
               }}
             >
+              <SquareClickIconButton
+                icon={
+                  isPinned ? (
+                    <PushPinIcon sx={{ transform: "rotate(45deg)" }} />
+                  ) : (
+                    <PushPinOutlinedIcon sx={{ transform: "rotate(45deg)" }} />
+                  )
+                }
+                onClick={() => setIsPinned(!isPinned)}
+                tooltipText="固定！🧷"
+              />
+
               {/* 打开文件 */}
               <SquareClickIconButton
                 icon={<FileCopyIcon />}
                 onClick={onClickOpenSingleFile}
-                tooltipText="打开文件 ✨"
+                tooltipText="打开文件 📁"
               />
 
               {/* 打开文件夹 */}
               <SquareClickIconButton
-                tooltipText="打开文件夹 💦"
+                tooltipText="打开文件夹 📂"
                 icon={<FolderIcon />}
                 onClick={onClickOpenFolder}
               />
 
               {/* 另存为 */}
               <SquareClickIconButton
-                tooltipText="另存为 🎁"
+                tooltipText="另存为 📑"
                 icon={<SaveAltIcon />}
                 onClick={() => fileManager.saveAsFile(getMdTextFromMonaco())}
               />
@@ -204,12 +223,15 @@ const FileDrawer = observer(function FileDrawer() {
               {fileDirectoryArr.length != 0 ? (
                 <>
                   <ScrollableBox sx={{ width: "100%", height: "100%" }}>
-                    <FileExplorer fileDirectoryArr={fileDirectoryArr} />
+                    <FileExplorer
+                      folderManager={folderManager}
+                      fillText={fillText}
+                      fileDirectoryArr={fileDirectoryArr}
+                    />
                   </ScrollableBox>
                 </>
               ) : (
                 <>
-                  <FileExplorer fileDirectoryArr={fileDirectoryArr} />
                   <Box
                     className={"FLEX COL ALI-CEN JUS-CEN"}
                     sx={{
