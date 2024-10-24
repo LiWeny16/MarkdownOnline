@@ -52,6 +52,12 @@ Object.defineProperty(FileState, "fileHandle", {
     writable: true,
     value: null
 });
+Object.defineProperty(FileState, "topDirectoryArray", {
+    enumerable: true,
+    configurable: true,
+    writable: true,
+    value: []
+});
 /**
  * @description 文件管理类
  */
@@ -173,7 +179,15 @@ export class FileFolderManager extends FileState {
             value: void 0
         });
         this.topDirectoryHandle = directoryHandle || window._directoryHandle;
-        this.currentDirectoryHandle = this.topDirectoryHandle;
+        // this.currentDirectoryHandle = this.topDirectoryHandle
+    }
+    // Getter for fileState
+    get topDirectoryArray() {
+        return FileState.topDirectoryArray;
+    }
+    // Setter for fileState
+    set topDirectoryArray(state) {
+        FileState.topDirectoryArray = state;
     }
     // Getter for fileState
     get fileState() {
@@ -216,7 +230,7 @@ export class FileFolderManager extends FileState {
             return null;
         }
     }
-    async readDirectoryAsArray(directoryHandle) {
+    async readDirectoryAsArray(directoryHandle, isTop = false) {
         // 递归函数来读取和处理子目录及文件
         async function processEntry(entryHandle, path, idParts) {
             const name = entryHandle.name;
@@ -245,13 +259,17 @@ export class FileFolderManager extends FileState {
                     children.push(childEntry);
                     index++;
                 }
-                return {
+                let temp = {
                     id: id,
                     label: name,
                     children: children,
                     fileType: "folder",
                     path: currentPath,
                 };
+                if (isTop) {
+                    FileState.topDirectoryArray = [temp];
+                }
+                return temp;
             }
         }
         const topLevelEntries = [];

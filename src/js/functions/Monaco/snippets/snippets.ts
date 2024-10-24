@@ -41,7 +41,7 @@ import {
   envs,
 } from "@cdn-latex-map"
 import { type Position } from "monaco-editor/esm/vs/editor/editor.api"
-// import emojilib from "@cdn-emojilib"
+import { FileFolderManager } from "@App/fileSystem/file"
 export function monacoSnippets(
   editor: editor.IStandaloneCodeEditor,
   monaco: Monaco
@@ -427,31 +427,162 @@ sequenceDiagram
       }
     },
   })
+
+  /**
+   * @description 补全文件路径
+   */
+
   monaco.languages.registerCompletionItemProvider("markdown", {
-    // triggerCharacters: [" "],
+    triggerCharacters: ["/"],
     //@ts-ignore
-    provideCompletionItems: (model, position, context) => {
-      const textUntilPosition: string = model.getValueInRange({
-        startLineNumber: 1,
+    provideCompletionItems: async (model, position, context) => {
+      // 获取到光标前的一行
+      const textUntilPosition = model.getValueInRange({
+        startLineNumber: position.lineNumber,
         startColumn: 1,
         endLineNumber: position.lineNumber,
         endColumn: position.column,
       })
-      if (isNeedToUseCodeIntellisense(textUntilPosition)) {
-        let _suggestions = [
-          {
-            label: "RED",
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: "RED",
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            detail: "RED...",
-          },
-        ]
-        return { suggestions: _suggestions }
+
+      const fileManager = new FileFolderManager() // 假设这是你用来管理文件和文件夹的类
+      let folderStructure = fileManager.topDirectoryArray // 获取文件夹结构
+      console.log(folderStructure)
+
+      // 检查是否需要建议图片路径
+      if (
+        isNeedToSuggestImagePath(monaco, model, textUntilPosition, position)
+      ) {
+        // 匹配Markdown中的图片路径
+        const pathMatch = textUntilPosition.match(
+          /!\[.*?\]\(\.\/([^\/)]+(?:\/[^\/)]+)*)\/?$/
+        )
+
+        // 如果用户刚输入 "./" 并且没有路径匹配，建议顶级文件夹和文件
+        if (textUntilPosition.slice(-2) === "./" && !pathMatch) {
+          let suggestions = generateSuggestions(folderStructure, monaco)
+          return { suggestions }
+        }
+
+        console.log(pathMatch)
+        if (pathMatch) {
+          const currentPath = pathMatch[1] // 当前路径片段
+          const currentPathArr = currentPath.split("/") // 当前路径片段数组
+          console.log(currentPathArr)
+
+          // 使用递归查找当前路径对应的文件夹
+          const currentFolder = findFolderRecursively(
+            folderStructure,
+            currentPathArr
+          )
+
+          if (
+            currentFolder &&
+            (currentFolder as any).fileType === "folder" &&
+            (currentFolder as any).children
+          ) {
+            let suggestions = generateSuggestions(
+              (currentFolder as any).children,
+              monaco
+            )
+            return { suggestions }
+          } else {
+            // 当前路径指向一个文件或不存在的文件夹，建议当前层级的文件和文件夹
+            const parentPathArr = currentPathArr.slice(0, -1)
+            const lastPart = currentPathArr[currentPathArr.length - 1]
+            const parentFolder = findFolderRecursively(
+              folderStructure,
+              parentPathArr
+            )
+
+            if (
+              parentFolder &&
+              (parentFolder as any).fileType === "folder" &&
+              (parentFolder as any).children
+            ) {
+              let suggestions = (parentFolder as any).children
+                .filter((item: { label: string }) =>
+                  item.label.startsWith(lastPart)
+                )
+                .map((item: { label: any; fileType: string }) => ({
+                  label: item.label,
+                  kind:
+                    item.fileType === "folder"
+                      ? monaco.languages.CompletionItemKind.Folder
+                      : monaco.languages.CompletionItemKind.File,
+                  insertText: item.label,
+                  detail: item.fileType === "folder" ? "Folder" : "File",
+                  insertTextRules:
+                    monaco.languages.CompletionItemInsertTextRule
+                      .InsertAsSnippet,
+                }))
+              return { suggestions }
+            }
+          }
+        }
       }
+
+      // 默认情况下返回空的建议
+      return { suggestions: [] }
     },
   })
+
+  /**
+   * @description 递归查找文件夹
+   * @param {Array} structure 文件夹结构
+   * @param {Array} pathParts 路径片段数组
+   * @returns {Object|null} 找到的文件夹对象或null
+   */
+  function findFolderRecursively(
+    structure: Array<any>,
+    pathParts: Array<any>
+  ): object | null {
+    if (pathParts.length === 0) {
+      return { children: structure }
+    }
+
+    let current = null
+    let remainingParts = [...pathParts]
+
+    current = structure.find(
+      (item) => item.label === remainingParts[0] && item.fileType === "folder"
+    )
+
+    if (!current) {
+      return null
+    }
+
+    remainingParts.shift()
+
+    if (remainingParts.length === 0) {
+      return current
+    }
+
+    if (current.children) {
+      return findFolderRecursively(current.children, remainingParts)
+    }
+
+    return null
+  }
+
+  /**
+   * @description 生成建议项
+   * @param {Array} items 文件或文件夹数组
+   * @param {Object} monaco Monaco编辑器实例
+   * @returns {Array} 建议项数组
+   */
+  function generateSuggestions(items: Array<any>, monaco: Monaco): Array<any> {
+    return items.map((item) => ({
+      label: item.label,
+      kind:
+        item.fileType === "folder"
+          ? monaco.languages.CompletionItemKind.Folder
+          : monaco.languages.CompletionItemKind.File,
+      insertText: item.label,
+      detail: item.fileType === "folder" ? "Folder" : "File",
+      insertTextRules:
+        monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+    }))
+  }
 }
 //
 
@@ -474,6 +605,23 @@ export function isNeedToUseLatexIntellisense(
   } else {
     return false
   }
+}
+export function isNeedToSuggestImagePath(
+  monaco: Monaco,
+  model: editor.ITextModel,
+  textUntilPosition: string,
+  position: Position
+): boolean {
+  // 匹配 Markdown 中图片路径语法的正则表达式，允许继续补全子文件夹和文件
+  const imagePathPattern = /!\[.*?\]\((\.\/[^)]*)$/
+  const match = textUntilPosition.match(imagePathPattern)
+
+  // 当路径中有 "./" 开头或以 "/" 结束时，继续触发补全
+  if (match) {
+    return true
+  }
+
+  return false
 }
 
 export function isInLatexBlock(textUntilPosition: string): boolean {

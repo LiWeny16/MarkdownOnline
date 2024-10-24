@@ -8,6 +8,7 @@ import { FileFolderManager, FileManager } from "@App/fileSystem/file"
 import { getMdTextFromMonaco } from "@App/text/getMdText"
 import { replaceMonacoAll, replaceMonacoAllForce } from "@App/text/replaceText"
 import {
+  Backdrop,
   Box,
   Button,
   Divider,
@@ -20,7 +21,7 @@ import {
 } from "@mui/material"
 import Drawer from "@mui/material/Drawer"
 import { observer } from "mobx-react"
-import { useTheme } from "@mui/material/styles"
+import { styled, useTheme } from "@mui/material/styles"
 import React, { useState } from "react"
 import SwitchIOS from "@Root/js/React/Components/myCom/Switches/SwitchIOS"
 import alertUseArco from "@App/message/alert"
@@ -50,8 +51,14 @@ const FileDrawer = observer(function FileDrawer() {
     alertUseArco(`打开${fileName}成功！😀`)
   }
   const toggleDrawer = (newOpen: boolean) => () => {
+    // const backDropEle = document.getElementsByClassName(
+    //   "pointed-through-backdrop"
+    // )
+    // const parentEle = backDropEle[0].parentElement
     if (!isPinned) {
       changeFileManagerState(newOpen)
+    } else {
+      // parentEle?.style.setProperty("pointer-events", "none")
     }
   }
   const handleOnChangeFileEditLocalSwitch = (_e: Event, i: boolean) => {
@@ -96,23 +103,46 @@ const FileDrawer = observer(function FileDrawer() {
     let fileFolderManager = folderManager
     const directoryHandle = await fileFolderManager.openDirectory()
     if (directoryHandle) {
-      setFileDirectoryArr(
-        await fileFolderManager.readDirectoryAsArray(directoryHandle)
+      let folderTopStackArray = await fileFolderManager.readDirectoryAsArray(
+        directoryHandle,
+        true
       )
-      console.log(await fileFolderManager.readDirectoryAsArray(directoryHandle))
+      fileFolderManager.topDirectoryArray = folderTopStackArray
+      setFileDirectoryArr(folderTopStackArray)
+      // fileFolderManager.setTopDirectoryArray(folderTopStackArray)
       // fileFolderManager.createNewFolder(directoryHandle, "test2")
     }
   }
   const startButtonStyle = { width: "53%", height: "6svh", mb: "10px" }
+  const TransparentBackdrop = styled(Backdrop)({
+    backgroundColor: "transparent",
+    // pointerEvents: "none", // 使点击事件穿透
+  })
   return (
     <>
       <Drawer
-        sx={{
-          "& .MuiBackdrop-root": {
-            backgroundColor: "transparent", // 设置背景为透明
+        PaperProps={{
+          style: {
+            pointerEvents: "all",
+            zIndex: 99999,
           },
         }}
+        ModalProps={{
+          disableEnforceFocus: true,
+          disableAutoFocus: true,
+          disableRestoreFocus: true,
+          style: {
+            pointerEvents: isPinned ? "none" : "all",
+          },
+          BackdropComponent: (props) => (
+            <TransparentBackdrop
+              {...props}
+              className="pointed-through-backdrop"
+            />
+          ),
+        }}
         anchor="right"
+        autoFocus={false}
         open={getFileManagerState()}
         onClose={toggleDrawer(false)}
       >

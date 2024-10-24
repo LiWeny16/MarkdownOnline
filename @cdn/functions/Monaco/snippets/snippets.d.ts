@@ -7,6 +7,7 @@ export declare function monacoSnippets(editor: editor.IStandaloneCodeEditor, mon
  * @param textUntilPosition string
  */
 export declare function isNeedToUseLatexIntellisense(monaco: Monaco, model: editor.ITextModel, textUntilPosition: string, position: Position): boolean;
+export declare function isNeedToSuggestImagePath(monaco: Monaco, model: editor.ITextModel, textUntilPosition: string, position: Position): boolean;
 export declare function isInLatexBlock(textUntilPosition: string): boolean;
 export declare function isInLatexInline(model: editor.ITextModel, position: Position, textUntilPosition: string): boolean;
 export declare function isNeedToUseClueIntellisense(textUntilPosition: string): boolean;

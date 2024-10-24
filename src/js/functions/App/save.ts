@@ -16,7 +16,7 @@ export default async function save(editor = null, message = true) {
       fillInMemoryText(text)
       if (getSettings().basic.fileEditLocal) {
         let fileManager = new FileManager()
-        console.log(fileManager.fileHandle);
+        // console.log(fileManager.fileHandle);
         // let folderManager = new FileFolderManager()
         // console.log(fileManager.fileState);
         if (await fileManager.saveFileSilently(text)) {

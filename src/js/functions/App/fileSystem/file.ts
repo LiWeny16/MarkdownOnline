@@ -44,6 +44,7 @@ class FileState {
   // 0 is single file, 1 is folder
   public static fileState: 0 | 1 = 0
   public static fileHandle: FileSystemFileHandle | null = null
+  public static topDirectoryArray: FileItem[] = []
 }
 /**
  * @description 文件管理类
@@ -151,7 +152,13 @@ export class FileManager extends FileState {
     }
   }
 }
-
+export interface FileItem {
+  id: string
+  label: string
+  fileType: "file" | "folder"
+  path: string
+  children?: FileItem[]
+}
 /**
  * @description 处理文件夹类
  */
@@ -161,7 +168,15 @@ export class FileFolderManager extends FileState {
   constructor(directoryHandle?: FileSystemDirectoryHandle) {
     super()
     this.topDirectoryHandle = directoryHandle || window._directoryHandle
-    this.currentDirectoryHandle = this.topDirectoryHandle
+    // this.currentDirectoryHandle = this.topDirectoryHandle
+  }
+  // Getter for fileState
+  public get topDirectoryArray(): Array<any> {
+    return FileState.topDirectoryArray
+  }
+  // Setter for fileState
+  public set topDirectoryArray(state: any) {
+    FileState.topDirectoryArray = state
   }
   // Getter for fileState
   public get fileState(): 0 | 1 {
@@ -207,10 +222,12 @@ export class FileFolderManager extends FileState {
     }
   }
   public async readDirectoryAsArray(
-    directoryHandle: FileSystemDirectoryHandle
+    directoryHandle: FileSystemDirectoryHandle,
+    isTop = false
   ) {
     // 递归函数来读取和处理子目录及文件
     async function processEntry(
+      this: any,
       entryHandle: FileSystemHandle | any,
       path: string,
       idParts: string[]
@@ -246,13 +263,17 @@ export class FileFolderManager extends FileState {
           children.push(childEntry)
           index++
         }
-        return {
+        let temp: FileItem = {
           id: id,
           label: name,
           children: children,
           fileType: "folder",
           path: currentPath,
         }
+        if (isTop) {
+          FileState.topDirectoryArray = [temp]
+        }
+        return temp
       }
     }
 

@@ -4,6 +4,7 @@ export declare const supportedImageExtensions: string[];
 declare class FileState {
     static fileState: 0 | 1;
     static fileHandle: FileSystemFileHandle | null;
+    static topDirectoryArray: FileItem[];
 }
 /**
  * @description 文件管理类
@@ -35,6 +36,13 @@ export declare class FileManager extends FileState {
      */
     saveAsFile(text: string): Promise<void>;
 }
+export interface FileItem {
+    id: string;
+    label: string;
+    fileType: "file" | "folder";
+    path: string;
+    children?: FileItem[];
+}
 /**
  * @description 处理文件夹类
  */
@@ -42,6 +50,8 @@ export declare class FileFolderManager extends FileState {
     protected topDirectoryHandle: FileSystemDirectoryHandle | undefined;
     protected currentDirectoryHandle: FileSystemDirectoryHandle | undefined;
     constructor(directoryHandle?: FileSystemDirectoryHandle);
+    get topDirectoryArray(): Array<any>;
+    set topDirectoryArray(state: any);
     get fileState(): 0 | 1;
     set fileState(state: 0 | 1);
     get fileHandle(): FileSystemFileHandle | null;
@@ -52,7 +62,7 @@ export declare class FileFolderManager extends FileState {
      * @description 打开目录并存储句柄到全局变量
      */
     openDirectory(): Promise<FileSystemDirectoryHandle | null>;
-    readDirectoryAsArray(directoryHandle: FileSystemDirectoryHandle): Promise<any[]>;
+    readDirectoryAsArray(directoryHandle: FileSystemDirectoryHandle, isTop?: boolean): Promise<any[]>;
     listDirectoryAsObject(directoryHandle: any): Promise<any>;
     readFileContent(directoryHandle: FileSystemDirectoryHandle, filePath: string, isImg?: boolean): Promise<string>;
     /**

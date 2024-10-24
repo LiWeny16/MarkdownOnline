@@ -3,10 +3,10 @@ import { changeFileManagerState, changeSettings, getFileManagerState, getSetting
 import { FileFolderManager, FileManager } from "@App/fileSystem/file";
 import { getMdTextFromMonaco } from "@App/text/getMdText";
 import { replaceMonacoAll } from "@App/text/replaceText";
-import { Box, Button, Stack, Tooltip, Typography, } from "@mui/material";
+import { Backdrop, Box, Button, Stack, Tooltip, Typography, } from "@mui/material";
 import Drawer from "@mui/material/Drawer";
 import { observer } from "mobx-react";
-import { useTheme } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import React, { useState } from "react";
 import SwitchIOS from "@Root/js/React/Components/myCom/Switches/SwitchIOS";
 import alertUseArco from "@App/message/alert";
@@ -31,8 +31,15 @@ const FileDrawer = observer(function FileDrawer() {
         alertUseArco(`打开${fileName}成功！😀`);
     };
     const toggleDrawer = (newOpen) => () => {
+        // const backDropEle = document.getElementsByClassName(
+        //   "pointed-through-backdrop"
+        // )
+        // const parentEle = backDropEle[0].parentElement
         if (!isPinned) {
             changeFileManagerState(newOpen);
+        }
+        else {
+            // parentEle?.style.setProperty("pointer-events", "none")
         }
     };
     const handleOnChangeFileEditLocalSwitch = (_e, i) => {
@@ -78,17 +85,32 @@ const FileDrawer = observer(function FileDrawer() {
         let fileFolderManager = folderManager;
         const directoryHandle = await fileFolderManager.openDirectory();
         if (directoryHandle) {
-            setFileDirectoryArr(await fileFolderManager.readDirectoryAsArray(directoryHandle));
-            console.log(await fileFolderManager.readDirectoryAsArray(directoryHandle));
+            let folderTopStackArray = await fileFolderManager.readDirectoryAsArray(directoryHandle, true);
+            fileFolderManager.topDirectoryArray = folderTopStackArray;
+            setFileDirectoryArr(folderTopStackArray);
+            // fileFolderManager.setTopDirectoryArray(folderTopStackArray)
             // fileFolderManager.createNewFolder(directoryHandle, "test2")
         }
     };
     const startButtonStyle = { width: "53%", height: "6svh", mb: "10px" };
-    return (_jsx(_Fragment, { children: _jsx(Drawer, { sx: {
-                "& .MuiBackdrop-root": {
-                    backgroundColor: "transparent", // 设置背景为透明
+    const TransparentBackdrop = styled(Backdrop)({
+        backgroundColor: "transparent",
+        // pointerEvents: "none", // 使点击事件穿透
+    });
+    return (_jsx(_Fragment, { children: _jsx(Drawer, { PaperProps: {
+                style: {
+                    pointerEvents: "all",
+                    zIndex: 99999,
                 },
-            }, anchor: "right", open: getFileManagerState(), onClose: toggleDrawer(false), children: _jsxs(Box, { sx: {
+            }, ModalProps: {
+                disableEnforceFocus: true,
+                disableAutoFocus: true,
+                disableRestoreFocus: true,
+                style: {
+                    pointerEvents: isPinned ? "none" : "all",
+                },
+                BackdropComponent: (props) => (_jsx(TransparentBackdrop, { ...props, className: "pointed-through-backdrop" })),
+            }, anchor: "right", autoFocus: false, open: getFileManagerState(), onClose: toggleDrawer(false), children: _jsxs(Box, { sx: {
                     overflow: "hidden",
                     background: theme.palette.mode === "light" ? "#F9F9F9" : "dark",
                     display: "flex",

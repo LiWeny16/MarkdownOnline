@@ -1,5 +1,5 @@
 import { accents1, delimiters0, delimeterSizing0, greekLetters0, otherLetters0, annotation1, verticalLayout0, verticalLayout1, verticalLayout2, overlap1, spacing0, spacing1, logicAndSetTheory0, logicAndSetTheory1, macros0, bigOperators0, binaryOperators0, fractions0, fractions2, binomialCoefficients0, binomialCoefficients2, mathOperators0, mathOperators1, sqrt1, relations0, negatedRelations0, arrows0, extensibleArrows1, braketNotation1, classAssignment1, color2, font0, font1, size0, style0, symbolsAndPunctuation0, debugging0, envs, } from "@cdn-latex-map";
-// import emojilib from "@cdn-emojilib"
+import { FileFolderManager } from "@App/fileSystem/file";
 export function monacoSnippets(editor, monaco) {
     /**
      * @补全普通提示，采用“/”触发提示
@@ -349,30 +349,116 @@ sequenceDiagram
             }
         },
     });
+    /**
+     * @description 补全文件路径
+     */
     monaco.languages.registerCompletionItemProvider("markdown", {
-        // triggerCharacters: [" "],
+        triggerCharacters: ["/"],
         //@ts-ignore
-        provideCompletionItems: (model, position, context) => {
+        provideCompletionItems: async (model, position, context) => {
+            // 获取到光标前的一行
             const textUntilPosition = model.getValueInRange({
-                startLineNumber: 1,
+                startLineNumber: position.lineNumber,
                 startColumn: 1,
                 endLineNumber: position.lineNumber,
                 endColumn: position.column,
             });
-            if (isNeedToUseCodeIntellisense(textUntilPosition)) {
-                let _suggestions = [
-                    {
-                        label: "RED",
-                        kind: monaco.languages.CompletionItemKind.Function,
-                        insertText: "RED",
-                        insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        detail: "RED...",
-                    },
-                ];
-                return { suggestions: _suggestions };
+            const fileManager = new FileFolderManager(); // 假设这是你用来管理文件和文件夹的类
+            let folderStructure = fileManager.topDirectoryArray; // 获取文件夹结构
+            console.log(folderStructure);
+            // 检查是否需要建议图片路径
+            if (isNeedToSuggestImagePath(monaco, model, textUntilPosition, position)) {
+                // 匹配Markdown中的图片路径
+                const pathMatch = textUntilPosition.match(/!\[.*?\]\(\.\/([^\/)]+(?:\/[^\/)]+)*)\/?$/);
+                // 如果用户刚输入 "./" 并且没有路径匹配，建议顶级文件夹和文件
+                if (textUntilPosition.slice(-2) === "./" && !pathMatch) {
+                    let suggestions = generateSuggestions(folderStructure, monaco);
+                    return { suggestions };
+                }
+                console.log(pathMatch);
+                if (pathMatch) {
+                    const currentPath = pathMatch[1]; // 当前路径片段
+                    const currentPathArr = currentPath.split("/"); // 当前路径片段数组
+                    console.log(currentPathArr);
+                    // 使用递归查找当前路径对应的文件夹
+                    const currentFolder = findFolderRecursively(folderStructure, currentPathArr);
+                    if (currentFolder &&
+                        currentFolder.fileType === "folder" &&
+                        currentFolder.children) {
+                        let suggestions = generateSuggestions(currentFolder.children, monaco);
+                        return { suggestions };
+                    }
+                    else {
+                        // 当前路径指向一个文件或不存在的文件夹，建议当前层级的文件和文件夹
+                        const parentPathArr = currentPathArr.slice(0, -1);
+                        const lastPart = currentPathArr[currentPathArr.length - 1];
+                        const parentFolder = findFolderRecursively(folderStructure, parentPathArr);
+                        if (parentFolder &&
+                            parentFolder.fileType === "folder" &&
+                            parentFolder.children) {
+                            let suggestions = parentFolder.children
+                                .filter((item) => item.label.startsWith(lastPart))
+                                .map((item) => ({
+                                label: item.label,
+                                kind: item.fileType === "folder"
+                                    ? monaco.languages.CompletionItemKind.Folder
+                                    : monaco.languages.CompletionItemKind.File,
+                                insertText: item.label,
+                                detail: item.fileType === "folder" ? "Folder" : "File",
+                                insertTextRules: monaco.languages.CompletionItemInsertTextRule
+                                    .InsertAsSnippet,
+                            }));
+                            return { suggestions };
+                        }
+                    }
+                }
             }
+            // 默认情况下返回空的建议
+            return { suggestions: [] };
         },
     });
+    /**
+     * @description 递归查找文件夹
+     * @param {Array} structure 文件夹结构
+     * @param {Array} pathParts 路径片段数组
+     * @returns {Object|null} 找到的文件夹对象或null
+     */
+    function findFolderRecursively(structure, pathParts) {
+        if (pathParts.length === 0) {
+            return { children: structure };
+        }
+        let current = null;
+        let remainingParts = [...pathParts];
+        current = structure.find((item) => item.label === remainingParts[0] && item.fileType === "folder");
+        if (!current) {
+            return null;
+        }
+        remainingParts.shift();
+        if (remainingParts.length === 0) {
+            return current;
+        }
+        if (current.children) {
+            return findFolderRecursively(current.children, remainingParts);
+        }
+        return null;
+    }
+    /**
+     * @description 生成建议项
+     * @param {Array} items 文件或文件夹数组
+     * @param {Object} monaco Monaco编辑器实例
+     * @returns {Array} 建议项数组
+     */
+    function generateSuggestions(items, monaco) {
+        return items.map((item) => ({
+            label: item.label,
+            kind: item.fileType === "folder"
+                ? monaco.languages.CompletionItemKind.Folder
+                : monaco.languages.CompletionItemKind.File,
+            insertText: item.label,
+            detail: item.fileType === "folder" ? "Folder" : "File",
+            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+        }));
+    }
 }
 //
 /**
@@ -388,6 +474,16 @@ export function isNeedToUseLatexIntellisense(monaco, model, textUntilPosition, p
     else {
         return false;
     }
+}
+export function isNeedToSuggestImagePath(monaco, model, textUntilPosition, position) {
+    // 匹配 Markdown 中图片路径语法的正则表达式，允许继续补全子文件夹和文件
+    const imagePathPattern = /!\[.*?\]\((\.\/[^)]*)$/;
+    const match = textUntilPosition.match(imagePathPattern);
+    // 当路径中有 "./" 开头或以 "/" 结束时，继续触发补全
+    if (match) {
+        return true;
+    }
+    return false;
 }
 export function isInLatexBlock(textUntilPosition) {
     return textUntilPosition.match(/\$\$/g)
