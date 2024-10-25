@@ -10,7 +10,6 @@ let opLocalStorage = new OperateLocalStorage()
 //#region *********************Theme*********************
 
 export function changeTheme(mode: string) {
-  // console.log(useConfig().getAllConfig())
   if (mode == "light") {
     useConfig().themeState = "light"
     opLocalStorage.setItem("themeState", "light")

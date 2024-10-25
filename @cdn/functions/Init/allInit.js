@@ -185,7 +185,15 @@ const defaultConfig = {
             speechLanguage: "zh-CN",
             fileEditLocal: true,
         },
-        advanced: { mermaidTheme: "default" },
+        advanced: {
+            mermaidTheme: "default",
+            imageSettings: {
+                modePrefer: "folder",
+                basicStyle: "#w70%#c#s",
+                imgStorePath: "/images/",
+                htmlOrMdStyle: "md",
+            },
+        },
     },
 };
 const normalConfigArr = ["on", "off", "light", "dark"];

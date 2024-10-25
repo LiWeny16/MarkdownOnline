@@ -12,6 +12,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import MicIcon from "@mui/icons-material/Mic";
 import { styled, alpha } from "@mui/material/styles";
 import { Box } from "@mui/material";
+import ImageIcon from "@mui/icons-material/Image";
 function TransitionComponent(props) {
     return (
     // 这里太大了，不用了！
@@ -89,5 +90,9 @@ export default function SettingsRoute() {
                                     linkToView("settings_2_1");
                                 }, itemId: "2_1", label: "\u5BFC\u51FA\u8BBE\u7F6E" }), _jsx(CustomTreeItem, { onClick: () => {
                                     linkToView("settings_2_2");
-                                }, itemId: "2_2", label: "Mermaid\u8BBE\u7F6E" })] })] }) }) }));
+                                }, itemId: "2_2", label: "Mermaid\u8BBE\u7F6E" }), _jsx(CustomTreeItem, { slots: {
+                                    endIcon: ImageIcon,
+                                }, onClick: () => {
+                                    linkToView("settings_2_3");
+                                }, itemId: "2_3", label: "\u56FE\u7247\u8BBE\u7F6E" })] })] }) }) }));
 }

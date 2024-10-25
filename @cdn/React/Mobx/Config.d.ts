@@ -23,8 +23,15 @@ type SettingsBasic = {
 };
 type SettingsAd = {
     mermaidTheme: MermaidTheme;
+    imageSettings: ImageSettings;
 };
 type MermaidTheme = "default" | "forest" | "dark" | "neutral" | "null";
+export interface ImageSettings {
+    modePrefer: "vf" | "folder";
+    basicStyle: String;
+    imgStorePath: String;
+    htmlOrMdStyle: "html" | "md";
+}
 export interface IConfig {
     [key: string]: any;
     themeState: ThemeState;

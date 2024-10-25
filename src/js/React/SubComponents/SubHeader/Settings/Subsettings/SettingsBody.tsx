@@ -10,8 +10,14 @@ import { LightTooltip } from "@Root/js/React/Components/myCom/Tooltips"
 import {
   Box,
   Divider,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
   MenuItem,
+  Radio,
+  RadioGroup,
   Select,
+  TextField,
   Typography,
   useTheme,
 } from "@mui/material"
@@ -23,13 +29,14 @@ import mermaid from "mermaid"
 import { mdConverter } from "@Root/js"
 import ShortcutExample from "@Root/js/React/Components/Mui/keyboard"
 import kit from "@cdn-kit"
+import { settings } from "firebase/analytics"
 
 export default observer(function SettingsBody() {
   const theme = getTheme()
   const muiTheme = useTheme()
   const settingsBodyContentBoxStyle = {
-    transition: "0.3s",
-    position: "relative", // 添加相对定位
+    transition: "background-color 0.4s ease, box-shadow 0.4s ease",
+    position: "relative",
     padding: "5px",
     borderRadius: "3px",
     display: "flex",
@@ -38,24 +45,34 @@ export default observer(function SettingsBody() {
     mb: "5px",
     ml: "0px",
     pl: "25px",
+    willChange: "background-color, box-shadow",
     "&::before": {
       content: '""',
       position: "absolute",
       left: 0,
       top: 0,
       height: "100%",
-      width: 4, // 左边框的宽度
+      width: 4,
       backgroundColor: "transparent",
-      transition: "background-color 0.3s", // 添加过渡效果
+      transition: "background-color 0.2s cubic-bezier(0.5, 0.05, 1, 0.5)",
     },
     "&:hover::before": {
-      backgroundColor: theme === "light" ? "#840084" : "#d2d2d2", // 悬停时左边框的颜色
+      backgroundColor: theme === "light" ? "#840084" : "#d2d2d2",
     },
     "&:hover": {
       backgroundColor: theme === "light" ? "#E7E6E5" : "",
-      // borderLeft:"solid"
+      boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", // 增加细微阴影增强效果
     },
   }
+  const secondSettingsBodyContentBoxStyle = {
+    ...settingsBodyContentBoxStyle,
+    transition: "background-color 2s ease, box-shadow 0.4s ease",
+    "&::before": {
+      ...settingsBodyContentBoxStyle["&::before"],
+      transition: "background-color 0.24s ease 0.1s",
+    },
+  }
+
   const ContentDescriptionTextStyle = {
     color: muiTheme.palette.info.contrastText ?? "#8B8A8A",
     fontSize: "0.79rem",
@@ -64,6 +81,42 @@ export default observer(function SettingsBody() {
   }
   const [themeState, setThemeState] = React.useState<boolean>(false)
 
+  const handleOnChangeImagePrefer = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    changeSettings({
+      advanced: {
+        imageSettings: {
+          ...getSettings().advanced.imageSettings,
+          modePrefer: event.target.value === "folder" ? "folder" : "vf",
+        },
+      },
+    })
+  }
+  const handleOnChangeImageStyle = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    changeSettings({
+      advanced: {
+        imageSettings: {
+          ...getSettings().advanced.imageSettings,
+          basicStyle: event.target.value,
+        },
+      },
+    })
+  }
+  const handleOnChangeImageStorePath = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    changeSettings({
+      advanced: {
+        imageSettings: {
+          ...getSettings().advanced.imageSettings,
+          imgStorePath: event.target.value,
+        },
+      },
+    })
+  }
   function handleOnChangeThemeSwitch(e: any, b: any) {
     const markdownBodyElement = document.querySelector(
       ".markdown-body"
@@ -161,6 +214,7 @@ export default observer(function SettingsBody() {
         >
           基础设置
         </Typography>
+
         <Divider></Divider>
         <Box id="settings_1_1" sx={settingsBodyContentBoxStyle}>
           {/* <LightTooltip title="编辑器主题" placement="bottom"> */}
@@ -182,8 +236,12 @@ export default observer(function SettingsBody() {
             onChange={handleOnChangeThemeSwitch}
           ></SwitchTheme>
         </Box>
+        <SecondaryHeading
+          id="settings_1_2"
+          content="编辑器设置"
+        ></SecondaryHeading>
         <Box sx={settingsBodyContentBoxStyle} id="settings_1_2">
-          <Box sx={settingsBodyContentBoxStyle}>
+          <Box sx={secondSettingsBodyContentBoxStyle}>
             <Box className="FLEX ROW">
               <Typography
                 sx={{
@@ -204,16 +262,14 @@ export default observer(function SettingsBody() {
               size="small"
               onChange={handleOnChangeFontSize}
             >
-              <MenuItem value={9}>9 px</MenuItem>
-              <MenuItem value={11}>11px</MenuItem>
-              <MenuItem value={13}>13px</MenuItem>
-              <MenuItem value={15}>15px</MenuItem>
-              <MenuItem value={16}>16px</MenuItem>
-              <MenuItem value={17}>17px</MenuItem>
-              <MenuItem value={19}>19px</MenuItem>
-              <MenuItem value={21}>21px</MenuItem>
-              <MenuItem value={23}>23px</MenuItem>
-              <MenuItem value={25}>25px</MenuItem>
+              {[...Array(10).keys()].map((i) => {
+                const size = 8 + i * 2 // 从9开始，每次增加2得到奇数
+                return (
+                  <MenuItem key={size} value={size}>
+                    {size} px
+                  </MenuItem>
+                )
+              })}
             </Select>
           </Box>
 
@@ -351,7 +407,130 @@ export default observer(function SettingsBody() {
             ))}
           </Select>
         </Box>
+        <SecondaryHeading
+          id="settings_2_3"
+          content="图片设置"
+        ></SecondaryHeading>
+        <Box sx={settingsBodyContentBoxStyle}>
+          <Box sx={secondSettingsBodyContentBoxStyle}>
+            <Typography
+              id="settings_2_3"
+              sx={{
+                fontSize: "0.89rem",
+                fontWeight: 500,
+              }}
+            >
+              Image Storage Mode Preference (Pasting)
+            </Typography>
+            <Typography sx={ContentDescriptionTextStyle}>
+              选择粘贴图片优先存储在浏览器/文件夹
+            </Typography>
+            <FormControl sx={{ transition: "inherit" }}>
+              <RadioGroup
+                value={getSettings().advanced.imageSettings.modePrefer}
+                onChange={handleOnChangeImagePrefer}
+              >
+                <FormControlLabel
+                  value="folder"
+                  control={
+                    <Radio
+                      sx={{
+                        "& .MuiSvgIcon-root": {
+                          fontSize: 22,
+                          color: "#65C466",
+                        },
+                      }}
+                    />
+                  }
+                  label="本地文件夹 (Prefer In Local Folder)"
+                />
+                <FormControlLabel
+                  value="vf"
+                  control={
+                    <Radio
+                      sx={{
+                        "& .MuiSvgIcon-root": {
+                          fontSize: 22,
+                          color: "#65C466",
+                        },
+                      }}
+                    />
+                  }
+                  label="浏览器 (Prefer In Browser)"
+                />
+              </RadioGroup>
+            </FormControl>
+          </Box>
+          <Box sx={secondSettingsBodyContentBoxStyle}>
+            <Typography
+              id="settings_2_4"
+              sx={{
+                fontSize: "0.89rem",
+                fontWeight: 500,
+              }}
+            >
+              Default Image Style
+            </Typography>
+            <Typography sx={ContentDescriptionTextStyle}>
+              默认填充的图片样式，大小，位置等,w表示大小, c表示center,
+              s表示shadow
+            </Typography>
+            <TextField
+              fullWidth
+              margin="normal"
+              name="basicStyle"
+              label="基本样式"
+              value={getSettings().advanced.imageSettings.basicStyle}
+              onChange={handleOnChangeImageStyle}
+            />
+          </Box>
+          <Box sx={secondSettingsBodyContentBoxStyle}>
+            <Typography
+              id="settings_2_5"
+              sx={{
+                fontSize: "0.89rem",
+                fontWeight: 500,
+              }}
+            >
+              Default Stored Path
+            </Typography>
+            <Typography sx={ContentDescriptionTextStyle}>
+              默认粘贴图片上传的路径，如设置为"images"，则图片会上传到名根目录的一个为"images"的文件夹下，如该项为空，则保持默认的"images"文件夹
+            </Typography>
+            <TextField
+              fullWidth
+              margin="none"
+              name="imgStorePath"
+              label="图片存储路径"
+              value={getSettings().advanced.imageSettings.imgStorePath}
+              onChange={handleOnChangeImageStorePath}
+            />
+          </Box>
+        </Box>
       </Box>
     </>
   )
 })
+
+interface SecondaryHeadingProps {
+  content: string
+  id: string
+}
+
+const SecondaryHeading = ({ content, id }: SecondaryHeadingProps) => {
+  return (
+    <>
+      <Typography
+        id={id}
+        sx={{
+          mt: "5px",
+          fontSize: "22px",
+          fontWeight: 700,
+        }}
+      >
+        {content}
+      </Typography>
+      <Divider />
+    </>
+  )
+}

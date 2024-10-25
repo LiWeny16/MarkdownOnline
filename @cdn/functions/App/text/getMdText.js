@@ -1,9 +1,3 @@
-export default function getMdText(id = "md-area") {
-    let inputEle = document.getElementById(id);
-    if (inputEle) {
-        return inputEle.value;
-    }
-}
 export function getMdTextFromMonaco() {
     if (window.editor?.getValue) {
         let _text = window.editor.getValue();

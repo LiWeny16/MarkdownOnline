@@ -16,6 +16,7 @@ import EditIcon from "@mui/icons-material/Edit"
 import MicIcon from "@mui/icons-material/Mic"
 import { styled, alpha } from "@mui/material/styles"
 import { Box, Divider } from "@mui/material"
+import ImageIcon from "@mui/icons-material/Image"
 function TransitionComponent(props: TransitionProps) {
   return (
     // 这里太大了，不用了！
@@ -159,6 +160,16 @@ export default function SettingsRoute() {
               }}
               itemId="2_2"
               label="Mermaid设置"
+            />
+            <CustomTreeItem
+              slots={{
+                endIcon: ImageIcon,
+              }}
+              onClick={() => {
+                linkToView("settings_2_3")
+              }}
+              itemId="2_3"
+              label="图片设置"
             />
           </CustomTreeItem>
         </SimpleTreeView>

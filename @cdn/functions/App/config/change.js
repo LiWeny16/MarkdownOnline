@@ -5,7 +5,6 @@ import { toJS } from "mobx";
 let opLocalStorage = new OperateLocalStorage();
 //#region *********************Theme*********************
 export function changeTheme(mode) {
-    // console.log(useConfig().getAllConfig())
     if (mode == "light") {
         useConfig().themeState = "light";
         opLocalStorage.setItem("themeState", "light");

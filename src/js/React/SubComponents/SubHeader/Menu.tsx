@@ -164,7 +164,7 @@ const CustomizedMenus = observer(() => {
         </MenuItem>
         <MenuItem onClick={handleFileManager} disableRipple>
           <FolderOpenOutlinedIcon />
-          文件管理器(实验性)
+          文件管理器
         </MenuItem>
         <MenuItem
           onClick={(e) => {

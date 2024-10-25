@@ -2,7 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 import { changeSettings, changeTheme, getSettings, getTheme, } from "@App/config/change";
 import SwitchTheme from "@Root/js/React/Components/myCom/Switches/SwitchTheme";
 import SwitchIOS from "@Root/js/React/Components/myCom/Switches/SwitchIOS";
-import { Box, Divider, MenuItem, Select, Typography, useTheme, } from "@mui/material";
+import { Box, Divider, FormControl, FormControlLabel, MenuItem, Radio, RadioGroup, Select, TextField, Typography, useTheme, } from "@mui/material";
 import React from "react";
 import { observer } from "mobx-react";
 import { speechLanguageMap } from "@App/voice/speech";
@@ -14,8 +14,8 @@ export default observer(function SettingsBody() {
     const theme = getTheme();
     const muiTheme = useTheme();
     const settingsBodyContentBoxStyle = {
-        transition: "0.3s",
-        position: "relative", // 添加相对定位
+        transition: "background-color 0.4s ease, box-shadow 0.4s ease",
+        position: "relative",
         padding: "5px",
         borderRadius: "3px",
         display: "flex",
@@ -24,22 +24,31 @@ export default observer(function SettingsBody() {
         mb: "5px",
         ml: "0px",
         pl: "25px",
+        willChange: "background-color, box-shadow",
         "&::before": {
             content: '""',
             position: "absolute",
             left: 0,
             top: 0,
             height: "100%",
-            width: 4, // 左边框的宽度
+            width: 4,
             backgroundColor: "transparent",
-            transition: "background-color 0.3s", // 添加过渡效果
+            transition: "background-color 0.2s cubic-bezier(0.5, 0.05, 1, 0.5)",
         },
         "&:hover::before": {
-            backgroundColor: theme === "light" ? "#840084" : "#d2d2d2", // 悬停时左边框的颜色
+            backgroundColor: theme === "light" ? "#840084" : "#d2d2d2",
         },
         "&:hover": {
             backgroundColor: theme === "light" ? "#E7E6E5" : "",
-            // borderLeft:"solid"
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", // 增加细微阴影增强效果
+        },
+    };
+    const secondSettingsBodyContentBoxStyle = {
+        ...settingsBodyContentBoxStyle,
+        transition: "background-color 2s ease, box-shadow 0.4s ease",
+        "&::before": {
+            ...settingsBodyContentBoxStyle["&::before"],
+            transition: "background-color 0.24s ease 0.1s",
         },
     };
     const ContentDescriptionTextStyle = {
@@ -49,6 +58,36 @@ export default observer(function SettingsBody() {
         mb: "5px",
     };
     const [themeState, setThemeState] = React.useState(false);
+    const handleOnChangeImagePrefer = (event) => {
+        changeSettings({
+            advanced: {
+                imageSettings: {
+                    ...getSettings().advanced.imageSettings,
+                    modePrefer: event.target.value === "folder" ? "folder" : "vf",
+                },
+            },
+        });
+    };
+    const handleOnChangeImageStyle = (event) => {
+        changeSettings({
+            advanced: {
+                imageSettings: {
+                    ...getSettings().advanced.imageSettings,
+                    basicStyle: event.target.value,
+                },
+            },
+        });
+    };
+    const handleOnChangeImageStorePath = (event) => {
+        changeSettings({
+            advanced: {
+                imageSettings: {
+                    ...getSettings().advanced.imageSettings,
+                    imgStorePath: event.target.value,
+                },
+            },
+        });
+    };
     function handleOnChangeThemeSwitch(e, b) {
         const markdownBodyElement = document.querySelector(".markdown-body");
         if (b) {
@@ -133,10 +172,13 @@ export default observer(function SettingsBody() {
             }, children: [_jsx(Typography, { id: "settings_1_x", sx: { fontSize: "30px", fontWeight: "700" }, children: "\u57FA\u7840\u8BBE\u7F6E" }), _jsx(Divider, {}), _jsxs(Box, { id: "settings_1_1", sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { sx: {
                                 fontSize: "0.89rem",
                                 fontWeight: 500,
-                            }, children: "Theme" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u7F16\u8F91\u5668\u7684\u4E3B\u9898" }), _jsx(SwitchTheme, { checked: themeState, size: "small", inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeThemeSwitch })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, id: "settings_1_2", children: [_jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {
+                            }, children: "Theme" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u7F16\u8F91\u5668\u7684\u4E3B\u9898" }), _jsx(SwitchTheme, { checked: themeState, size: "small", inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeThemeSwitch })] }), _jsx(SecondaryHeading, { id: "settings_1_2", content: "\u7F16\u8F91\u5668\u8BBE\u7F6E" }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, id: "settings_1_2", children: [_jsxs(Box, { sx: secondSettingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {
                                             fontSize: "0.89rem",
                                             fontWeight: 500,
-                                        }, children: "Font Size" }) }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u6E32\u67D3\u540E\u6587\u5B57\u5B57\u4F53\u5927\u5C0F" }), _jsxs(Select, { value: getSettings().basic.fontSize, defaultChecked: true, fullWidth: true, size: "small", onChange: handleOnChangeFontSize, children: [_jsx(MenuItem, { value: 9, children: "9 px" }), _jsx(MenuItem, { value: 11, children: "11px" }), _jsx(MenuItem, { value: 13, children: "13px" }), _jsx(MenuItem, { value: 15, children: "15px" }), _jsx(MenuItem, { value: 16, children: "16px" }), _jsx(MenuItem, { value: 17, children: "17px" }), _jsx(MenuItem, { value: 19, children: "19px" }), _jsx(MenuItem, { value: 21, children: "21px" }), _jsx(MenuItem, { value: 23, children: "23px" }), _jsx(MenuItem, { value: 25, children: "25px" })] })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {
+                                        }, children: "Font Size" }) }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u6E32\u67D3\u540E\u6587\u5B57\u5B57\u4F53\u5927\u5C0F" }), _jsx(Select, { value: getSettings().basic.fontSize, defaultChecked: true, fullWidth: true, size: "small", onChange: handleOnChangeFontSize, children: [...Array(10).keys()].map((i) => {
+                                        const size = 8 + i * 2; // 从9开始，每次增加2得到奇数
+                                        return (_jsxs(MenuItem, { value: size, children: [size, " px"] }, size));
+                                    }) })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {
                                             fontSize: "0.89rem",
                                             fontWeight: 500,
                                         }, children: "Synchronous Scrolling" }) }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u540C\u6B65\u6EDA\u52A8\u5DE6\u8FB9\u7F16\u8F91\u533A\u548C\u9884\u89C8\u533A\u57DF\u3002" }), _jsx(SwitchIOS, { checked: getSettings().basic.syncScroll, size: "small", inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeSyncScrollSwitch })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {
@@ -161,5 +203,31 @@ export default observer(function SettingsBody() {
                                 fontWeight: 500,
                             }, children: "Mermaid Theme Configs" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "Mermaid\u6D41\u7A0B\u56FE\u4E3B\u9898" }), _jsx(Select, { value: getSettings().advanced.mermaidTheme ?? "default", defaultChecked: true, fullWidth: true, size: "small", 
                             // label="Theme"
-                            color: "primary", onChange: handleOnChangeMermaidTheme, children: normalMermaidTheme.map((e, i) => (_jsx(MenuItem, { value: e, children: normalMermaidThemeMap[i] }, i))) })] })] }) }));
+                            color: "primary", onChange: handleOnChangeMermaidTheme, children: normalMermaidTheme.map((e, i) => (_jsx(MenuItem, { value: e, children: normalMermaidThemeMap[i] }, i))) })] }), _jsx(SecondaryHeading, { id: "settings_2_3", content: "\u56FE\u7247\u8BBE\u7F6E" }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsxs(Box, { sx: secondSettingsBodyContentBoxStyle, children: [_jsx(Typography, { id: "settings_2_3", sx: {
+                                        fontSize: "0.89rem",
+                                        fontWeight: 500,
+                                    }, children: "Image Storage Mode Preference (Pasting)" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u9009\u62E9\u7C98\u8D34\u56FE\u7247\u4F18\u5148\u5B58\u50A8\u5728\u6D4F\u89C8\u5668/\u6587\u4EF6\u5939" }), _jsx(FormControl, { sx: { transition: "inherit" }, children: _jsxs(RadioGroup, { value: getSettings().advanced.imageSettings.modePrefer, onChange: handleOnChangeImagePrefer, children: [_jsx(FormControlLabel, { value: "folder", control: _jsx(Radio, { sx: {
+                                                        "& .MuiSvgIcon-root": {
+                                                            fontSize: 22,
+                                                            color: "#65C466",
+                                                        },
+                                                    } }), label: "\u672C\u5730\u6587\u4EF6\u5939 (Prefer In Local Folder)" }), _jsx(FormControlLabel, { value: "vf", control: _jsx(Radio, { sx: {
+                                                        "& .MuiSvgIcon-root": {
+                                                            fontSize: 22,
+                                                            color: "#65C466",
+                                                        },
+                                                    } }), label: "\u6D4F\u89C8\u5668 (Prefer In Browser)" })] }) })] }), _jsxs(Box, { sx: secondSettingsBodyContentBoxStyle, children: [_jsx(Typography, { id: "settings_2_4", sx: {
+                                        fontSize: "0.89rem",
+                                        fontWeight: 500,
+                                    }, children: "Default Image Style" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u9ED8\u8BA4\u586B\u5145\u7684\u56FE\u7247\u6837\u5F0F\uFF0C\u5927\u5C0F\uFF0C\u4F4D\u7F6E\u7B49,w\u8868\u793A\u5927\u5C0F, c\u8868\u793Acenter, s\u8868\u793Ashadow" }), _jsx(TextField, { fullWidth: true, margin: "normal", name: "basicStyle", label: "\u57FA\u672C\u6837\u5F0F", value: getSettings().advanced.imageSettings.basicStyle, onChange: handleOnChangeImageStyle })] }), _jsxs(Box, { sx: secondSettingsBodyContentBoxStyle, children: [_jsx(Typography, { id: "settings_2_5", sx: {
+                                        fontSize: "0.89rem",
+                                        fontWeight: 500,
+                                    }, children: "Default Stored Path" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u9ED8\u8BA4\u7C98\u8D34\u56FE\u7247\u4E0A\u4F20\u7684\u8DEF\u5F84\uFF0C\u5982\u8BBE\u7F6E\u4E3A\"images\"\uFF0C\u5219\u56FE\u7247\u4F1A\u4E0A\u4F20\u5230\u540D\u6839\u76EE\u5F55\u7684\u4E00\u4E2A\u4E3A\"images\"\u7684\u6587\u4EF6\u5939\u4E0B\uFF0C\u5982\u8BE5\u9879\u4E3A\u7A7A\uFF0C\u5219\u4FDD\u6301\u9ED8\u8BA4\u7684\"images\"\u6587\u4EF6\u5939" }), _jsx(TextField, { fullWidth: true, margin: "none", name: "imgStorePath", label: "\u56FE\u7247\u5B58\u50A8\u8DEF\u5F84", value: getSettings().advanced.imageSettings.imgStorePath, onChange: handleOnChangeImageStorePath })] })] })] }) }));
 });
+const SecondaryHeading = ({ content, id }) => {
+    return (_jsxs(_Fragment, { children: [_jsx(Typography, { id: id, sx: {
+                    mt: "5px",
+                    fontSize: "22px",
+                    fontWeight: 700,
+                }, children: content }), _jsx(Divider, {})] }));
+};
