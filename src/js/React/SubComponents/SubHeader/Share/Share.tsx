@@ -15,13 +15,14 @@ import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
 import DialogContentText from "@mui/material/DialogContentText"
 import DialogTitle from "@mui/material/DialogTitle"
-
+import ShareIcon from "@mui/icons-material/Share"
 // import ketaxCss from "https://npm.elemecdn.com/katex@0.16.7/dist/katex.min.css?raw"
 import CloudMail from "@App/share/CloudMail"
-import { getRenderHTML } from "@App/text/getMdText"
+import { getMdTextFromMonaco, getRenderHTML } from "@App/text/getMdText"
 import { Message } from "@arco-design/web-react"
 import { Notification } from "@arco-design/web-react"
 import ChatIcon from "@mui/icons-material/Chat"
+import { getMdFromFireDB, uploadMdToFireDB } from "@App/share/firebase"
 // import FormDialog from "@Com/myCom/Dialog"
 export default function Share(props: any) {
   let mailOptionsRef = React.useRef<any>()
@@ -33,31 +34,12 @@ export default function Share(props: any) {
     props.onClick(e)
     // console.log()
   }
-  let handleSendMail = (e: React.MouseEvent<HTMLElement>) => {
-    let mailTo = mailOptionsRef.current.value
-    CloudMail(
-      "https://service-g12i7wh1-1321514649.sh.apigw.tencentcs.com/release/mail",
-      "post",
-      {
-        to: mailTo,
-        subject: "Mailed from Markdown Online+",
-        html: `<div class="markdown-body">${getRenderHTML()}</div>`,
-        // `<style>${mailCss + katexCss + hljsCss}</style>`,
-        raw: 0,
-      }
-    )
-    handleCloseAll(e)
-    Notification.success({
-      title: "邮件发送成功！",
-      content: `Beta版本,请勿重复尝试`,
-      position: "topRight",
-    })
-    Notification.info({
-      title: "请注意,邮件发送暂时不能完全支持mermaid和Latex",
-      content: `Beta版本,请勿重复尝试`,
-      position: "topRight",
-    })
-    props.closAll()
+  let handleCreateShareLink = async (e: React.MouseEvent<HTMLElement>) => {
+    const shareContent = getMdTextFromMonaco()
+    // uploadMdToFireDB(shareContent)
+    getMdFromFireDB()
+    // console.log(await uploadMdToFireDB(window.monaco.getValue(), "bigonion"));
+    mailOptionsRef.current.value = " wow"
   }
   const handleAppClick = (urlScheme: string) => (e: any) => {
     e.stopPropagation()
@@ -72,30 +54,22 @@ export default function Share(props: any) {
         open={mailSharePanelState}
         onClose={handleCloseAll}
       >
-        <DialogTitle>神奇邮箱</DialogTitle>
+        <DialogTitle>真·分享</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            请输入你要发送到的邮箱
-            <br />
-          </DialogContentText>
           <TextField
             inputRef={mailOptionsRef}
-            autoFocus
             margin="dense"
             id="name"
-            label="Email Address"
-            type="email"
             fullWidth
             variant="standard"
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseAll}>取消</Button>
-          <Button onClick={handleSendMail}>发送</Button>
+          <Button onClick={handleCreateShareLink}>创建分享链接</Button>
         </DialogActions>
       </Dialog>
       {/* **************************** */}
-      <ArchiveIcon />
+      <ShareIcon />
       分享(开发中)
       <StyledMenu
         style={{ width: "fitContent" }}
@@ -117,11 +91,10 @@ export default function Share(props: any) {
             e.stopPropagation()
             setMailSharePanelState(true)
           }}
-          disabled
           disableRipple
         >
-          <AttachEmailIcon />
-          邮箱分享
+          <ShareIcon />
+          真·分享
         </MenuItem>
         {/* 打开微信应用 */}
         <MenuItem onClick={handleAppClick("weixin://dl/scan")} disableRipple>

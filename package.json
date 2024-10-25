@@ -34,6 +34,7 @@
     "axios": "^1.6.5",
     "bigonion-kit": "0.12.3",
     "emoji-mart": "^5.5.2",
+    "firebase": "^11.0.1",
     "gsap": "^3.12.5",
     "html2canvas": "^1.4.1",
     "incremental-dom": "^0.7.0",
