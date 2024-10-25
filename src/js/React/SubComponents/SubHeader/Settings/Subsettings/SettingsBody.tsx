@@ -498,6 +498,11 @@ export default observer(function SettingsBody() {
               默认粘贴图片上传的路径，如设置为"images"，则图片会上传到名根目录的一个为"images"的文件夹下，如该项为空，则保持默认的"images"文件夹
             </Typography>
             <TextField
+              disabled={
+                getSettings().advanced.imageSettings.modePrefer === "vf"
+                  ? true
+                  : false
+              }
               fullWidth
               margin="none"
               name="imgStorePath"

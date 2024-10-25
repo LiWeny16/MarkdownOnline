@@ -22,11 +22,15 @@ import { getMdTextFromMonaco, getRenderHTML } from "@App/text/getMdText"
 import { Message } from "@arco-design/web-react"
 import { Notification } from "@arco-design/web-react"
 import ChatIcon from "@mui/icons-material/Chat"
+import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import { getMdFromFireDB, uploadMdToFireDB } from "@App/share/firebase"
+import { Tooltip } from "@mui/material"
 // import FormDialog from "@Com/myCom/Dialog"
 export default function Share(props: any) {
   let mailOptionsRef = React.useRef<any>()
   let [mailSharePanelState, setMailSharePanelState] = React.useState(false)
+  const [sharedLink, setSharedLink] = React.useState("https://bigonion.cn")
+  const [copied, setCopied] = React.useState(false)
   let handleCloseAll = (e: React.MouseEvent<HTMLElement>) => {
     setMailSharePanelState(() => {
       return false
@@ -36,15 +40,26 @@ export default function Share(props: any) {
   }
   let handleCreateShareLink = async (e: React.MouseEvent<HTMLElement>) => {
     const shareContent = getMdTextFromMonaco()
-    // uploadMdToFireDB(shareContent)
-    getMdFromFireDB()
-    // console.log(await uploadMdToFireDB(window.monaco.getValue(), "bigonion"));
-    mailOptionsRef.current.value = " wow"
+    await uploadMdToFireDB(shareContent)
+    await getMdFromFireDB().then((res) => {
+      setSharedLink(res)
+    })
   }
   const handleAppClick = (urlScheme: string) => (e: any) => {
     e.stopPropagation()
     window.location.href = urlScheme
     // setMailSharePanelState(true)
+  }
+  const handleCopy = () => {
+    navigator.clipboard
+      .writeText(sharedLink)
+      .then(() => {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000) // 2秒后恢复默认状态
+      })
+      .catch((err) => {
+        console.error("Failed to copy URL:", err)
+      })
   }
   return (
     <>
@@ -56,13 +71,17 @@ export default function Share(props: any) {
       >
         <DialogTitle>真·分享</DialogTitle>
         <DialogContent>
-          <TextField
-            inputRef={mailOptionsRef}
-            margin="dense"
-            id="name"
-            fullWidth
-            variant="standard"
-          />
+          <Tooltip title={copied ? "已复制!" : "点击复制"}>
+            <TextField
+              value={sharedLink}
+              variant="outlined"
+              fullWidth
+              InputProps={{
+                readOnly: true,
+              }}
+              onClick={handleCopy}
+            />
+          </Tooltip>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCreateShareLink}>创建分享链接</Button>

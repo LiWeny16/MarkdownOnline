@@ -29,13 +29,7 @@ export async function uploadMdToFireDB(content, author) {
     });
 }
 export async function getMdFromFireDB() {
-    getDownloadURL(ref(storage, "shared.md"))
-        .then((url) => {
-        console.log(url);
-    })
-        .catch((error) => {
-        // Handle any errors
-    });
+    return getDownloadURL(ref(storage, "shared.md"));
 }
 // 生成 Markdown 文档的分享链接
 export function generateShareLink(docId) {

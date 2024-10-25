@@ -34,14 +34,8 @@ export async function uploadMdToFireDB(content: any, author?: any) {
     console.log("Uploaded a raw string!")
   })
 }
-export async function getMdFromFireDB() {
-  getDownloadURL(ref(storage, "shared.md"))
-    .then((url) => {
-      console.log(url)
-    })
-    .catch((error) => {
-      // Handle any errors
-    })
+export async function getMdFromFireDB(): Promise<string> {
+  return getDownloadURL(ref(storage, "shared.md"))
 }
 // 生成 Markdown 文档的分享链接
 export function generateShareLink(docId: string) {

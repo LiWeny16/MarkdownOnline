@@ -1,5 +1,6 @@
 import insertTextAtCursor, { insertTextMonacoAtCursor, } from "@App/text/insertTextAtCursor";
 import { fillInMemoryImg, fillInMemoryImgs, } from "@App/memory/memory";
+import { getSettings } from "@App/config/change";
 // import { editor } from "monaco-editor"
 /**
  * @description handle native event
@@ -19,8 +20,7 @@ export function monacoPasteEvent(editor, monaco) {
                 let timeStamp = new Date().getTime();
                 // console.log(base64Arr)
                 for (let i = 0; i <= base64Arr.length - 1; i++) {
-                    // console.log(i)
-                    insertImgText += `![我是图片](/vf/${timeStamp + i})`;
+                    insertImgText += `![${getSettings().advanced.imageSettings.basicStyle}](/vf/${timeStamp + i})`;
                 }
                 fillInMemoryImgs(base64Arr, timeStamp);
                 insertTextMonacoAtCursor(insertImgText, true);
