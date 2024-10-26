@@ -30,8 +30,8 @@ type SettingsAd = {
 type MermaidTheme = "default" | "forest" | "dark" | "neutral" | "null"
 export interface ImageSettings {
   modePrefer: "vf" | "folder"
-  basicStyle: String
-  imgStorePath: String
+  basicStyle: string
+  imgStorePath: string
   htmlOrMdStyle: "html" | "md"
 }
 export interface IConfig {

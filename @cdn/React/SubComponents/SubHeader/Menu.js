@@ -101,7 +101,7 @@ const CustomizedMenus = observer(() => {
                                     setModalState(false);
                                 }, autoFocus: true, children: "\u8FBE\u54A9" })] })] }), _jsx(MyButton, { open: open, endIcon: _jsx(MoreVertIcon, {}), onClick: handleClick, children: "更多" }), _jsxs(StyledMenu, { id: "demo-customized-menu", MenuListProps: {
                     "aria-labelledby": "demo-customized-button",
-                }, elevation: 24, anchorEl: anchorEl, open: open, onClose: handleCloseMenu, children: [_jsxs(MenuItem, { onClick: handleImageManager, disableRipple: true, children: [_jsx(EditIcon, {}), "\u56FE\u7247\u7BA1\u7406\u5668"] }), _jsxs(MenuItem, { onClick: handleFileManager, disableRipple: true, children: [_jsx(FolderOpenOutlinedIcon, {}), "\u6587\u4EF6\u7BA1\u7406\u5668"] }), _jsx(MenuItem, { onClick: (e) => {
+                }, elevation: 24, anchorEl: anchorEl, open: open, onClose: handleCloseMenu, children: [_jsxs(MenuItem, { onClick: handleImageManager, disableRipple: true, children: [_jsx(EditIcon, {}), "\u56FE\u7247\u7BA1\u7406\u5668(\u6D4F\u89C8\u5668)"] }), _jsxs(MenuItem, { onClick: handleFileManager, disableRipple: true, children: [_jsx(FolderOpenOutlinedIcon, {}), "\u6587\u4EF6\u7BA1\u7406\u5668\u2728"] }), _jsx(MenuItem, { onClick: (e) => {
                             handleClick3(e);
                             // handleCloseMenu()s
                         }, disableRipple: true, children: _jsx(Export, { anchorEl: anchorEl3, open: open3, closeMenu: handleCloseMenu, closeExportMenu: handleCloseExport }) }), _jsx(Divider, { sx: { my: 0.5 } }), _jsx(MenuItem, { onClick: (e) => {

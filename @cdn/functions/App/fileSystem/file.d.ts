@@ -47,8 +47,9 @@ export interface FileItem {
  * @description 处理文件夹类
  */
 export declare class FileFolderManager extends FileState {
-    protected topDirectoryHandle: FileSystemDirectoryHandle | undefined;
+    protected static topDirectoryHandle: FileSystemDirectoryHandle | undefined;
     protected currentDirectoryHandle: FileSystemDirectoryHandle | undefined;
+    protected isWatching: boolean;
     constructor(directoryHandle?: FileSystemDirectoryHandle);
     get topDirectoryArray(): Array<any>;
     set topDirectoryArray(state: any);
@@ -68,16 +69,14 @@ export declare class FileFolderManager extends FileState {
     /**
      * @description 检查该目录是否存在，如果存在那么设置当前目录为该目录的句柄
      */
-    checkOrCreateDirectory(directoryHandle: FileSystemDirectoryHandle, dirName: string): Promise<FileSystemDirectoryHandle>;
+    checkOrCreateNestedDirectory(directoryHandle: FileSystemDirectoryHandle, nestedPath: string): Promise<FileSystemDirectoryHandle>;
     renameFolder(directoryHandle: FileSystemDirectoryHandle, oldName: string, newName: string): Promise<void>;
-    /**
-     * @description 在当前目录写入文件
-     */
     writeFile(directoryHandle: FileSystemDirectoryHandle, fileName: string, content: string | Blob): Promise<void>;
     /**
-     * @description 以base64写入文件
+     * @description Writes a base64 image to a file in a specified nested directory
      */
-    writeBase64ImageFile(directoryHandle: FileSystemDirectoryHandle, fileName: string, base64Data: string): Promise<void>;
+    writeBase64ImageFile(directoryHandle: FileSystemDirectoryHandle, fileName: string, base64Data: string, rootPath?: string): Promise<number>;
+    watchDirectory(callback: () => void, interval?: number): Promise<void>;
     private arrayBufferToBase64;
     private copyDirectory;
 }

@@ -18,6 +18,7 @@
 | <120.0.6099.218 (Official Build) (64-bit) | :question:         |
 
 
+
 | FireFox Version <s>(Highly Not recommended)</s>| Supported  |
 | --------------- | ---------- |
 | 121.0           | :question: |

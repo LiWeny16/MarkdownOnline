@@ -107,6 +107,14 @@ const FileDrawer = observer(function FileDrawer() {
         directoryHandle,
         true
       )
+      fileFolderManager.watchDirectory(async () => {
+        let folderTopStackArray = await fileFolderManager.readDirectoryAsArray(
+          directoryHandle,
+          true
+        )
+        fileFolderManager.topDirectoryArray = folderTopStackArray
+        setFileDirectoryArr(folderTopStackArray)
+      }, 1700)
       fileFolderManager.topDirectoryArray = folderTopStackArray
       setFileDirectoryArr(folderTopStackArray)
       // fileFolderManager.setTopDirectoryArray(folderTopStackArray)
@@ -223,6 +231,8 @@ const FileDrawer = observer(function FileDrawer() {
                 width: "23svw",
                 height: "10svh",
                 alignItems: "center",
+                mt: "4px",
+                justifyContent: "center",
               }}
               className={"FLEX COW ALI-CEN JUS-CEN"}
             >

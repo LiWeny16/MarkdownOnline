@@ -28,6 +28,7 @@ import { TreeItem2Icon } from "@mui/x-tree-view/TreeItem2Icon"
 import { TreeItem2Provider } from "@mui/x-tree-view/TreeItem2Provider"
 import { TreeViewBaseItem } from "@mui/x-tree-view/models"
 import { mdConverter } from "@Root/js"
+import sortFileDirectoryArr from "@App/fileSystem/sort"
 
 type FileType =
   | "image"
@@ -48,31 +49,11 @@ const ITEMS: TreeViewBaseItem<ExtendedTreeItemProps>[] = [
   {
     id: "1",
     label: "Documents",
-    children: [
-      {
-        id: "1.1",
-        label: "Company",
-        children: [
-          { id: "1.1.1", label: "Invoice", fileType: "pdf" },
-          { id: "1.1.4", label: "Equipment", fileType: "pdf" },
-          { id: "1.1.5", label: "Video conference", fileType: "video" },
-        ],
-      },
-    ],
   },
   {
     id: "2",
     label: "Bookmarked",
-    children: [
-      { id: "2.1", label: "Learning materials", fileType: "folder" },
-      { id: "2.2", label: "News", fileType: "folder" },
-    ],
-  },
-  {
-    id: "3",
-    label: "Bookmarked",
-    children: [],
-    fileType: "folder",
+    children: [{ id: "2.1", label: "Learning materials", fileType: "folder" }],
   },
 ]
 
@@ -80,11 +61,13 @@ function DotIcon() {
   return (
     <Box
       sx={{
-        width: 6,
-        height: 6,
-        borderRadius: "70%",
+        width: 8,
+        height: 8,
+        borderRadius: "100%",
         bgcolor: "warning.main",
-        display: "inline-block",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         verticalAlign: "middle",
         zIndex: 1,
         mx: 1,
@@ -326,6 +309,7 @@ export default function FileExplorer(props: {
   folderManager: any
   fillText: Function
 }) {
+  let sortedFileDirectoryArr = sortFileDirectoryArr(props.fileDirectoryArr)
   // 使用函数来传递 folderManager 到 CustomTreeItem
   const WrappedCustomTreeItem = (itemProps: any) => (
     <CustomTreeItem
@@ -336,16 +320,17 @@ export default function FileExplorer(props: {
   )
   return (
     <RichTreeView
-      items={props.fileDirectoryArr ?? ITEMS}
+      items={sortedFileDirectoryArr ?? ITEMS}
       aria-label="file explorer"
       defaultExpandedItems={["1", "1.1"]}
       defaultSelectedItems="1.1"
       sx={{
-        height: "fit-content",
+        height: "100%",
         flexGrow: 1,
         userSelect: "none",
         maxWidth: 400,
-        overflowY: "auto",
+        overflowY: "scroll",
+        flex: 1,
       }}
       slots={{ item: WrappedCustomTreeItem }}
     />

@@ -11,7 +11,3 @@ export declare function monacoPasteEventNative(editor: editor.IStandaloneCodeEdi
  * @param monaco
  */
 export declare function monacoPasteEvent(editor: editor.IStandaloneCodeEditor, monaco: Monaco): void;
-/**
- * @deprecated
- */
-export default function pasteEvent(): void;

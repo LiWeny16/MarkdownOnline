@@ -2,6 +2,7 @@ import { jsx as _jsx } from "react/jsx-runtime";
 import Box from "@mui/material/Box";
 function ScrollableBox({ children, sx, ...rest }) {
     return (_jsx(Box, { sx: {
+            display: "flex",
             width: 300, // 默认宽度
             height: 200, // 默认高度
             overflow: "auto", // 默认启用滚动

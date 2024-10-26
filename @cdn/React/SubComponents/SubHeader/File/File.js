@@ -86,6 +86,11 @@ const FileDrawer = observer(function FileDrawer() {
         const directoryHandle = await fileFolderManager.openDirectory();
         if (directoryHandle) {
             let folderTopStackArray = await fileFolderManager.readDirectoryAsArray(directoryHandle, true);
+            fileFolderManager.watchDirectory(async () => {
+                let folderTopStackArray = await fileFolderManager.readDirectoryAsArray(directoryHandle, true);
+                fileFolderManager.topDirectoryArray = folderTopStackArray;
+                setFileDirectoryArr(folderTopStackArray);
+            }, 1700);
             fileFolderManager.topDirectoryArray = folderTopStackArray;
             setFileDirectoryArr(folderTopStackArray);
             // fileFolderManager.setTopDirectoryArray(folderTopStackArray)
@@ -139,6 +144,8 @@ const FileDrawer = observer(function FileDrawer() {
                                     width: "23svw",
                                     height: "10svh",
                                     alignItems: "center",
+                                    mt: "4px",
+                                    justifyContent: "center",
                                 }, className: "FLEX COW ALI-CEN JUS-CEN", children: [_jsx(Typography, { sx: { mr: "10px", fontSize: "17px" }, color: theme.palette.info.contrastText, children: "\u540C\u6B65\u672C\u5730\u7F16\u8F91" }), _jsx(SwitchIOS, { checked: getSettings().basic.fileEditLocal, size: "small", 
                                         // value={getSettings().basic.syncScroll}
                                         inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeFileEditLocalSwitch })] }), _jsx(Box, { className: "FLEX ALI-CEN JUS-CEN", sx: {

@@ -11,6 +11,7 @@ function ScrollableBox({ children, sx, ...rest }: ScrollableBoxProps) {
   return (
     <Box
       sx={{
+        display: "flex",
         width: 300, // 默认宽度
         height: 200, // 默认高度
         overflow: "auto", // 默认启用滚动

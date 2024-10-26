@@ -1,7 +1,9 @@
-import insertTextAtCursor, { insertTextMonacoAtCursor, } from "@App/text/insertTextAtCursor";
-import { fillInMemoryImg, fillInMemoryImgs, } from "@App/memory/memory";
+import { insertTextMonacoAtCursor, } from "@App/text/insertTextAtCursor";
+import { fillInMemoryImgs, } from "@App/memory/memory";
 import { getSettings } from "@App/config/change";
-// import { editor } from "monaco-editor"
+import { FileFolderManager } from "@App/fileSystem/file";
+const basicStyle = getSettings().advanced.imageSettings.basicStyle;
+const folderManager = new FileFolderManager();
 /**
  * @description handle native event
  */
@@ -14,35 +16,31 @@ export function monacoPasteEventNative(editor, monaco) { }
  */
 export function monacoPasteEvent(editor, monaco) {
     editor.getContainerDomNode().addEventListener("paste", (event) => {
-        handlePasteEvent(event).then((base64Arr) => {
+        handlePasteEvent(event).then(async (base64Arr) => {
+            let insertImgText = "";
             if (base64Arr) {
-                let insertImgText = "";
-                let timeStamp = new Date().getTime();
-                // console.log(base64Arr)
-                for (let i = 0; i <= base64Arr.length - 1; i++) {
-                    insertImgText += `![${getSettings().advanced.imageSettings.basicStyle}](/vf/${timeStamp + i})`;
+                if (!folderManager.getTopDirectoryHandle() ||
+                    getSettings().advanced.imageSettings.modePrefer === "vf") {
+                    let timeStamp = new Date().getTime();
+                    // console.log(base64Arr)
+                    for (let i = 0; i <= base64Arr.length - 1; i++) {
+                        insertImgText += `![${basicStyle}](/vf/${timeStamp + i})`;
+                    }
+                    fillInMemoryImgs(base64Arr, timeStamp);
                 }
-                fillInMemoryImgs(base64Arr, timeStamp);
+                else {
+                    let path = getSettings().advanced.imageSettings.imgStorePath;
+                    path =
+                        path.slice(-1) === "/" ? path.slice(0, path.length - 1) : path;
+                    const maxNumber = await folderManager.writeBase64ImageFile(folderManager.getTopDirectoryHandle(), ".png", base64Arr[0], path);
+                    for (let i = 0; i <= base64Arr.length - 1; i++) {
+                        insertImgText += `![${basicStyle}](.${path}/${maxNumber}.png)`;
+                    }
+                }
                 insertTextMonacoAtCursor(insertImgText, true);
             }
         });
     }, true);
-}
-/**
- * @deprecated
- */
-export default function pasteEvent() {
-    document.getElementById("md-area").addEventListener("paste", (e) => {
-        handlePasteEvent(e).then((base64) => {
-            if (base64) {
-                // console.log(base64)
-                let timeStamp = new Date().getTime();
-                let insertImg = `![我是图片](/vf/${timeStamp})`;
-                fillInMemoryImg(base64, timeStamp);
-                insertTextAtCursor(document.getElementById("md-area"), insertImg);
-            }
-        });
-    });
 }
 function handlePasteEvent(e) {
     return new Promise((resolve) => {

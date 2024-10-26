@@ -160,11 +160,11 @@ const CustomizedMenus = observer(() => {
       >
         <MenuItem onClick={handleImageManager} disableRipple>
           <EditIcon />
-          图片管理器
+          图片管理器(浏览器)
         </MenuItem>
         <MenuItem onClick={handleFileManager} disableRipple>
           <FolderOpenOutlinedIcon />
-          文件管理器
+          文件管理器✨
         </MenuItem>
         <MenuItem
           onClick={(e) => {

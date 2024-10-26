@@ -166,20 +166,18 @@ export class FileManager extends FileState {
 export class FileFolderManager extends FileState {
     constructor(directoryHandle) {
         super();
-        Object.defineProperty(this, "topDirectoryHandle", {
-            enumerable: true,
-            configurable: true,
-            writable: true,
-            value: void 0
-        });
         Object.defineProperty(this, "currentDirectoryHandle", {
             enumerable: true,
             configurable: true,
             writable: true,
             value: void 0
         });
-        this.topDirectoryHandle = directoryHandle || window._directoryHandle;
-        // this.currentDirectoryHandle = this.topDirectoryHandle
+        Object.defineProperty(this, "isWatching", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: false
+        });
     }
     // Getter for fileState
     get topDirectoryArray() {
@@ -206,7 +204,7 @@ export class FileFolderManager extends FileState {
         FileState.fileHandle = handle;
     }
     getTopDirectoryHandle() {
-        return this.topDirectoryHandle;
+        return FileFolderManager.topDirectoryHandle;
     }
     getCurrentDirectoryHandle() {
         return this.currentDirectoryHandle;
@@ -219,10 +217,9 @@ export class FileFolderManager extends FileState {
             // 通过 showDirectoryPicker 打开文件夹选择对话框
             const directoryHandle = await window.showDirectoryPicker();
             // console.log("Directory selected:", directoryHandle)
-            this.topDirectoryHandle = directoryHandle;
+            FileFolderManager.topDirectoryHandle = directoryHandle;
             this.fileState = 1;
             this.currentDirectoryHandle = directoryHandle;
-            window._directoryHandle = directoryHandle;
             return directoryHandle;
         }
         catch (error) {
@@ -366,28 +363,23 @@ export class FileFolderManager extends FileState {
     /**
      * @description 检查该目录是否存在，如果存在那么设置当前目录为该目录的句柄
      */
-    async checkOrCreateDirectory(directoryHandle, dirName) {
+    async checkOrCreateNestedDirectory(directoryHandle, nestedPath) {
         try {
-            // 尝试获取现有的子目录
-            const dirHandle = await directoryHandle.getDirectoryHandle(dirName);
-            // console.log("Directory already exists")
-            this.currentDirectoryHandle = dirHandle;
-            return dirHandle; // 目录已存在，直接返回句柄
-        }
-        catch (err) {
-            if (err.name === "NotFoundError") {
-                // 目录不存在，基于create选项创建它
-                // console.log("Directory does not exist, creating...")
-                const newDirHandle = await directoryHandle.getDirectoryHandle(dirName, {
+            const pathParts = nestedPath.split("/").filter(Boolean); // 过滤空字符串
+            let currentDirHandle = directoryHandle;
+            for (const part of pathParts) {
+                // Check or create each directory part
+                currentDirHandle = await currentDirHandle.getDirectoryHandle(part, {
                     create: true,
                 });
-                this.currentDirectoryHandle = newDirHandle;
-                return newDirHandle; // 返回新创建的目录句柄
             }
-            else {
-                // 其他错误
-                throw err;
-            }
+            // After loop, currentDirHandle will be the deepest directory handle
+            this.currentDirectoryHandle = currentDirHandle;
+            return currentDirHandle;
+        }
+        catch (error) {
+            console.error("Error creating nested directory:", error);
+            throw error;
         }
     }
     async renameFolder(directoryHandle, oldName, newName) {
@@ -418,51 +410,67 @@ export class FileFolderManager extends FileState {
             console.error("Error renaming folder:", error);
         }
     }
-    /**
-     * @description 在当前目录写入文件
-     */
     async writeFile(directoryHandle, fileName, content) {
         try {
             const fileHandle = await directoryHandle.getFileHandle(fileName, {
-                create: false,
+                create: true,
             });
             const writable = await fileHandle.createWritable();
             await writable.write(content);
             await writable.close();
-            // console.log(`File ${fileName} written successfully.`)
         }
         catch (error) {
-            // 如果文件不存在，将会抛出异常
-            if (error.name === "NotFoundError") {
-                const fileHandle = await directoryHandle.getFileHandle(fileName, {
-                    create: true,
-                });
-                const writable = await fileHandle.createWritable();
-                await writable.write(content);
-                await writable.close();
-                // console.log(`File ${fileName} written successfully.`)
-            }
-            else {
-                throw error;
-            }
+            console.error(`Error writing file ${fileName}:`, error);
+            throw error;
         }
     }
     /**
-     * @description 以base64写入文件
+     * @description Writes a base64 image to a file in a specified nested directory
      */
-    async writeBase64ImageFile(directoryHandle, fileName, base64Data) {
+    async writeBase64ImageFile(directoryHandle, fileName, base64Data, rootPath = "/images") {
         try {
-            const binaryData = atob(base64Data.split(",")[1]);
-            const arrayBuffer = new ArrayBuffer(binaryData.length);
-            const uint8Array = new Uint8Array(arrayBuffer);
+            // Ensure the nested directory structure exists
+            const targetDirectoryHandle = await this.checkOrCreateNestedDirectory(directoryHandle, rootPath);
+            let maxNumberTemp = 0;
+            let maxNumber = 0;
+            for await (const entry of targetDirectoryHandle.values()) {
+                if (entry.kind === "file") {
+                    const match = entry.name.match(/^(\d+)\.png$/); // Match files with only numbers followed by .png
+                    if (match) {
+                        const number = parseInt(match[1], 10); // Extract and parse the number
+                        if (number > maxNumberTemp) {
+                            maxNumberTemp = number;
+                        }
+                    }
+                }
+            }
+            maxNumber = maxNumberTemp + 1;
+            // Extract and decode base64 content
+            const base64Part = base64Data.split(",")[1];
+            const binaryData = atob(base64Part);
+            const uint8Array = new Uint8Array(binaryData.length);
             for (let i = 0; i < binaryData.length; i++) {
                 uint8Array[i] = binaryData.charCodeAt(i);
             }
+            // Create a blob for the image and write to the file
             const blob = new Blob([uint8Array], { type: "image/png" });
-            await this.writeFile(directoryHandle, fileName, blob);
+            await this.writeFile(targetDirectoryHandle, maxNumber + fileName, blob);
+            return maxNumber;
         }
         catch (error) {
             console.error("Error writing Base64 image file:", error);
+            throw error;
+        }
+    }
+    async watchDirectory(callback, interval = 1000) {
+        if (this.isWatching) {
+            return;
+        }
+        else {
+            this.isWatching = true;
+            setInterval(() => {
+                callback();
+            }, interval);
         }
     }
     // 辅助函数：将 ArrayBuffer 转换为 Base64
