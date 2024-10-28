@@ -1,6 +1,6 @@
 import { Monaco } from "@monaco-editor/react"
 import { editor } from "monaco-editor"
-import insertTextAtCursor, {
+import  {
   insertTextMonacoAtCursor,
 } from "@App/text/insertTextAtCursor"
 import {

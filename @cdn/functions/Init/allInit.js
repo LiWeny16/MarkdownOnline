@@ -177,6 +177,14 @@ const defaultConfig = {
     fileManagerState: false,
     emojiPickerState: "off",
     contextMenuClickPosition: { posx: 20, posy: 20 },
+    states: {
+        unmemorable: {
+            aiPanelState: false,
+            promptPanelState: false,
+            mouseUpPos: { posx: 0, posy: 0 },
+            selectEndPos: { posx: 0, posy: 0 },
+        },
+    },
     settingsConfig: {
         basic: {
             editorAutoWrap: true,
@@ -196,8 +204,9 @@ const defaultConfig = {
         },
     },
 };
-const normalConfigArr = ["on", "off", "light", "dark"];
+// const normalConfigArr: NormalConfigArr = ["on", "off", "light", "dark"]
 const normalSettingsKey = [
+    ...Object.keys(defaultConfig.states.unmemorable),
     ...Object.keys(defaultConfig.settingsConfig.basic),
     ...Object.keys(defaultConfig.settingsConfig.advanced),
 ];
@@ -233,12 +242,13 @@ export function configInit(defaultConfig) {
             if (key == "themeState" ||
                 key == "emojiPickerState" ||
                 key == "settingsConfig"
+            // key == "states"
             // @ts-ignore 这里他妈为什么会报错？？？？不合理啊？？？
             // normalConfigArr.includes(opLocalStorage.getItem(key).toString())
             ) {
                 try {
                     if (typeof _defaultConfig[key] === "object") {
-                        // 以下为settingConfig设置内容
+                        // 以下为settingConfig / state的设置内容
                         const storedSettings = JSON.parse(opLocalStorage.getItem(key).toString());
                         for (let i in storedSettings) {
                             Object.keys(storedSettings[i]).forEach((e) => {

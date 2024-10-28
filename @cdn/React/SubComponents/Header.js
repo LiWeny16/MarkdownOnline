@@ -44,7 +44,6 @@ const handleHomeClick = () => {
 };
 const boxShadow = "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);";
 const drawerWidth = 240;
-// const navItems = ["Home", "About3", "Contact"]
 const DrawerAppBar = observer((props) => {
     const theme = useTheme();
     const { window } = props;
@@ -68,7 +67,7 @@ const DrawerAppBar = observer((props) => {
                             }, children: [_jsx(ListItemAvatar, { children: _jsx(Avatar, { children: _jsx(InfoIcon, {}) }) }), _jsx(ListItemText, { primary: "About", secondary: "" })] }) })] })] })
     // </ThemeProvider>
     );
-    return (_jsx(_Fragment, { children: _jsxs("div", { className: "FLEX header-app-bar", style: { flex: "0 0 8.7vh" }, children: [_jsx(CssBaseline, {}), _jsx(AppBar, { component: "nav", 
+    return (_jsx(_Fragment, { children: _jsxs(Box, { className: "FLEX header-app-bar", style: { transition: "0.5s", flex: "0 0 8.7vh" }, children: [_jsx(CssBaseline, {}), _jsx(AppBar, { component: "nav", 
                     // enableColorOnDark={false}
                     sx: {
                         position: "inherit",

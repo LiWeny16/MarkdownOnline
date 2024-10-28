@@ -23,7 +23,7 @@ const lightTheme = createTheme({
             contrastText: "#fff378",
         },
         secondary: {
-            main: green[500],
+            main: "#EEEEEE",
             contrastText: "pink",
         },
         info: {

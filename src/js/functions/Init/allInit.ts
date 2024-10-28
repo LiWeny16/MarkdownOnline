@@ -31,7 +31,7 @@ import {
 } from "@Func/Parser/mdItPlugin/clueParser"
 import preViewClickEvent from "@Func/Events/click/preClick"
 import markdownItLatex from "@Func/Parser/mdItPlugin/latex"
-import { getSettings } from "@App/config/change"
+import { changeStates, getSettings } from "@App/config/change"
 import noteUseArco from "@App/message/note"
 import { mergeObjects } from "@App/basic/basic"
 /**
@@ -190,6 +190,7 @@ export default function allInit(
     speechResult: "",
     speech: null,
   }
+
   /**
    * @description 全局事件初始化
    */
@@ -202,6 +203,14 @@ const defaultConfig: IConfig = {
   fileManagerState: false,
   emojiPickerState: "off",
   contextMenuClickPosition: { posx: 20, posy: 20 },
+  states: {
+    unmemorable: {
+      aiPanelState: false,
+      promptPanelState: false,
+      mouseUpPos: { posx: 0, posy: 0 },
+      selectEndPos: { posx: 0, posy: 0 },
+    },
+  },
   settingsConfig: {
     basic: {
       editorAutoWrap: true,
@@ -222,8 +231,9 @@ const defaultConfig: IConfig = {
   },
 }
 
-const normalConfigArr: NormalConfigArr = ["on", "off", "light", "dark"]
+// const normalConfigArr: NormalConfigArr = ["on", "off", "light", "dark"]
 const normalSettingsKey = [
+  ...Object.keys(defaultConfig.states.unmemorable),
   ...Object.keys(defaultConfig.settingsConfig.basic),
   ...Object.keys(defaultConfig.settingsConfig.advanced),
 ]
@@ -261,12 +271,13 @@ export function configInit(defaultConfig: IConfig) {
         key == "themeState" ||
         key == "emojiPickerState" ||
         key == "settingsConfig"
+        // key == "states"
         // @ts-ignore 这里他妈为什么会报错？？？？不合理啊？？？
         // normalConfigArr.includes(opLocalStorage.getItem(key).toString())
       ) {
         try {
           if (typeof _defaultConfig[key] === "object") {
-            // 以下为settingConfig设置内容
+            // 以下为settingConfig / state的设置内容
             const storedSettings = JSON.parse(
               opLocalStorage.getItem(key).toString()
             )

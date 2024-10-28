@@ -1,3 +1,8 @@
+/**
+ * @description 合并对象
+ * @param oldObj 旧对象
+ * @param newObj 新对象
+*/
 export function mergeObjects(oldObj: any, newObj: any) {
   // 如果任何一个参数不是对象或者是null，直接返回旧对象
   if (

@@ -2,6 +2,7 @@
 import save from "@App/save";
 import exeSyncScrollAction from "./actions/syncScroll";
 import exeFileManagerAction from "./actions/fileManager";
+import exeAskAI from "./actions/askAI";
 // import voice from "@App/voice/sound"
 // import qiniuFileAPI from "@App/qiniu/index"
 // import insertTextAtCursor from "@App/text/insertTextAtCursor"
@@ -28,9 +29,10 @@ function enableFastKeyEvent() {
             e.preventDefault();
             save();
         }
-        if (e.ctrlKey && e.key == "b") {
-            // e.stopPropagation() //停止冒泡，向上传递事件
-            // e.preventDefault()
+        if (e.ctrlKey && e.key == "j") {
+            e.stopPropagation(); //停止冒泡，向上传递事件
+            e.preventDefault();
+            exeAskAI(window.editor, window.monaco);
             // save()
         }
     }, true);

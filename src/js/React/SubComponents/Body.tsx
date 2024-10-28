@@ -3,12 +3,15 @@ import React from "react"
 import fastKeyEvent from "@Func/Events/key/fastKey"
 import MdArea from "./SubBody/MdArea"
 import { observer } from "mobx-react"
-import { getEmojiPickerState, getTheme } from "@App/config/change"
+import { getEmojiPickerState, getStates, getTheme } from "@App/config/change"
 import { Suspense } from "react"
 
 // 使用 React.lazy 懒加载组件
-const LazyEmojiPicker = React.lazy(() => import("@Com/myCom/EmojiPicker"))
-
+const LazyEmojiPicker = React.lazy(
+  () => import("@Root/js/React/Components/myCom/EmojiPicker")
+)
+const LazyPromptPanel = React.lazy(() => import("@Com/myCom/Prompt/Prompt"))
+const LazyPromptAIPanel = React.lazy(() => import("@Com/myCom/Prompt/AIPanel"))
 export default observer(function Body() {
   const [content, setContent] = React.useState("")
   const articleRef = React.useRef(null)
@@ -49,6 +52,12 @@ export default observer(function Body() {
           <LazyEmojiPicker
             open={getEmojiPickerState() === "on" ? true : false}
           />
+        </Suspense>
+        <Suspense fallback={<></>}>
+          <LazyPromptPanel open={getStates().unmemorable.promptPanelState} />
+        </Suspense>
+        <Suspense>
+          <LazyPromptAIPanel open={getStates().unmemorable.aiPanelState} />
         </Suspense>
       </div>
       {/* <CircularLoadingButton></CircularLoadingButton> */}

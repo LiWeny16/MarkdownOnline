@@ -56,8 +56,6 @@ const boxShadow =
   "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);"
 
 const drawerWidth = 240
-// const navItems = ["Home", "About3", "Contact"]
-
 const DrawerAppBar = observer((props: Props) => {
   const theme = useTheme()
   const { window } = props
@@ -145,7 +143,10 @@ const DrawerAppBar = observer((props: Props) => {
 
   return (
     <>
-      <div className="FLEX header-app-bar" style={{ flex: "0 0 8.7vh" }}>
+      <Box
+        className="FLEX header-app-bar"
+        style={{ transition: "0.5s", flex: "0 0 8.7vh" }}
+      >
         <CssBaseline />
         <AppBar
           component="nav"
@@ -245,7 +246,7 @@ const DrawerAppBar = observer((props: Props) => {
             {drawer}
           </Drawer>
         </Box>
-      </div>
+      </Box>
     </>
   )
 })

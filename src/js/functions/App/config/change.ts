@@ -2,7 +2,7 @@
 
 import OperateLocalStorage from "@App/localStorage/localStorage"
 import { useConfig } from "@Func/Init/allInit"
-import { IConfig, Settings } from "@Root/js/React/Mobx/Config"
+import { IConfig, Settings, States } from "@Root/js/React/Mobx/Config"
 import { toJS } from "mobx"
 
 let opLocalStorage = new OperateLocalStorage()
@@ -61,6 +61,21 @@ export function getContextMenuClickPosition() {
 /**
  * @description 更新设置,合并设置，存储到localStorage
  */
+export function changeStates(newStates: {
+  unmemorable?: Partial<States["unmemorable"]>
+}) {
+  const currentStates = getStates()
+  const updatedStates = updateStatesConfig(currentStates, newStates)
+  useConfig().states = updatedStates
+  opLocalStorage.setItem("states", JSON.stringify(updatedStates))
+}
+/**
+ * @description 读取设置
+ */
+export function getStates() {
+  return toJS(useConfig().states)
+}
+
 export function changeSettings(newSettings: {
   basic?: Partial<Settings["basic"]>
   advanced?: Partial<Settings["advanced"]>
@@ -70,15 +85,33 @@ export function changeSettings(newSettings: {
   useConfig().settingsConfig = updatedSettings
   opLocalStorage.setItem("settingsConfig", JSON.stringify(updatedSettings))
 }
-/**
- * @description 读取设置
- */
+
 export function getSettings() {
   return toJS(useConfig().settingsConfig)
 }
 /**
  * @description 合并新设置和旧设置
  */
+function updateStatesConfig(
+  currentStates: States,
+  newSettings: {
+    [key: string]: any // 添加索引签名
+    unmemorable?: Partial<States["unmemorable"]>
+  }
+) {
+  // 遍历新设置的每个键
+  for (const key in newSettings) {
+    if (key in currentStates) {
+      // 如果键存在于当前设置中，则更新子对象
+      Object.assign(currentStates[key], newSettings[key])
+    } else {
+      // 如果键不存在，则将新键添加到当前设置
+      currentStates[key] = newSettings[key]
+    }
+  }
+
+  return currentStates
+}
 function updateSettingsConfig(
   currentSettings: Settings,
   newSettings: {

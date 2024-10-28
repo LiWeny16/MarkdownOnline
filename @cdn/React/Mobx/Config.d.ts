@@ -9,6 +9,16 @@ export type MousePosition = {
     posx: number;
     posy: number;
 };
+type StateUnmemorable = {
+    aiPanelState: Boolean;
+    promptPanelState: Boolean;
+    mouseUpPos: MousePosition;
+    selectEndPos: MousePosition;
+};
+export type States = {
+    [key: string]: any;
+    unmemorable: StateUnmemorable;
+};
 export type Settings = {
     [key: string]: any;
     basic: SettingsBasic;
@@ -37,6 +47,7 @@ export interface IConfig {
     themeState: ThemeState;
     emojiPickerState: EmojiPickerState;
     contextMenuClickPosition: MousePosition;
+    states: States;
     settingsConfig: Settings;
 }
 /**
@@ -48,8 +59,9 @@ declare class ConfigStore {
     fileManagerState: boolean;
     emojiPickerState: EmojiPickerState;
     contextMenuClickPosition: MousePosition;
+    states: States;
     settingsConfig: Settings;
-    constructor({ themeState, fileManagerState, emojiPickerState, contextMenuClickPosition, settingsConfig, }: IConfig);
+    constructor({ themeState, fileManagerState, emojiPickerState, contextMenuClickPosition, states, settingsConfig, }: IConfig);
     /**
      * @description getAllConfig
      */

@@ -11,6 +11,16 @@ export type MousePosition = {
   posx: number
   posy: number
 }
+type StateUnmemorable = {
+  aiPanelState: Boolean
+  promptPanelState: Boolean
+  mouseUpPos: MousePosition
+  selectEndPos: MousePosition
+}
+export type States = {
+  [key: string]: any
+  unmemorable: StateUnmemorable
+}
 export type Settings = {
   [key: string]: any // 添加索引签名
   basic: SettingsBasic
@@ -40,6 +50,7 @@ export interface IConfig {
   themeState: ThemeState
   emojiPickerState: EmojiPickerState
   contextMenuClickPosition: MousePosition
+  states: States
   settingsConfig: Settings
 }
 // 对应用状态进行建模。
@@ -54,12 +65,14 @@ class ConfigStore {
   public fileManagerState: boolean
   public emojiPickerState: EmojiPickerState
   public contextMenuClickPosition: MousePosition
+  public states: States
   public settingsConfig: Settings
   constructor({
     themeState,
     fileManagerState,
     emojiPickerState,
     contextMenuClickPosition,
+    states,
     settingsConfig,
   }: IConfig) {
     makeAutoObservable(this, {
@@ -67,12 +80,14 @@ class ConfigStore {
       fileManagerState: observable,
       emojiPickerState: observable,
       contextMenuClickPosition: observable,
+      states: observable,
       settingsConfig: observable,
     })
     this.themeState = themeState
     this.fileManagerState = fileManagerState
     this.emojiPickerState = emojiPickerState
     this.contextMenuClickPosition = contextMenuClickPosition
+    this.states = states
     this.settingsConfig = settingsConfig
   }
   /**

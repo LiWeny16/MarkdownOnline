@@ -38,10 +38,6 @@ export default observer(function EmojiPicker(props: any) {
   }
   React.useEffect(() => {
     setShowState(props.open)
-    // if(isElementOverflow(document.querySelector("em-emoji-picker"))){
-    //   console.log("yes");
-    // }
-    // gsap.to(container.current, { x: 200 }) // <-- automatically reverted
     if (!props.open) {
       // 关闭
       gsap.to(".emojiPicker", {

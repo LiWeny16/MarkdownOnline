@@ -1,7 +1,6 @@
-import React from "react";
-import { BoxProps } from "@mui/material/Box";
+import React from 'react';
+import { BoxProps } from '@mui/material';
 interface ScrollableBoxProps extends BoxProps {
-    children: React.ReactNode;
 }
-declare function ScrollableBox({ children, sx, ...rest }: ScrollableBoxProps): import("react/jsx-runtime").JSX.Element;
+declare const ScrollableBox: React.ForwardRefExoticComponent<Omit<ScrollableBoxProps, "ref"> & React.RefAttributes<HTMLDivElement>>;
 export default ScrollableBox;

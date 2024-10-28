@@ -50,21 +50,44 @@ export function getContextMenuClickPosition() {
 /**
  * @description 更新设置,合并设置，存储到localStorage
  */
+export function changeStates(newStates) {
+    const currentStates = getStates();
+    const updatedStates = updateStatesConfig(currentStates, newStates);
+    useConfig().states = updatedStates;
+    opLocalStorage.setItem("states", JSON.stringify(updatedStates));
+}
+/**
+ * @description 读取设置
+ */
+export function getStates() {
+    return toJS(useConfig().states);
+}
 export function changeSettings(newSettings) {
     const currentSettings = getSettings();
     const updatedSettings = updateSettingsConfig(currentSettings, newSettings);
     useConfig().settingsConfig = updatedSettings;
     opLocalStorage.setItem("settingsConfig", JSON.stringify(updatedSettings));
 }
-/**
- * @description 读取设置
- */
 export function getSettings() {
     return toJS(useConfig().settingsConfig);
 }
 /**
  * @description 合并新设置和旧设置
  */
+function updateStatesConfig(currentStates, newSettings) {
+    // 遍历新设置的每个键
+    for (const key in newSettings) {
+        if (key in currentStates) {
+            // 如果键存在于当前设置中，则更新子对象
+            Object.assign(currentStates[key], newSettings[key]);
+        }
+        else {
+            // 如果键不存在，则将新键添加到当前设置
+            currentStates[key] = newSettings[key];
+        }
+    }
+    return currentStates;
+}
 function updateSettingsConfig(currentSettings, newSettings) {
     // 遍历新设置的每个键
     for (const key in newSettings) {
