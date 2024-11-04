@@ -122,21 +122,18 @@ export default observer(function AIPromptPanel(props: any) {
     // 检查是否按下了 Ctrl 键和 Enter 键
     if (event.ctrlKey && event.key === "Enter") {
       // 执行你需要的操作，例如提交表单或发送请求
-      // console.log("Ctrl+Enter 被按下")
       handleSend()
       inputQsRef.current!.value = ""
-      // 例如，调用一个提交函数
-      // handleSubmit();
     }
   }
   const handleSend = () => {
-    setAnswerBoxState(true)
     const inputValue = inputQsRef.current!.value
-    // if (inputValue.trim() === '') return;
-    // onSend(inputValue);
+
+    if (!inputValue) return
+    setAnswerBoxState(true)
     setAiResponse("") // 重置 AI 回复
     setIsLoading(true)
-
+    setIsEnd(false)
     bigModel.askAI(
       inputValue,
       (messageChunk) => {
@@ -268,7 +265,7 @@ export default observer(function AIPromptPanel(props: any) {
           />
           <Tooltip title="接受AI并插入编辑器">
             <IconButtonSq
-              disabled={isLoading || !isEnd ? true : false}
+              disabled={isEnd ? false : true}
               color="primary"
               onClick={handleInsertAIResponse}
               sx={{

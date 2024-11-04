@@ -99,20 +99,18 @@ export default observer(function AIPromptPanel(props) {
         // 检查是否按下了 Ctrl 键和 Enter 键
         if (event.ctrlKey && event.key === "Enter") {
             // 执行你需要的操作，例如提交表单或发送请求
-            // console.log("Ctrl+Enter 被按下")
             handleSend();
             inputQsRef.current.value = "";
-            // 例如，调用一个提交函数
-            // handleSubmit();
         }
     };
     const handleSend = () => {
-        setAnswerBoxState(true);
         const inputValue = inputQsRef.current.value;
-        // if (inputValue.trim() === '') return;
-        // onSend(inputValue);
+        if (!inputValue)
+            return;
+        setAnswerBoxState(true);
         setAiResponse(""); // 重置 AI 回复
         setIsLoading(true);
+        setIsEnd(false);
         bigModel.askAI(inputValue, (messageChunk) => {
             if (aiResponseRef.current) {
                 aiResponseRef.current.scrollTo(0, 10000);
@@ -158,7 +156,7 @@ export default observer(function AIPromptPanel(props) {
                                     padding: "0px 20px",
                                     fontWeight: "700",
                                     borderRadius: "25px ",
-                                }, children: [_jsx(ChatIcon, {}), "Ask AI"] }) }), _jsx(InputBase, { multiline: true, disabled: true, fullWidth: true, sx: { ml: 1, flex: 1 }, maxRows: 5, autoFocus: true, placeholder: "Press Ctrl + Enter To Send", inputProps: { "aria-label": "search google maps" } }), _jsx(Tooltip, { title: "\u63A5\u53D7AI\u5E76\u63D2\u5165\u7F16\u8F91\u5668", children: _jsx(IconButtonSq, { disabled: isLoading || !isEnd ? true : false, color: "primary", onClick: handleInsertAIResponse, sx: {
+                                }, children: [_jsx(ChatIcon, {}), "Ask AI"] }) }), _jsx(InputBase, { multiline: true, disabled: true, fullWidth: true, sx: { ml: 1, flex: 1 }, maxRows: 5, autoFocus: true, placeholder: "Press Ctrl + Enter To Send", inputProps: { "aria-label": "search google maps" } }), _jsx(Tooltip, { title: "\u63A5\u53D7AI\u5E76\u63D2\u5165\u7F16\u8F91\u5668", children: _jsx(IconButtonSq, { disabled: isEnd ? false : true, color: "primary", onClick: handleInsertAIResponse, sx: {
                                     padding: "0px 20px",
                                     fontWeight: "700",
                                     borderRadius: "25px",

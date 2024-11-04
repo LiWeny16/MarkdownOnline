@@ -12,6 +12,8 @@ export type MousePosition = {
   posy: number
 }
 type StateUnmemorable = {
+  loading:boolean
+  previewMode:Boolean
   aiPanelState: Boolean
   promptPanelState: Boolean
   mouseUpPos: MousePosition

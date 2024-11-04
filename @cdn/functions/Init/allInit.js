@@ -21,9 +21,11 @@ import { codePlugin } from "@Func/Parser/mdItPlugin/code";
 import { cluePlugin, customAlignPlugin, customAlignPluginHeading, } from "@Func/Parser/mdItPlugin/clueParser";
 import preViewClickEvent from "@Func/Events/click/preClick";
 import markdownItLatex from "@Func/Parser/mdItPlugin/latex";
-import { getSettings } from "@App/config/change";
+import { changeStates, getSettings } from "@App/config/change";
 import noteUseArco from "@App/message/note";
 import { mergeObjects } from "@App/basic/basic";
+import importFilePlugin from "@Func/Parser/mdItPlugin/file";
+// import { excelParser } from "@App/fileSystem/excel"
 /**
  * @description markdownParser init plugin && settings
  */
@@ -57,6 +59,7 @@ export function markdownParser() {
         .use(markdownItEmoji)
         .use(markdownItTaskLists)
         .use(markdownItLatex)
+        .use(importFilePlugin)
         .use(window.markdownitIncrementalDOM);
     // if (window.katex) {
     // markdownItParser.use(markdownItLatex)
@@ -126,7 +129,7 @@ export function waitForVariable(variableName, callback, interval = 100) {
  * @description 初始化配置和事件初始化
  * @returns {void}
  */
-export default function allInit(editor = window.editor, monaco = window.monaco, handleCloseLoading) {
+export default function allInit(editor = window.editor, monaco = window.monaco) {
     /**@description Third Party Settings Init*/
     const settings = new settingsClass();
     settings.settingsAllInit();
@@ -147,9 +150,8 @@ export default function allInit(editor = window.editor, monaco = window.monaco, 
          * @description 这之后全部 md都解析完成到 html
          */
         await mdConverter(false);
-        if (handleCloseLoading) {
-            handleCloseLoading();
-        }
+        // await excelParser()
+        changeStates({ unmemorable: { loading: false } });
         await kit.sleep(110);
         noteUseArco("已更新到最新版本", "当前版本:v3.0.0");
         await kit.sleep(680);
@@ -179,6 +181,8 @@ const defaultConfig = {
     contextMenuClickPosition: { posx: 20, posy: 20 },
     states: {
         unmemorable: {
+            loading: true,
+            previewMode: false,
             aiPanelState: false,
             promptPanelState: false,
             mouseUpPos: { posx: 0, posy: 0 },

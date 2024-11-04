@@ -58,16 +58,12 @@ export async function mdConverter(fully = false) {
    * @description 处理需要异步的信息
    * */
   let env = await prepareParser(view)
-  // console.log(markdownParser().renderer.rules)
-  // console.log(markdownParser().render(view, env))
   if (fully || !window.IncrementalDOM) {
     document.getElementById("view-area")!.innerHTML = markdownParser().render(
       view,
       env
     )
   } else {
-    // console.log(markdownParser().renderer.rules["math_block"])
-    // console.log(markdownParser().render(view, env))
     window.IncrementalDOM.patch(
       document.getElementById("view-area") as HTMLElement,
       // @ts-ignore

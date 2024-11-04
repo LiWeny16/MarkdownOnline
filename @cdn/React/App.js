@@ -7,8 +7,8 @@ import { observer } from "mobx-react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { green, blue } from "@mui/material/colors";
-import { getTheme } from "@App/config/change";
-import { Box } from "@mui/material";
+import { changeStates, getStates, getTheme } from "@App/config/change";
+import { Backdrop, Box, CircularProgress } from "@mui/material";
 import kit from "bigonion-kit";
 // import { getTextFB } from "@App/share/firebase"
 // console.log(getTextFB);
@@ -60,6 +60,12 @@ const App = observer(() => {
     }
     `);
     }, []);
-    return (_jsx(_Fragment, { children: _jsxs(ThemeProvider, { theme: getTheme() === "light" ? lightTheme : darkTheme, children: [_jsx(CssBaseline, {}), _jsxs(Box, { className: "FLEX COL App-top", children: [_jsx(Header, {}), _jsx(Body, {})] })] }) }));
+    const [loading, setLoading] = React.useState(true);
+    const handleCloseLoading = () => {
+        setLoading(false);
+    };
+    return (_jsx(_Fragment, { children: _jsxs(ThemeProvider, { theme: getTheme() === "light" ? lightTheme : darkTheme, children: [_jsx(CssBaseline, {}), _jsxs(Box, { className: "FLEX COL App-top", children: [_jsx(Header, {}), _jsx(Body, {}), _jsx(Backdrop, { sx: { color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }, open: getStates().unmemorable.loading, onClick: () => {
+                                changeStates({ unmemorable: { loading: false } });
+                            }, children: _jsx(CircularProgress, { color: "inherit" }) })] })] }) }));
 });
 export default App;

@@ -34,6 +34,8 @@ import markdownItLatex from "@Func/Parser/mdItPlugin/latex"
 import { changeStates, getSettings } from "@App/config/change"
 import noteUseArco from "@App/message/note"
 import { mergeObjects } from "@App/basic/basic"
+import importFilePlugin from "@Func/Parser/mdItPlugin/file"
+// import { excelParser } from "@App/fileSystem/excel"
 /**
  * @description markdownParser init plugin && settings
  */
@@ -67,6 +69,7 @@ export function markdownParser() {
     .use(markdownItEmoji)
     .use(markdownItTaskLists)
     .use(markdownItLatex)
+    .use(importFilePlugin)
     .use(window.markdownitIncrementalDOM)
 
   // if (window.katex) {
@@ -143,8 +146,7 @@ export function waitForVariable(
  */
 export default function allInit(
   editor: editor.IStandaloneCodeEditor = window.editor,
-  monaco: Monaco = window.monaco,
-  handleCloseLoading?: any
+  monaco: Monaco = window.monaco
 ): void {
   /**@description Third Party Settings Init*/
   const settings = new settingsClass()
@@ -169,9 +171,8 @@ export default function allInit(
      * @description 这之后全部 md都解析完成到 html
      */
     await mdConverter(false)
-    if (handleCloseLoading) {
-      handleCloseLoading()
-    }
+    // await excelParser()
+    changeStates({ unmemorable: { loading: false } })
     await kit.sleep(110)
     noteUseArco("已更新到最新版本", "当前版本:v3.0.0")
 
@@ -205,6 +206,8 @@ const defaultConfig: IConfig = {
   contextMenuClickPosition: { posx: 20, posy: 20 },
   states: {
     unmemorable: {
+      loading: true,
+      previewMode: false,
       aiPanelState: false,
       promptPanelState: false,
       mouseUpPos: { posx: 0, posy: 0 },

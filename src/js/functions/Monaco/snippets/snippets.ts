@@ -42,6 +42,7 @@ import {
 } from "@cdn-latex-map"
 import { type Position } from "monaco-editor/esm/vs/editor/editor.api"
 import { FileFolderManager } from "@App/fileSystem/file"
+import { getSettings } from "@App/config/change"
 export function monacoSnippets(
   editor: editor.IStandaloneCodeEditor,
   monaco: Monaco
@@ -86,7 +87,7 @@ export function monacoSnippets(
             label: "/image (图片)",
             detail: "插入图片",
             kind: monaco.languages.CompletionItemKind.Function,
-            insertText: `![\${1:}](\${2:})`,
+            insertText: `![${getSettings().advanced.imageSettings.basicStyle}\${1:}](\${2:})`,
             insertTextRules:
               monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             sortText: "1",

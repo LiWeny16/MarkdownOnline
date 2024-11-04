@@ -29,6 +29,7 @@ import { TreeItem2Provider } from "@mui/x-tree-view/TreeItem2Provider"
 import { TreeViewBaseItem } from "@mui/x-tree-view/models"
 import { mdConverter } from "@Root/js"
 import sortFileDirectoryArr from "@App/fileSystem/sort"
+import { changeStates, getSettings } from "@App/config/change"
 
 type FileType =
   | "image"
@@ -259,12 +260,19 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
     ) => {
       if (item.fileType === "file" && folderManager.fileState === 1) {
         try {
-          let content = await folderManager.readFileContent(
-            folderManager.getTopDirectoryHandle(),
-            item.path
-          )
-          fillText(content, item.label)
-          await mdConverter(false)
+          if (item.fileType && item.label.slice(-4) === ".png") {
+            changeStates({ unmemorable: { previewMode: true } })
+            let content = `![${getSettings().advanced.imageSettings.basicStyle}](./${item.path})`
+            fillText(content, item.label)
+          } else {
+            changeStates({ unmemorable: { previewMode: false } })
+            let content = await folderManager.readFileContent(
+              folderManager.getTopDirectoryHandle(),
+              item.path
+            )
+            fillText(content, item.label)
+            await mdConverter(false)
+          }
         } catch (error) {
           console.error("Error reading file content:", error)
         }
@@ -322,7 +330,7 @@ export default function FileExplorer(props: {
     <RichTreeView
       items={sortedFileDirectoryArr ?? ITEMS}
       aria-label="file explorer"
-      defaultExpandedItems={["1", "1.1"]}
+      // defaultExpandedItems={["1", "1.1"]}
       defaultSelectedItems="1.1"
       sx={{
         height: "100%",

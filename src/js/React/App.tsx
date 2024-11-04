@@ -7,8 +7,8 @@ import { observer } from "mobx-react"
 import { createTheme, ThemeOptions, ThemeProvider } from "@mui/material/styles"
 import CssBaseline from "@mui/material/CssBaseline"
 import { green, blue } from "@mui/material/colors"
-import { getTheme } from "@App/config/change"
-import { Box } from "@mui/material"
+import { changeStates, getStates, getTheme } from "@App/config/change"
+import { Backdrop, Box, CircularProgress } from "@mui/material"
 import kit from "bigonion-kit"
 // import { getTextFB } from "@App/share/firebase"
 // console.log(getTextFB);
@@ -61,6 +61,11 @@ const App: any = observer(() => {
     }
     `)
   }, [])
+  const [loading, setLoading] = React.useState(true)
+  const handleCloseLoading = () => {
+    setLoading(false)
+  }
+
   return (
     <>
       <ThemeProvider theme={getTheme() === "light" ? lightTheme : darkTheme}>
@@ -68,6 +73,15 @@ const App: any = observer(() => {
         <Box className="FLEX COL App-top">
           <Header />
           <Body />
+          <Backdrop
+            sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+            open={getStates().unmemorable.loading}
+            onClick={() => {
+              changeStates({ unmemorable: { loading: false } })
+            }}
+          >
+            <CircularProgress color="inherit" />
+          </Backdrop>
         </Box>
       </ThemeProvider>
     </>

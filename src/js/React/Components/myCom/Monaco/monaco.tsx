@@ -56,15 +56,12 @@ const files: any = {
 
 export default observer(function MonacoEditor() {
   const monacoEditorRef = React.useRef(null)
-  const [loading, setLoading] = React.useState(true)
-  const handleCloseLoading = () => {
-    setLoading(false)
-  }
+
 
   const [resizableWidth, setResizableWidth] = React.useState(640)
   const [resizableHeight, setResizableHeight] = React.useState(800)
   const handleResizeStop = () => {
-    mdConverter(true)
+    // mdConverter(true)
     setTimeout(() => {
       setEditorOptions((pre) => {
         return { ...pre, minimap: { enabled: true } }
@@ -159,7 +156,7 @@ export default observer(function MonacoEditor() {
       "React",
       "ReactDOM",
     ]).then(() => {
-      allInit(editor, monaco, handleCloseLoading)
+      allInit(editor, monaco)
       monacoInit(editor, monaco)
       monacoPasteEvent(editor, monaco)
       monacoKeyEvent(editor, monaco)
@@ -174,6 +171,7 @@ export default observer(function MonacoEditor() {
       // errIntellisense()
       // 动态改变编辑器高度
       monacoResizeHeightEvent(setResizableHeight)
+      
     })
   }
   return (
@@ -221,13 +219,7 @@ export default observer(function MonacoEditor() {
             beforeMount={handleBeforeMount}
           />
         </ResizableBox>
-        <Backdrop
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
-          open={loading}
-          onClick={handleCloseLoading}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
+        
         {/* <div style={{width:size.width}}>2323</div> */}
       </div>
       {/* </DraggableBox> */}

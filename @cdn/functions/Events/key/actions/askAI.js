@@ -4,7 +4,14 @@ export default function exeAskAI(editor, monaco) {
         changeStates({ unmemorable: { aiPanelState: false } });
     }
     else {
-        changeStates({ unmemorable: { selectEndPos: { posx: 350, posy: 299 } } });
+        changeStates({
+            unmemorable: {
+                selectEndPos: {
+                    posx: window.innerWidth / 4,
+                    posy: window.innerHeight / 2.6,
+                },
+            },
+        });
         changeStates({ unmemorable: { aiPanelState: true } });
     }
 }

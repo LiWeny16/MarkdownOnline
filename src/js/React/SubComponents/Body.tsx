@@ -59,6 +59,7 @@ export default observer(function Body() {
         <Suspense>
           <LazyPromptAIPanel open={getStates().unmemorable.aiPanelState} />
         </Suspense>
+        
       </div>
       {/* <CircularLoadingButton></CircularLoadingButton> */}
     </>

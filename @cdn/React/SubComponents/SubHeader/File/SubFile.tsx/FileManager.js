@@ -20,6 +20,7 @@ import { TreeItem2Icon } from "@mui/x-tree-view/TreeItem2Icon";
 import { TreeItem2Provider } from "@mui/x-tree-view/TreeItem2Provider";
 import { mdConverter } from "@Root/js";
 import sortFileDirectoryArr from "@App/fileSystem/sort";
+import { changeStates, getSettings } from "@App/config/change";
 const ITEMS = [
     {
         id: "1",
@@ -151,9 +152,17 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
     const handleClickFolderFile = async (_event) => {
         if (item.fileType === "file" && folderManager.fileState === 1) {
             try {
-                let content = await folderManager.readFileContent(folderManager.getTopDirectoryHandle(), item.path);
-                fillText(content, item.label);
-                await mdConverter(false);
+                if (item.fileType && item.label.slice(-4) === ".png") {
+                    changeStates({ unmemorable: { previewMode: true } });
+                    let content = `![${getSettings().advanced.imageSettings.basicStyle}](./${item.path})`;
+                    fillText(content, item.label);
+                }
+                else {
+                    changeStates({ unmemorable: { previewMode: false } });
+                    let content = await folderManager.readFileContent(folderManager.getTopDirectoryHandle(), item.path);
+                    fillText(content, item.label);
+                    await mdConverter(false);
+                }
             }
             catch (error) {
                 console.error("Error reading file content:", error);
@@ -180,7 +189,9 @@ export default function FileExplorer(props) {
     let sortedFileDirectoryArr = sortFileDirectoryArr(props.fileDirectoryArr);
     // 使用函数来传递 folderManager 到 CustomTreeItem
     const WrappedCustomTreeItem = (itemProps) => (_jsx(CustomTreeItem, { ...itemProps, fillText: props.fillText, folderManager: props.folderManager }));
-    return (_jsx(RichTreeView, { items: sortedFileDirectoryArr ?? ITEMS, "aria-label": "file explorer", defaultExpandedItems: ["1", "1.1"], defaultSelectedItems: "1.1", sx: {
+    return (_jsx(RichTreeView, { items: sortedFileDirectoryArr ?? ITEMS, "aria-label": "file explorer", 
+        // defaultExpandedItems={["1", "1.1"]}
+        defaultSelectedItems: "1.1", sx: {
             height: "100%",
             flexGrow: 1,
             userSelect: "none",

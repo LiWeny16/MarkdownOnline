@@ -6,9 +6,13 @@ import {
   readMemoryImg,
 } from "@App/memory/memory"
 import { FileFolderManager, FileManager } from "./fileSystem/file"
-import { getSettings } from "./config/change"
+import { getSettings, getStates } from "./config/change"
 import alertUseArco from "./message/alert"
 export default async function save(editor = null, message = true) {
+  if(getStates().unmemorable.previewMode){
+    alertUseArco("预览模式你保存个屁，开另一个文件！", 2500, { kind: "error" })
+    return 
+  }
   let text = getMdTextFromMonaco()
   let infoMsg = ""
   if (message && text != "null") {

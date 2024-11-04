@@ -1,4 +1,4 @@
-import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+import { jsx as _jsx, Fragment as _Fragment } from "react/jsx-runtime";
 import React, { useState } from "react";
 import Editor, { loader } from "@monaco-editor/react";
 // import DraggableBox from "@Com/myCom/DragBox"
@@ -16,7 +16,6 @@ import { observer } from "mobx-react";
 import monacoKeyEvent from "@Func/Events/key/monacoKey";
 import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
-import { mdConverter } from "@Root/js";
 // import DragHandleIcon from "@mui/icons-material/DragHandle"
 import { monacoSnippets } from "@Func/Monaco/snippets/snippets";
 import monacoFormat from "@Func/Monaco/format/format";
@@ -26,7 +25,6 @@ import monacoMouseEvent from "@Func/Events/mouse/monacoMouse";
 import monacoClickEvent from "@Func/Events/click/monacoClick";
 import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight";
 import monacoScrollEvent from "@Func/Events/scroll/monacoScroll";
-import { Backdrop, CircularProgress } from "@mui/material";
 import { pollVariables } from "@App/basic/basic";
 const version = "0.45.0";
 loader.config({
@@ -53,14 +51,10 @@ const files = {
 };
 export default observer(function MonacoEditor() {
     const monacoEditorRef = React.useRef(null);
-    const [loading, setLoading] = React.useState(true);
-    const handleCloseLoading = () => {
-        setLoading(false);
-    };
     const [resizableWidth, setResizableWidth] = React.useState(640);
     const [resizableHeight, setResizableHeight] = React.useState(800);
     const handleResizeStop = () => {
-        mdConverter(true);
+        // mdConverter(true)
         setTimeout(() => {
             setEditorOptions((pre) => {
                 return { ...pre, minimap: { enabled: true } };
@@ -150,7 +144,7 @@ export default observer(function MonacoEditor() {
             "React",
             "ReactDOM",
         ]).then(() => {
-            allInit(editor, monaco, handleCloseLoading);
+            allInit(editor, monaco);
             monacoInit(editor, monaco);
             monacoPasteEvent(editor, monaco);
             monacoKeyEvent(editor, monaco);
@@ -167,20 +161,20 @@ export default observer(function MonacoEditor() {
             monacoResizeHeightEvent(setResizableHeight);
         });
     }
-    return (_jsx(_Fragment, { children: _jsxs("div", { ref: monacoEditorRef, id: "monaco-editor", style: { width: resizableWidth, height: "100%" }, children: [_jsx(ResizableBox, { className: "custom-resizable", width: resizableWidth, height: resizableHeight, draggableOpts: { grid: [5, 15] }, minConstraints: [100, resizableHeight], onResizeStop: handleResizeStop, onResize: (e) => {
-                        setEditorOptions((pre) => {
-                            // pre.minimap=false
-                            return { ...pre, minimap: { enabled: false } };
-                        });
-                        // if (e.x > document.getElementById("editor")!.clientWidth * 0.3) {
-                        // @ts-ignore
-                        setResizableWidth(e.x);
-                        // }
-                        // @ts-ignore
-                    }, 
-                    // resizeHandles={(e)=>{}}
-                    // maxConstraints={[1000, 1800]}
-                    axis: "x", children: _jsx(Editor, { className: "monaco-editor-inner", height: "100%", width: resizableWidth, theme: getTheme() === "light" ? "vs-light" : "vs-dark", path: file.name, 
-                        // language="markdown"
-                        defaultLanguage: file.language, defaultValue: file.value, onMount: handleEditorDidMount, onChange: handleOnChange, options: editorOptions, beforeMount: handleBeforeMount }) }), _jsx(Backdrop, { sx: { color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }, open: loading, onClick: handleCloseLoading, children: _jsx(CircularProgress, { color: "inherit" }) })] }) }));
+    return (_jsx(_Fragment, { children: _jsx("div", { ref: monacoEditorRef, id: "monaco-editor", style: { width: resizableWidth, height: "100%" }, children: _jsx(ResizableBox, { className: "custom-resizable", width: resizableWidth, height: resizableHeight, draggableOpts: { grid: [5, 15] }, minConstraints: [100, resizableHeight], onResizeStop: handleResizeStop, onResize: (e) => {
+                    setEditorOptions((pre) => {
+                        // pre.minimap=false
+                        return { ...pre, minimap: { enabled: false } };
+                    });
+                    // if (e.x > document.getElementById("editor")!.clientWidth * 0.3) {
+                    // @ts-ignore
+                    setResizableWidth(e.x);
+                    // }
+                    // @ts-ignore
+                }, 
+                // resizeHandles={(e)=>{}}
+                // maxConstraints={[1000, 1800]}
+                axis: "x", children: _jsx(Editor, { className: "monaco-editor-inner", height: "100%", width: resizableWidth, theme: getTheme() === "light" ? "vs-light" : "vs-dark", path: file.name, 
+                    // language="markdown"
+                    defaultLanguage: file.language, defaultValue: file.value, onMount: handleEditorDidMount, onChange: handleOnChange, options: editorOptions, beforeMount: handleBeforeMount }) }) }) }));
 });
