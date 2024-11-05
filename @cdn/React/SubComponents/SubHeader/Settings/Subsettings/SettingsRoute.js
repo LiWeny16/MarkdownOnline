@@ -4,22 +4,18 @@ import Collapse from "@mui/material/Collapse";
 import { SimpleTreeView } from "@mui/x-tree-view/SimpleTreeView";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { TreeItem, treeItemClasses, } from "@mui/x-tree-view/TreeItem";
-// import { useSpring, animated } from "@react-spring/web"
-// import AddBoxIcon from "@mui/icons-material/AddBox"
-// import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox"
 import ContrastIcon from "@mui/icons-material/Contrast";
 import EditIcon from "@mui/icons-material/Edit";
 import MicIcon from "@mui/icons-material/Mic";
 import { styled, alpha } from "@mui/material/styles";
 import { Box } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image";
+import GTranslateIcon from "@mui/icons-material/GTranslate";
+import { useTranslation } from "react-i18next";
 function TransitionComponent(props) {
     return (
     // 这里太大了，不用了！
-    // <animated.div style={style}>
-    _jsx(Collapse, { ...props })
-    // </animated.div>
-    );
+    _jsx(Collapse, { ...props }));
 }
 const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
     color: theme.palette.mode === "light"
@@ -47,6 +43,8 @@ const CustomTreeItem = React.forwardRef((props, ref) => (
 // @ts-ignore
 _jsx(StyledTreeItem, { ...props, slots: { groupTransition: TransitionComponent, ...props.slots }, ref: ref })));
 export default function SettingsRoute() {
+    // 在组件中使用 useTranslation 钩子
+    const { t } = useTranslation();
     function linkToView(id) {
         let targetElement = document.getElementById(id);
         targetElement.scrollIntoView();
@@ -58,41 +56,41 @@ export default function SettingsRoute() {
                 overflowX: "hidden",
                 borderRight: "solid rgba(0, 0, 0, 0.12)",
             }, children: _jsxs(SimpleTreeView, { "aria-label": "customized", defaultExpandedItems: ["1_x", "2_x"], slots: {
-                    // expandIcon: AddBoxIcon,
-                    // collapseIcon: IndeterminateCheckBoxIcon,
                     endIcon: SettingsIcon,
                 }, sx: {
                     userSelect: "none",
                     minHeight: 270,
                     maxWidth: 300,
                 }, children: [_jsxs(CustomTreeItem, { slots: {
-                            // expandIcon: AddBoxIcon,
-                            // collapseIcon: IndeterminateCheckBoxIcon,
                             endIcon: EditIcon,
                         }, onClick: () => {
                             linkToView("settings_1_x");
-                        }, itemId: "1_x", label: "\u57FA\u7840\u8BBE\u7F6E", children: [_jsx(CustomTreeItem, { slots: {
+                        }, itemId: "1_x", label: t("t-basic-settings"), children: [_jsx(CustomTreeItem, { slots: {
                                     endIcon: ContrastIcon,
                                 }, onClick: () => {
                                     linkToView("settings_1_1");
-                                }, itemId: "1_1", label: "\u4E3B\u9898\u8BBE\u7F6E" }), _jsx(CustomTreeItem, { slots: {
-                                    endIcon: EditIcon,
+                                }, itemId: "1_1", label: t("t-theme-settings") }), _jsx(CustomTreeItem, { slots: {
+                                    endIcon: GTranslateIcon,
                                 }, onClick: () => {
                                     linkToView("settings_1_2");
-                                }, itemId: "1_2", label: "\u7F16\u8F91\u5668\u8BBE\u7F6E" }), _jsx(CustomTreeItem, { slots: {
+                                }, itemId: "1_2", label: t("t-language-settings") }), _jsx(CustomTreeItem, { slots: {
+                                    endIcon: EditIcon,
+                                }, onClick: () => {
+                                    linkToView("settings_1_3");
+                                }, itemId: "1_3", label: t("t-editor-settings") }), _jsx(CustomTreeItem, { slots: {
                                     endIcon: MicIcon,
                                 }, onClick: () => {
-                                    let targetElement = document.getElementById("settings_1_3");
+                                    let targetElement = document.getElementById("settings_1_4");
                                     targetElement.scrollIntoView();
-                                }, itemId: "1_3", label: "\u8BED\u97F3\u8F6C\u6587\u5B57" })] }), _jsxs(CustomTreeItem, { onClick: () => {
+                                }, itemId: "1_4", label: t("t-speech-to-text") })] }), _jsxs(CustomTreeItem, { onClick: () => {
                             linkToView("settings_2_x");
-                        }, itemId: "2_x", label: "\u9AD8\u7EA7\u8BBE\u7F6E", children: [_jsx(CustomTreeItem, { onClick: () => {
+                        }, itemId: "2_x", label: t("t-advanced-settings"), children: [_jsx(CustomTreeItem, { onClick: () => {
                                     linkToView("settings_2_1");
-                                }, itemId: "2_1", label: "\u5BFC\u51FA\u8BBE\u7F6E" }), _jsx(CustomTreeItem, { onClick: () => {
+                                }, itemId: "2_1", label: t("t-export-settings") }), _jsx(CustomTreeItem, { onClick: () => {
                                     linkToView("settings_2_2");
-                                }, itemId: "2_2", label: "Mermaid\u8BBE\u7F6E" }), _jsx(CustomTreeItem, { slots: {
+                                }, itemId: "2_2", label: t("t-mermaid-settings") }), _jsx(CustomTreeItem, { slots: {
                                     endIcon: ImageIcon,
                                 }, onClick: () => {
                                     linkToView("settings_2_3");
-                                }, itemId: "2_3", label: "\u56FE\u7247\u8BBE\u7F6E" })] })] }) }) }));
+                                }, itemId: "2_3", label: t("t-image-settings") })] })] }) }) }));
 }

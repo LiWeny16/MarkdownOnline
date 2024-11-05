@@ -29,7 +29,9 @@ import { Box, Divider, ThemeProvider } from "@mui/material"
 import IconBreadcrumbs from "./Subsettings/SettingsBread"
 import SettingsBody from "./Subsettings/SettingsBody"
 import { getTheme } from "@App/config/change"
+import { useTranslation } from "react-i18next"
 export default function Settings(props: any) {
+  const { t } = useTranslation()
   const palette = useTheme().palette
   const theme = getTheme()
   let mailOptionsRef = React.useRef<any>()
@@ -86,7 +88,8 @@ export default function Settings(props: any) {
         </Box>
       </Dialog>
       <SettingsIcon />
-      设置
+      {/* // 设置 / Settings */}
+      {t("t-settings")}
     </>
   )
 }

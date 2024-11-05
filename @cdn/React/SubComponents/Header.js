@@ -33,6 +33,7 @@ import { useTheme } from "@mui/material";
 import FileDrawer from "./SubHeader/File/File";
 import alertUseArco from "@App/message/alert";
 import { Suspense } from "react";
+import { useTranslation } from "react-i18next";
 const LazyMenu = React.lazy(() => import("./SubHeader/Menu"));
 const runTo = (url, delay) => {
     kit.sleep(delay).then(() => {
@@ -45,6 +46,7 @@ const handleHomeClick = () => {
 const boxShadow = "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12);";
 const drawerWidth = 240;
 const DrawerAppBar = observer((props) => {
+    const { t } = useTranslation();
     const theme = useTheme();
     const { window } = props;
     // const image = useImage()
@@ -89,9 +91,9 @@ const DrawerAppBar = observer((props) => {
                                     fontFamily: "emoji",
                                     letterSpacing: ".3rem",
                                     textDecoration: "none",
-                                }, children: _jsx("h2", { style: { fontSize: "28px" }, children: "Markdown+ Online View" }) }), _jsxs(Box, { sx: { display: { xs: "none", sm: "flex", flexDirection: "row" } }, children: [_jsx(MyButton, { href: "https://bigonion.cn", startIcon: _jsx(LinkIcon, {}), children: "\u9996\u9875" }), _jsx(MyButton, { onClick: () => {
+                                }, children: _jsx("h2", { style: { fontSize: "28px" }, children: "Markdown+ Online View" }) }), _jsxs(Box, { sx: { display: { xs: "none", sm: "flex", flexDirection: "row" } }, children: [_jsx(MyButton, { href: "https://bigonion.cn", startIcon: _jsx(LinkIcon, {}), children: t("t-home") }), _jsx(MyButton, { onClick: () => {
                                             enObj.enAboutBox ? aboutBox() : undefined;
-                                        }, startIcon: _jsx(HelpOutlineIcon, {}), children: "\u5173\u4E8E" }), _jsx(Suspense, { fallback: _jsx(MyButton, { open: open, endIcon: _jsx(MoreVertIcon, {}), children: "更多" }), children: _jsx(LazyMenu, {}) }), _jsx(ImageManger, {}), _jsx(FileDrawer, {})] })] }) }), _jsx(Box, { sx: { display: { xs: "flex", sm: "none" } }, component: "nav", children: _jsx(Drawer, { container: container, variant: "temporary", open: mobileOpen, onClose: handleDrawerToggle, ModalProps: {
+                                        }, startIcon: _jsx(HelpOutlineIcon, {}), children: t("t-about") }), _jsx(Suspense, { fallback: _jsx(MyButton, { open: open, endIcon: _jsx(MoreVertIcon, {}), children: t("t-more") }), children: _jsx(LazyMenu, {}) }), _jsx(ImageManger, {}), _jsx(FileDrawer, {})] })] }) }), _jsx(Box, { sx: { display: { xs: "flex", sm: "none" } }, component: "nav", children: _jsx(Drawer, { container: container, variant: "temporary", open: mobileOpen, onClose: handleDrawerToggle, ModalProps: {
                             keepMounted: true, // Better open performance on mobile.
                         }, sx: {
                             display: { xs: "block", sm: "none" },

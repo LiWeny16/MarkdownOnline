@@ -25,7 +25,9 @@ import { Box, Divider } from "@mui/material";
 import IconBreadcrumbs from "./Subsettings/SettingsBread";
 import SettingsBody from "./Subsettings/SettingsBody";
 import { getTheme } from "@App/config/change";
+import { useTranslation } from "react-i18next";
 export default function Settings(props) {
+    const { t } = useTranslation();
     const palette = useTheme().palette;
     const theme = getTheme();
     let mailOptionsRef = React.useRef();
@@ -58,5 +60,5 @@ export default function Settings(props) {
                                 // background: "#ffffff",
                                 // boxShadow: theme === "light" ? "20px 20px 60px #d9d9d9,-20px -20px 60px #ffffff": "" ,
                                 borderRadius: "5px",
-                            }, children: [_jsx(SettingsRoute, {}), _jsx(SettingsBody, {})] })] }) }), _jsx(SettingsIcon, {}), "\u8BBE\u7F6E"] }));
+                            }, children: [_jsx(SettingsRoute, {}), _jsx(SettingsBody, {})] })] }) }), _jsx(SettingsIcon, {}), t("t-settings")] }));
 }

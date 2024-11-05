@@ -18,8 +18,10 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
 import myPrint from "@App/export/myPrint";
 import FolderOpenOutlinedIcon from "@mui/icons-material/Folder";
 import { changeFileManagerState } from "@App/config/change";
+import { useTranslation } from "react-i18next";
 // import domtoimg from "@App/export/domToImg"
 const CustomizedMenus = observer(() => {
+    const { t } = useTranslation();
     const image = useImage();
     // 1本menu anchor
     const [anchorEl, setAnchorEl] = React.useState(null);
@@ -99,11 +101,10 @@ const CustomizedMenus = observer(() => {
                                     myPrint();
                                 }, children: "\u662F\u561F" }), _jsx(Button, { onClick: () => {
                                     setModalState(false);
-                                }, autoFocus: true, children: "\u8FBE\u54A9" })] })] }), _jsx(MyButton, { open: open, endIcon: _jsx(MoreVertIcon, {}), onClick: handleClick, children: "更多" }), _jsxs(StyledMenu, { id: "demo-customized-menu", MenuListProps: {
+                                }, autoFocus: true, children: "\u8FBE\u54A9" })] })] }), _jsx(MyButton, { open: open, endIcon: _jsx(MoreVertIcon, {}), onClick: handleClick, children: t("t-more") }), _jsxs(StyledMenu, { id: "demo-customized-menu", MenuListProps: {
                     "aria-labelledby": "demo-customized-button",
-                }, elevation: 24, anchorEl: anchorEl, open: open, onClose: handleCloseMenu, children: [_jsxs(MenuItem, { onClick: handleImageManager, disableRipple: true, children: [_jsx(EditIcon, {}), "\u56FE\u7247\u7BA1\u7406\u5668(\u6D4F\u89C8\u5668)"] }), _jsxs(MenuItem, { onClick: handleFileManager, disableRipple: true, children: [_jsx(FolderOpenOutlinedIcon, {}), "\u6587\u4EF6\u7BA1\u7406\u5668\u2728"] }), _jsx(MenuItem, { onClick: (e) => {
+                }, elevation: 24, anchorEl: anchorEl, open: open, onClose: handleCloseMenu, children: [_jsxs(MenuItem, { onClick: handleImageManager, disableRipple: true, children: [_jsx(EditIcon, {}), t("t-image-manager")] }), _jsxs(MenuItem, { onClick: handleFileManager, disableRipple: true, children: [_jsx(FolderOpenOutlinedIcon, {}), t("t-file-manager")] }), _jsx(MenuItem, { onClick: (e) => {
                             handleClick3(e);
-                            // handleCloseMenu()s
                         }, disableRipple: true, children: _jsx(Export, { anchorEl: anchorEl3, open: open3, closeMenu: handleCloseMenu, closeExportMenu: handleCloseExport }) }), _jsx(Divider, { sx: { my: 0.5 } }), _jsx(MenuItem, { onClick: (e) => {
                             handleClick2(e);
                             // handleCloseMenu()
@@ -113,6 +114,6 @@ const CustomizedMenus = observer(() => {
                             handleClick4(e);
                         }, disableRipple: true, children: _jsx(Settings, { closeAll: handleCloseMenu, anchorEl: anchorEl4, open: open4, onClick: handleCloseSettings }) }), _jsxs(MenuItem, { onClick: () => {
                             handleCloseMenu();
-                        }, disableRipple: true, children: [_jsx(MoreHorizIcon, {}), "\u66F4\u591A(\u656C\u8BF7\u671F\u5F85)\u00A0\u00A0"] })] })] }));
+                        }, disableRipple: true, children: [_jsx(MoreHorizIcon, {}), t("t-more-coming-soon")] })] })] }));
 });
 export default CustomizedMenus;

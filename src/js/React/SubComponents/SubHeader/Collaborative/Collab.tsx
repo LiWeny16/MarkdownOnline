@@ -5,8 +5,10 @@ import Dialog from "@mui/material/Dialog"
 import { useTheme } from "@mui/material/styles"
 import { Box, Divider } from "@mui/material"
 import { getTheme } from "@App/config/change"
+import { useTranslation } from "react-i18next"
 
 export default function Settings(props: any) {
+  const { t } = useTranslation()
   const palette = useTheme().palette
   const theme = getTheme()
   let [mailSharePanelState, setMailSharePanelState] = React.useState(false)
@@ -55,7 +57,8 @@ export default function Settings(props: any) {
         </Box>
       </Dialog>
       <ScreenShareIcon />
-      协同办公(开发中)
+      {/*  // 协同办公 (开发中) / Collaborative Office (In Development) */}
+      {t("t-collaborative-office")}
     </>
   )
 }

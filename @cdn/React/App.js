@@ -1,7 +1,6 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import React from "react";
 import Header from "./SubComponents/Header";
-// Import the functions you need from the SDKs you need
 import Body from "./SubComponents/Body";
 import { observer } from "mobx-react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -9,9 +8,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import { green, blue } from "@mui/material/colors";
 import { changeStates, getStates, getTheme } from "@App/config/change";
 import { Backdrop, Box, CircularProgress } from "@mui/material";
-import kit from "bigonion-kit";
-// import { getTextFB } from "@App/share/firebase"
-// console.log(getTextFB);
+import { aheadInit } from "@Func/Init/aheadInit";
 const bothStyle = {
     zIndex: { drawer: 1300, modal: 1200, appBar: 1200 },
 };
@@ -53,17 +50,8 @@ const darkTheme = createTheme({
 });
 const App = observer(() => {
     React.useEffect(() => {
-        kit.addStyle(`
-    ::selection {
-      border-radius: 5px;
-      background-color: ${getTheme() === "light" ? "#add6ff" : "#636363"};
-    }
-    `);
+        aheadInit();
     }, []);
-    const [loading, setLoading] = React.useState(true);
-    const handleCloseLoading = () => {
-        setLoading(false);
-    };
     return (_jsx(_Fragment, { children: _jsxs(ThemeProvider, { theme: getTheme() === "light" ? lightTheme : darkTheme, children: [_jsx(CssBaseline, {}), _jsxs(Box, { className: "FLEX COL App-top", children: [_jsx(Header, {}), _jsx(Body, {}), _jsx(Backdrop, { sx: { color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }, open: getStates().unmemorable.loading, onClick: () => {
                                 changeStates({ unmemorable: { loading: false } });
                             }, children: _jsx(CircularProgress, { color: "inherit" }) })] })] }) }));

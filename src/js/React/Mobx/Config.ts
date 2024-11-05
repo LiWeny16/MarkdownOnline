@@ -12,16 +12,23 @@ export type MousePosition = {
   posy: number
 }
 type StateUnmemorable = {
-  loading:boolean
-  previewMode:Boolean
+  loading: boolean
+  previewMode: Boolean
   aiPanelState: Boolean
   promptPanelState: Boolean
   mouseUpPos: MousePosition
   selectEndPos: MousePosition
 }
+type StateMemorable = {
+  languageChanged: Boolean
+}
 export type States = {
   [key: string]: any
   unmemorable: StateUnmemorable
+}
+export type MemorableStates = {
+  [key: string]: any
+  memorable: StateMemorable
 }
 export type Settings = {
   [key: string]: any // 添加索引签名
@@ -34,6 +41,7 @@ type SettingsBasic = {
   fileEditLocal: boolean
   fontSize: number
   editorAutoWrap: boolean
+  language: "zh" | "en"
 }
 type SettingsAd = {
   mermaidTheme: MermaidTheme
@@ -53,6 +61,7 @@ export interface IConfig {
   emojiPickerState: EmojiPickerState
   contextMenuClickPosition: MousePosition
   states: States
+  memorableStates: MemorableStates
   settingsConfig: Settings
 }
 // 对应用状态进行建模。
@@ -68,6 +77,7 @@ class ConfigStore {
   public emojiPickerState: EmojiPickerState
   public contextMenuClickPosition: MousePosition
   public states: States
+  public memorableStates: MemorableStates
   public settingsConfig: Settings
   constructor({
     themeState,
@@ -75,6 +85,7 @@ class ConfigStore {
     emojiPickerState,
     contextMenuClickPosition,
     states,
+    memorableStates,
     settingsConfig,
   }: IConfig) {
     makeAutoObservable(this, {
@@ -83,6 +94,7 @@ class ConfigStore {
       emojiPickerState: observable,
       contextMenuClickPosition: observable,
       states: observable,
+      memorableStates: observable,
       settingsConfig: observable,
     })
     this.themeState = themeState
@@ -90,6 +102,7 @@ class ConfigStore {
     this.emojiPickerState = emojiPickerState
     this.contextMenuClickPosition = contextMenuClickPosition
     this.states = states
+    this.memorableStates = memorableStates
     this.settingsConfig = settingsConfig
   }
   /**

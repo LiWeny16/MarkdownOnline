@@ -1,0 +1,65 @@
+declare const map: {
+    en: {
+        translation: {
+            "t-more": string;
+            "t-about": string;
+            "t-home": string;
+            "t-image-manager": string;
+            "t-file-manager": string;
+            "t-file-manager-open-file": string;
+            "t-file-manager-open-folder": string;
+            "t-file-manager-saveAs": string;
+            "t-file-manager-pinned": string;
+            "t-file-manager-syncLocal": string;
+            "t-export": string;
+            "t-share": string;
+            "t-collaborative-office": string;
+            "t-settings": string;
+            "t-more-coming-soon": string;
+            "t-export-pdf": string;
+            "t-export-image": string;
+            "t-export-markdown": string;
+            "t-basic-settings": string;
+            "t-theme-settings": string;
+            "t-language-settings": string;
+            "t-editor-settings": string;
+            "t-speech-to-text": string;
+            "t-advanced-settings": string;
+            "t-export-settings": string;
+            "t-mermaid-settings": string;
+            "t-image-settings": string;
+        };
+    };
+    zh: {
+        translation: {
+            "t-more": string;
+            "t-about": string;
+            "t-home": string;
+            "t-image-manager": string;
+            "t-file-manager": string;
+            "t-file-manager-open-file": string;
+            "t-file-manager-open-folder": string;
+            "t-file-manager-saveAs": string;
+            "t-file-manager-pinned": string;
+            "t-file-manager-syncLocal": string;
+            "t-export": string;
+            "t-share": string;
+            "t-collaborative-office": string;
+            "t-settings": string;
+            "t-more-coming-soon": string;
+            "t-export-pdf": string;
+            "t-export-image": string;
+            "t-export-markdown": string;
+            "t-basic-settings": string;
+            "t-theme-settings": string;
+            "t-language-settings": string;
+            "t-editor-settings": string;
+            "t-speech-to-text": string;
+            "t-advanced-settings": string;
+            "t-export-settings": string;
+            "t-mermaid-settings": string;
+            "t-image-settings": string;
+        };
+    };
+};
+export default map;

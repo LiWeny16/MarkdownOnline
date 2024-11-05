@@ -1,5 +1,6 @@
 import {
   changeSettings,
+  changeStatesMemorable,
   changeTheme,
   getSettings,
   getTheme,
@@ -30,8 +31,10 @@ import { mdConverter } from "@Root/js"
 import ShortcutExample from "@Root/js/React/Components/Mui/keyboard"
 import kit from "@cdn-kit"
 import { settings } from "firebase/analytics"
+import { useTranslation } from "react-i18next"
 
 export default observer(function SettingsBody() {
+  const { t, i18n } = useTranslation()
   const theme = getTheme()
   const muiTheme = useTheme()
   const settingsBodyContentBoxStyle = {
@@ -178,6 +181,13 @@ export default observer(function SettingsBody() {
       wordWrap: getSettings().basic.editorAutoWrap ? "on" : "off",
     })
   }
+  function handleOnChangeLanguage(e: any) {
+    let lang = e.target.value
+    i18n.changeLanguage(e.target.value)
+    document.documentElement.lang = e.target.value
+    changeStatesMemorable({ memorable: { languageChanged: true } })
+    changeSettings({ basic: { language: lang } })
+  }
   function handleOnChangeMermaidTheme(e: any) {
     changeSettings({
       advanced: { mermaidTheme: e.target.value },
@@ -236,8 +246,31 @@ export default observer(function SettingsBody() {
             onChange={handleOnChangeThemeSwitch}
           ></SwitchTheme>
         </Box>
+        <Box id="settings_1_2" sx={settingsBodyContentBoxStyle}>
+          <Typography
+            sx={{
+              fontSize: "0.89rem",
+              fontWeight: 500,
+            }}
+          >
+            Language
+          </Typography>
+          <Typography sx={ContentDescriptionTextStyle}>
+            更改编辑器的语言
+          </Typography>
+          <Select
+            value={getSettings().basic.language ?? "zh"}
+            defaultChecked={true}
+            size="small"
+            color="primary"
+            onChange={handleOnChangeLanguage}
+          >
+            <MenuItem value="zh">中文</MenuItem>
+            <MenuItem value="en">English</MenuItem>
+          </Select>
+        </Box>
         <SecondaryHeading
-          id="settings_1_2"
+          id="settings_1_3"
           content="编辑器设置"
         ></SecondaryHeading>
         <Box sx={settingsBodyContentBoxStyle} id="settings_1_2">
@@ -320,7 +353,7 @@ export default observer(function SettingsBody() {
             </Select>
           </Box>
         </Box>
-        <Box id="settings_1_3" sx={settingsBodyContentBoxStyle}>
+        <Box id="settings_1_4" sx={settingsBodyContentBoxStyle}>
           <Typography
             sx={{
               fontSize: "0.89rem",

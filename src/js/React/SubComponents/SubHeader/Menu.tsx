@@ -26,9 +26,11 @@ import { deleteDBAll } from "@App/db.js"
 import myPrint from "@App/export/myPrint"
 import FolderOpenOutlinedIcon from "@mui/icons-material/Folder"
 import { changeFileManagerState, getFileManagerState } from "@App/config/change"
+import { useTranslation } from "react-i18next"
 // import domtoimg from "@App/export/domToImg"
 
 const CustomizedMenus = observer(() => {
+  const { t } = useTranslation()
   const image = useImage()
   // 1本menu anchor
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -145,7 +147,7 @@ const CustomizedMenus = observer(() => {
         </DialogActions>
       </Dialog>
       <MyButton open={open} endIcon={<MoreVertIcon />} onClick={handleClick}>
-        {"更多"}
+        {t("t-more")}
       </MyButton>
 
       <StyledMenu
@@ -160,16 +162,17 @@ const CustomizedMenus = observer(() => {
       >
         <MenuItem onClick={handleImageManager} disableRipple>
           <EditIcon />
-          图片管理器(浏览器)
+          {/* // 图片管理器 (浏览器) / Image Manager (Browser) */}
+          {t("t-image-manager")} 
         </MenuItem>
         <MenuItem onClick={handleFileManager} disableRipple>
           <FolderOpenOutlinedIcon />
-          文件管理器✨
+          {/* // 文件管理器 / File Manager */}
+          {t("t-file-manager")} 
         </MenuItem>
         <MenuItem
           onClick={(e) => {
             handleClick3(e)
-            // handleCloseMenu()s
           }}
           disableRipple
         >
@@ -230,7 +233,8 @@ const CustomizedMenus = observer(() => {
           disableRipple
         >
           <MoreHorizIcon />
-          更多(敬请期待)&nbsp;&nbsp;
+          {/* // 更多 (敬请期待) / More (Coming Soon) */}
+          {t("t-more-coming-soon")} 
         </MenuItem>
       </StyledMenu>
     </div>

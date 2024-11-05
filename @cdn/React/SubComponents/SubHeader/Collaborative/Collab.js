@@ -5,7 +5,9 @@ import Dialog from "@mui/material/Dialog";
 import { useTheme } from "@mui/material/styles";
 import { Box, Divider } from "@mui/material";
 import { getTheme } from "@App/config/change";
+import { useTranslation } from "react-i18next";
 export default function Settings(props) {
+    const { t } = useTranslation();
     const palette = useTheme().palette;
     const theme = getTheme();
     let [mailSharePanelState, setMailSharePanelState] = React.useState(false);
@@ -34,5 +36,5 @@ export default function Settings(props) {
                                 flexDirection: "row",
                                 borderRradius: "50px",
                                 borderRadius: "5px",
-                            } })] }) }), _jsx(ScreenShareIcon, {}), "\u534F\u540C\u529E\u516C(\u5F00\u53D1\u4E2D)"] }));
+                            } })] }) }), _jsx(ScreenShareIcon, {}), t("t-collaborative-office")] }));
 }

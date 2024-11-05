@@ -1,6 +1,5 @@
 import React from "react"
 import Header from "./SubComponents/Header"
-// Import the functions you need from the SDKs you need
 import Body from "./SubComponents/Body"
 import { observer } from "mobx-react"
 
@@ -9,9 +8,7 @@ import CssBaseline from "@mui/material/CssBaseline"
 import { green, blue } from "@mui/material/colors"
 import { changeStates, getStates, getTheme } from "@App/config/change"
 import { Backdrop, Box, CircularProgress } from "@mui/material"
-import kit from "bigonion-kit"
-// import { getTextFB } from "@App/share/firebase"
-// console.log(getTextFB);
+import { aheadInit } from "@Func/Init/aheadInit"
 const bothStyle: ThemeOptions = {
   zIndex: { drawer: 1300, modal: 1200, appBar: 1200 },
 }
@@ -52,19 +49,11 @@ const darkTheme = createTheme({
     mode: "dark",
   },
 })
+
 const App: any = observer(() => {
   React.useEffect(() => {
-    kit.addStyle(`
-    ::selection {
-      border-radius: 5px;
-      background-color: ${getTheme() === "light" ? "#add6ff" : "#636363"};
-    }
-    `)
+    aheadInit()
   }, [])
-  const [loading, setLoading] = React.useState(true)
-  const handleCloseLoading = () => {
-    setLoading(false)
-  }
 
   return (
     <>

@@ -35,6 +35,7 @@ import { changeStates, getSettings } from "@App/config/change"
 import noteUseArco from "@App/message/note"
 import { mergeObjects } from "@App/basic/basic"
 import importFilePlugin from "@Func/Parser/mdItPlugin/file"
+
 // import { excelParser } from "@App/fileSystem/excel"
 /**
  * @description markdownParser init plugin && settings
@@ -151,6 +152,7 @@ export default function allInit(
   /**@description Third Party Settings Init*/
   const settings = new settingsClass()
   settings.settingsAllInit()
+
   /**
    * @description Style init
    */
@@ -204,6 +206,11 @@ const defaultConfig: IConfig = {
   fileManagerState: false,
   emojiPickerState: "off",
   contextMenuClickPosition: { posx: 20, posy: 20 },
+  memorableStates: {
+    memorable: {
+      languageChanged: false,
+    },
+  },
   states: {
     unmemorable: {
       loading: true,
@@ -216,6 +223,7 @@ const defaultConfig: IConfig = {
   },
   settingsConfig: {
     basic: {
+      language: "zh",
       editorAutoWrap: true,
       fontSize: 16,
       syncScroll: false,
@@ -236,6 +244,7 @@ const defaultConfig: IConfig = {
 
 // const normalConfigArr: NormalConfigArr = ["on", "off", "light", "dark"]
 const normalSettingsKey = [
+  ...Object.keys(defaultConfig.memorableStates.memorable),
   ...Object.keys(defaultConfig.states.unmemorable),
   ...Object.keys(defaultConfig.settingsConfig.basic),
   ...Object.keys(defaultConfig.settingsConfig.advanced),
@@ -273,7 +282,8 @@ export function configInit(defaultConfig: IConfig) {
       if (
         key == "themeState" ||
         key == "emojiPickerState" ||
-        key == "settingsConfig"
+        key == "settingsConfig" ||
+        key == "memorableStates"
         // key == "states"
         // @ts-ignore 这里他妈为什么会报错？？？？不合理啊？？？
         // normalConfigArr.includes(opLocalStorage.getItem(key).toString())

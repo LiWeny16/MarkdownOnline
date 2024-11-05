@@ -18,8 +18,10 @@ import { getMdTextFromMonaco } from "@App/text/getMdText";
 import ChatIcon from "@mui/icons-material/Chat";
 import { getMdFromFireDB, uploadMdToFireDB } from "@App/share/firebase";
 import { Tooltip } from "@mui/material";
+import { useTranslation } from "react-i18next";
 // import FormDialog from "@Com/myCom/Dialog"
 export default function Share(props) {
+    const { t } = useTranslation();
     let mailOptionsRef = React.useRef();
     let [mailSharePanelState, setMailSharePanelState] = React.useState(false);
     const [sharedLink, setSharedLink] = React.useState("https://bigonion.cn");
@@ -56,7 +58,7 @@ export default function Share(props) {
     };
     return (_jsxs(_Fragment, { children: [_jsxs(Dialog, { fullWidth: true, maxWidth: "sm", open: mailSharePanelState, onClose: handleCloseAll, children: [_jsx(DialogTitle, { children: "\u771F\u00B7\u5206\u4EAB" }), _jsx(DialogContent, { children: _jsx(Tooltip, { title: copied ? "已复制!" : "点击复制", children: _jsx(TextField, { value: sharedLink, variant: "outlined", fullWidth: true, InputProps: {
                                     readOnly: true,
-                                }, onClick: handleCopy }) }) }), _jsx(DialogActions, { children: _jsx(Button, { onClick: handleCreateShareLink, children: "\u521B\u5EFA\u5206\u4EAB\u94FE\u63A5" }) })] }), _jsx(ShareIcon, {}), "\u5206\u4EAB(\u5F00\u53D1\u4E2D)", _jsxs(StyledMenu, { style: { width: "fitContent" }, anchorOrigin: {
+                                }, onClick: handleCopy }) }) }), _jsx(DialogActions, { children: _jsx(Button, { onClick: handleCreateShareLink, children: "\u521B\u5EFA\u5206\u4EAB\u94FE\u63A5" }) })] }), _jsx(ShareIcon, {}), t("t-share"), _jsxs(StyledMenu, { style: { width: "fitContent" }, anchorOrigin: {
                     vertical: -5,
                     horizontal: 12,
                 }, id: "demo-customized-menu", MenuListProps: {

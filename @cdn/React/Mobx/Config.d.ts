@@ -17,9 +17,16 @@ type StateUnmemorable = {
     mouseUpPos: MousePosition;
     selectEndPos: MousePosition;
 };
+type StateMemorable = {
+    languageChanged: Boolean;
+};
 export type States = {
     [key: string]: any;
     unmemorable: StateUnmemorable;
+};
+export type MemorableStates = {
+    [key: string]: any;
+    memorable: StateMemorable;
 };
 export type Settings = {
     [key: string]: any;
@@ -32,6 +39,7 @@ type SettingsBasic = {
     fileEditLocal: boolean;
     fontSize: number;
     editorAutoWrap: boolean;
+    language: "zh" | "en";
 };
 type SettingsAd = {
     mermaidTheme: MermaidTheme;
@@ -50,6 +58,7 @@ export interface IConfig {
     emojiPickerState: EmojiPickerState;
     contextMenuClickPosition: MousePosition;
     states: States;
+    memorableStates: MemorableStates;
     settingsConfig: Settings;
 }
 /**
@@ -62,8 +71,9 @@ declare class ConfigStore {
     emojiPickerState: EmojiPickerState;
     contextMenuClickPosition: MousePosition;
     states: States;
+    memorableStates: MemorableStates;
     settingsConfig: Settings;
-    constructor({ themeState, fileManagerState, emojiPickerState, contextMenuClickPosition, states, settingsConfig, }: IConfig);
+    constructor({ themeState, fileManagerState, emojiPickerState, contextMenuClickPosition, states, memorableStates, settingsConfig, }: IConfig);
     /**
      * @description getAllConfig
      */

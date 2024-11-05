@@ -32,7 +32,7 @@ import { useTheme } from "@mui/material"
 import FileDrawer from "./SubHeader/File/File"
 import alertUseArco from "@App/message/alert"
 import { Suspense } from "react"
-import mdIcon from "@Asset/img/mdIcon.svg"
+import { useTranslation } from "react-i18next"
 const LazyMenu = React.lazy(() => import("./SubHeader/Menu"))
 
 interface Props {
@@ -57,6 +57,7 @@ const boxShadow =
 
 const drawerWidth = 240
 const DrawerAppBar = observer((props: Props) => {
+  const { t } = useTranslation()
   const theme = useTheme()
   const { window } = props
   // const image = useImage()
@@ -201,7 +202,7 @@ const DrawerAppBar = observer((props: Props) => {
               sx={{ display: { xs: "none", sm: "flex", flexDirection: "row" } }}
             >
               <MyButton href="https://bigonion.cn" startIcon={<LinkIcon />}>
-                首页
+                {t("t-home")}
               </MyButton>
               <MyButton
                 onClick={() => {
@@ -209,12 +210,12 @@ const DrawerAppBar = observer((props: Props) => {
                 }}
                 startIcon={<HelpOutlineIcon />}
               >
-                关于
+                {t("t-about")}
               </MyButton>
               <Suspense
                 fallback={
                   <MyButton open={open} endIcon={<MoreVertIcon />}>
-                    {"更多"}
+                    {t("t-more")}
                   </MyButton>
                 }
               >

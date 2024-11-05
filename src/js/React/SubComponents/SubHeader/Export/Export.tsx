@@ -28,14 +28,11 @@ import FormControl from "@mui/material/FormControl"
 import Select, { SelectChangeEvent } from "@mui/material/Select"
 
 import Box from "@mui/material/Box"
-import LR from "@Com/myCom/Layout/LR"
-import TB from "@Com/myCom/Layout/TB"
-
-import { Notification } from "@arco-design/web-react"
 import noteUseArco from "@App/message/note"
+import { useTranslation } from "react-i18next"
 export default function Export(props: any) {
+  const { t } = useTranslation()
   let closeExportMenu = props.closeExportMenu
-  let closeMenu = props.closeMenu
   let [openExportAsImgSettings, setOpenExportAsImgSettings] =
     React.useState(false)
   let handleCloseExportImageSetting = (e: React.MouseEvent) => {
@@ -136,9 +133,10 @@ export default function Export(props: any) {
           </DialogActions>
         </div>
       </Dialog>
-      {/* jpeg导出设置Panel */}
+      {/* jpeg导出设置Panel */} 
       <FileCopyIcon />
-      导出
+      {/* // 导出 / Export */}
+      {t("t-export")}
       <StyledMenu
         style={{ width: "fitContent" }}
         anchorOrigin={{
@@ -163,7 +161,8 @@ export default function Export(props: any) {
           disableRipple
         >
           <PictureAsPdfIcon />
-          导出为PDF
+          {/* 导出为PDF */}
+          {t("t-export-pdf")}
         </MenuItem>
         <MenuItem
           onClick={(e) => {
@@ -176,7 +175,8 @@ export default function Export(props: any) {
           disableRipple
         >
           <AddPhotoAlternateIcon />
-          导出为图片(Beta1.0)
+          {/* 导出为图片(Beta1.0) */}
+          {t("t-export-image")}
         </MenuItem>
 
         <MenuItem
@@ -186,7 +186,8 @@ export default function Export(props: any) {
           disableRipple
         >
           <ShortTextIcon />
-          导出为Markdown
+          {t("t-export-markdown")}
+          {/* 导出为Markdown */}
         </MenuItem>
       </StyledMenu>
     </>

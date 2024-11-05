@@ -37,10 +37,13 @@ import {
   PushPin as PushPinIcon,
   PushPinOutlined as PushPinOutlinedIcon,
 } from "@mui/icons-material"
+import { useTranslation } from "react-i18next"
 const fileManager = new FileManager()
 const folderManager = new FileFolderManager()
 let _t: NodeJS.Timeout | null
 const FileDrawer = observer(function FileDrawer() {
+  const { t } = useTranslation()
+
   const [fileDirectoryArr, setFileDirectoryArr] = React.useState<any>([])
   const [editingFileName, setEditingFileName] = React.useState("")
   const [isPinned, setIsPinned] = useState(false)
@@ -193,26 +196,26 @@ const FileDrawer = observer(function FileDrawer() {
                   )
                 }
                 onClick={() => setIsPinned(!isPinned)}
-                tooltipText="固定！🧷"
+                tooltipText={"🧷" + t("t-file-manager-pinned")}
               />
 
               {/* 打开文件 */}
               <SquareClickIconButton
                 icon={<FileCopyIcon />}
                 onClick={onClickOpenSingleFile}
-                tooltipText="打开文件 📁"
+                tooltipText={"📁" + t("t-file-manager-open-file")}
               />
 
               {/* 打开文件夹 */}
               <SquareClickIconButton
-                tooltipText="打开文件夹 📂"
+                tooltipText={"📁" + t("t-file-manager-open-folder")}
                 icon={<FolderIcon />}
                 onClick={onClickOpenFolder}
               />
 
               {/* 另存为 */}
               <SquareClickIconButton
-                tooltipText="另存为 📑"
+                tooltipText={"📑" + t("t-file-manager-saveAs")}
                 icon={<SaveAltIcon />}
                 onClick={() => fileManager.saveAsFile(getMdTextFromMonaco())}
               />
@@ -240,7 +243,8 @@ const FileDrawer = observer(function FileDrawer() {
                 sx={{ mr: "10px", fontSize: "17px" }}
                 color={theme.palette.info.contrastText}
               >
-                同步本地编辑
+                {/* 同步本地编辑 */}
+                {t("t-file-manager-syncLocal")}
               </Typography>
               <SwitchIOS
                 checked={getSettings().basic.fileEditLocal}
@@ -287,7 +291,8 @@ const FileDrawer = observer(function FileDrawer() {
                       variant="contained"
                       color="primary"
                     >
-                      打开文件
+                      {/* 打开文件 */}
+                      {t("t-file-manager-open-file")}
                     </Button>
                     <Button
                       sx={startButtonStyle}
@@ -295,7 +300,8 @@ const FileDrawer = observer(function FileDrawer() {
                       color="primary"
                       onClick={onClickOpenFolder}
                     >
-                      打开文件夹
+                      {/* 打开文件夹 */}
+                      {t("t-file-manager-open-folder")}
                     </Button>
                     <Button
                       sx={startButtonStyle}
@@ -304,7 +310,8 @@ const FileDrawer = observer(function FileDrawer() {
                         fileManager.saveAsFile(getMdTextFromMonaco())
                       }}
                     >
-                      另存为
+                      {/* 另存为 */}
+                      {t("t-file-manager-saveAs")}
                     </Button>
                   </Box>
                 </>

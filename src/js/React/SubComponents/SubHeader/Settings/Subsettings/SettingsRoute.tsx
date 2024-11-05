@@ -8,21 +8,18 @@ import {
   TreeItemProps,
   treeItemClasses,
 } from "@mui/x-tree-view/TreeItem"
-// import { useSpring, animated } from "@react-spring/web"
-// import AddBoxIcon from "@mui/icons-material/AddBox"
-// import IndeterminateCheckBoxIcon from "@mui/icons-material/IndeterminateCheckBox"
 import ContrastIcon from "@mui/icons-material/Contrast"
 import EditIcon from "@mui/icons-material/Edit"
 import MicIcon from "@mui/icons-material/Mic"
 import { styled, alpha } from "@mui/material/styles"
 import { Box, Divider } from "@mui/material"
 import ImageIcon from "@mui/icons-material/Image"
+import GTranslateIcon from "@mui/icons-material/GTranslate"
+import { useTranslation } from "react-i18next"
 function TransitionComponent(props: TransitionProps) {
   return (
     // 这里太大了，不用了！
-    // <animated.div style={style}>
     <Collapse {...props} />
-    // </animated.div>
   )
 }
 const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
@@ -63,6 +60,8 @@ const CustomTreeItem = React.forwardRef(
 )
 
 export default function SettingsRoute() {
+  // 在组件中使用 useTranslation 钩子
+  const { t } = useTranslation()
   function linkToView(id: string) {
     let targetElement = document.getElementById(id) as HTMLElement
     targetElement.scrollIntoView()
@@ -83,8 +82,6 @@ export default function SettingsRoute() {
           aria-label="customized"
           defaultExpandedItems={["1_x", "2_x"]}
           slots={{
-            // expandIcon: AddBoxIcon,
-            // collapseIcon: IndeterminateCheckBoxIcon,
             endIcon: SettingsIcon,
           }}
           sx={{
@@ -95,15 +92,13 @@ export default function SettingsRoute() {
         >
           <CustomTreeItem
             slots={{
-              // expandIcon: AddBoxIcon,
-              // collapseIcon: IndeterminateCheckBoxIcon,
               endIcon: EditIcon,
             }}
             onClick={() => {
               linkToView("settings_1_x")
             }}
             itemId="1_x"
-            label="基础设置"
+            label={t("t-basic-settings")}
           >
             <CustomTreeItem
               slots={{
@@ -113,17 +108,27 @@ export default function SettingsRoute() {
                 linkToView("settings_1_1")
               }}
               itemId="1_1"
-              label="主题设置"
+              label={t("t-theme-settings")}
+            />
+            <CustomTreeItem
+              slots={{
+                endIcon: GTranslateIcon,
+              }}
+              onClick={() => {
+                linkToView("settings_1_2")
+              }}
+              itemId="1_2"
+              label={t("t-language-settings")}
             />
             <CustomTreeItem
               slots={{
                 endIcon: EditIcon,
               }}
               onClick={() => {
-                linkToView("settings_1_2")
+                linkToView("settings_1_3")
               }}
-              itemId="1_2"
-              label="编辑器设置"
+              itemId="1_3"
+              label={t("t-editor-settings")}
             />
             <CustomTreeItem
               slots={{
@@ -131,35 +136,34 @@ export default function SettingsRoute() {
               }}
               onClick={() => {
                 let targetElement = document.getElementById(
-                  "settings_1_3"
+                  "settings_1_4"
                 ) as HTMLElement
                 targetElement.scrollIntoView()
               }}
-              itemId="1_3"
-              label="语音转文字"
+              itemId="1_4"
+              label={t("t-speech-to-text")}
             />
           </CustomTreeItem>
-          {/* <Divider sx={{ my: 0.5 }} /> */}
           <CustomTreeItem
             onClick={() => {
               linkToView("settings_2_x")
             }}
             itemId="2_x"
-            label="高级设置"
+            label={t("t-advanced-settings")}
           >
             <CustomTreeItem
               onClick={() => {
                 linkToView("settings_2_1")
               }}
               itemId="2_1"
-              label="导出设置"
+              label={t("t-export-settings")}
             />
             <CustomTreeItem
               onClick={() => {
                 linkToView("settings_2_2")
               }}
               itemId="2_2"
-              label="Mermaid设置"
+              label={t("t-mermaid-settings")}
             />
             <CustomTreeItem
               slots={{
@@ -169,7 +173,7 @@ export default function SettingsRoute() {
                 linkToView("settings_2_3")
               }}
               itemId="2_3"
-              label="图片设置"
+              label={t("t-image-settings")}
             />
           </CustomTreeItem>
         </SimpleTreeView>

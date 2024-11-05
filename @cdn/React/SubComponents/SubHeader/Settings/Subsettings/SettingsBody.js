@@ -1,5 +1,5 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import { changeSettings, changeTheme, getSettings, getTheme, } from "@App/config/change";
+import { changeSettings, changeStatesMemorable, changeTheme, getSettings, getTheme, } from "@App/config/change";
 import SwitchTheme from "@Root/js/React/Components/myCom/Switches/SwitchTheme";
 import SwitchIOS from "@Root/js/React/Components/myCom/Switches/SwitchIOS";
 import { Box, Divider, FormControl, FormControlLabel, MenuItem, Radio, RadioGroup, Select, TextField, Typography, useTheme, } from "@mui/material";
@@ -10,7 +10,9 @@ import { normalMermaidTheme, normalMermaidThemeMap } from "@Func/Init/allInit";
 import mermaid from "mermaid";
 import { mdConverter } from "@Root/js";
 import kit from "@cdn-kit";
+import { useTranslation } from "react-i18next";
 export default observer(function SettingsBody() {
+    const { t, i18n } = useTranslation();
     const theme = getTheme();
     const muiTheme = useTheme();
     const settingsBodyContentBoxStyle = {
@@ -146,6 +148,13 @@ export default observer(function SettingsBody() {
             wordWrap: getSettings().basic.editorAutoWrap ? "on" : "off",
         });
     }
+    function handleOnChangeLanguage(e) {
+        let lang = e.target.value;
+        i18n.changeLanguage(e.target.value);
+        document.documentElement.lang = e.target.value;
+        changeStatesMemorable({ memorable: { languageChanged: true } });
+        changeSettings({ basic: { language: lang } });
+    }
     function handleOnChangeMermaidTheme(e) {
         changeSettings({
             advanced: { mermaidTheme: e.target.value },
@@ -172,7 +181,10 @@ export default observer(function SettingsBody() {
             }, children: [_jsx(Typography, { id: "settings_1_x", sx: { fontSize: "30px", fontWeight: "700" }, children: "\u57FA\u7840\u8BBE\u7F6E" }), _jsx(Divider, {}), _jsxs(Box, { id: "settings_1_1", sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { sx: {
                                 fontSize: "0.89rem",
                                 fontWeight: 500,
-                            }, children: "Theme" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u7F16\u8F91\u5668\u7684\u4E3B\u9898" }), _jsx(SwitchTheme, { checked: themeState, size: "small", inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeThemeSwitch })] }), _jsx(SecondaryHeading, { id: "settings_1_2", content: "\u7F16\u8F91\u5668\u8BBE\u7F6E" }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, id: "settings_1_2", children: [_jsxs(Box, { sx: secondSettingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {
+                            }, children: "Theme" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u7F16\u8F91\u5668\u7684\u4E3B\u9898" }), _jsx(SwitchTheme, { checked: themeState, size: "small", inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeThemeSwitch })] }), _jsxs(Box, { id: "settings_1_2", sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { sx: {
+                                fontSize: "0.89rem",
+                                fontWeight: 500,
+                            }, children: "Language" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u7F16\u8F91\u5668\u7684\u8BED\u8A00" }), _jsxs(Select, { value: getSettings().basic.language ?? "zh", defaultChecked: true, size: "small", color: "primary", onChange: handleOnChangeLanguage, children: [_jsx(MenuItem, { value: "zh", children: "\u4E2D\u6587" }), _jsx(MenuItem, { value: "en", children: "English" })] })] }), _jsx(SecondaryHeading, { id: "settings_1_3", content: "\u7F16\u8F91\u5668\u8BBE\u7F6E" }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, id: "settings_1_2", children: [_jsxs(Box, { sx: secondSettingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {
                                             fontSize: "0.89rem",
                                             fontWeight: 500,
                                         }, children: "Font Size" }) }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u6E32\u67D3\u540E\u6587\u5B57\u5B57\u4F53\u5927\u5C0F" }), _jsx(Select, { value: getSettings().basic.fontSize, defaultChecked: true, fullWidth: true, size: "small", onChange: handleOnChangeFontSize, children: [...Array(10).keys()].map((i) => {
@@ -184,7 +196,7 @@ export default observer(function SettingsBody() {
                                         }, children: "Synchronous Scrolling" }) }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u540C\u6B65\u6EDA\u52A8\u5DE6\u8FB9\u7F16\u8F91\u533A\u548C\u9884\u89C8\u533A\u57DF\u3002" }), _jsx(SwitchIOS, { checked: getSettings().basic.syncScroll, size: "small", inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeSyncScrollSwitch })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {
                                             fontSize: "0.89rem",
                                             fontWeight: 500,
-                                        }, children: "Editor Auto Wrap" }) }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u662F\u5426\u5F00\u542F\u7F16\u8F91\u5668\u81EA\u52A8\u6362\u884C" }), _jsxs(Select, { value: getSettings().basic.editorAutoWrap ? 1 : 0, defaultChecked: true, fullWidth: true, size: "small", onChange: handleOnChangeEditorAutoWrap, children: [_jsx(MenuItem, { value: 1, children: "On" }), _jsx(MenuItem, { value: 0, children: "OFF" })] })] })] }), _jsxs(Box, { id: "settings_1_3", sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { sx: {
+                                        }, children: "Editor Auto Wrap" }) }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u662F\u5426\u5F00\u542F\u7F16\u8F91\u5668\u81EA\u52A8\u6362\u884C" }), _jsxs(Select, { value: getSettings().basic.editorAutoWrap ? 1 : 0, defaultChecked: true, fullWidth: true, size: "small", onChange: handleOnChangeEditorAutoWrap, children: [_jsx(MenuItem, { value: 1, children: "On" }), _jsx(MenuItem, { value: 0, children: "OFF" })] })] })] }), _jsxs(Box, { id: "settings_1_4", sx: settingsBodyContentBoxStyle, children: [_jsx(Typography, { sx: {
                                 fontSize: "0.89rem",
                                 fontWeight: 500,
                             }, children: "Speech To Text" }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u9009\u62E9\u8BED\u97F3\u8F6C\u6587\u5B57\u7684\u8BC6\u522B\u8BED\u8A00" }), _jsx(Select

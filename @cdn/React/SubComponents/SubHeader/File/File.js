@@ -17,10 +17,12 @@ import FileCopyIcon from "@mui/icons-material/FileCopy";
 import Zoom from "@mui/material/Zoom";
 import ScrollableBox from "@Root/js/React/Components/myCom/Layout/ScrollBox";
 import { PushPin as PushPinIcon, PushPinOutlined as PushPinOutlinedIcon, } from "@mui/icons-material";
+import { useTranslation } from "react-i18next";
 const fileManager = new FileManager();
 const folderManager = new FileFolderManager();
 let _t;
 const FileDrawer = observer(function FileDrawer() {
+    const { t } = useTranslation();
     const [fileDirectoryArr, setFileDirectoryArr] = React.useState([]);
     const [editingFileName, setEditingFileName] = React.useState("");
     const [isPinned, setIsPinned] = useState(false);
@@ -135,7 +137,7 @@ const FileDrawer = observer(function FileDrawer() {
                                 height: "100vh", // 满屏高度
                                 alignItems: "center", // 中心对齐图标
                                 paddingTop: 2, // 顶部间隔
-                            }, children: [_jsx(SquareClickIconButton, { icon: isPinned ? (_jsx(PushPinIcon, { sx: { transform: "rotate(45deg)" } })) : (_jsx(PushPinOutlinedIcon, { sx: { transform: "rotate(45deg)" } })), onClick: () => setIsPinned(!isPinned), tooltipText: "\u56FA\u5B9A\uFF01\uD83E\uDDF7" }), _jsx(SquareClickIconButton, { icon: _jsx(FileCopyIcon, {}), onClick: onClickOpenSingleFile, tooltipText: "\u6253\u5F00\u6587\u4EF6 \uD83D\uDCC1" }), _jsx(SquareClickIconButton, { tooltipText: "\u6253\u5F00\u6587\u4EF6\u5939 \uD83D\uDCC2", icon: _jsx(FolderIcon, {}), onClick: onClickOpenFolder }), _jsx(SquareClickIconButton, { tooltipText: "\u53E6\u5B58\u4E3A \uD83D\uDCD1", icon: _jsx(SaveAltIcon, {}), onClick: () => fileManager.saveAsFile(getMdTextFromMonaco()) })] }) }), _jsxs(Box, { sx: {
+                            }, children: [_jsx(SquareClickIconButton, { icon: isPinned ? (_jsx(PushPinIcon, { sx: { transform: "rotate(45deg)" } })) : (_jsx(PushPinOutlinedIcon, { sx: { transform: "rotate(45deg)" } })), onClick: () => setIsPinned(!isPinned), tooltipText: "🧷" + t("t-file-manager-pinned") }), _jsx(SquareClickIconButton, { icon: _jsx(FileCopyIcon, {}), onClick: onClickOpenSingleFile, tooltipText: "📁" + t("t-file-manager-open-file") }), _jsx(SquareClickIconButton, { tooltipText: "📁" + t("t-file-manager-open-folder"), icon: _jsx(FolderIcon, {}), onClick: onClickOpenFolder }), _jsx(SquareClickIconButton, { tooltipText: "📑" + t("t-file-manager-saveAs"), icon: _jsx(SaveAltIcon, {}), onClick: () => fileManager.saveAsFile(getMdTextFromMonaco()) })] }) }), _jsxs(Box, { sx: {
                             width: "23svw",
                             height: "100svh",
                             display: "flex",
@@ -146,7 +148,7 @@ const FileDrawer = observer(function FileDrawer() {
                                     alignItems: "center",
                                     mt: "4px",
                                     justifyContent: "center",
-                                }, className: "FLEX COW ALI-CEN JUS-CEN", children: [_jsx(Typography, { sx: { mr: "10px", fontSize: "17px" }, color: theme.palette.info.contrastText, children: "\u540C\u6B65\u672C\u5730\u7F16\u8F91" }), _jsx(SwitchIOS, { checked: getSettings().basic.fileEditLocal, size: "small", 
+                                }, className: "FLEX COW ALI-CEN JUS-CEN", children: [_jsx(Typography, { sx: { mr: "10px", fontSize: "17px" }, color: theme.palette.info.contrastText, children: t("t-file-manager-syncLocal") }), _jsx(SwitchIOS, { checked: getSettings().basic.fileEditLocal, size: "small", 
                                         // value={getSettings().basic.syncScroll}
                                         inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeFileEditLocalSwitch })] }), _jsx(Box, { className: "FLEX ALI-CEN JUS-CEN", sx: {
                                     display: "flex",
@@ -156,9 +158,9 @@ const FileDrawer = observer(function FileDrawer() {
                                     marginBottom: "20svh",
                                 }, children: fileDirectoryArr.length != 0 ? (_jsx(_Fragment, { children: _jsx(ScrollableBox, { sx: { width: "100%", height: "100%" }, children: _jsx(FileExplorer, { folderManager: folderManager, fillText: fillText, fileDirectoryArr: fileDirectoryArr }) }) })) : (_jsx(_Fragment, { children: _jsxs(Box, { className: "FLEX COL ALI-CEN JUS-CEN", sx: {
                                             width: "100%",
-                                        }, children: [_jsx(Typography, { children: getSettings().basic.fileEditLocal ? editingFileName : "" }), _jsx(Button, { sx: startButtonStyle, onClick: onClickOpenSingleFile, variant: "contained", color: "primary", children: "\u6253\u5F00\u6587\u4EF6" }), _jsx(Button, { sx: startButtonStyle, variant: "contained", color: "primary", onClick: onClickOpenFolder, children: "\u6253\u5F00\u6587\u4EF6\u5939" }), _jsx(Button, { sx: startButtonStyle, variant: "contained", onClick: () => {
+                                        }, children: [_jsx(Typography, { children: getSettings().basic.fileEditLocal ? editingFileName : "" }), _jsx(Button, { sx: startButtonStyle, onClick: onClickOpenSingleFile, variant: "contained", color: "primary", children: t("t-file-manager-open-file") }), _jsx(Button, { sx: startButtonStyle, variant: "contained", color: "primary", onClick: onClickOpenFolder, children: t("t-file-manager-open-folder") }), _jsx(Button, { sx: startButtonStyle, variant: "contained", onClick: () => {
                                                     fileManager.saveAsFile(getMdTextFromMonaco());
-                                                }, children: "\u53E6\u5B58\u4E3A" })] }) })) })] })] }) }) }));
+                                                }, children: t("t-file-manager-saveAs") })] }) })) })] })] }) }) }));
 });
 export default FileDrawer;
 function SquareClickIconButton({ icon, onClick, tooltipText, }) {

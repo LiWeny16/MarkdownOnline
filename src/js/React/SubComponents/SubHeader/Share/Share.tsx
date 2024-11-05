@@ -25,8 +25,11 @@ import ChatIcon from "@mui/icons-material/Chat"
 import ContentCopyIcon from "@mui/icons-material/ContentCopy"
 import { getMdFromFireDB, uploadMdToFireDB } from "@App/share/firebase"
 import { Tooltip } from "@mui/material"
+import { useTranslation } from "react-i18next"
 // import FormDialog from "@Com/myCom/Dialog"
 export default function Share(props: any) {
+  const { t } = useTranslation()
+
   let mailOptionsRef = React.useRef<any>()
   let [mailSharePanelState, setMailSharePanelState] = React.useState(false)
   const [sharedLink, setSharedLink] = React.useState("https://bigonion.cn")
@@ -89,7 +92,8 @@ export default function Share(props: any) {
       </Dialog>
       {/* **************************** */}
       <ShareIcon />
-      分享(开发中)
+      {/* // 分享 (开发中) / Share (In Development) */}
+      {t("t-share")} 
       <StyledMenu
         style={{ width: "fitContent" }}
         anchorOrigin={{

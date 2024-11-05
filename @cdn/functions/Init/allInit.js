@@ -179,6 +179,11 @@ const defaultConfig = {
     fileManagerState: false,
     emojiPickerState: "off",
     contextMenuClickPosition: { posx: 20, posy: 20 },
+    memorableStates: {
+        memorable: {
+            languageChanged: false,
+        },
+    },
     states: {
         unmemorable: {
             loading: true,
@@ -191,6 +196,7 @@ const defaultConfig = {
     },
     settingsConfig: {
         basic: {
+            language: "zh",
             editorAutoWrap: true,
             fontSize: 16,
             syncScroll: false,
@@ -210,6 +216,7 @@ const defaultConfig = {
 };
 // const normalConfigArr: NormalConfigArr = ["on", "off", "light", "dark"]
 const normalSettingsKey = [
+    ...Object.keys(defaultConfig.memorableStates.memorable),
     ...Object.keys(defaultConfig.states.unmemorable),
     ...Object.keys(defaultConfig.settingsConfig.basic),
     ...Object.keys(defaultConfig.settingsConfig.advanced),
@@ -245,7 +252,8 @@ export function configInit(defaultConfig) {
             // 判断内容是否是正常的设置内容,并且哪些内容需要记忆
             if (key == "themeState" ||
                 key == "emojiPickerState" ||
-                key == "settingsConfig"
+                key == "settingsConfig" ||
+                key == "memorableStates"
             // key == "states"
             // @ts-ignore 这里他妈为什么会报错？？？？不合理啊？？？
             // normalConfigArr.includes(opLocalStorage.getItem(key).toString())
