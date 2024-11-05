@@ -58,7 +58,7 @@ const FileDrawer = observer(function FileDrawer() {
             const fileHandle = await fileManager.openSingleFile();
             if (!fileHandle) {
                 // 如果没有文件被选中，显示错误提示消息
-                alertUseArco("左顾右盼，活在梦幻?", 2500, {
+                alertUseArco(t("t-no-file-selected"), 2500, {
                     kind: "warning",
                 });
                 return;
@@ -72,7 +72,7 @@ const FileDrawer = observer(function FileDrawer() {
                 },
             ]);
             // 显示正在打开文件的提示
-            alertUseArco("正在打开本地文件，别急，你给我等会😅");
+            alertUseArco(t("t-opening-file"));
             // 读取文件内容
             const content = await fileManager.readFile(fileHandle);
             fillText(content, fileHandle.name);
@@ -80,7 +80,7 @@ const FileDrawer = observer(function FileDrawer() {
         catch (error) {
             // 错误处理
             console.error("Error opening file:", error);
-            alertUseArco("尼玛的报错乐🤣", 2000, { kind: "error" });
+            alertUseArco(t("t-error-opening-file"), 2000, { kind: "error" });
         }
     };
     const onClickOpenFolder = async () => {

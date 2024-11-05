@@ -32,6 +32,7 @@ import SaveAltIcon from "@mui/icons-material/SaveAlt"
 import FileCopyIcon from "@mui/icons-material/FileCopy"
 import Zoom from "@mui/material/Zoom"
 import ScrollableBox from "@Root/js/React/Components/myCom/Layout/ScrollBox"
+import i18n from "i18next"
 
 import {
   PushPin as PushPinIcon,
@@ -72,36 +73,38 @@ const FileDrawer = observer(function FileDrawer() {
   /**
    * @description 打开单个文件
    */
+
   const onClickOpenSingleFile = async () => {
     try {
       // 调用 openSingleFile 方法从文件管理器中打开单个文件
-      const fileHandle = await fileManager.openSingleFile()
+      const fileHandle = await fileManager.openSingleFile();
       if (!fileHandle) {
         // 如果没有文件被选中，显示错误提示消息
-        alertUseArco("左顾右盼，活在梦幻?", 2500, {
+        alertUseArco(t("t-no-file-selected"), 2500, {
           kind: "warning",
-        })
-        return
+        });
+        return;
       }
-      setEditingFileName(fileHandle.name)
+      setEditingFileName(fileHandle.name);
       setFileDirectoryArr([
         {
           id: "1." + fileHandle.name,
           label: fileHandle.name,
           fileType: fileHandle.kind,
         },
-      ])
+      ]);
       // 显示正在打开文件的提示
-      alertUseArco("正在打开本地文件，别急，你给我等会😅")
+      alertUseArco(t("t-opening-file"));
       // 读取文件内容
-      const content = await fileManager.readFile(fileHandle)
-      fillText(content, fileHandle.name)
+      const content = await fileManager.readFile(fileHandle);
+      fillText(content, fileHandle.name);
     } catch (error) {
       // 错误处理
-      console.error("Error opening file:", error)
-      alertUseArco("尼玛的报错乐🤣", 2000, { kind: "error" })
+      console.error("Error opening file:", error);
+      alertUseArco(t("t-error-opening-file"), 2000, { kind: "error" });
     }
-  }
+  };
+  
   const onClickOpenFolder = async () => {
     let fileFolderManager = folderManager
     const directoryHandle = await fileFolderManager.openDirectory()

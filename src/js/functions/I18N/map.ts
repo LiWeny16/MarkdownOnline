@@ -29,6 +29,20 @@ const map = {
       "t-export-settings": "Export Settings",
       "t-mermaid-settings": "Mermaid Settings",
       "t-image-settings": "Image Settings",
+      //
+      "t-preview-mode-error":
+        "Preview mode is enabled, can't save. Open another file!",
+      "t-save-success-local": "Saved locally! 🎉",
+      "t-save-success-browser-no-local":
+        "Saved to browser! 🎉 (No local file opened)",
+      "t-save-success-browser": "Saved to browser! 🎉",
+      "t-rejection-error": "How dare you refuse me.",
+      "t-updated-to-latest-version": "Updated to the latest version",
+      "t-current-version": "Current version: {{version}}",
+      "t-new-features-current-version": "New features in the current version",
+      "t-no-file-selected": "Looking around, living in a fantasy?",
+      "t-opening-file": "Opening local file, hold on a bit 😅",
+      "t-error-opening-file": "An error occurred 🤣",
     },
   },
   zh: {
@@ -61,6 +75,18 @@ const map = {
       "t-export-settings": "导出设置",
       "t-mermaid-settings": "Mermaid设置",
       "t-image-settings": "图片设置",
+      // 提示翻译
+      "t-preview-mode-error": "预览模式你保存个屁，开另一个文件！",
+      "t-save-success-local": "成功保存到本地！🎉",
+      "t-save-success-browser-no-local": "成功保存到浏览器！🎉(未打开本地文件)",
+      "t-save-success-browser": "成功保存到浏览器！🎉",
+      "t-rejection-error": "你竟敢拒绝我。",
+      "t-updated-to-latest-version": "已更新到最新版本",
+      "t-current-version": "当前版本: {{version}}",
+      "t-new-features-current-version": "当前版本新增特性",
+      "t-no-file-selected": "左顾右盼，活在梦幻?",
+      "t-opening-file": "正在打开本地文件，别急，你给我等会😅",
+      "t-error-opening-file": "尼玛的报错乐🤣",
     },
   },
 }

@@ -3,8 +3,11 @@ import { initReactI18next } from "react-i18next"
 import LanguageDetector from "i18next-browser-languagedetector"
 import map from "./map"
 import getLang from "@App/user/langugae"
+import { changeSettings } from "@App/config/change"
 const initI18N = () => {
-  const preferredLanguage = localStorage.getItem("i18nextLng") || getLang()
+  const preferredLanguage =
+    (localStorage.getItem("i18nextLng") as "zh" | "en") || getLang()
+  changeSettings({ basic: { language: preferredLanguage } })
   i18n
     // 检测用户当前使用的语言
     // 文档: https://github.com/i18next/i18next-browser-languageDetector
@@ -14,7 +17,7 @@ const initI18N = () => {
     // 初始化 i18next
     // 配置参数的文档: https://www.i18next.com/overview/configuration-options
     .init({
-      debug: true,
+      debug: false,
       lng: preferredLanguage,
       fallbackLng: "zh",
       interpolation: {

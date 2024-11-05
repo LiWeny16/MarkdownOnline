@@ -28,6 +28,17 @@ declare const map: {
             "t-export-settings": string;
             "t-mermaid-settings": string;
             "t-image-settings": string;
+            "t-preview-mode-error": string;
+            "t-save-success-local": string;
+            "t-save-success-browser-no-local": string;
+            "t-save-success-browser": string;
+            "t-rejection-error": string;
+            "t-updated-to-latest-version": string;
+            "t-current-version": string;
+            "t-new-features-current-version": string;
+            "t-no-file-selected": string;
+            "t-opening-file": string;
+            "t-error-opening-file": string;
         };
     };
     zh: {
@@ -59,6 +70,17 @@ declare const map: {
             "t-export-settings": string;
             "t-mermaid-settings": string;
             "t-image-settings": string;
+            "t-preview-mode-error": string;
+            "t-save-success-local": string;
+            "t-save-success-browser-no-local": string;
+            "t-save-success-browser": string;
+            "t-rejection-error": string;
+            "t-updated-to-latest-version": string;
+            "t-current-version": string;
+            "t-new-features-current-version": string;
+            "t-no-file-selected": string;
+            "t-opening-file": string;
+            "t-error-opening-file": string;
         };
     };
 };

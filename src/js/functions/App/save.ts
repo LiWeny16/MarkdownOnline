@@ -8,10 +8,14 @@ import {
 import { FileFolderManager, FileManager } from "./fileSystem/file"
 import { getSettings, getStates } from "./config/change"
 import alertUseArco from "./message/alert"
+import { useTranslation } from "react-i18next"
+import i18n from "i18next"
 export default async function save(editor = null, message = true) {
-  if(getStates().unmemorable.previewMode){
-    alertUseArco("预览模式你保存个屁，开另一个文件！", 2500, { kind: "error" })
-    return 
+  const t = i18n.t
+
+  if (getStates().unmemorable.previewMode) {
+    alertUseArco(t("t-preview-mode-error"), 2500, { kind: "error" })
+    return
   }
   let text = getMdTextFromMonaco()
   let infoMsg = ""
@@ -20,20 +24,17 @@ export default async function save(editor = null, message = true) {
       fillInMemoryText(text)
       if (getSettings().basic.fileEditLocal) {
         let fileManager = new FileManager()
-        // console.log(fileManager.fileHandle);
-        // let folderManager = new FileFolderManager()
-        // console.log(fileManager.fileState);
         if (await fileManager.saveFileSilently(text)) {
-          infoMsg = "成功保存到本地！🎉"
+          infoMsg = t("t-save-success-local")
         } else {
-          infoMsg = "成功保存到浏览器！🎉(未打开本地文件)"
+          infoMsg = t("t-save-success-browser-no-local")
         }
       } else {
-        infoMsg = "成功保存到浏览器！🎉"
+        infoMsg = t("t-save-success-browser")
       }
       alertUseArco(infoMsg)
     } catch (error) {
-      alertUseArco("你竟敢拒绝我。", 2500, { kind: "error" })
+      alertUseArco(t("t-rejection-error"), 2500, { kind: "error" })
     }
   } else {
     save()

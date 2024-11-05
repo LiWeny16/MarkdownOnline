@@ -25,6 +25,7 @@ import { changeStates, getSettings } from "@App/config/change";
 import noteUseArco from "@App/message/note";
 import { mergeObjects } from "@App/basic/basic";
 import importFilePlugin from "@Func/Parser/mdItPlugin/file";
+import i18n from "i18next";
 // import { excelParser } from "@App/fileSystem/excel"
 /**
  * @description markdownParser init plugin && settings
@@ -153,9 +154,9 @@ export default function allInit(editor = window.editor, monaco = window.monaco) 
         // await excelParser()
         changeStates({ unmemorable: { loading: false } });
         await kit.sleep(110);
-        noteUseArco("已更新到最新版本", "当前版本:v3.0.0");
+        noteUseArco(i18n.t("t-updated-to-latest-version"), i18n.t("t-current-version", { version: "v3.1.0" }));
         await kit.sleep(680);
-        noteUseArco("当前版本新增特性", `文件管理器`, {
+        noteUseArco(i18n.t("t-new-features-current-version"), i18n.t("t-file-manager"), {
             kind: "info",
         });
     });
