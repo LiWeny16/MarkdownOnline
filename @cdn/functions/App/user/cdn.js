@@ -133,7 +133,7 @@ export async function loadScripts() {
             cdnUrl: `https://${usefulDomain}/npm/clue-parser@1.0.4/index.min.css`,
         },
         {
-            id: "react-dom",
+            id: "arco-design",
             cdnUrl: `https://${usefulDomain}/npm/@arco-design/web-react@2.58.3/dist/css/arco.min.css`,
         },
     ];

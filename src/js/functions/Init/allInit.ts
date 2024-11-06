@@ -216,6 +216,7 @@ const defaultConfig: IConfig = {
   memorableStates: {
     memorable: {
       languageChanged: false,
+      welcomeAnimationState: true,
     },
   },
   states: {

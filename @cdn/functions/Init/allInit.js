@@ -183,6 +183,7 @@ const defaultConfig = {
     memorableStates: {
         memorable: {
             languageChanged: false,
+            welcomeAnimationState: true,
         },
     },
     states: {

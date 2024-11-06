@@ -19,6 +19,7 @@ type StateUnmemorable = {
 };
 type StateMemorable = {
     languageChanged: Boolean;
+    welcomeAnimationState: boolean;
 };
 export type States = {
     [key: string]: any;

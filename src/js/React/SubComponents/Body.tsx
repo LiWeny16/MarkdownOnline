@@ -5,6 +5,7 @@ import MdArea from "./SubBody/MdArea"
 import { observer } from "mobx-react"
 import { getEmojiPickerState, getStates, getTheme } from "@App/config/change"
 import { Suspense } from "react"
+import WelcomeAnimation from "../Components/myCom/Prompt/WelcomeAni"
 
 // 使用 React.lazy 懒加载组件
 const LazyEmojiPicker = React.lazy(
@@ -15,7 +16,11 @@ const LazyPromptAIPanel = React.lazy(() => import("@Com/myCom/Prompt/AIPanel"))
 export default observer(function Body() {
   const [content, setContent] = React.useState("")
   const articleRef = React.useRef(null)
+  const [showWelcome, setShowWelcome] = React.useState(true)
 
+  const handleEnter = () => {
+    setShowWelcome(false)
+  }
   React.useEffect(() => {
     fastKeyEvent()
   }, [])
@@ -48,6 +53,7 @@ export default observer(function Body() {
             ></div>
           </div>
         </div>
+        <WelcomeAnimation />
         <Suspense fallback={<></>}>
           <LazyEmojiPicker
             open={getEmojiPickerState() === "on" ? true : false}
@@ -59,9 +65,7 @@ export default observer(function Body() {
         <Suspense>
           <LazyPromptAIPanel open={getStates().unmemorable.aiPanelState} />
         </Suspense>
-        
       </div>
-      {/* <CircularLoadingButton></CircularLoadingButton> */}
     </>
   )
 })

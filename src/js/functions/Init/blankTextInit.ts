@@ -1,6 +1,7 @@
 import welcomeText from "@Asset/welcome.md?raw"
 // import getMdText from "@App/text/getMdText"
 import { fillInMemoryText, readMemoryText } from "@App/memory/memory"
+import { changeStatesMemorable } from "@App/config/change"
 // let welcomeText
 
 /**
@@ -13,6 +14,7 @@ export default function blankTextInit() {
         window.editor.setValue(list[0].contentText)
         resolve()
       } else {
+        changeStatesMemorable({ memorable: { welcomeAnimationState: true } })
         // fetch(
         //   "https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@main/src/assets/welcome.md"
         // )
