@@ -43,6 +43,32 @@ const map = {
       "t-no-file-selected": "Looking around, living in a fantasy?",
       "t-opening-file": "Opening local file, hold on a bit 😅",
       "t-error-opening-file": "An error occurred 🤣",
+      featuresList: {
+        startExperience: {
+          title: "Start Experience",
+          description: "Click to start and explore more features.",
+        },
+        smartEditor: {
+          title: "Markdown\nPlus AI",
+          description:
+            "A smart, dual-pane editor with live scrolling preview, integrated with smart completions and comprehensive shortcuts. Press Ctrl+J to summon the GPT-4 assistant, enhancing your creativity.",
+        },
+        codeDisplay: {
+          title: "Mind Maps\nAll-Inclusive",
+          description:
+            "Supports syntax highlighting for over 30 programming languages and offers Mermaid flowcharts and mind maps in various themes, adding vibrance to your creation.",
+        },
+        multiDeviceSync: {
+          title: "Advanced\nFile System",
+          description:
+            "A clear folder directory, one-click sync to local files, and easy clipboard image pasting, freeing your creative worries.",
+        },
+        flexibleExport: {
+          title: "Flexible\nExport Options",
+          description:
+            "Export effortlessly in formats like PDF, Markdown, and JPG, making content management a breeze.",
+        },
+      },
     },
   },
   zh: {
@@ -87,6 +113,32 @@ const map = {
       "t-no-file-selected": "左顾右盼，活在梦幻?",
       "t-opening-file": "正在打开本地文件，别急，你给我等会😅",
       "t-error-opening-file": "尼玛的报错乐🤣",
+      featuresList: {
+        startExperience: {
+          title: "开始体验",
+          description: "点击，\n探索更多功能。\n\n(Ctrl+S跳过下次引导)",
+        },
+        smartEditor: {
+          title: "Markdown \n Plus AI \n",
+          description:
+            "免费，智能，实时滚动预览的双栏编辑器，集成智能补全和完备的快捷键，Ctrl+J 一键呼出GPT4助手，让你的创作如虎添翼",
+        },
+        codeDisplay: {
+          title: `思维导图\n 一应俱全`,
+          description:
+            "支持超过30种编程语言的语法高亮，内置多种主题的Mermaid流程图和思维导图，让您的创作丰富多彩",
+        },
+        multiDeviceSync: {
+          title: "先进的\n文件系统",
+          description:
+            "一览无遗的文件夹目录，一键同步到本地文件，粘贴轻松写入剪切板图片，解放你的创作担忧",
+        },
+        flexibleExport: {
+          title: "灵活的\n导出方式",
+          description:
+            "一键导出为PDF、Markdown、JPG等多种格式，让您的内容轻松管理",
+        },
+      },
     },
   },
 }

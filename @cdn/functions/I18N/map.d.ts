@@ -39,6 +39,28 @@ declare const map: {
             "t-no-file-selected": string;
             "t-opening-file": string;
             "t-error-opening-file": string;
+            featuresList: {
+                startExperience: {
+                    title: string;
+                    description: string;
+                };
+                smartEditor: {
+                    title: string;
+                    description: string;
+                };
+                codeDisplay: {
+                    title: string;
+                    description: string;
+                };
+                multiDeviceSync: {
+                    title: string;
+                    description: string;
+                };
+                flexibleExport: {
+                    title: string;
+                    description: string;
+                };
+            };
         };
     };
     zh: {
@@ -81,6 +103,28 @@ declare const map: {
             "t-no-file-selected": string;
             "t-opening-file": string;
             "t-error-opening-file": string;
+            featuresList: {
+                startExperience: {
+                    title: string;
+                    description: string;
+                };
+                smartEditor: {
+                    title: string;
+                    description: string;
+                };
+                codeDisplay: {
+                    title: string;
+                    description: string;
+                };
+                multiDeviceSync: {
+                    title: string;
+                    description: string;
+                };
+                flexibleExport: {
+                    title: string;
+                    description: string;
+                };
+            };
         };
     };
 };

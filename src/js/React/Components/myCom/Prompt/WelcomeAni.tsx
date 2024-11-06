@@ -3,46 +3,56 @@ import React, { useEffect, useRef, useState } from "react"
 import { Backdrop, Button, Typography, Box } from "@mui/material"
 import { gsap } from "gsap"
 import { changeStatesMemorable, getStatesMemorable } from "@App/config/change"
-
-const featuresList = [
-  {
-    title: "开始体验",
-    description: "点击开始，探索更多功能。",
-    icon: "🚀",
-    isButton: true,
-  },
-  {
-    title: "智能编辑器",
-    description:
-      "支持实时预览的双栏编辑器，集成智能补全和格式化功能，让写作更轻松。",
-    icon: "✍️",
-  },
-  {
-    title: "代码展示",
-    description: "支持超过40种编程语言的语法高亮，内置多种主题，让代码更易读。",
-    icon: "💻",
-  },
-  {
-    title: "多端同步",
-    description: "云端自动保存，多设备实时同步，随时随地继续你的创作。",
-    icon: "🔄",
-  },
-  {
-    title: "灵活导出",
-    description: "一键导出为PDF、Md、Txt等多种格式，支持自定义导出模板。",
-    icon: "📤",
-  },
-]
+import i18n from "i18next"
+import { useTranslation } from "react-i18next"
+const t = i18n.t
 
 const WelcomeAnimation = () => {
+  const { t } = useTranslation()
+  const featuresList = [
+    {
+      title: t("featuresList.startExperience.title"),
+      description: t("featuresList.startExperience.description"),
+      icon: "🚀",
+      isButton: true,
+    },
+    {
+      title: "未完待续...",
+      description:
+        "探索，\n创新，\n永不言弃。\n\n To Explore, \nTo Innovate, \nNever give up.",
+      icon: "✨",
+    },
+    {
+      title: t("featuresList.smartEditor.title"),
+      description: t("featuresList.smartEditor.description"),
+      icon: "✍️",
+    },
+
+    {
+      title: t("featuresList.codeDisplay.title"),
+      description: t("featuresList.codeDisplay.description"),
+      icon: "🌍",
+    },
+    {
+      title: t("featuresList.multiDeviceSync.title"),
+      description: t("featuresList.multiDeviceSync.description"),
+      icon: "📂",
+    },
+    {
+      title: t("featuresList.flexibleExport.title"),
+      description: t("featuresList.flexibleExport.description"),
+      icon: "📤",
+    },
+  ]
   const welcomeRef = useRef(null)
-  const featuresRefs = useRef([])
-  const floatingAnimations = useRef([])
-  const [activeIndex, setActiveIndex] = useState(null)
+  const featuresRefs = useRef<(HTMLDivElement | null)[]>([])
+  const floatingAnimations = useRef<(gsap.core.Tween | null)[]>([])
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const [isInitialAnimationComplete, setIsInitialAnimationComplete] =
     useState(false)
 
-  const getRandomFloat = (min, max) => Math.random() * (max - min) + min
+  const getRandomFloat = (min: number, max: number) =>
+    Math.random() * (max - min) + min
 
   const initialCardStates = featuresList.map((feature, index) => {
     let angle
@@ -56,6 +66,7 @@ const WelcomeAnimation = () => {
       y: 0,
       rotation: angle,
       zIndex: feature.isButton ? featuresList.length + 1 : index,
+      scale: 1,
     }
   })
 
@@ -67,7 +78,7 @@ const WelcomeAnimation = () => {
 
       const buttonIndex = featuresList.findIndex((feature) => feature.isButton)
 
-      // Initialize: only show the "Start Experience" card
+      // 初始化：仅显示“开始体验”卡片
       featuresRefs.current.forEach((ref, index) => {
         if (ref) {
           if (index === buttonIndex) {
@@ -77,6 +88,7 @@ const WelcomeAnimation = () => {
               rotation: 0,
               scale: 1,
               opacity: 1,
+              zIndex: featuresList.length + 1, // 设置初始 zIndex
             })
           } else {
             gsap.set(ref, {
@@ -85,15 +97,16 @@ const WelcomeAnimation = () => {
               rotation: 0,
               scale: 0.8,
               opacity: 0,
+              zIndex: index, // 设置初始 zIndex
             })
           }
         }
       })
 
-      // Start card reveal after a short delay
-      tl.add("cardsReveal", "+=0.3")
+      // 短暂延迟后开始卡片展示
+      tl.add("cardsReveal", "+=0.6")
 
-      // Reveal other cards
+      // 展示其他卡片
       featuresRefs.current.forEach((ref, index) => {
         if (ref && index !== buttonIndex) {
           let angle = (index - (featuresList.length - 1) / 2) * 15
@@ -109,12 +122,15 @@ const WelcomeAnimation = () => {
               y: 0,
               duration: 0.8,
               ease: "back.out(1.7)",
-              zIndex: index,
+              onStart: () => {
+                // 在动画开始前设置 zIndex
+                gsap.set(ref, { zIndex: index })
+              },
             },
             `cardsReveal+=${delay}`
           )
 
-          // Add continuous floating animation
+          // 添加持续浮动动画
           tl.add(
             () => {
               const floatAnim = gsap.to(ref, {
@@ -131,7 +147,7 @@ const WelcomeAnimation = () => {
         }
       })
 
-      // Move the "Start Experience" card to its position
+      // 移动“开始体验”卡片到其位置
       tl.to(
         featuresRefs.current[buttonIndex],
         {
@@ -141,12 +157,17 @@ const WelcomeAnimation = () => {
           y: 0,
           duration: 0.8,
           ease: "back.out(1.7)",
-          zIndex: featuresList.length + 1,
+          onStart: () => {
+            // 在动画开始前设置 zIndex
+            gsap.set(featuresRefs.current[buttonIndex], {
+              zIndex: featuresList.length + 1,
+            })
+          },
         },
         `cardsReveal+=${featuresRefs.current.length * 0.15}`
       )
 
-      // Add floating animation to the "Start Experience" card
+      // 为“开始体验”卡片添加浮动动画
       tl.add(() => {
         const floatAnim = gsap.to(featuresRefs.current[buttonIndex], {
           y: -10,
@@ -163,12 +184,12 @@ const WelcomeAnimation = () => {
   }, [])
 
   const handleEnter = () => {
-    // Ensure the state is changed immediately when the button is clicked
+    // 确保点击按钮时立即更改状态
     changeStatesMemorable({ memorable: { welcomeAnimationState: false } })
 
     const tl = gsap.timeline()
 
-    // Cards disappear animation
+    // 卡片消失动画
     featuresRefs.current.forEach((ref, index) => {
       if (ref) {
         const randomDirection = Math.random() * 360
@@ -192,42 +213,45 @@ const WelcomeAnimation = () => {
       }
     })
 
-    // Fade out background
+    // 背景淡出
     tl.to(
       welcomeRef.current,
       {
         opacity: 0,
-        duration: 0.6,
+        duration: 0.2,
       },
       ">-0.2"
     )
   }
 
-  const handleCardClick = (index) => {
+  const handleCardClick = (index: number) => {
     if (!isInitialAnimationComplete) return
 
     const tl = gsap.timeline()
 
     if (activeIndex === index) {
-      // Deactivate card
+      // 取消激活卡片
       const ref = featuresRefs.current[index]
       if (ref) {
-        // Kill floating animation
-        if (floatingAnimations.current[index]) {
+        // 终止浮动动画
+        if (floatingAnimations.current[index] !== null) {
           floatingAnimations.current[index].kill()
           floatingAnimations.current[index] = null
         }
+
+        // 先调整 zIndex 到收起状态
+        gsap.set(ref, { zIndex: initialCardStates[index].zIndex })
+
+        // 动画路径：斜着插回去
         tl.to(ref, {
-          scale: 1,
-          zIndex: initialCardStates[index].zIndex,
-          duration: 0.5,
-          ease: "power2.out",
+          scale: initialCardStates[index].scale || 1,
+          rotation: initialCardStates[index].rotation,
+          duration: 0.8,
+          ease: "power2.inOut",
           x: initialCardStates[index].x,
           y: initialCardStates[index].y,
-          rotation: initialCardStates[index].rotation,
-          yPercent: 0,
           onComplete: () => {
-            // Recreate floating animation
+            // 重新创建浮动动画
             const floatAnim = gsap.to(ref, {
               rotation: `+=${getRandomFloat(-2, 2)}`,
               duration: getRandomFloat(3, 5),
@@ -241,27 +265,29 @@ const WelcomeAnimation = () => {
       }
       setActiveIndex(null)
     } else {
-      // Deactivate previously active card
+      // 取消之前激活的卡片
       if (activeIndex !== null && featuresRefs.current[activeIndex]) {
         const prevRef = featuresRefs.current[activeIndex]
-        // Kill floating animation
+        // 终止浮动动画
         if (floatingAnimations.current[activeIndex]) {
           floatingAnimations.current[activeIndex].kill()
           floatingAnimations.current[activeIndex] = null
         }
+        // 先调整 zIndex 到初始值
+        gsap.set(prevRef, { zIndex: initialCardStates[activeIndex].zIndex })
+
+        // 动画路径：斜着插回去
         tl.to(
           prevRef,
           {
-            scale: 1,
-            zIndex: initialCardStates[activeIndex].zIndex,
-            duration: 0.5,
-            ease: "power2.out",
+            scale: initialCardStates[activeIndex].scale || 1,
+            rotation: initialCardStates[activeIndex].rotation,
+            duration: 0.8,
+            ease: "power2.inOut",
             x: initialCardStates[activeIndex].x,
             y: initialCardStates[activeIndex].y,
-            rotation: initialCardStates[activeIndex].rotation,
-            yPercent: 0,
             onComplete: () => {
-              // Recreate floating animation
+              // 重新创建浮动动画
               const floatAnim = gsap.to(prevRef, {
                 rotation: `+=${getRandomFloat(-2, 2)}`,
                 duration: getRandomFloat(3, 5),
@@ -276,25 +302,46 @@ const WelcomeAnimation = () => {
         )
       }
 
-      // Activate new card
+      // 激活新的卡片
       if (featuresRefs.current[index]) {
         const currentRef = featuresRefs.current[index]
-        // Kill floating animation
+
+        // 终止当前卡片的浮动动画
         if (floatingAnimations.current[index]) {
           floatingAnimations.current[index].kill()
           floatingAnimations.current[index] = null
         }
+
+        // 动态计算缩放比例，确保卡片不会过大或过小
+        const calculateScale = () => {
+          const viewportWidth = window.innerWidth
+          const viewportHeight = window.innerHeight
+          const cardWidth = 300 // 原始宽度
+          const cardHeight = 400 // 原始高度
+          const maxScaleWidth = (0.8 * viewportWidth) / cardWidth
+          const maxScaleHeight = (0.8 * viewportHeight) / cardHeight
+          const scale = Math.min(maxScaleWidth, maxScaleHeight, 2) // 限制最大缩放为2
+          return scale < 1 ? 1 : scale // 确保缩放不小于1
+        }
+
+        const scale = calculateScale()
+
+        // 先设置 zIndex 再进行动画
+        gsap.set(currentRef, { zIndex: 100 })
+
         tl.to(
           currentRef,
           {
-            scale: 1.5,
-            zIndex: 10,
+            scale: scale,
+            x: -300,
+            y: -50,
+            rotation: 0,
             duration: 0.5,
             ease: "power2.out",
-            x: 0,
-            y: 0,
-            yPercent: -50,
-            rotation: 0,
+            onComplete: () => {
+              // 取消 yPercent 以确保居中
+              gsap.set(currentRef, { yPercent: 0 })
+            },
           },
           0
         )
@@ -304,7 +351,9 @@ const WelcomeAnimation = () => {
     }
   }
 
-  const handleBackgroundClick = (event) => {
+  const handleBackgroundClick = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
     if (event.target === event.currentTarget && activeIndex !== null) {
       handleCardClick(activeIndex)
     }
@@ -323,7 +372,7 @@ const WelcomeAnimation = () => {
         alignItems: "center",
         justifyContent: "center",
         gap: 4,
-        paddingTop: 50,
+        paddingTop: 30,
         overflow: "hidden",
       }}
     >
@@ -333,17 +382,23 @@ const WelcomeAnimation = () => {
           width: "300px",
           height: "400px",
           perspective: "1000px",
+          userSelect: "none",
           marginBottom: 8,
         }}
       >
         {featuresList.map((feature, index) => (
           <Box
             key={index}
-            ref={(el) => (featuresRefs.current[index] = el)}
+            ref={(el: HTMLDivElement | null) =>
+              (featuresRefs.current[index] = el)
+            }
             onClick={(e) => {
-              e.stopPropagation() // Prevent event bubbling to Backdrop
+              e.stopPropagation() // 防止事件冒泡到 Backdrop
               if (!feature.isButton) {
                 handleCardClick(index)
+              } else {
+                // 对于按钮类型的卡片，处理点击事件
+                handleEnter()
               }
             }}
             sx={{
@@ -360,20 +415,27 @@ const WelcomeAnimation = () => {
               cursor: "pointer",
               transformOrigin: "center center",
               transition: "box-shadow 0.3s ease",
-              zIndex: feature.isButton ? featuresList.length + 1 : index,
+              // 移除 zIndex 这里的设置，改由动画控制
+              // zIndex: feature.isButton ? featuresList.length + 1 : index,
               "&:hover": {
                 boxShadow: isInitialAnimationComplete
                   ? "0 12px 48px rgba(0, 0, 0, 0.2)"
                   : "0 8px 32px rgba(0, 0, 0, 0.1)",
               },
               pointerEvents: isInitialAnimationComplete ? "auto" : "none",
+              // 设置最小和最大缩放
+              minWidth: feature.isButton ? "300px" : "200px",
+              minHeight: feature.isButton ? "400px" : "250px",
+              maxWidth: "80vw",
+              maxHeight: "80vh",
+              willChange: "transform, opacity", // 优化动画性能
             }}
           >
             {feature.isButton ? (
               <Button
                 variant="contained"
                 onClick={(e) => {
-                  e.stopPropagation() // Prevent event bubbling
+                  e.stopPropagation() // 防止事件冒泡
                   handleEnter()
                 }}
                 sx={{
@@ -396,10 +458,16 @@ const WelcomeAnimation = () => {
                   transition: "all 0.3s ease",
                 }}
               >
-                <Typography variant="h5" sx={{ fontSize: "1.5rem", mb: 1 }}>
+                <Typography
+                  variant="h5"
+                  sx={{ whiteSpace: "pre-line", fontSize: "1.5rem", mb: 1 }}
+                >
                   {feature.icon} {feature.title}
                 </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ whiteSpace: "pre-line", opacity: 0.8 }}
+                >
                   {feature.description}
                 </Typography>
               </Button>
@@ -409,6 +477,7 @@ const WelcomeAnimation = () => {
                   sx={{
                     height: "100%",
                     width: "100%",
+                    display: "flex",
                     flexDirection: "column",
                   }}
                 >
@@ -420,6 +489,7 @@ const WelcomeAnimation = () => {
                       display: "flex",
                       alignItems: "center",
                       gap: 2,
+                      whiteSpace: "pre-line",
                     }}
                   >
                     <span>{feature.icon}</span>
@@ -429,16 +499,17 @@ const WelcomeAnimation = () => {
                     sx={{
                       height: "100%",
                       width: "100%",
+                      display: "flex",
                       flexDirection: "column",
                       alignContent: "center",
                       justifyContent: "center",
-                      pb:"80px"
+                      pb: "80px",
                     }}
                   >
                     <Typography
                       alignContent={"center"}
                       variant="body2"
-                      sx={{ opacity: 0.8 }}
+                      sx={{ whiteSpace: "pre-line",opacity: 0.8 }}
                     >
                       {feature.description}
                     </Typography>
