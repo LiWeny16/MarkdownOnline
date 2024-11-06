@@ -20,7 +20,7 @@ import { TreeItem2Icon } from "@mui/x-tree-view/TreeItem2Icon";
 import { TreeItem2Provider } from "@mui/x-tree-view/TreeItem2Provider";
 import { mdConverter } from "@Root/js";
 import sortFileDirectoryArr from "@App/fileSystem/sort";
-import { changeStates, getSettings } from "@App/config/change";
+import { changeStates, getSettings, } from "@App/config/change";
 const ITEMS = [
     {
         id: "1",
@@ -99,16 +99,11 @@ const CustomTreeItemContent = styled(TreeItem2Content)(({ theme }) => ({
 function TransitionComponent(props) {
     return _jsx(Collapse, { ...props });
 }
-const StyledTreeItemLabelText = styled(Typography)({
-    color: "inherit",
-    fontFamily: "General Sans",
-    fontWeight: 500,
-});
-function CustomLabel({ icon: Icon, expandable, children, ...other }) {
-    return (_jsxs(TreeItem2Label, { ...other, sx: {
+function CustomLabel({ icon: Icon, expandable = false, children, draggable = false, onClick, }) {
+    return (_jsxs(TreeItem2Label, { onClick: onClick, draggable: draggable, sx: {
             display: "flex",
             alignItems: "center",
-        }, children: [Icon && (_jsx(Box, { component: Icon, className: "labelIcon", color: "inherit", sx: { mr: 1, fontSize: "1.2rem" } })), _jsx(StyledTreeItemLabelText, { variant: "body2", children: children }), expandable && _jsx(DotIcon, {})] }));
+        }, children: [Icon && (_jsx(Box, { component: Icon, className: "labelIcon", color: "inherit", sx: { mr: 1, fontSize: "1.2rem" } })), _jsx(Typography, { sx: { color: "inherit", fontFamily: "General Sans", fontWeight: 500 }, variant: "body2", children: children }), expandable && _jsx(DotIcon, {})] }));
 }
 const isExpandable = (reactChildren) => {
     if (Array.isArray(reactChildren)) {
@@ -137,7 +132,7 @@ const getIconFromFileType = (fileType) => {
     }
 };
 const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
-    const { fillText, folderManager, id, itemId, label, disabled, children, ...other } = props;
+    const { setIsDragging, fillText, folderManager, id, itemId, label, disabled, children, ...other } = props;
     const { getRootProps, getContentProps, getIconContainerProps, getLabelProps, getGroupTransitionProps, status, publicAPI, } = useTreeItem2({ id, itemId, children, label, disabled, rootRef: ref });
     let item = publicAPI.getItem(itemId);
     const expandable = isExpandable(children);
@@ -169,18 +164,22 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
             }
         }
     };
-    return (_jsx(TreeItem2Provider, { itemId: itemId, children: _jsxs(StyledTreeItemRoot, { ...getRootProps(other), children: [_jsxs(CustomTreeItemContent, { ...getContentProps({
+    return (_jsx(TreeItem2Provider, { itemId: itemId, children: _jsxs(StyledTreeItemRoot, { draggable: false, ...getRootProps(other), children: [_jsxs(CustomTreeItemContent, { draggable: item.label.slice(-3) === "png" ? true : false, onDragStart: (e) => {
+                        if (item.label.slice(-3) === "png") {
+                            setTimeout(() => {
+                                setIsDragging(true);
+                            }, 400);
+                            e.dataTransfer.effectAllowed = "copy"; // 允许拖拽复制
+                            e.dataTransfer.setData("text/plain", `![${getSettings().advanced.imageSettings.basicStyle}](./${item.path})`);
+                        }
+                    }, ...getContentProps({
                         className: clsx("content", {
                             "Mui-expanded": status.expanded,
                             "Mui-selected": status.selected,
                             "Mui-focused": status.focused,
                             "Mui-disabled": status.disabled,
                         }),
-                    }), children: [_jsx(TreeItem2IconContainer, { ...getIconContainerProps(), children: _jsx(TreeItem2Icon, { status: status }) }), _jsx(CustomLabel
-                        // @ts-ignore
-                        , { 
-                            // @ts-ignore
-                            onClick: handleClickFolderFile, ...getLabelProps({
+                    }), children: [_jsx(TreeItem2IconContainer, { ...getIconContainerProps(), children: _jsx(TreeItem2Icon, { status: status }) }), _jsx(CustomLabel, { draggable: false, onClick: handleClickFolderFile, ...getLabelProps({
                                 icon,
                                 expandable: expandable && status.expanded,
                             }) })] }), children && _jsx(TransitionComponent, { ...getGroupTransitionProps() })] }) }));
@@ -188,7 +187,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
 export default function FileExplorer(props) {
     let sortedFileDirectoryArr = sortFileDirectoryArr(props.fileDirectoryArr);
     // 使用函数来传递 folderManager 到 CustomTreeItem
-    const WrappedCustomTreeItem = (itemProps) => (_jsx(CustomTreeItem, { ...itemProps, fillText: props.fillText, folderManager: props.folderManager }));
+    const WrappedCustomTreeItem = (itemProps) => (_jsx(CustomTreeItem, { ...itemProps, fillText: props.fillText, setIsDragging: props.setIsDragging, folderManager: props.folderManager }));
     return (_jsx(RichTreeView, { items: sortedFileDirectoryArr ?? ITEMS, "aria-label": "file explorer", 
         // defaultExpandedItems={["1", "1.1"]}
         defaultSelectedItems: "1.1", sx: {

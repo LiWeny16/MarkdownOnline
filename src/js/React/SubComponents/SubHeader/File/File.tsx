@@ -33,6 +33,7 @@ import FileCopyIcon from "@mui/icons-material/FileCopy"
 import Zoom from "@mui/material/Zoom"
 import ScrollableBox from "@Root/js/React/Components/myCom/Layout/ScrollBox"
 import i18n from "i18next"
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
 
 import {
   PushPin as PushPinIcon,
@@ -44,10 +45,11 @@ const folderManager = new FileFolderManager()
 let _t: NodeJS.Timeout | null
 const FileDrawer = observer(function FileDrawer() {
   const { t } = useTranslation()
-
   const [fileDirectoryArr, setFileDirectoryArr] = React.useState<any>([])
   const [editingFileName, setEditingFileName] = React.useState("")
   const [isPinned, setIsPinned] = useState(false)
+  const [isDragging, setIsDragging] = useState(false)
+  window._setIsDragging = setIsDragging
   const theme = useTheme()
   const fillText = (content: string | undefined, fileName: string) => {
     // 使用 Monaco 编辑器显示文件内容
@@ -55,14 +57,9 @@ const FileDrawer = observer(function FileDrawer() {
     alertUseArco(`打开${fileName}成功！😀`)
   }
   const toggleDrawer = (newOpen: boolean) => () => {
-    // const backDropEle = document.getElementsByClassName(
-    //   "pointed-through-backdrop"
-    // )
-    // const parentEle = backDropEle[0].parentElement
     if (!isPinned) {
       changeFileManagerState(newOpen)
     } else {
-      // parentEle?.style.setProperty("pointer-events", "none")
     }
   }
   const handleOnChangeFileEditLocalSwitch = (_e: Event, i: boolean) => {
@@ -77,34 +74,34 @@ const FileDrawer = observer(function FileDrawer() {
   const onClickOpenSingleFile = async () => {
     try {
       // 调用 openSingleFile 方法从文件管理器中打开单个文件
-      const fileHandle = await fileManager.openSingleFile();
+      const fileHandle = await fileManager.openSingleFile()
       if (!fileHandle) {
         // 如果没有文件被选中，显示错误提示消息
         alertUseArco(t("t-no-file-selected"), 2500, {
           kind: "warning",
-        });
-        return;
+        })
+        return
       }
-      setEditingFileName(fileHandle.name);
+      setEditingFileName(fileHandle.name)
       setFileDirectoryArr([
         {
           id: "1." + fileHandle.name,
           label: fileHandle.name,
           fileType: fileHandle.kind,
         },
-      ]);
+      ])
       // 显示正在打开文件的提示
-      alertUseArco(t("t-opening-file"));
+      alertUseArco(t("t-opening-file"))
       // 读取文件内容
-      const content = await fileManager.readFile(fileHandle);
-      fillText(content, fileHandle.name);
+      const content = await fileManager.readFile(fileHandle)
+      fillText(content, fileHandle.name)
     } catch (error) {
       // 错误处理
-      console.error("Error opening file:", error);
-      alertUseArco(t("t-error-opening-file"), 2000, { kind: "error" });
+      console.error("Error opening file:", error)
+      alertUseArco(t("t-error-opening-file"), 2000, { kind: "error" })
     }
-  };
-  
+  }
+
   const onClickOpenFolder = async () => {
     let fileFolderManager = folderManager
     const directoryHandle = await fileFolderManager.openDirectory()
@@ -132,6 +129,7 @@ const FileDrawer = observer(function FileDrawer() {
     backgroundColor: "transparent",
     // pointerEvents: "none", // 使点击事件穿透
   })
+
   return (
     <>
       <Drawer
@@ -146,10 +144,15 @@ const FileDrawer = observer(function FileDrawer() {
           disableAutoFocus: true,
           disableRestoreFocus: true,
           style: {
-            pointerEvents: isPinned ? "none" : "all",
+            pointerEvents: isPinned || isDragging ? "none" : "all",
           },
           BackdropComponent: (props) => (
             <TransparentBackdrop
+              onDrop={() => {
+                setTimeout(() => {
+                  window._setIsDragging(false)
+                }, 30)
+              }}
               {...props}
               className="pointed-through-backdrop"
             />
@@ -191,6 +194,10 @@ const FileDrawer = observer(function FileDrawer() {
               }}
             >
               <SquareClickIconButton
+                icon={<ArrowForwardIosIcon />}
+                onClick={() => changeFileManagerState(false)}
+              />
+              <SquareClickIconButton
                 icon={
                   isPinned ? (
                     <PushPinIcon sx={{ transform: "rotate(45deg)" }} />
@@ -199,6 +206,7 @@ const FileDrawer = observer(function FileDrawer() {
                   )
                 }
                 onClick={() => setIsPinned(!isPinned)}
+                // 固定
                 tooltipText={"🧷" + t("t-file-manager-pinned")}
               />
 
@@ -273,6 +281,7 @@ const FileDrawer = observer(function FileDrawer() {
                     <FileExplorer
                       folderManager={folderManager}
                       fillText={fillText}
+                      setIsDragging={setIsDragging}
                       fileDirectoryArr={fileDirectoryArr}
                     />
                   </ScrollableBox>

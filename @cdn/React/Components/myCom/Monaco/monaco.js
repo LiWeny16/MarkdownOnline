@@ -26,6 +26,7 @@ import monacoClickEvent from "@Func/Events/click/monacoClick";
 import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight";
 import monacoScrollEvent from "@Func/Events/scroll/monacoScroll";
 import { pollVariables } from "@App/basic/basic";
+import monacoDragEvent from "@Func/Events/drag/drag";
 const version = "0.45.0";
 loader.config({
     paths: {
@@ -80,7 +81,7 @@ export default observer(function MonacoEditor() {
         colorDecorators: true,
         minimap: { enabled: true },
         unicodeHighlight: { nonBasicASCII: false, ambiguousCharacters: false },
-        // dragAndDrop: true,
+        dragAndDrop: true,
         //   lightbulb: {
         //     enabled: true, // 快速修复功能
         //  },
@@ -154,6 +155,7 @@ export default observer(function MonacoEditor() {
             monacoMouseEvent(editor, monaco);
             monacoClickEvent(editor, monaco);
             monacoScrollEvent(editor, monaco);
+            monacoDragEvent(editor, monaco);
             // monacoPalette(editor,monaco)
             // monacoKeyDownEvent()
             // errIntellisense()

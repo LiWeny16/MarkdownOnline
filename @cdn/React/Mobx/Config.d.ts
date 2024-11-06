@@ -10,6 +10,7 @@ export type MousePosition = {
     posy: number;
 };
 type StateUnmemorable = {
+    isDragging: boolean;
     loading: boolean;
     previewMode: Boolean;
     aiPanelState: Boolean;

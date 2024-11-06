@@ -188,6 +188,7 @@ const defaultConfig = {
     },
     states: {
         unmemorable: {
+            isDragging: false,
             loading: true,
             previewMode: false,
             aiPanelState: false,

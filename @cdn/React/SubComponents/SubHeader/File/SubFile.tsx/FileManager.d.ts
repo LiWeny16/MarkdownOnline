@@ -13,6 +13,7 @@ declare module "react" {
 export default function FileExplorer(props: {
     fileDirectoryArr: any;
     folderManager: any;
+    setIsDragging: Function;
     fillText: Function;
 }): import("react/jsx-runtime").JSX.Element;
 export {};

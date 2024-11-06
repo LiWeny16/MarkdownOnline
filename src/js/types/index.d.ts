@@ -204,6 +204,7 @@ declare module "*index.js" {
 }
 
 declare interface Window {
+  _setIsDragging: any
   editor: any
   monaco: any
   katex: any

@@ -16,6 +16,7 @@ import SaveAltIcon from "@mui/icons-material/SaveAlt";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
 import Zoom from "@mui/material/Zoom";
 import ScrollableBox from "@Root/js/React/Components/myCom/Layout/ScrollBox";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { PushPin as PushPinIcon, PushPinOutlined as PushPinOutlinedIcon, } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
 const fileManager = new FileManager();
@@ -26,6 +27,8 @@ const FileDrawer = observer(function FileDrawer() {
     const [fileDirectoryArr, setFileDirectoryArr] = React.useState([]);
     const [editingFileName, setEditingFileName] = React.useState("");
     const [isPinned, setIsPinned] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
+    window._setIsDragging = setIsDragging;
     const theme = useTheme();
     const fillText = (content, fileName) => {
         // 使用 Monaco 编辑器显示文件内容
@@ -33,15 +36,10 @@ const FileDrawer = observer(function FileDrawer() {
         alertUseArco(`打开${fileName}成功！😀`);
     };
     const toggleDrawer = (newOpen) => () => {
-        // const backDropEle = document.getElementsByClassName(
-        //   "pointed-through-backdrop"
-        // )
-        // const parentEle = backDropEle[0].parentElement
         if (!isPinned) {
             changeFileManagerState(newOpen);
         }
         else {
-            // parentEle?.style.setProperty("pointer-events", "none")
         }
     };
     const handleOnChangeFileEditLocalSwitch = (_e, i) => {
@@ -114,9 +112,13 @@ const FileDrawer = observer(function FileDrawer() {
                 disableAutoFocus: true,
                 disableRestoreFocus: true,
                 style: {
-                    pointerEvents: isPinned ? "none" : "all",
+                    pointerEvents: isPinned || isDragging ? "none" : "all",
                 },
-                BackdropComponent: (props) => (_jsx(TransparentBackdrop, { ...props, className: "pointed-through-backdrop" })),
+                BackdropComponent: (props) => (_jsx(TransparentBackdrop, { onDrop: () => {
+                        setTimeout(() => {
+                            window._setIsDragging(false);
+                        }, 30);
+                    }, ...props, className: "pointed-through-backdrop" })),
             }, anchor: "right", autoFocus: false, open: getFileManagerState(), onClose: toggleDrawer(false), children: _jsxs(Box, { sx: {
                     overflow: "hidden",
                     background: theme.palette.mode === "light" ? "#F9F9F9" : "dark",
@@ -137,7 +139,9 @@ const FileDrawer = observer(function FileDrawer() {
                                 height: "100vh", // 满屏高度
                                 alignItems: "center", // 中心对齐图标
                                 paddingTop: 2, // 顶部间隔
-                            }, children: [_jsx(SquareClickIconButton, { icon: isPinned ? (_jsx(PushPinIcon, { sx: { transform: "rotate(45deg)" } })) : (_jsx(PushPinOutlinedIcon, { sx: { transform: "rotate(45deg)" } })), onClick: () => setIsPinned(!isPinned), tooltipText: "🧷" + t("t-file-manager-pinned") }), _jsx(SquareClickIconButton, { icon: _jsx(FileCopyIcon, {}), onClick: onClickOpenSingleFile, tooltipText: "📁" + t("t-file-manager-open-file") }), _jsx(SquareClickIconButton, { tooltipText: "📁" + t("t-file-manager-open-folder"), icon: _jsx(FolderIcon, {}), onClick: onClickOpenFolder }), _jsx(SquareClickIconButton, { tooltipText: "📑" + t("t-file-manager-saveAs"), icon: _jsx(SaveAltIcon, {}), onClick: () => fileManager.saveAsFile(getMdTextFromMonaco()) })] }) }), _jsxs(Box, { sx: {
+                            }, children: [_jsx(SquareClickIconButton, { icon: _jsx(ArrowForwardIosIcon, {}), onClick: () => changeFileManagerState(false) }), _jsx(SquareClickIconButton, { icon: isPinned ? (_jsx(PushPinIcon, { sx: { transform: "rotate(45deg)" } })) : (_jsx(PushPinOutlinedIcon, { sx: { transform: "rotate(45deg)" } })), onClick: () => setIsPinned(!isPinned), 
+                                    // 固定
+                                    tooltipText: "🧷" + t("t-file-manager-pinned") }), _jsx(SquareClickIconButton, { icon: _jsx(FileCopyIcon, {}), onClick: onClickOpenSingleFile, tooltipText: "📁" + t("t-file-manager-open-file") }), _jsx(SquareClickIconButton, { tooltipText: "📁" + t("t-file-manager-open-folder"), icon: _jsx(FolderIcon, {}), onClick: onClickOpenFolder }), _jsx(SquareClickIconButton, { tooltipText: "📑" + t("t-file-manager-saveAs"), icon: _jsx(SaveAltIcon, {}), onClick: () => fileManager.saveAsFile(getMdTextFromMonaco()) })] }) }), _jsxs(Box, { sx: {
                             width: "23svw",
                             height: "100svh",
                             display: "flex",
@@ -156,7 +160,7 @@ const FileDrawer = observer(function FileDrawer() {
                                     alignContent: "center",
                                     justifyContent: "center",
                                     marginBottom: "20svh",
-                                }, children: fileDirectoryArr.length != 0 ? (_jsx(_Fragment, { children: _jsx(ScrollableBox, { sx: { width: "100%", height: "100%" }, children: _jsx(FileExplorer, { folderManager: folderManager, fillText: fillText, fileDirectoryArr: fileDirectoryArr }) }) })) : (_jsx(_Fragment, { children: _jsxs(Box, { className: "FLEX COL ALI-CEN JUS-CEN", sx: {
+                                }, children: fileDirectoryArr.length != 0 ? (_jsx(_Fragment, { children: _jsx(ScrollableBox, { sx: { width: "100%", height: "100%" }, children: _jsx(FileExplorer, { folderManager: folderManager, fillText: fillText, setIsDragging: setIsDragging, fileDirectoryArr: fileDirectoryArr }) }) })) : (_jsx(_Fragment, { children: _jsxs(Box, { className: "FLEX COL ALI-CEN JUS-CEN", sx: {
                                             width: "100%",
                                         }, children: [_jsx(Typography, { children: getSettings().basic.fileEditLocal ? editingFileName : "" }), _jsx(Button, { sx: startButtonStyle, onClick: onClickOpenSingleFile, variant: "contained", color: "primary", children: t("t-file-manager-open-file") }), _jsx(Button, { sx: startButtonStyle, variant: "contained", color: "primary", onClick: onClickOpenFolder, children: t("t-file-manager-open-folder") }), _jsx(Button, { sx: startButtonStyle, variant: "contained", onClick: () => {
                                                     fileManager.saveAsFile(getMdTextFromMonaco());

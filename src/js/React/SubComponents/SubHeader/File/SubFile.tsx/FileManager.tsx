@@ -29,7 +29,11 @@ import { TreeItem2Provider } from "@mui/x-tree-view/TreeItem2Provider"
 import { TreeViewBaseItem } from "@mui/x-tree-view/models"
 import { mdConverter } from "@Root/js"
 import sortFileDirectoryArr from "@App/fileSystem/sort"
-import { changeStates, getSettings } from "@App/config/change"
+import {
+  changeStates,
+  getSettings,
+  getStatesMemorable,
+} from "@App/config/change"
 
 type FileType =
   | "image"
@@ -144,28 +148,26 @@ const CustomTreeItemContent = styled(TreeItem2Content)(({ theme }) => ({
 function TransitionComponent(props: TransitionProps) {
   return <Collapse {...props} />
 }
-
-const StyledTreeItemLabelText = styled(Typography)({
-  color: "inherit",
-  fontFamily: "General Sans",
-  fontWeight: 500,
-}) as unknown as typeof Typography
-
 interface CustomLabelProps {
   children: React.ReactNode
   icon?: React.ElementType
   expandable?: boolean
+  draggable: boolean
+  onClick: React.MouseEventHandler<HTMLDivElement>
+  // onDragStart: (e: React.DragEvent<HTMLDivElement>) => void
 }
 
 function CustomLabel({
   icon: Icon,
-  expandable,
+  expandable = false,
   children,
-  ...other
+  draggable = false,
+  onClick,
 }: CustomLabelProps) {
   return (
     <TreeItem2Label
-      {...other}
+      onClick={onClick}
+      draggable={draggable}
       sx={{
         display: "flex",
         alignItems: "center",
@@ -180,9 +182,12 @@ function CustomLabel({
         />
       )}
 
-      <StyledTreeItemLabelText variant="body2">
+      <Typography
+        sx={{ color: "inherit", fontFamily: "General Sans", fontWeight: 500 }}
+        variant="body2"
+      >
         {children}
-      </StyledTreeItemLabelText>
+      </Typography>
       {expandable && <DotIcon />}
     </TreeItem2Label>
   )
@@ -221,11 +226,13 @@ interface CustomTreeItemProps
     Omit<React.HTMLAttributes<HTMLLIElement>, "onFocus"> {
   folderManager: any
   fillText: any
+  setIsDragging: Function
 }
 
 const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
   function CustomTreeItem(props, ref) {
     const {
+      setIsDragging,
       fillText,
       folderManager,
       id,
@@ -278,11 +285,23 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
         }
       }
     }
-
     return (
       <TreeItem2Provider itemId={itemId}>
-        <StyledTreeItemRoot {...getRootProps(other)}>
+        <StyledTreeItemRoot draggable={false} {...getRootProps(other)}>
           <CustomTreeItemContent
+            draggable={item.label.slice(-3) === "png" ? true : false}
+            onDragStart={(e) => {
+              if (item.label.slice(-3) === "png") {
+                setTimeout(() => {
+                  setIsDragging(true)
+                }, 400)
+                e.dataTransfer.effectAllowed = "copy" // 允许拖拽复制
+                e.dataTransfer.setData(
+                  "text/plain",
+                  `![${getSettings().advanced.imageSettings.basicStyle}](./${item.path})`
+                )
+              } 
+            }}
             {...getContentProps({
               className: clsx("content", {
                 "Mui-expanded": status.expanded,
@@ -297,7 +316,7 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
             </TreeItem2IconContainer>
 
             <CustomLabel
-              // @ts-ignore
+              draggable={false}
               onClick={handleClickFolderFile}
               {...getLabelProps({
                 icon,
@@ -315,6 +334,7 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
 export default function FileExplorer(props: {
   fileDirectoryArr: any
   folderManager: any
+  setIsDragging: Function
   fillText: Function
 }) {
   let sortedFileDirectoryArr = sortFileDirectoryArr(props.fileDirectoryArr)
@@ -323,6 +343,7 @@ export default function FileExplorer(props: {
     <CustomTreeItem
       {...itemProps}
       fillText={props.fillText}
+      setIsDragging={props.setIsDragging}
       folderManager={props.folderManager}
     />
   )

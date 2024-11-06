@@ -12,6 +12,7 @@ export type MousePosition = {
   posy: number
 }
 type StateUnmemorable = {
+  isDragging: boolean
   loading: boolean
   previewMode: Boolean
   aiPanelState: Boolean
@@ -21,7 +22,7 @@ type StateUnmemorable = {
 }
 type StateMemorable = {
   languageChanged: Boolean
-  welcomeAnimationState:boolean
+  welcomeAnimationState: boolean
 }
 export type States = {
   [key: string]: any
