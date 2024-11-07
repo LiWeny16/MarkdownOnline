@@ -5,7 +5,6 @@ import { gsap } from "gsap"
 import { changeStatesMemorable, getStatesMemorable } from "@App/config/change"
 import i18n from "i18next"
 import { useTranslation } from "react-i18next"
-const t = i18n.t
 
 const WelcomeAnimation = () => {
   const { t } = useTranslation()
@@ -27,7 +26,6 @@ const WelcomeAnimation = () => {
       description: t("featuresList.smartEditor.description"),
       icon: "✍️",
     },
-
     {
       title: t("featuresList.codeDisplay.title"),
       description: t("featuresList.codeDisplay.description"),
@@ -130,7 +128,6 @@ const WelcomeAnimation = () => {
             `cardsReveal+=${delay}`
           )
 
-          // 添加持续浮动动画
           tl.add(
             () => {
               const floatAnim = gsap.to(ref, {
@@ -151,9 +148,9 @@ const WelcomeAnimation = () => {
       tl.to(
         featuresRefs.current[buttonIndex],
         {
-          scale: 1,
-          rotation: 45,
-          x: 135,
+          scale: 1.05,
+          rotation: 50,
+          x: 175,
           y: 0,
           duration: 0.8,
           ease: "back.out(1.7)",
@@ -163,21 +160,22 @@ const WelcomeAnimation = () => {
               zIndex: featuresList.length + 1,
             })
           },
+          onComplete: () => {
+            // 为“开始体验”卡片添加浮动动画
+            tl.add(() => {
+              const floatAnim = gsap.to(featuresRefs.current[buttonIndex], {
+                y: -10,
+                duration: 1.5,
+                repeat: -1,
+                yoyo: true,
+                ease: "power1.inOut",
+              })
+              floatingAnimations.current[buttonIndex] = floatAnim
+            })
+          },
         },
         `cardsReveal+=${featuresRefs.current.length * 0.15}`
       )
-
-      // 为“开始体验”卡片添加浮动动画
-      tl.add(() => {
-        const floatAnim = gsap.to(featuresRefs.current[buttonIndex], {
-          y: -10,
-          duration: 1.5,
-          repeat: -1,
-          yoyo: true,
-          ease: "power1.inOut",
-        })
-        floatingAnimations.current[buttonIndex] = floatAnim
-      })
     }, welcomeRef)
 
     return () => ctx.revert()
@@ -239,28 +237,25 @@ const WelcomeAnimation = () => {
           floatingAnimations.current[index] = null
         }
 
-        // 先调整 zIndex 到收起状态
-        gsap.set(ref, { zIndex: initialCardStates[index].zIndex })
-
         // 动画路径：斜着插回去
         tl.to(ref, {
-          scale: initialCardStates[index].scale || 1,
+          scale: 1.1, // 中间点放大一些
+          rotation: -30,
+          duration: 0.7, // 设置较短的持续时间，保证这是动画的中间点
+          ease: "power2.inOut",
+          x: initialCardStates[index].x - 400, // 中间位置移动到一半
+          y: initialCardStates[index].y - 250,
+          onComplete: () => {
+            // 先调整 zIndex 到收起状态
+            gsap.set(ref, { zIndex: initialCardStates[index].zIndex })
+          },
+        }).to(ref, {
+          scale: initialCardStates[index].scale || 1, // 最终状态
           rotation: initialCardStates[index].rotation,
-          duration: 0.8,
+          duration: 0.4, // 剩余持续时间
           ease: "power2.inOut",
           x: initialCardStates[index].x,
           y: initialCardStates[index].y,
-          onComplete: () => {
-            // 重新创建浮动动画
-            const floatAnim = gsap.to(ref, {
-              rotation: `+=${getRandomFloat(-2, 2)}`,
-              duration: getRandomFloat(3, 5),
-              repeat: -1,
-              yoyo: true,
-              ease: "sine.inOut",
-            })
-            floatingAnimations.current[index] = floatAnim
-          },
         })
       }
       setActiveIndex(null)
@@ -286,17 +281,6 @@ const WelcomeAnimation = () => {
             ease: "power2.inOut",
             x: initialCardStates[activeIndex].x,
             y: initialCardStates[activeIndex].y,
-            onComplete: () => {
-              // 重新创建浮动动画
-              const floatAnim = gsap.to(prevRef, {
-                rotation: `+=${getRandomFloat(-2, 2)}`,
-                duration: getRandomFloat(3, 5),
-                repeat: -1,
-                yoyo: true,
-                ease: "sine.inOut",
-              })
-              floatingAnimations.current[activeIndex] = floatAnim
-            },
           },
           0
         )
@@ -358,6 +342,36 @@ const WelcomeAnimation = () => {
       handleCardClick(activeIndex)
     }
   }
+
+  // // 新增：处理鼠标进入卡片时的动画
+  // const handleMouseEnter = (e: React.MouseEvent, index: number) => {
+  //   e.stopPropagation()
+  //   e.preventDefault()
+  //   const ref = featuresRefs.current[index]
+  //   if (ref) {
+  //     gsap.to(ref, {
+  //       scale: 1,
+  //       y: -20,
+  //       duration: 0.8,
+  //       ease: "power2.out",
+  //     })
+  //   }
+  // }
+
+  // // 新增：处理鼠标离开卡片时的动画
+  // const handleMouseLeave = (e, index: number) => {
+  //   e.stopPropagation()
+  //   e.preventDefault()
+  //   const ref = featuresRefs.current[index]
+  //   if (ref) {
+  //     gsap.to(ref, {
+  //       scale: initialCardStates[index].scale,
+  //       y: initialCardStates[index].y,
+  //       duration: 0.5,
+  //       ease: "power2.out",
+  //     })
+  //   }
+  // }
 
   return (
     <Backdrop
@@ -479,6 +493,7 @@ const WelcomeAnimation = () => {
                     width: "100%",
                     display: "flex",
                     flexDirection: "column",
+                    pointerEvents: "auto",
                   }}
                 >
                   <Typography
@@ -509,7 +524,7 @@ const WelcomeAnimation = () => {
                     <Typography
                       alignContent={"center"}
                       variant="body2"
-                      sx={{ whiteSpace: "pre-line",opacity: 0.8 }}
+                      sx={{ whiteSpace: "pre-line", opacity: 0.8 }}
                     >
                       {feature.description}
                     </Typography>

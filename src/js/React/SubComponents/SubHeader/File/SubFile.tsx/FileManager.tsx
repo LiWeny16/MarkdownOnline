@@ -34,6 +34,8 @@ import {
   getSettings,
   getStatesMemorable,
 } from "@App/config/change"
+import { supportedImageExtensions } from "@App/fileSystem/file"
+import { Menu, MenuItem } from "@mui/material"
 
 type FileType =
   | "image"
@@ -154,42 +156,47 @@ interface CustomLabelProps {
   expandable?: boolean
   draggable: boolean
   onClick: React.MouseEventHandler<HTMLDivElement>
-  // onDragStart: (e: React.DragEvent<HTMLDivElement>) => void
 }
-
-function CustomLabel({
+const CustomLabel: React.FC<CustomLabelProps> = ({
   icon: Icon,
   expandable = false,
   children,
   draggable = false,
   onClick,
-}: CustomLabelProps) {
+}) => {
   return (
-    <TreeItem2Label
-      onClick={onClick}
-      draggable={draggable}
-      sx={{
-        display: "flex",
-        alignItems: "center",
-      }}
-    >
-      {Icon && (
+    <>
+      <TreeItem2Label onClick={onClick} draggable={draggable}>
         <Box
-          component={Icon}
-          className="labelIcon"
-          color="inherit"
-          sx={{ mr: 1, fontSize: "1.2rem" }}
-        />
-      )}
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            cursor: "pointer",
+          }}
+        >
+          {Icon && (
+            <Box
+              component={Icon}
+              className="labelIcon"
+              color="inherit"
+              sx={{ mr: 1, fontSize: "1.2rem" }}
+            />
+          )}
 
-      <Typography
-        sx={{ color: "inherit", fontFamily: "General Sans", fontWeight: 500 }}
-        variant="body2"
-      >
-        {children}
-      </Typography>
-      {expandable && <DotIcon />}
-    </TreeItem2Label>
+          <Typography
+            sx={{
+              color: "inherit",
+              fontFamily: "General Sans",
+              fontWeight: 500,
+            }}
+            variant="body2"
+          >
+            {children}
+          </Typography>
+          {expandable && <DotIcon />}
+        </Box>
+      </TreeItem2Label>
+    </>
   )
 }
 
@@ -226,6 +233,7 @@ interface CustomTreeItemProps
     Omit<React.HTMLAttributes<HTMLLIElement>, "onFocus"> {
   folderManager: any
   fillText: any
+  setExpandedFolderState: Function
   setIsDragging: Function
 }
 
@@ -235,6 +243,7 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
       setIsDragging,
       fillText,
       folderManager,
+      setExpandedFolderState,
       id,
       itemId,
       label,
@@ -265,6 +274,13 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
     const handleClickFolderFile = async (
       _event: React.MouseEvent<HTMLDivElement, MouseEvent>
     ) => {
+      // if (item.fileType === "folder") {
+      //   if(status.expandable && status.expanded)
+      //   setExpandedFolderState((pre:string[])=>{
+      //     return [...pre,item.id]
+      //   })
+      // }
+      console.log(status)
       if (item.fileType === "file" && folderManager.fileState === 1) {
         try {
           if (item.fileType && item.label.slice(-4) === ".png") {
@@ -285,48 +301,52 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
         }
       }
     }
-    return (
-      <TreeItem2Provider itemId={itemId}>
-        <StyledTreeItemRoot draggable={false} {...getRootProps(other)}>
-          <CustomTreeItemContent
-            draggable={item.label.slice(-3) === "png" ? true : false}
-            onDragStart={(e) => {
-              if (item.label.slice(-3) === "png") {
-                setTimeout(() => {
-                  setIsDragging(true)
-                }, 400)
-                e.dataTransfer.effectAllowed = "copy" // 允许拖拽复制
-                e.dataTransfer.setData(
-                  "text/plain",
-                  `![${getSettings().advanced.imageSettings.basicStyle}](./${item.path})`
-                )
-              } 
-            }}
-            {...getContentProps({
-              className: clsx("content", {
-                "Mui-expanded": status.expanded,
-                "Mui-selected": status.selected,
-                "Mui-focused": status.focused,
-                "Mui-disabled": status.disabled,
-              }),
-            })}
-          >
-            <TreeItem2IconContainer {...getIconContainerProps()}>
-              <TreeItem2Icon status={status} />
-            </TreeItem2IconContainer>
 
-            <CustomLabel
-              draggable={false}
-              onClick={handleClickFolderFile}
-              {...getLabelProps({
-                icon,
-                expandable: expandable && status.expanded,
+    return (
+      <>
+        <TreeItem2Provider itemId={itemId}>
+          <StyledTreeItemRoot draggable={false} {...getRootProps(other)}>
+            <CustomTreeItemContent
+              draggable={canItDrag(item)}
+              onDragStart={(e) => {
+                if (isImage(item)) {
+                  setTimeout(() => {
+                    setIsDragging(true)
+                  }, 400)
+                  e.dataTransfer.effectAllowed = "copy" // 允许拖拽复制
+                  e.dataTransfer.setData(
+                    "text/plain",
+                    `![${getSettings().advanced.imageSettings.basicStyle}](./${item.path})`
+                  )
+                }
+              }}
+              {...getContentProps({
+                className: clsx("content", {
+                  "Mui-expanded": status.expanded,
+                  "Mui-selected": status.selected,
+                  "Mui-focused": status.focused,
+                  "Mui-disabled": status.disabled,
+                }),
               })}
-            />
-          </CustomTreeItemContent>
-          {children && <TransitionComponent {...getGroupTransitionProps()} />}
-        </StyledTreeItemRoot>
-      </TreeItem2Provider>
+            >
+              <TreeItem2IconContainer {...getIconContainerProps()}>
+                <TreeItem2Icon status={status} />
+              </TreeItem2IconContainer>
+
+              <CustomLabel
+                draggable={false}
+                onClick={handleClickFolderFile}
+                {...getLabelProps({
+                  icon,
+                  expandable: expandable && status.expanded,
+                })}
+              />
+            </CustomTreeItemContent>
+            {children && <TransitionComponent {...getGroupTransitionProps()} />}
+          </StyledTreeItemRoot>
+          {/* 右键菜单 */}
+        </TreeItem2Provider>
+      </>
     )
   }
 )
@@ -351,8 +371,6 @@ export default function FileExplorer(props: {
     <RichTreeView
       items={sortedFileDirectoryArr ?? ITEMS}
       aria-label="file explorer"
-      // defaultExpandedItems={["1", "1.1"]}
-      defaultSelectedItems="1.1"
       sx={{
         height: "100%",
         flexGrow: 1,
@@ -364,4 +382,20 @@ export default function FileExplorer(props: {
       slots={{ item: WrappedCustomTreeItem }}
     />
   )
+}
+
+function canItDrag(item: { label: string }) {
+  const extensionName = item.label.slice(-3)
+  if (supportedImageExtensions.includes(extensionName)) {
+    return true
+  }
+  return false
+}
+
+function isImage(item: { label: string }) {
+  const extensionName = item.label.slice(-3)
+  if (supportedImageExtensions.includes(extensionName)) {
+    return true
+  }
+  return false
 }

@@ -1,4 +1,4 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import * as React from "react";
 import clsx from "clsx";
 import { styled, alpha } from "@mui/material/styles";
@@ -21,6 +21,7 @@ import { TreeItem2Provider } from "@mui/x-tree-view/TreeItem2Provider";
 import { mdConverter } from "@Root/js";
 import sortFileDirectoryArr from "@App/fileSystem/sort";
 import { changeStates, getSettings, } from "@App/config/change";
+import { supportedImageExtensions } from "@App/fileSystem/file";
 const ITEMS = [
     {
         id: "1",
@@ -99,12 +100,17 @@ const CustomTreeItemContent = styled(TreeItem2Content)(({ theme }) => ({
 function TransitionComponent(props) {
     return _jsx(Collapse, { ...props });
 }
-function CustomLabel({ icon: Icon, expandable = false, children, draggable = false, onClick, }) {
-    return (_jsxs(TreeItem2Label, { onClick: onClick, draggable: draggable, sx: {
-            display: "flex",
-            alignItems: "center",
-        }, children: [Icon && (_jsx(Box, { component: Icon, className: "labelIcon", color: "inherit", sx: { mr: 1, fontSize: "1.2rem" } })), _jsx(Typography, { sx: { color: "inherit", fontFamily: "General Sans", fontWeight: 500 }, variant: "body2", children: children }), expandable && _jsx(DotIcon, {})] }));
-}
+const CustomLabel = ({ icon: Icon, expandable = false, children, draggable = false, onClick, }) => {
+    return (_jsx(_Fragment, { children: _jsx(TreeItem2Label, { onClick: onClick, draggable: draggable, children: _jsxs(Box, { sx: {
+                    display: "flex",
+                    alignItems: "center",
+                    cursor: "pointer",
+                }, children: [Icon && (_jsx(Box, { component: Icon, className: "labelIcon", color: "inherit", sx: { mr: 1, fontSize: "1.2rem" } })), _jsx(Typography, { sx: {
+                            color: "inherit",
+                            fontFamily: "General Sans",
+                            fontWeight: 500,
+                        }, variant: "body2", children: children }), expandable && _jsx(DotIcon, {})] }) }) }));
+};
 const isExpandable = (reactChildren) => {
     if (Array.isArray(reactChildren)) {
         return reactChildren.length > 0 && reactChildren.some(isExpandable);
@@ -132,7 +138,7 @@ const getIconFromFileType = (fileType) => {
     }
 };
 const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
-    const { setIsDragging, fillText, folderManager, id, itemId, label, disabled, children, ...other } = props;
+    const { setIsDragging, fillText, folderManager, setExpandedFolderState, id, itemId, label, disabled, children, ...other } = props;
     const { getRootProps, getContentProps, getIconContainerProps, getLabelProps, getGroupTransitionProps, status, publicAPI, } = useTreeItem2({ id, itemId, children, label, disabled, rootRef: ref });
     let item = publicAPI.getItem(itemId);
     const expandable = isExpandable(children);
@@ -145,6 +151,13 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
     }
     // Function to handle click events on folder/file
     const handleClickFolderFile = async (_event) => {
+        // if (item.fileType === "folder") {
+        //   if(status.expandable && status.expanded)
+        //   setExpandedFolderState((pre:string[])=>{
+        //     return [...pre,item.id]
+        //   })
+        // }
+        console.log(status);
         if (item.fileType === "file" && folderManager.fileState === 1) {
             try {
                 if (item.fileType && item.label.slice(-4) === ".png") {
@@ -164,33 +177,31 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
             }
         }
     };
-    return (_jsx(TreeItem2Provider, { itemId: itemId, children: _jsxs(StyledTreeItemRoot, { draggable: false, ...getRootProps(other), children: [_jsxs(CustomTreeItemContent, { draggable: item.label.slice(-3) === "png" ? true : false, onDragStart: (e) => {
-                        if (item.label.slice(-3) === "png") {
-                            setTimeout(() => {
-                                setIsDragging(true);
-                            }, 400);
-                            e.dataTransfer.effectAllowed = "copy"; // 允许拖拽复制
-                            e.dataTransfer.setData("text/plain", `![${getSettings().advanced.imageSettings.basicStyle}](./${item.path})`);
-                        }
-                    }, ...getContentProps({
-                        className: clsx("content", {
-                            "Mui-expanded": status.expanded,
-                            "Mui-selected": status.selected,
-                            "Mui-focused": status.focused,
-                            "Mui-disabled": status.disabled,
-                        }),
-                    }), children: [_jsx(TreeItem2IconContainer, { ...getIconContainerProps(), children: _jsx(TreeItem2Icon, { status: status }) }), _jsx(CustomLabel, { draggable: false, onClick: handleClickFolderFile, ...getLabelProps({
-                                icon,
-                                expandable: expandable && status.expanded,
-                            }) })] }), children && _jsx(TransitionComponent, { ...getGroupTransitionProps() })] }) }));
+    return (_jsx(_Fragment, { children: _jsx(TreeItem2Provider, { itemId: itemId, children: _jsxs(StyledTreeItemRoot, { draggable: false, ...getRootProps(other), children: [_jsxs(CustomTreeItemContent, { draggable: canItDrag(item), onDragStart: (e) => {
+                            if (isImage(item)) {
+                                setTimeout(() => {
+                                    setIsDragging(true);
+                                }, 400);
+                                e.dataTransfer.effectAllowed = "copy"; // 允许拖拽复制
+                                e.dataTransfer.setData("text/plain", `![${getSettings().advanced.imageSettings.basicStyle}](./${item.path})`);
+                            }
+                        }, ...getContentProps({
+                            className: clsx("content", {
+                                "Mui-expanded": status.expanded,
+                                "Mui-selected": status.selected,
+                                "Mui-focused": status.focused,
+                                "Mui-disabled": status.disabled,
+                            }),
+                        }), children: [_jsx(TreeItem2IconContainer, { ...getIconContainerProps(), children: _jsx(TreeItem2Icon, { status: status }) }), _jsx(CustomLabel, { draggable: false, onClick: handleClickFolderFile, ...getLabelProps({
+                                    icon,
+                                    expandable: expandable && status.expanded,
+                                }) })] }), children && _jsx(TransitionComponent, { ...getGroupTransitionProps() })] }) }) }));
 });
 export default function FileExplorer(props) {
     let sortedFileDirectoryArr = sortFileDirectoryArr(props.fileDirectoryArr);
     // 使用函数来传递 folderManager 到 CustomTreeItem
     const WrappedCustomTreeItem = (itemProps) => (_jsx(CustomTreeItem, { ...itemProps, fillText: props.fillText, setIsDragging: props.setIsDragging, folderManager: props.folderManager }));
-    return (_jsx(RichTreeView, { items: sortedFileDirectoryArr ?? ITEMS, "aria-label": "file explorer", 
-        // defaultExpandedItems={["1", "1.1"]}
-        defaultSelectedItems: "1.1", sx: {
+    return (_jsx(RichTreeView, { items: sortedFileDirectoryArr ?? ITEMS, "aria-label": "file explorer", sx: {
             height: "100%",
             flexGrow: 1,
             userSelect: "none",
@@ -198,4 +209,18 @@ export default function FileExplorer(props) {
             overflowY: "scroll",
             flex: 1,
         }, slots: { item: WrappedCustomTreeItem } }));
+}
+function canItDrag(item) {
+    const extensionName = item.label.slice(-3);
+    if (supportedImageExtensions.includes(extensionName)) {
+        return true;
+    }
+    return false;
+}
+function isImage(item) {
+    const extensionName = item.label.slice(-3);
+    if (supportedImageExtensions.includes(extensionName)) {
+        return true;
+    }
+    return false;
 }

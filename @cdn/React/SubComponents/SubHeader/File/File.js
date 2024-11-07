@@ -107,7 +107,7 @@ const FileDrawer = observer(function FileDrawer() {
                     pointerEvents: "all",
                     zIndex: 99999,
                 },
-            }, ModalProps: {
+            }, keepMounted: true, ModalProps: {
                 disableEnforceFocus: true,
                 disableAutoFocus: true,
                 disableRestoreFocus: true,
