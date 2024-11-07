@@ -15,6 +15,12 @@ const WelcomeAnimation = () => {
             isButton: true,
         },
         {
+            title: t("featuresList.startExperience.title"),
+            description: t("featuresList.startExperience.description"),
+            icon: "🚀",
+            isStartCard: true,
+        },
+        {
             title: "未完待续...",
             description: "探索，\n创新，\n永不言弃。\n\n To Explore, \nTo Innovate, \nNever give up.",
             icon: "✨",
@@ -55,7 +61,7 @@ const WelcomeAnimation = () => {
             angle = (index - (featuresList.length - 1) / 2) * 15;
         }
         return {
-            x: feature.isButton ? 135 : angle * 3,
+            x: feature.isButton ? 175 : angle * 3,
             y: 0,
             rotation: angle,
             zIndex: feature.isButton ? featuresList.length + 1 : index,
@@ -68,7 +74,6 @@ const WelcomeAnimation = () => {
                 onComplete: () => setIsInitialAnimationComplete(true),
             });
             const buttonIndex = featuresList.findIndex((feature) => feature.isButton);
-            // 初始化：仅显示“开始体验”卡片
             featuresRefs.current.forEach((ref, index) => {
                 if (ref) {
                     if (index === buttonIndex) {
@@ -78,7 +83,7 @@ const WelcomeAnimation = () => {
                             rotation: 0,
                             scale: 1,
                             opacity: 1,
-                            zIndex: featuresList.length + 1, // 设置初始 zIndex
+                            zIndex: featuresList.length + 1,
                         });
                     }
                     else {
@@ -88,14 +93,12 @@ const WelcomeAnimation = () => {
                             rotation: 0,
                             scale: 0.8,
                             opacity: 0,
-                            zIndex: index, // 设置初始 zIndex
+                            zIndex: index,
                         });
                     }
                 }
             });
-            // 短暂延迟后开始卡片展示
             tl.add("cardsReveal", "+=0.6");
-            // 展示其他卡片
             featuresRefs.current.forEach((ref, index) => {
                 if (ref && index !== buttonIndex) {
                     let angle = (index - (featuresList.length - 1) / 2) * 15;
@@ -109,23 +112,23 @@ const WelcomeAnimation = () => {
                         duration: 0.8,
                         ease: "back.out(1.7)",
                         onStart: () => {
-                            // 在动画开始前设置 zIndex
                             gsap.set(ref, { zIndex: index });
                         },
                     }, `cardsReveal+=${delay}`);
-                    tl.add(() => {
-                        const floatAnim = gsap.to(ref, {
-                            rotation: `+=${getRandomFloat(-2, 2)}`,
-                            duration: getRandomFloat(3, 5),
-                            repeat: -1,
-                            yoyo: true,
-                            ease: "sine.inOut",
-                        });
-                        floatingAnimations.current[index] = floatAnim;
-                    }, `cardsReveal+=${delay + 0.8}`);
+                    if (index !== 0) {
+                        tl.add(() => {
+                            const floatAnim = gsap.to(ref, {
+                                rotation: `+=${getRandomFloat(-2, 2)}`,
+                                duration: getRandomFloat(3, 5),
+                                repeat: -1,
+                                yoyo: true,
+                                ease: "sine.inOut",
+                            });
+                            floatingAnimations.current[index] = floatAnim;
+                        }, `cardsReveal+=${delay + 0.8}`);
+                    }
                 }
             });
-            // 移动“开始体验”卡片到其位置
             tl.to(featuresRefs.current[buttonIndex], {
                 scale: 1.05,
                 rotation: 50,
@@ -134,33 +137,27 @@ const WelcomeAnimation = () => {
                 duration: 0.8,
                 ease: "back.out(1.7)",
                 onStart: () => {
-                    // 在动画开始前设置 zIndex
                     gsap.set(featuresRefs.current[buttonIndex], {
                         zIndex: featuresList.length + 1,
                     });
                 },
                 onComplete: () => {
-                    // 为“开始体验”卡片添加浮动动画
-                    tl.add(() => {
-                        const floatAnim = gsap.to(featuresRefs.current[buttonIndex], {
-                            y: -10,
-                            duration: 1.5,
-                            repeat: -1,
-                            yoyo: true,
-                            ease: "power1.inOut",
-                        });
-                        floatingAnimations.current[buttonIndex] = floatAnim;
+                    const floatAnim = gsap.to(featuresRefs.current[buttonIndex], {
+                        y: -10,
+                        duration: 1.5,
+                        repeat: -1,
+                        yoyo: true,
+                        ease: "power1.inOut",
                     });
+                    floatingAnimations.current[buttonIndex] = floatAnim;
                 },
             }, `cardsReveal+=${featuresRefs.current.length * 0.15}`);
         }, welcomeRef);
         return () => ctx.revert();
     }, []);
     const handleEnter = () => {
-        // 确保点击按钮时立即更改状态
         changeStatesMemorable({ memorable: { welcomeAnimationState: false } });
         const tl = gsap.timeline();
-        // 卡片消失动画
         featuresRefs.current.forEach((ref, index) => {
             if (ref) {
                 const randomDirection = Math.random() * 360;
@@ -178,7 +175,6 @@ const WelcomeAnimation = () => {
                 }, 0);
             }
         });
-        // 背景淡出
         tl.to(welcomeRef.current, {
             opacity: 0,
             duration: 0.2,
@@ -189,49 +185,56 @@ const WelcomeAnimation = () => {
             return;
         const tl = gsap.timeline();
         if (activeIndex === index) {
-            // 取消激活卡片
             const ref = featuresRefs.current[index];
             if (ref) {
-                // 终止浮动动画
                 if (floatingAnimations.current[index] !== null) {
                     floatingAnimations.current[index].kill();
                     floatingAnimations.current[index] = null;
                 }
-                // 动画路径：斜着插回去
                 tl.to(ref, {
-                    scale: 1.1, // 中间点放大一些
+                    scale: 1.1,
                     rotation: -30,
-                    duration: 0.7, // 设置较短的持续时间，保证这是动画的中间点
+                    duration: 0.7,
                     ease: "power2.inOut",
-                    x: initialCardStates[index].x - 400, // 中间位置移动到一半
+                    x: initialCardStates[index].x - 400,
                     y: initialCardStates[index].y - 250,
                     onComplete: () => {
-                        // 先调整 zIndex 到收起状态
                         gsap.set(ref, { zIndex: initialCardStates[index].zIndex });
                     },
                 }).to(ref, {
-                    scale: initialCardStates[index].scale || 1, // 最终状态
+                    scale: initialCardStates[index].scale || 1,
                     rotation: initialCardStates[index].rotation,
-                    duration: 0.4, // 剩余持续时间
+                    duration: 0.4,
                     ease: "power2.inOut",
                     x: initialCardStates[index].x,
                     y: initialCardStates[index].y,
+                    onComplete: () => {
+                        if (index === 0) {
+                            const floatAnim = gsap.to(ref, {
+                                rotation: `+=${getRandomFloat(-2, 2)}`,
+                                duration: getRandomFloat(3, 5),
+                                repeat: -1,
+                                yoyo: true,
+                                ease: "sine.inOut",
+                            });
+                            floatingAnimations.current[index] = floatAnim;
+                        }
+                        if (featuresList[index].isStartCard) {
+                            handleEnter();
+                        }
+                    },
                 });
             }
             setActiveIndex(null);
         }
         else {
-            // 取消之前激活的卡片
             if (activeIndex !== null && featuresRefs.current[activeIndex]) {
                 const prevRef = featuresRefs.current[activeIndex];
-                // 终止浮动动画
                 if (floatingAnimations.current[activeIndex]) {
                     floatingAnimations.current[activeIndex].kill();
                     floatingAnimations.current[activeIndex] = null;
                 }
-                // 先调整 zIndex 到初始值
                 gsap.set(prevRef, { zIndex: initialCardStates[activeIndex].zIndex });
-                // 动画路径：斜着插回去
                 tl.to(prevRef, {
                     scale: initialCardStates[activeIndex].scale || 1,
                     rotation: initialCardStates[activeIndex].rotation,
@@ -239,29 +242,37 @@ const WelcomeAnimation = () => {
                     ease: "power2.inOut",
                     x: initialCardStates[activeIndex].x,
                     y: initialCardStates[activeIndex].y,
+                    onComplete: () => {
+                        if (activeIndex === 0) {
+                            const floatAnim = gsap.to(prevRef, {
+                                rotation: `+=${getRandomFloat(-2, 2)}`,
+                                duration: getRandomFloat(3, 5),
+                                repeat: -1,
+                                yoyo: true,
+                                ease: "sine.inOut",
+                            });
+                            floatingAnimations.current[activeIndex] = floatAnim;
+                        }
+                    },
                 }, 0);
             }
-            // 激活新的卡片
             if (featuresRefs.current[index]) {
                 const currentRef = featuresRefs.current[index];
-                // 终止当前卡片的浮动动画
                 if (floatingAnimations.current[index]) {
                     floatingAnimations.current[index].kill();
                     floatingAnimations.current[index] = null;
                 }
-                // 动态计算缩放比例，确保卡片不会过大或过小
                 const calculateScale = () => {
                     const viewportWidth = window.innerWidth;
                     const viewportHeight = window.innerHeight;
-                    const cardWidth = 300; // 原始宽度
-                    const cardHeight = 400; // 原始高度
+                    const cardWidth = 300;
+                    const cardHeight = 400;
                     const maxScaleWidth = (0.8 * viewportWidth) / cardWidth;
                     const maxScaleHeight = (0.8 * viewportHeight) / cardHeight;
-                    const scale = Math.min(maxScaleWidth, maxScaleHeight, 2); // 限制最大缩放为2
-                    return scale < 1 ? 1 : scale; // 确保缩放不小于1
+                    const scale = Math.min(maxScaleWidth, maxScaleHeight, 2);
+                    return scale < 1 ? 1 : scale;
                 };
                 const scale = calculateScale();
-                // 先设置 zIndex 再进行动画
                 gsap.set(currentRef, { zIndex: 100 });
                 tl.to(currentRef, {
                     scale: scale,
@@ -271,8 +282,13 @@ const WelcomeAnimation = () => {
                     duration: 0.5,
                     ease: "power2.out",
                     onComplete: () => {
-                        // 取消 yPercent 以确保居中
                         gsap.set(currentRef, { yPercent: 0 });
+                        if (index === 0) {
+                            if (floatingAnimations.current[index]) {
+                                floatingAnimations.current[index].kill();
+                                floatingAnimations.current[index] = null;
+                            }
+                        }
                     },
                 }, 0);
             }
@@ -284,34 +300,6 @@ const WelcomeAnimation = () => {
             handleCardClick(activeIndex);
         }
     };
-    // // 新增：处理鼠标进入卡片时的动画
-    // const handleMouseEnter = (e: React.MouseEvent, index: number) => {
-    //   e.stopPropagation()
-    //   e.preventDefault()
-    //   const ref = featuresRefs.current[index]
-    //   if (ref) {
-    //     gsap.to(ref, {
-    //       scale: 1,
-    //       y: -20,
-    //       duration: 0.8,
-    //       ease: "power2.out",
-    //     })
-    //   }
-    // }
-    // // 新增：处理鼠标离开卡片时的动画
-    // const handleMouseLeave = (e, index: number) => {
-    //   e.stopPropagation()
-    //   e.preventDefault()
-    //   const ref = featuresRefs.current[index]
-    //   if (ref) {
-    //     gsap.to(ref, {
-    //       scale: initialCardStates[index].scale,
-    //       y: initialCardStates[index].y,
-    //       duration: 0.5,
-    //       ease: "power2.out",
-    //     })
-    //   }
-    // }
     return (_jsx(Backdrop, { ref: welcomeRef, open: getStatesMemorable().memorable.welcomeAnimationState, onClick: handleBackgroundClick, sx: {
             zIndex: (theme) => theme.zIndex.drawer + 1,
             backgroundColor: "#f5f5f5",
@@ -330,13 +318,12 @@ const WelcomeAnimation = () => {
                 userSelect: "none",
                 marginBottom: 8,
             }, children: featuresList.map((feature, index) => (_jsx(Box, { ref: (el) => (featuresRefs.current[index] = el), onClick: (e) => {
-                    e.stopPropagation(); // 防止事件冒泡到 Backdrop
+                    e.stopPropagation();
                     if (!feature.isButton) {
                         handleCardClick(index);
                     }
                     else {
-                        // 对于按钮类型的卡片，处理点击事件
-                        handleEnter();
+                        // handleEnter()
                     }
                 }, sx: {
                     position: "absolute",
@@ -352,23 +339,42 @@ const WelcomeAnimation = () => {
                     cursor: "pointer",
                     transformOrigin: "center center",
                     transition: "box-shadow 0.3s ease",
-                    // 移除 zIndex 这里的设置，改由动画控制
-                    // zIndex: feature.isButton ? featuresList.length + 1 : index,
                     "&:hover": {
                         boxShadow: isInitialAnimationComplete
                             ? "0 12px 48px rgba(0, 0, 0, 0.2)"
                             : "0 8px 32px rgba(0, 0, 0, 0.1)",
                     },
                     pointerEvents: isInitialAnimationComplete ? "auto" : "none",
-                    // 设置最小和最大缩放
                     minWidth: feature.isButton ? "300px" : "200px",
                     minHeight: feature.isButton ? "400px" : "250px",
                     maxWidth: "80vw",
                     maxHeight: "80vh",
-                    willChange: "transform, opacity", // 优化动画性能
+                    willChange: "transform, opacity",
                 }, children: feature.isButton ? (_jsxs(Button, { variant: "contained", onClick: (e) => {
+                        e.stopPropagation();
                         e.stopPropagation(); // 防止事件冒泡
-                        handleEnter();
+                        // handleEnter()
+                        const tl = gsap.timeline();
+                        const ref = featuresRefs.current[index];
+                        gsap.set(ref.parentNode, { perspective: 800 });
+                        tl.to(ref, {
+                            scale: 1.15, // 中间点放大一些
+                            duration: 0.7, // 设置较短的持续时间，保证这是动画的中间点
+                            ease: "power2.inOut",
+                        }).to(ref, {
+                            scale: 0, // 中间点放大一些
+                            duration: 0.7, // 设置较短的持续时间，保证这是动画的中间点
+                            opacity: 0,
+                            ease: "power2.inOut",
+                            onComplete: () => {
+                                gsap.to(ref, {
+                                    duration: 0.2,
+                                    onComplete: () => {
+                                        gsap.set(ref, { display: "none" });
+                                    },
+                                });
+                            },
+                        });
                     }, sx: {
                         width: "100%",
                         height: "100%",
@@ -387,12 +393,39 @@ const WelcomeAnimation = () => {
                             transform: "translateY(-2px)",
                         },
                         transition: "all 0.3s ease",
-                    }, children: [_jsxs(Typography, { variant: "h5", sx: { whiteSpace: "pre-line", fontSize: "1.5rem", mb: 1 }, children: [feature.icon, " ", feature.title] }), _jsx(Typography, { variant: "body2", sx: { whiteSpace: "pre-line", opacity: 0.8 }, children: feature.description })] })) : (_jsx(_Fragment, { children: _jsxs(Box, { sx: {
+                    }, children: [_jsxs(Typography, { variant: "h5", sx: { whiteSpace: "pre-line", fontSize: "1.5rem", mb: 1 }, children: [feature.icon, " ", feature.title] }), _jsx(Typography, { variant: "body2", sx: { whiteSpace: "pre-line", opacity: 0.8 }, children: feature.description })] })) : feature.isStartCard ? (_jsx(_Fragment, { children: _jsx(Box, { sx: {
                             height: "100%",
                             width: "100%",
                             display: "flex",
                             flexDirection: "column",
-                            pointerEvents: "auto",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }, children: _jsxs(Button, { variant: "contained", onClick: (e) => {
+                                e.stopPropagation();
+                                handleCardClick(index);
+                            }, sx: {
+                                width: "100%",
+                                height: "100%",
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                px: 4,
+                                py: 2,
+                                fontSize: "1rem",
+                                backgroundColor: "#FFDDEE",
+                                color: "#fff",
+                                borderRadius: "12px",
+                                "&:hover": {
+                                    backgroundColor: "#ffc3e1",
+                                    transform: "translateY(-2px)",
+                                },
+                                transition: "all 0.3s ease",
+                            }, children: [_jsxs(Typography, { variant: "h5", sx: { whiteSpace: "pre-line", fontSize: "1.5rem", mb: 1 }, children: [feature.icon, " ", feature.title] }), _jsx(Typography, { variant: "body2", sx: { whiteSpace: "pre-line", opacity: 0.8 }, children: feature.description })] }) }) })) : (_jsx(_Fragment, { children: _jsxs(Box, { sx: {
+                            height: "100%",
+                            width: "100%",
+                            display: "flex",
+                            flexDirection: "column",
                         }, children: [_jsxs(Typography, { variant: "h5", sx: {
                                     fontSize: "1.5rem",
                                     mb: 1,
