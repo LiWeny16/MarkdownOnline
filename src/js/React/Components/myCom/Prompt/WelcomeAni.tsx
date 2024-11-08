@@ -52,6 +52,7 @@ const WelcomeAnimation = () => {
   const featuresRefs = useRef<(HTMLDivElement | null)[]>([])
   const floatingAnimations = useRef<(gsap.core.Tween | null)[]>([])
   const [activeIndex, setActiveIndex] = useState<number | null>(null)
+  const [welcomeClickTimes, setWelcomeClickTimes] = useState<number>(0)
   const [isInitialAnimationComplete, setIsInitialAnimationComplete] =
     useState(false)
 
@@ -73,46 +74,26 @@ const WelcomeAnimation = () => {
       scale: 1,
     }
   })
-
-  useEffect(() => {
+  const handleSpreadingAnimation = () => {
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         onComplete: () => setIsInitialAnimationComplete(true),
       })
 
       const buttonIndex = featuresList.findIndex((feature) => feature.isButton)
-
-      featuresRefs.current.forEach((ref, index) => {
-        if (ref) {
-          if (index === buttonIndex) {
-            gsap.set(ref, {
-              x: 0,
-              y: 0,
-              rotation: 0,
-              scale: 1,
-              opacity: 1,
-              zIndex: featuresList.length + 1,
-            })
-          } else {
-            gsap.set(ref, {
-              x: 0,
-              y: 0,
-              rotation: 0,
-              scale: 0.8,
-              opacity: 0,
-              zIndex: index,
-            })
-          }
-        }
-      })
-
       tl.add("cardsReveal", "+=0.6")
 
+      tl.to(featuresRefs.current[buttonIndex], {
+        scale: 1.1, // 放大比例
+        duration: 0.5, // 放大持续时间
+        yoyo: true, // 启用 yoyo，动画结束后会反向
+        repeat: 1, // 重复一次，确保它回到原始大小
+        ease: "power1.inOut", // 动画缓动效果
+      })
       featuresRefs.current.forEach((ref, index) => {
         if (ref && index !== buttonIndex) {
           let angle = (index - (featuresList.length - 1) / 2) * 15
           const delay = index * 0.15
-
           tl.to(
             ref,
             {
@@ -175,6 +156,39 @@ const WelcomeAnimation = () => {
         },
         `cardsReveal+=${featuresRefs.current.length * 0.15}`
       )
+    }, welcomeRef)
+  }
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        onComplete: () => setIsInitialAnimationComplete(true),
+      })
+
+      const buttonIndex = featuresList.findIndex((feature) => feature.isButton)
+
+      featuresRefs.current.forEach((ref, index) => {
+        if (ref) {
+          if (index === buttonIndex) {
+            gsap.set(ref, {
+              x: 0,
+              y: 0,
+              rotation: 0,
+              scale: 1,
+              opacity: 1,
+              zIndex: featuresList.length + 1,
+            })
+          } else {
+            gsap.set(ref, {
+              x: 0,
+              y: 0,
+              rotation: 0,
+              scale: 0.8,
+              opacity: 0,
+              zIndex: index,
+            })
+          }
+        }
+      })
     }, welcomeRef)
 
     return () => ctx.revert()
@@ -433,30 +447,34 @@ const WelcomeAnimation = () => {
                 onClick={(e) => {
                   e.stopPropagation()
                   e.stopPropagation() // 防止事件冒泡
-                  // handleEnter()
-                  const tl = gsap.timeline()
+                  if (welcomeClickTimes == 0) {
+                    handleSpreadingAnimation()
+                    setWelcomeClickTimes(1)
+                  } else {
+                    const tl = gsap.timeline()
 
-                  const ref = featuresRefs.current[index]
-                  gsap.set(ref.parentNode, { perspective: 800 })
-                  tl.to(ref, {
-                    scale: 1.15, // 中间点放大一些
-                    duration: 0.7, // 设置较短的持续时间，保证这是动画的中间点
-                    ease: "power2.inOut",
-                  }).to(ref, {
-                    scale: 0, // 中间点放大一些
-                    duration: 0.7, // 设置较短的持续时间，保证这是动画的中间点
-                    opacity: 0,
-                    ease: "power2.inOut",
+                    const ref = featuresRefs.current[index]
+                    gsap.set(ref.parentNode, { perspective: 800 })
+                    tl.to(ref, {
+                      scale: 1.15, // 中间点放大一些
+                      duration: 0.7, // 设置较短的持续时间，保证这是动画的中间点
+                      ease: "power2.inOut",
+                    }).to(ref, {
+                      scale: 0, // 中间点放大一些
+                      duration: 0.7, // 设置较短的持续时间，保证这是动画的中间点
+                      opacity: 0,
+                      ease: "power2.inOut",
 
-                    onComplete: () => {
-                      gsap.to(ref, {
-                        duration: 0.2,
-                        onComplete: () => {
-                          gsap.set(ref, { display: "none" })
-                        },
-                      })
-                    },
-                  })
+                      onComplete: () => {
+                        gsap.to(ref, {
+                          duration: 0.2,
+                          onComplete: () => {
+                            gsap.set(ref, { display: "none" })
+                          },
+                        })
+                      },
+                    })
+                  }
                 }}
                 sx={{
                   width: "100%",

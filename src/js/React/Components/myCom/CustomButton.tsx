@@ -20,9 +20,6 @@ const ColorButton = styled(Button)<ButtonProps>(({ theme }) => ({
 
 export default function CustomizedButtons(props: any) {
   return (
-    // <BootstrapButton variant="contained" disableRipple>
-    //   Bootstrap
-    // </BootstrapButton>
     <ColorButton
       id="demo-customized-button"
       href={props.href ? props.href : undefined}

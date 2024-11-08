@@ -15,11 +15,7 @@ const ColorButton = styled(Button)(({ theme }) => ({
     },
 }));
 export default function CustomizedButtons(props) {
-    return (
-    // <BootstrapButton variant="contained" disableRipple>
-    //   Bootstrap
-    // </BootstrapButton>
-    _jsx(ColorButton, { id: "demo-customized-button", href: props.href ? props.href : undefined, "aria-controls": props.open ? "demo-customized-menu" : undefined, "aria-haspopup": "true", "aria-expanded": props.open ? "true" : undefined, disableElevation: true, 
+    return (_jsx(ColorButton, { id: "demo-customized-button", href: props.href ? props.href : undefined, "aria-controls": props.open ? "demo-customized-menu" : undefined, "aria-haspopup": "true", "aria-expanded": props.open ? "true" : undefined, disableElevation: true, 
         // style={{ background: "white", color: "black" }}
         onClick: props.onClick, onMouseOver: props.onHover, endIcon: props.endIcon, startIcon: props.startIcon ? props.startIcon : undefined, variant: "contained", children: props.children }));
 }

@@ -1,3 +1,6 @@
+/**
+ * @description 获取Monaco全部文本
+ */
 export function getMdTextFromMonaco() {
     if (window.editor?.getValue) {
         let _text = window.editor.getValue();
@@ -7,6 +10,9 @@ export function getMdTextFromMonaco() {
         return "null";
     }
 }
+/**
+ * @description 从行获取文本
+ */
 export function geTextFromMonacoLine(lineNumber) {
     return window.monaco.editor.getModels()[0].getLineContent(lineNumber);
 }
