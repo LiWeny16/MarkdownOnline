@@ -1,24 +1,14 @@
 import React, { useRef, useState } from "react"
 import ReactDOM from "react-dom"
 import Editor, { loader, Monaco } from "@monaco-editor/react"
-// import DraggableBox from "@Com/myCom/DragBox"
-// import { getMdTextFromMonaco } from "@App/text/getMdText"
-// import * as monaco from "monaco-editor"
 import allInit, { waitForVariable } from "@Func/Init/allInit"
 import { monacoPasteEvent } from "@Func/Events/pasteEvent"
 import { editor } from "monaco-editor"
 import { triggerConverterEvent } from "@Func/Events/convert"
-// import { transform } from "html2canvas/dist/types/css/property-descriptors/transform"
-// loader.config({ monaco });
-// import { useTheme } from "@Root/js/React/Mobx/Theme"
 import { observer } from "mobx-react"
-// import changeTheme from "@App/theme/change"
-// import monacoKeyDownEvent from "@Func/Events/key/monacoKey"
 import monacoKeyEvent from "@Func/Events/key/monacoKey"
 import { ResizableBox } from "react-resizable"
 import "react-resizable/css/styles.css"
-import { mdConverter } from "@Root/js"
-// import DragHandleIcon from "@mui/icons-material/DragHandle"
 import { monacoSnippets } from "@Func/Monaco/snippets/snippets"
 import monacoFormat from "@Func/Monaco/format/format"
 import { getDeviceTyByProportion } from "@App/user/userAgent"
@@ -27,7 +17,6 @@ import monacoMouseEvent from "@Func/Events/mouse/monacoMouse"
 import monacoClickEvent from "@Func/Events/click/monacoClick"
 import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight"
 import monacoScrollEvent from "@Func/Events/scroll/monacoScroll"
-import { Backdrop, CircularProgress } from "@mui/material"
 import { pollVariables } from "@App/basic/basic"
 import monacoDragEvent from "@Func/Events/drag/drag"
 const version = "0.45.0"
@@ -57,7 +46,6 @@ const files: any = {
 
 export default observer(function MonacoEditor() {
   const monacoEditorRef = React.useRef(null)
-
 
   const [resizableWidth, setResizableWidth] = React.useState(640)
   const [resizableHeight, setResizableHeight] = React.useState(800)
@@ -167,13 +155,12 @@ export default observer(function MonacoEditor() {
       monacoMouseEvent(editor, monaco)
       monacoClickEvent(editor, monaco)
       monacoScrollEvent(editor, monaco)
-      monacoDragEvent(editor,monaco)
+      monacoDragEvent(editor, monaco)
       // monacoPalette(editor,monaco)
       // monacoKeyDownEvent()
       // errIntellisense()
       // 动态改变编辑器高度
       monacoResizeHeightEvent(setResizableHeight)
-      
     })
   }
   return (
@@ -221,7 +208,7 @@ export default observer(function MonacoEditor() {
             beforeMount={handleBeforeMount}
           />
         </ResizableBox>
-        
+
         {/* <div style={{width:size.width}}>2323</div> */}
       </div>
       {/* </DraggableBox> */}

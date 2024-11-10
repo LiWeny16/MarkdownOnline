@@ -1,22 +1,13 @@
 import { jsx as _jsx, Fragment as _Fragment } from "react/jsx-runtime";
 import React, { useState } from "react";
 import Editor, { loader } from "@monaco-editor/react";
-// import DraggableBox from "@Com/myCom/DragBox"
-// import { getMdTextFromMonaco } from "@App/text/getMdText"
-// import * as monaco from "monaco-editor"
 import allInit from "@Func/Init/allInit";
 import { monacoPasteEvent } from "@Func/Events/pasteEvent";
 import { triggerConverterEvent } from "@Func/Events/convert";
-// import { transform } from "html2canvas/dist/types/css/property-descriptors/transform"
-// loader.config({ monaco });
-// import { useTheme } from "@Root/js/React/Mobx/Theme"
 import { observer } from "mobx-react";
-// import changeTheme from "@App/theme/change"
-// import monacoKeyDownEvent from "@Func/Events/key/monacoKey"
 import monacoKeyEvent from "@Func/Events/key/monacoKey";
 import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
-// import DragHandleIcon from "@mui/icons-material/DragHandle"
 import { monacoSnippets } from "@Func/Monaco/snippets/snippets";
 import monacoFormat from "@Func/Monaco/format/format";
 import { getDeviceTyByProportion } from "@App/user/userAgent";

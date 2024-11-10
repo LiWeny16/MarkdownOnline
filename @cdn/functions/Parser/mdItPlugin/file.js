@@ -31,7 +31,7 @@ const importFilePlugin = function importPlugin(md) {
         }
         if (!silent) {
             const filePath = match[2].trim();
-            const extensionMatch = filePath.match(/\.(md|xlsx|csv)$/);
+            const extensionMatch = filePath.match(/\.(md|xlsx|csv|pdf)$/);
             if (!extensionMatch) {
                 // 不支持的文件扩展名，可以选择忽略或处理为默认情况
                 return false;
@@ -49,6 +49,9 @@ const importFilePlugin = function importPlugin(md) {
                 case "csv":
                     className = "import-csv";
                     break;
+                case "pdf":
+                    className = "import-pdf";
+                    break;
                 default:
                     className = "import-unknown";
             }
@@ -57,6 +60,11 @@ const importFilePlugin = function importPlugin(md) {
             tokenOpen.content = `<div class="${className}">`;
             // 这里可以选择在 div 中包含文件路径或其他信息
             tokenOpen.content = `<div class="${className}" data-path="${filePath}">`;
+            if (extension === "pdf") {
+                // 创建 PDF <embed> 元素
+                const embedToken = state.push("html_inline", "", 0);
+                embedToken.content = `<embed src="${filePath}" type="application/pdf" width="100%" height="600px">`;
+            }
             const tokenClose = state.push("html_inline", "", 0);
             tokenClose.content = `</div>`;
         }

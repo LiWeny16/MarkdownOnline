@@ -38,7 +38,7 @@ export const supportedImageExtensions = [
   "bmp",
   "webp",
   "svg",
-  "fig"
+  "fig",
 ]
 
 class FileState {
@@ -167,6 +167,8 @@ export class FileFolderManager extends FileState {
   protected static topDirectoryHandle: FileSystemDirectoryHandle | undefined
   protected currentDirectoryHandle: FileSystemDirectoryHandle | undefined
   protected isWatching: boolean = false
+  public watchInterval: ReturnType<typeof setInterval> | null = null
+
   constructor(directoryHandle?: FileSystemDirectoryHandle) {
     super()
   }
@@ -317,19 +319,23 @@ export class FileFolderManager extends FileState {
     isImg: boolean = false
   ): Promise<string> {
     try {
-      // 将文件路径拆分为各个部分
-      const pathParts = filePath.split("/")
+      // 解码文件路径，确保包含中文和空格的路径可以正确处理
+      console.log(filePath);
+      const decodedFilePath = decodeURIComponent(filePath)
+      const pathParts = decodedFilePath.split("/")
+      console.log(pathParts);
       let currentHandle = directoryHandle
 
       // 递归遍历目录以找到目标文件
       for (let i = 0; i < pathParts.length - 1; i++) {
         const part = pathParts[i]
-        currentHandle = await currentHandle.getDirectoryHandle(part)
+        if (part) {
+          currentHandle = await currentHandle.getDirectoryHandle(part)
+        }
       }
 
       // 获取文件名
       const fileName = pathParts[pathParts.length - 1]
-
       // 检查文件扩展名
       const fileExtension = fileName.split(".").pop()?.toLowerCase()
       if (!fileExtension) {
@@ -522,15 +528,21 @@ export class FileFolderManager extends FileState {
   }
 
   public async watchDirectory(callback: () => void, interval: number = 1000) {
-    if (this.isWatching) {
-      return
-    } else {
-      this.isWatching = true
-      setInterval(() => {
-        callback()
-      }, interval)
+    if (this.isWatching) return
+
+    this.isWatching = true
+    this.watchInterval = setInterval(callback, interval)
+  }
+
+  // 停止监控的方法
+  public stopWatching() {
+    if (this.isWatching && this.watchInterval) {
+      clearInterval(this.watchInterval)
+      this.isWatching = false
+      this.watchInterval = null
     }
   }
+
   // 辅助函数：将 ArrayBuffer 转换为 Base64
   private async arrayBufferToBase64(
     buffer: ArrayBuffer,

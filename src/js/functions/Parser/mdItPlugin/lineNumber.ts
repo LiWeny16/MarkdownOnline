@@ -35,6 +35,7 @@ function markdownitLineNumber(md: MarkdownIt, option: any) {
     md.renderer.rules.th_open =
     md.renderer.rules.bullet_list_open =
     md.renderer.rules.list_item_open =
+    md.renderer.rules.import_plugin =
       injectLineNumbers
 }
 

@@ -84,7 +84,7 @@ export default defineConfig({
     [react({ jsxRuntime: "classic" })],
     // dynamicImport(/* options */),
     retryImportPlugin({
-   
+      // "@monaco-editor/react"
       gsap: "https://cdn.jsdmirror.com/npm/gsap@3.12/+esm",
       "react-photo-view":
         "https://cdn.jsdmirror.com/npm/react-photo-view-cdn@0.0.1/esm/react-photo-view.module.js",
@@ -127,6 +127,8 @@ export default defineConfig({
       "@cdn-mermaid":
         "https://cdn.jsdmirror.com/npm/mermaid@10/dist/mermaid.esm.min.mjs",
       "@cdn-kit":
+        "https://cdn.jsdmirror.com/npm/bigonion-kit@0.12.6/esm/kit.min.js",
+      "bigonion-kit":
         "https://cdn.jsdmirror.com/npm/bigonion-kit@0.12.6/esm/kit.min.js",
       "@cdn-hljs":
         "https://cdn.jsdmirror.com/npm/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js",

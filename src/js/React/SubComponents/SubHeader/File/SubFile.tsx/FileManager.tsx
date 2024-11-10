@@ -34,7 +34,10 @@ import {
   getSettings,
   getStatesMemorable,
 } from "@App/config/change"
-import { supportedImageExtensions } from "@App/fileSystem/file"
+import {
+  FileFolderManager,
+  supportedImageExtensions,
+} from "@App/fileSystem/file"
 import { Menu, MenuItem } from "@mui/material"
 
 type FileType =
@@ -231,7 +234,7 @@ const getIconFromFileType = (fileType: FileType) => {
 interface CustomTreeItemProps
   extends Omit<UseTreeItem2Parameters, "rootRef">,
     Omit<React.HTMLAttributes<HTMLLIElement>, "onFocus"> {
-  folderManager: any
+  folderManager: FileFolderManager
   fillText: any
   setExpandedFolderState: Function
   setIsDragging: Function
@@ -274,23 +277,24 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
     const handleClickFolderFile = async (
       _event: React.MouseEvent<HTMLDivElement, MouseEvent>
     ) => {
-      // if (item.fileType === "folder") {
-      //   if(status.expandable && status.expanded)
-      //   setExpandedFolderState((pre:string[])=>{
-      //     return [...pre,item.id]
-      //   })
-      // }
-      console.log(status)
       if (item.fileType === "file" && folderManager.fileState === 1) {
         try {
-          if (item.fileType && item.label.slice(-4) === ".png") {
-            changeStates({ unmemorable: { previewMode: true } })
+          changeStates({ unmemorable: { previewMode: true } })
+
+          if (
+            item.fileType &&
+            supportedImageExtensions.includes(item.label.slice(-3))
+          ) {
             let content = `![${getSettings().advanced.imageSettings.basicStyle}](./${item.path})`
+            fillText(content, item.label)
+          } else if (item.fileType && item.label.slice(-3) === "pdf") {
+            // @[import](path/to/file.ext)
+            let content = `@[import](./${item.path})`
             fillText(content, item.label)
           } else {
             changeStates({ unmemorable: { previewMode: false } })
             let content = await folderManager.readFileContent(
-              folderManager.getTopDirectoryHandle(),
+              folderManager.getTopDirectoryHandle()!,
               item.path
             )
             fillText(content, item.label)
@@ -353,7 +357,7 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
 
 export default function FileExplorer(props: {
   fileDirectoryArr: any
-  folderManager: any
+  folderManager: FileFolderManager
   setIsDragging: Function
   fillText: Function
 }) {

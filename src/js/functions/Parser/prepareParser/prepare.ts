@@ -14,18 +14,20 @@ export default async function prepareParser(originalMd: string) {
    */
   async function prepareImage(imageToken: { attrGet: (arg0: string) => any }) {
     let src = imageToken.attrGet("src")
+    console.log(src);
     if (src.startsWith("/vf/")) {
       let imgId = src.match(/\d+/)[0]
       return await readMemoryImg("uuid", parseInt(imgId)).then((e) => {
         return e[0].imgBase64
       })
     } else if (src.startsWith("./")) {
+      console.log(src);
       const folderManager = new FileFolderManager()
 
       if (folderManager.getTopDirectoryHandle()) {
         return await folderManager.readFileContent(
           folderManager.getTopDirectoryHandle()!,
-          src.slice(2),
+          decodeURIComponent(src).slice(2),
           true
         )
       }

@@ -1,9 +1,19 @@
 let imagePlugin = function (md) {
     const oldRender = md.renderer.rules.image;
+    // 添加 Markdown 渲染前的预处理
+    md.core.ruler.before("normalize", "replace_spaces_in_image_src", (state) => {
+        // 遍历所有 token 并替换图片路径中的空格
+        state.src = state.src.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+            // 替换路径中的空格为 %20
+            const encodedSrc = src.replace(/ /g, "%20");
+            return `![${alt}](${encodedSrc})`;
+        });
+    });
     md.renderer.rules.image = function (tokens, idx, options, env, self) {
         const token = tokens[idx];
         const grammar = "#";
         let src = token.attrs[token.attrIndex("src")][1];
+        console.log(src);
         let alt = token.content;
         if (token && token.attrGet("src")?.startsWith("/vf/")) {
             if (env.vfImgSrcArr) {

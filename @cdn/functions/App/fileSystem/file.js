@@ -36,7 +36,7 @@ export const supportedImageExtensions = [
     "bmp",
     "webp",
     "svg",
-    "fig"
+    "fig",
 ];
 class FileState {
 }
@@ -179,6 +179,12 @@ export class FileFolderManager extends FileState {
             writable: true,
             value: false
         });
+        Object.defineProperty(this, "watchInterval", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: null
+        });
     }
     // Getter for fileState
     get topDirectoryArray() {
@@ -304,13 +310,18 @@ export class FileFolderManager extends FileState {
     }
     async readFileContent(directoryHandle, filePath, isImg = false) {
         try {
-            // 将文件路径拆分为各个部分
-            const pathParts = filePath.split("/");
+            // 解码文件路径，确保包含中文和空格的路径可以正确处理
+            console.log(filePath);
+            const decodedFilePath = decodeURIComponent(filePath);
+            const pathParts = decodedFilePath.split("/");
+            console.log(pathParts);
             let currentHandle = directoryHandle;
             // 递归遍历目录以找到目标文件
             for (let i = 0; i < pathParts.length - 1; i++) {
                 const part = pathParts[i];
-                currentHandle = await currentHandle.getDirectoryHandle(part);
+                if (part) {
+                    currentHandle = await currentHandle.getDirectoryHandle(part);
+                }
             }
             // 获取文件名
             const fileName = pathParts[pathParts.length - 1];
@@ -464,14 +475,17 @@ export class FileFolderManager extends FileState {
         }
     }
     async watchDirectory(callback, interval = 1000) {
-        if (this.isWatching) {
+        if (this.isWatching)
             return;
-        }
-        else {
-            this.isWatching = true;
-            setInterval(() => {
-                callback();
-            }, interval);
+        this.isWatching = true;
+        this.watchInterval = setInterval(callback, interval);
+    }
+    // 停止监控的方法
+    stopWatching() {
+        if (this.isWatching && this.watchInterval) {
+            clearInterval(this.watchInterval);
+            this.isWatching = false;
+            this.watchInterval = null;
         }
     }
     // 辅助函数：将 ArrayBuffer 转换为 Base64

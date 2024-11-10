@@ -50,6 +50,7 @@ export declare class FileFolderManager extends FileState {
     protected static topDirectoryHandle: FileSystemDirectoryHandle | undefined;
     protected currentDirectoryHandle: FileSystemDirectoryHandle | undefined;
     protected isWatching: boolean;
+    watchInterval: ReturnType<typeof setInterval> | null;
     constructor(directoryHandle?: FileSystemDirectoryHandle);
     get topDirectoryArray(): Array<any>;
     set topDirectoryArray(state: any);
@@ -77,6 +78,7 @@ export declare class FileFolderManager extends FileState {
      */
     writeBase64ImageFile(directoryHandle: FileSystemDirectoryHandle, fileName: string, base64Data: string, rootPath?: string): Promise<number>;
     watchDirectory(callback: () => void, interval?: number): Promise<void>;
+    stopWatching(): void;
     private arrayBufferToBase64;
     private copyDirectory;
 }

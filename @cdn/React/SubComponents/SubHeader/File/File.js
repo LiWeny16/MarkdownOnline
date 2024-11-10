@@ -81,11 +81,15 @@ const FileDrawer = observer(function FileDrawer() {
             alertUseArco(t("t-error-opening-file"), 2000, { kind: "error" });
         }
     };
+    // 改进的 onClickOpenFolder 函数
     const onClickOpenFolder = async () => {
         let fileFolderManager = folderManager;
+        // 先停止旧文件夹的监控（如果存在）
+        fileFolderManager.stopWatching();
         const directoryHandle = await fileFolderManager.openDirectory();
         if (directoryHandle) {
             let folderTopStackArray = await fileFolderManager.readDirectoryAsArray(directoryHandle, true);
+            // 启动新的文件夹监控
             fileFolderManager.watchDirectory(async () => {
                 let folderTopStackArray = await fileFolderManager.readDirectoryAsArray(directoryHandle, true);
                 fileFolderManager.topDirectoryArray = folderTopStackArray;
@@ -93,8 +97,6 @@ const FileDrawer = observer(function FileDrawer() {
             }, 1700);
             fileFolderManager.topDirectoryArray = folderTopStackArray;
             setFileDirectoryArr(folderTopStackArray);
-            // fileFolderManager.setTopDirectoryArray(folderTopStackArray)
-            // fileFolderManager.createNewFolder(directoryHandle, "test2")
         }
     };
     const startButtonStyle = { width: "53%", height: "6svh", mb: "10px" };

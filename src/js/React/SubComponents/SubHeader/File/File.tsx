@@ -41,7 +41,7 @@ import {
 } from "@mui/icons-material"
 import { useTranslation } from "react-i18next"
 const fileManager = new FileManager()
-const folderManager = new FileFolderManager()
+const folderManager:FileFolderManager = new FileFolderManager()
 let _t: NodeJS.Timeout | null
 const FileDrawer = observer(function FileDrawer() {
   const { t } = useTranslation()
@@ -102,14 +102,21 @@ const FileDrawer = observer(function FileDrawer() {
     }
   }
 
+  // 改进的 onClickOpenFolder 函数
   const onClickOpenFolder = async () => {
     let fileFolderManager = folderManager
+
+    // 先停止旧文件夹的监控（如果存在）
+    fileFolderManager.stopWatching()
+
     const directoryHandle = await fileFolderManager.openDirectory()
     if (directoryHandle) {
       let folderTopStackArray = await fileFolderManager.readDirectoryAsArray(
         directoryHandle,
         true
       )
+
+      // 启动新的文件夹监控
       fileFolderManager.watchDirectory(async () => {
         let folderTopStackArray = await fileFolderManager.readDirectoryAsArray(
           directoryHandle,
@@ -118,12 +125,12 @@ const FileDrawer = observer(function FileDrawer() {
         fileFolderManager.topDirectoryArray = folderTopStackArray
         setFileDirectoryArr(folderTopStackArray)
       }, 1700)
+
       fileFolderManager.topDirectoryArray = folderTopStackArray
       setFileDirectoryArr(folderTopStackArray)
-      // fileFolderManager.setTopDirectoryArray(folderTopStackArray)
-      // fileFolderManager.createNewFolder(directoryHandle, "test2")
     }
   }
+
   const startButtonStyle = { width: "53%", height: "6svh", mb: "10px" }
   const TransparentBackdrop = styled(Backdrop)({
     backgroundColor: "transparent",

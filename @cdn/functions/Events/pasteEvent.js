@@ -33,8 +33,8 @@ export function monacoPasteEvent(editor, monaco) {
                     let path = getSettings().advanced.imageSettings.imgStorePath;
                     path =
                         path.slice(-1) === "/" ? path.slice(0, path.length - 1) : path;
-                    const maxNumber = await folderManager.writeBase64ImageFile(folderManager.getTopDirectoryHandle(), ".png", base64Arr[0], path);
                     for (let i = 0; i <= base64Arr.length - 1; i++) {
+                        let maxNumber = await folderManager.writeBase64ImageFile(folderManager.getTopDirectoryHandle(), ".png", base64Arr[i], path);
                         insertImgText += `![${basicStyle}](.${path}/${maxNumber}.png)`;
                     }
                 }
