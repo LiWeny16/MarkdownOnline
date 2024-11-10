@@ -36,6 +36,7 @@ export const supportedImageExtensions = [
     "bmp",
     "webp",
     "svg",
+    "fig"
 ];
 class FileState {
 }

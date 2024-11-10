@@ -1,15 +1,16 @@
 import { Monaco } from "@monaco-editor/react"
 import { editor } from "monaco-editor"
-import  {
-  insertTextMonacoAtCursor,
-} from "@App/text/insertTextAtCursor"
+import { insertTextMonacoAtCursor } from "@App/text/insertTextAtCursor"
 import {
   fillInMemoryImg,
   fillInMemoryImgs,
   readMemoryImg,
 } from "@App/memory/memory"
 import { getSettings } from "@App/config/change"
-import { FileFolderManager } from "@App/fileSystem/file"
+import {
+  FileFolderManager,
+  supportedImageExtensions,
+} from "@App/fileSystem/file"
 const basicStyle = getSettings().advanced.imageSettings.basicStyle
 const folderManager = new FileFolderManager()
 /**
@@ -32,9 +33,10 @@ export function monacoPasteEvent(
 ) {
   editor.getContainerDomNode().addEventListener(
     "paste",
-    (event) => {
-      handlePasteEvent(event).then(async (base64Arr: any) => {
+    async (event) => {
+      await handlePasteEvent(event).then(async (base64Arr: any) => {
         let insertImgText: string = ""
+        // console.log(base64Arr)
         if (base64Arr) {
           if (
             !folderManager.getTopDirectoryHandle() ||
@@ -73,7 +75,7 @@ function handlePasteEvent(e: ClipboardEvent) {
     let clipboardData = e.clipboardData!
     let items = clipboardData.items
     const itemsLength = items.length
-    let imageBase64Arr: any = []
+    let imageBase64Arr: string[] = []
     for (let i = 0; i < items.length; i++) {
       let item = items[i]
       if (item.kind == "file") {
@@ -82,27 +84,22 @@ function handlePasteEvent(e: ClipboardEvent) {
         let pasteFile = item.getAsFile()!
         let reader = new FileReader()
         reader.onload = function (event) {
-          imageBase64Arr.push(event.target!.result)
+          if (typeof event.target!.result === "string") {
+            imageBase64Arr.push(event.target!.result)
+          }
           // console.log(event.target!.result)
           // Resolve 只会传最后一次结果
           if (i === itemsLength - 1) {
+            // console.log(imageBase64Arr);
             resolve(imageBase64Arr)
           }
         }
         // 将文件读取为BASE64格式字符串
         const fileType = pasteFile.type.split("/")[1]
-        if (
-          fileType === "png" ||
-          fileType === "jpg" ||
-          fileType === "jpeg" ||
-          fileType === "webp" ||
-          fileType === "svg"
-        ) {
+        if (supportedImageExtensions.includes(fileType)) {
           reader.readAsDataURL(pasteFile)
         }
-      } else {
-        resolve([])
-      }
+      } 
     }
   })
 }

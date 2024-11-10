@@ -9,8 +9,9 @@ import { useTranslation } from "react-i18next";
 import realTimeColab from "@App/share/colab/realTimeColab";
 import { replaceMonacoAll } from "@App/text/replaceText";
 import { getMdTextFromMonaco } from "@App/text/getMdText";
-const urlTest = "ws://127.0.0.1:9000";
-const url = "wss://webrtc-wabmmfcxmo.cn-shanghai.fcapp.run";
+// const url = "ws://127.0.0.1:9000"
+const url = "ws://md-server-md-server-bndnqhexdf.cn-hangzhou.fcapp.run";
+// https://md-server-md-server-bndnqhexdf.cn-hangzhou.fcapp.run
 export default function Settings(props) {
     const { t } = useTranslation();
     const palette = useTheme().palette;
