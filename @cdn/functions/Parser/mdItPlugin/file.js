@@ -1,7 +1,11 @@
-// markdown-it-import-plugin.js
+export const importRegex = /^@\[(import)\]\(([^)]+)\)$/;
 const importFilePlugin = function importPlugin(md) {
-    // 定义匹配 @[import](path/to/file.ext) 的正则表达式
-    const importRegex = /^@\[(import)\]\(([^)]+)\)$/;
+    const pdfStyle = `
+width: 45svw;
+border: none;
+padding-left: 0.2svw;
+height: 89svh;
+`;
     function importInline(state, silent) {
         const max = state.posMax;
         const start = state.pos;
@@ -30,43 +34,14 @@ const importFilePlugin = function importPlugin(md) {
             return false;
         }
         if (!silent) {
+            const token = state.push("import_inline", "", 0);
             const filePath = match[2].trim();
             const extensionMatch = filePath.match(/\.(md|xlsx|csv|pdf)$/);
             if (!extensionMatch) {
-                // 不支持的文件扩展名，可以选择忽略或处理为默认情况
                 return false;
             }
-            const extension = extensionMatch[1];
-            // 根据扩展名定义 class 名
-            let className = "";
-            switch (extension) {
-                case "md":
-                    className = "import-md";
-                    break;
-                case "xlsx":
-                    className = "import-xlsx";
-                    break;
-                case "csv":
-                    className = "import-csv";
-                    break;
-                case "pdf":
-                    className = "import-pdf";
-                    break;
-                default:
-                    className = "import-unknown";
-            }
-            // 创建包含 class 名的 div
-            const tokenOpen = state.push("html_inline", "", 0);
-            tokenOpen.content = `<div class="${className}">`;
-            // 这里可以选择在 div 中包含文件路径或其他信息
-            tokenOpen.content = `<div class="${className}" data-path="${filePath}">`;
-            if (extension === "pdf") {
-                // 创建 PDF <embed> 元素
-                const embedToken = state.push("html_inline", "", 0);
-                embedToken.content = `<embed src="${filePath}" type="application/pdf" width="100%" height="600px">`;
-            }
-            const tokenClose = state.push("html_inline", "", 0);
-            tokenClose.content = `</div>`;
+            token.content = filePath;
+            token.meta = { extension: extensionMatch[1] };
         }
         // 更新解析位置
         state.pos = endParen + 1;
@@ -74,5 +49,23 @@ const importFilePlugin = function importPlugin(md) {
     }
     // 在内联规则中注册插件，确保在其他内联规则之前处理
     md.inline.ruler.before("emphasis", "import_plugin", importInline);
+    md.renderer.rules["import_inline"] = function (tokens, idx, options, env) {
+        const token = tokens[idx];
+        const filePath = token.content;
+        const extension = token.meta.extension;
+        // 确保 pdfBase64 是完整的 data URL
+        const pdfBase64 = `${env.pdfParsedArr[0]}`;
+        let returnString;
+        if (pdfBase64.length > 10) {
+            // 正确使用 src 属性嵌入 Base64 PDF
+            returnString = `<embed style="${pdfStyle}" src="${pdfBase64}"></embed>`;
+        }
+        else {
+            returnString = `<div>PDF loading...</div>`;
+        }
+        // <iframe src="${pdfBase64}" width="100%" height="100%"></iframe>
+        return returnString;
+    };
 };
+// <embed name="357AEDA64D3719C6AC6C259FFC2A222C" style="position:absolute; left: 0; top: 0;" width="100%" height="100%" src="about:blank" type="application/pdf" internalid="357AEDA64D3719C6AC6C259FFC2A222C">
 export default importFilePlugin;

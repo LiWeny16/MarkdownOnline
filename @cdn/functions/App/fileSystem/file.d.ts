@@ -66,7 +66,7 @@ export declare class FileFolderManager extends FileState {
     openDirectory(): Promise<FileSystemDirectoryHandle | null>;
     readDirectoryAsArray(directoryHandle: FileSystemDirectoryHandle, isTop?: boolean): Promise<any[]>;
     listDirectoryAsObject(directoryHandle: any): Promise<any>;
-    readFileContent(directoryHandle: FileSystemDirectoryHandle, filePath: string, isImg?: boolean): Promise<string>;
+    readFileContent(directoryHandle: FileSystemDirectoryHandle, filePath: string, isFile?: boolean): Promise<string>;
     /**
      * @description 检查该目录是否存在，如果存在那么设置当前目录为该目录的句柄
      */

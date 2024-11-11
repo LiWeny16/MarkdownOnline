@@ -7,4 +7,6 @@ export default function prepareParser(originalMd: string): Promise<{
     vfImgSeq: number;
     mermaidParsedArr: string[];
     mermaidSeq: number;
+    pdfParsedArr: any;
+    pdfSeq: number;
 }>;

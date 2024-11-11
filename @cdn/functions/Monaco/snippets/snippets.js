@@ -366,7 +366,7 @@ sequenceDiagram
             });
             const fileManager = new FileFolderManager(); // 假设这是你用来管理文件和文件夹的类
             let folderStructure = fileManager.topDirectoryArray; // 获取文件夹结构
-            console.log(folderStructure);
+            // console.log(folderStructure)
             // 检查是否需要建议图片路径
             if (isNeedToSuggestImagePath(monaco, model, textUntilPosition, position)) {
                 // 匹配Markdown中的图片路径

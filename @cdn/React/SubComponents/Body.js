@@ -20,7 +20,9 @@ export default observer(function Body() {
     React.useEffect(() => {
         fastKeyEvent();
     }, []);
-    return (_jsx(_Fragment, { children: _jsxs("div", { style: { marginTop: "1.3vh" }, id: "bodyTopBox", children: [_jsxs("div", { id: "editor", className: `${getTheme() == "light" ? "theme-light" : "theme-dark"} FLEX ROW`, children: [_jsx(MdArea, {}), _jsx("article", { id: "view-area-hidden", className: "hidden-pre" }), _jsx("article", { ref: articleRef, id: "view-area", className: "markdown-body " +
+    return (_jsx(_Fragment, { children: _jsxs("div", { style: { marginTop: "1.3vh" }, id: "bodyTopBox", children: [_jsxs("div", { id: "editor", className: `${getTheme() == "light" ? "theme-light" : "theme-dark"} FLEX ROW`, children: [_jsx(MdArea, {}), _jsx("article", { id: "view-area-hidden", className: "hidden-pre" }), _jsx("article", { ref: articleRef, id: "view-area", style: {
+                                padding: getStates().unmemorable.previewMode ? "0px 5px" : "26px 38px",
+                            }, className: "markdown-body " +
                                 `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}` })] }), _jsx("div", { id: "aboutBox", children: _jsx("div", { id: "markdownParser", children: _jsx("div", { id: "aboutMd", className: "aboutViewArea markdown-body " +
                                 `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}` }) }) }), _jsx(WelcomeAnimation, {}), _jsx(Suspense, { fallback: _jsx(_Fragment, {}), children: _jsx(LazyEmojiPicker, { open: getEmojiPickerState() === "on" ? true : false }) }), _jsx(Suspense, { fallback: _jsx(_Fragment, {}), children: _jsx(LazyPromptPanel, { open: getStates().unmemorable.promptPanelState }) }), _jsx(Suspense, { children: _jsx(LazyPromptAIPanel, { open: getStates().unmemorable.aiPanelState }) })] }) }));
 });

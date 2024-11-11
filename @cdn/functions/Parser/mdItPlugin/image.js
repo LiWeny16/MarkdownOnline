@@ -13,7 +13,6 @@ let imagePlugin = function (md) {
         const token = tokens[idx];
         const grammar = "#";
         let src = token.attrs[token.attrIndex("src")][1];
-        console.log(src);
         let alt = token.content;
         if (token && token.attrGet("src")?.startsWith("/vf/")) {
             if (env.vfImgSrcArr) {

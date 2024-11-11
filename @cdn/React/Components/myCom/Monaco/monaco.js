@@ -154,12 +154,32 @@ export default observer(function MonacoEditor() {
             monacoResizeHeightEvent(setResizableHeight);
         });
     }
+    React.useEffect(() => {
+        const resizeObserver = new ResizeObserver((entries) => {
+            for (let entry of entries) {
+                const { width, height } = entry.contentRect;
+                setResizableWidth(width);
+                setResizableHeight(height);
+            }
+        });
+        if (monacoEditorRef.current) {
+            resizeObserver.observe(monacoEditorRef.current);
+        }
+        return () => {
+            if (monacoEditorRef.current) {
+                resizeObserver.unobserve(monacoEditorRef.current);
+            }
+        };
+    }, []);
+    // React.useEffect(() => {
+    //   if (getStates().unmemorable.previewMode) {
+    //     setResizableWidth(20)
+    //   }
+    // }, [getStates().unmemorable.previewMode])
     return (_jsx(_Fragment, { children: _jsx("div", { ref: monacoEditorRef, id: "monaco-editor", style: { width: resizableWidth, height: "100%" }, children: _jsx(ResizableBox, { className: "custom-resizable", width: resizableWidth, height: resizableHeight, draggableOpts: { grid: [5, 15] }, minConstraints: [100, resizableHeight], onResizeStop: handleResizeStop, onResize: (e) => {
                     setEditorOptions((pre) => {
-                        // pre.minimap=false
                         return { ...pre, minimap: { enabled: false } };
                     });
-                    // if (e.x > document.getElementById("editor")!.clientWidth * 0.3) {
                     // @ts-ignore
                     setResizableWidth(e.x);
                     // }

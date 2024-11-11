@@ -12,7 +12,7 @@ import "react-resizable/css/styles.css"
 import { monacoSnippets } from "@Func/Monaco/snippets/snippets"
 import monacoFormat from "@Func/Monaco/format/format"
 import { getDeviceTyByProportion } from "@App/user/userAgent"
-import { getSettings, getTheme } from "@App/config/change"
+import { getSettings, getStates, getTheme } from "@App/config/change"
 import monacoMouseEvent from "@Func/Events/mouse/monacoMouse"
 import monacoClickEvent from "@Func/Events/click/monacoClick"
 import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight"
@@ -163,6 +163,30 @@ export default observer(function MonacoEditor() {
       monacoResizeHeightEvent(setResizableHeight)
     })
   }
+  React.useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const { width, height } = entry.contentRect
+        setResizableWidth(width)
+        setResizableHeight(height)
+      }
+    })
+
+    if (monacoEditorRef.current) {
+      resizeObserver.observe(monacoEditorRef.current)
+    }
+
+    return () => {
+      if (monacoEditorRef.current) {
+        resizeObserver.unobserve(monacoEditorRef.current)
+      }
+    }
+  }, [])
+  // React.useEffect(() => {
+  //   if (getStates().unmemorable.previewMode) {
+  //     setResizableWidth(20)
+  //   }
+  // }, [getStates().unmemorable.previewMode])
   return (
     <>
       {/* <DraggableBox> */}
@@ -180,10 +204,8 @@ export default observer(function MonacoEditor() {
           onResizeStop={handleResizeStop}
           onResize={(e) => {
             setEditorOptions((pre) => {
-              // pre.minimap=false
               return { ...pre, minimap: { enabled: false } }
             })
-            // if (e.x > document.getElementById("editor")!.clientWidth * 0.3) {
             // @ts-ignore
             setResizableWidth(e.x)
             // }

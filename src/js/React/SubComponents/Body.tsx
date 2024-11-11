@@ -36,6 +36,9 @@ export default observer(function Body() {
           <article
             ref={articleRef}
             id="view-area"
+            style={{
+              padding: getStates().unmemorable.previewMode ? "0px 5px" : "26px 38px",
+            }}
             className={
               "markdown-body " +
               `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}`

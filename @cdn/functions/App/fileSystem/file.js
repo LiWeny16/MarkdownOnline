@@ -27,7 +27,7 @@ export const supportFileTypes = [
 ];
 // 包含点号的扩展名数组
 export const supportFileTypes2 = supportFileTypes.map((ext) => `.${ext}`);
-// 定义支持的文件扩展名列表
+// 定义支持的图片扩展名列表
 export const supportedImageExtensions = [
     "jpg",
     "jpeg",
@@ -308,68 +308,62 @@ export class FileFolderManager extends FileState {
         // 返回表示目录结构的对象
         return directoryObj;
     }
-    async readFileContent(directoryHandle, filePath, isImg = false) {
-        try {
-            // 解码文件路径，确保包含中文和空格的路径可以正确处理
-            console.log(filePath);
-            const decodedFilePath = decodeURIComponent(filePath);
-            const pathParts = decodedFilePath.split("/");
-            console.log(pathParts);
-            let currentHandle = directoryHandle;
-            // 递归遍历目录以找到目标文件
-            for (let i = 0; i < pathParts.length - 1; i++) {
-                const part = pathParts[i];
-                if (part) {
-                    currentHandle = await currentHandle.getDirectoryHandle(part);
-                }
-            }
-            // 获取文件名
-            const fileName = pathParts[pathParts.length - 1];
-            // 检查文件扩展名
-            const fileExtension = fileName.split(".").pop()?.toLowerCase();
-            if (!fileExtension) {
-                throw new Error("无法识别文件扩展名。");
-            }
-            // 获取文件句柄
-            const fileHandle = await currentHandle.getFileHandle(fileName);
-            // 检查文件类型是否支持
-            if (isImg) {
-                // 处理图片文件
-                if (!supportedImageExtensions.includes(fileExtension)) {
-                    alertUseArco(`文件扩展名 .${fileExtension} 不被支持为图片文件。`, 1000, {
-                        kind: "error",
-                    });
-                    throw new Error(`文件扩展名 .${fileExtension} 不被支持为图片文件。`);
-                }
-                // 不修改 this.fileHandle，保持之前的状态
-            }
-            else {
-                // 处理文本文件
-                if (!supportFileTypes.includes(fileExtension)) {
-                    alertUseArco(`文件扩展名 .${fileExtension} 不被支持为文本文件。`, 1000, {
-                        kind: "error",
-                    });
-                    throw new Error(`文件扩展名 .${fileExtension} 不被支持为文本文件。`);
-                }
-                // 更新共享的 fileHandle
-                this.fileHandle = fileHandle;
-            }
-            // 读取文件内容
-            const file = await fileHandle.getFile();
-            if (isImg) {
-                // 将文件读取为 Base64
-                const arrayBuffer = await file.arrayBuffer();
-                const base64String = await this.arrayBufferToBase64(arrayBuffer, file.type);
-                return base64String;
-            }
-            else {
-                // 读取文本内容
-                return await file.text();
+    async readFileContent(directoryHandle, filePath, isFile = false) {
+        // 解码文件路径，确保包含中文和空格的路径可以正确处理
+        // console.log(filePath);
+        const decodedFilePath = decodeURIComponent(filePath);
+        const pathParts = decodedFilePath.split("/");
+        let currentHandle = directoryHandle;
+        // 递归遍历目录以找到目标文件
+        for (let i = 0; i < pathParts.length - 1; i++) {
+            const part = pathParts[i];
+            if (part) {
+                currentHandle = await currentHandle.getDirectoryHandle(part);
             }
         }
-        catch (error) {
-            console.error("读取文件时出错:", error);
-            throw new Error("未找到文件或读取文件时出错。");
+        // 获取文件名
+        const fileName = pathParts[pathParts.length - 1];
+        // 检查文件扩展名
+        const fileExtension = fileName.split(".").pop()?.toLowerCase();
+        if (!fileExtension) {
+            throw new Error("无法识别文件扩展名。");
+        }
+        // 获取文件句柄
+        const fileHandle = await currentHandle.getFileHandle(fileName);
+        // 检查文件类型是否支持
+        if (isFile) {
+            // 处理文件
+            if (!(supportedImageExtensions.includes(fileExtension) ||
+                fileExtension === "pdf")) {
+                alertUseArco(`文件扩展名 .${fileExtension} 不被支持为可读文件。`, 1000, {
+                    kind: "error",
+                });
+                throw new Error(`文件扩展名 .${fileExtension} 不被支持为可读文件。`);
+            }
+            // 不修改 this.fileHandle，保持之前的状态
+        }
+        else {
+            // 处理文本文件
+            if (!supportFileTypes.includes(fileExtension)) {
+                alertUseArco(`文件扩展名 .${fileExtension} 不被支持为文本文件。`, 1000, {
+                    kind: "error",
+                });
+                throw new Error(`文件扩展名 .${fileExtension} 不被支持为文本文件。`);
+            }
+            // 更新共享的 fileHandle
+            this.fileHandle = fileHandle;
+        }
+        // 读取文件内容
+        const file = await fileHandle.getFile();
+        if (isFile) {
+            // 将文件读取为 Base64
+            const arrayBuffer = await file.arrayBuffer();
+            const base64String = await this.arrayBufferToBase64(arrayBuffer, file.type);
+            return base64String;
+        }
+        else {
+            // 读取文本内容
+            return await file.text();
         }
     }
     /**
