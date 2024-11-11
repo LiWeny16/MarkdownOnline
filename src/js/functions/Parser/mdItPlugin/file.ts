@@ -4,9 +4,7 @@ export const importRegex = /^@\[(import)\]\(([^)]+)\)$/
 
 const importFilePlugin = function importPlugin(md: MarkdownIt) {
   const pdfStyle = `
-width: 45svw;
 border: none;
-padding-left: 0.2svw;
 height: 89svh;
 `
   function importInline(state: any, silent: boolean) {
@@ -70,9 +68,9 @@ height: 89svh;
     // 确保 pdfBase64 是完整的 data URL
     const pdfBase64 = `${env.pdfParsedArr[0]}`
     let returnString
-    if (pdfBase64.length>10) {
+    if (pdfBase64.length > 10) {
       // 正确使用 src 属性嵌入 Base64 PDF
-      returnString = `<embed style="${pdfStyle}" src="${pdfBase64}"></embed>`
+      returnString = `<embed onload="(()=>{Array.from(document.getElementsByClassName('pdf-preview')).forEach(e=>e.style.width=document.getElementById('view-area').clientWidth-20+'px')})()" class="pdf-preview" style="${pdfStyle}" src="${pdfBase64}"></embed>`
     } else {
       returnString = `<div>PDF loading...</div>`
     }

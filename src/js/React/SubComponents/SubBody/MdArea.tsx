@@ -1,9 +1,9 @@
-import React from 'react'
-import MonacoEditor from '@Com/myCom/Monaco/monaco'
-export default function MdArea() {
+import React from "react"
+import MonacoEditor from "@Com/myCom/Monaco/monaco"
+export default function MdArea({ setMarkdownViewerWidth }: any) {
   return (
     <>
-    <MonacoEditor/>
+      <MonacoEditor setMarkdownViewerWidth={setMarkdownViewerWidth} />
     </>
   )
 }

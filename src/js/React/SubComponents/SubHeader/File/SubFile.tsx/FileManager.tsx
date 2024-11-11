@@ -158,18 +158,18 @@ interface CustomLabelProps {
   icon?: React.ElementType
   expandable?: boolean
   draggable: boolean
-  onClick: React.MouseEventHandler<HTMLDivElement>
+  // onClick: React.MouseEventHandler<HTMLDivElement>
 }
 const CustomLabel: React.FC<CustomLabelProps> = ({
   icon: Icon,
   expandable = false,
   children,
   draggable = false,
-  onClick,
+  // onClick,
 }) => {
   return (
     <>
-      <TreeItem2Label onClick={onClick} draggable={draggable}>
+      <TreeItem2Label draggable={draggable}>
         <Box
           sx={{
             display: "flex",
@@ -273,9 +273,8 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
       icon = getIconFromFileType(item.fileType)
     }
 
-    // Function to handle click events on folder/file
     const handleClickFolderFile = async (
-      _event: React.MouseEvent<HTMLDivElement, MouseEvent>
+      _event: React.MouseEvent<HTMLLIElement, MouseEvent>
     ) => {
       if (item.fileType === "file" && folderManager.fileState === 1) {
         try {
@@ -309,7 +308,11 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
     return (
       <>
         <TreeItem2Provider itemId={itemId}>
-          <StyledTreeItemRoot draggable={false} {...getRootProps(other)}>
+          <StyledTreeItemRoot
+            onClick={handleClickFolderFile}
+            draggable={false}
+            {...getRootProps(other)}
+          >
             <CustomTreeItemContent
               draggable={canItDrag(item)}
               onDragStart={(e) => {
@@ -339,7 +342,7 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
 
               <CustomLabel
                 draggable={false}
-                onClick={handleClickFolderFile}
+                // onClick={handleClickFolderFile}
                 {...getLabelProps({
                   icon,
                   expandable: expandable && status.expanded,

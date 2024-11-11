@@ -7,7 +7,7 @@ import { editor } from "monaco-editor"
 import { triggerConverterEvent } from "@Func/Events/convert"
 import { observer } from "mobx-react"
 import monacoKeyEvent from "@Func/Events/key/monacoKey"
-import { ResizableBox } from "react-resizable"
+import { ResizableBox, ResizeCallbackData } from "react-resizable"
 import "react-resizable/css/styles.css"
 import { monacoSnippets } from "@Func/Monaco/snippets/snippets"
 import monacoFormat from "@Func/Monaco/format/format"
@@ -19,6 +19,8 @@ import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight"
 import monacoScrollEvent from "@Func/Events/scroll/monacoScroll"
 import { pollVariables } from "@App/basic/basic"
 import monacoDragEvent from "@Func/Events/drag/drag"
+import gsap from "gsap"
+import { Backdrop, debounce } from "@mui/material"
 const version = "0.45.0"
 loader.config({
   paths: {
@@ -44,20 +46,15 @@ const files: any = {
   },
 }
 
-export default observer(function MonacoEditor() {
+const MonacoEditor = observer(function MonacoEditor({
+  setMarkdownViewerWidth,
+}: any) {
   const monacoEditorRef = React.useRef(null)
-
+  const [fileName, setFileName] = useState("index.md")
+  const file = files[fileName]
   const [resizableWidth, setResizableWidth] = React.useState(640)
   const [resizableHeight, setResizableHeight] = React.useState(800)
-  const handleResizeStop = () => {
-    // mdConverter(true)
-    setTimeout(() => {
-      setEditorOptions((pre) => {
-        return { ...pre, minimap: { enabled: true } }
-      })
-    }, 300)
-  }
-
+  const [openBackdrop, setOpenBackdrop] = useState(false)
   const [editorOptions, setEditorOptions] =
     useState<editor.IStandaloneEditorConstructionOptions>({
       fontSize: 16, // 设置字体大小
@@ -83,13 +80,58 @@ export default observer(function MonacoEditor() {
       //     enabled: true, // 快速修复功能
       //  },
     })
-  const [fileName, setFileName] = useState("index.md")
-  // let previousValue = window.editor.getValue();
-  // window.setFileName = setFileName
-  const file = files[fileName]
-  // const editorRef = useRef(null)
-  function handleOnChange(e: any) {
+  // 禁用选择样式
+  const disableTextSelection = () => {
+    document.body.style.userSelect = "none" // 禁用文本选择
+    document.body.style.cursor = "col-resize" // 更改光标样式
+  }
+
+  // 恢复选择样式
+  const enableTextSelection = () => {
+    document.body.style.userSelect = "auto" // 恢复文本选择
+    document.body.style.cursor = "default" // 恢复光标样式
+  }
+  const handleOnChange = (e: any) => {
     triggerConverterEvent(4)
+  }
+  const handleResizeStart = () => {
+    setOpenBackdrop(true) // 开始拖拽时显示遮罩
+    disableTextSelection()
+    ;(
+      document.getElementsByClassName(
+        "react-resizable-handle"
+      )[0] as HTMLElement
+    ).style.backgroundColor = "#90caf9"
+  }
+  const handleResizeStop = () => {
+    setOpenBackdrop(false)
+    enableTextSelection()
+    ;(
+      document.getElementsByClassName(
+        "react-resizable-handle"
+      )[0] as HTMLElement
+    ).style.backgroundColor = ""
+    setTimeout(() => {
+      setEditorOptions((pre) => {
+        return { ...pre, minimap: { enabled: true } }
+      })
+    }, 300)
+  }
+  const handleResize = (e: React.SyntheticEvent, data: ResizeCallbackData) => {
+    const pdfDivs = document.getElementsByClassName("pdf-preview")
+    const editor = document.getElementById("editor") as HTMLElement
+    const newWidth = editor.clientWidth - data.size.width - 20 + "px"
+
+    // 遍历每一个具有 pdf-preview 类的元素并设置新宽度
+    Array.from(pdfDivs).forEach((pdfDiv) => {
+      ;(pdfDiv as HTMLElement).style.width = newWidth
+    })
+
+    setEditorOptions((pre) => {
+      return { ...pre, minimap: { enabled: false } }
+    })
+    // @ts-ignore
+    setResizableWidth(e.x)
   }
   function monacoInit(editor: editor.IStandaloneCodeEditor, monaco: Monaco) {
     getDeviceTyByProportion() == "PC"
@@ -182,37 +224,26 @@ export default observer(function MonacoEditor() {
       }
     }
   }, [])
-  // React.useEffect(() => {
-  //   if (getStates().unmemorable.previewMode) {
-  //     setResizableWidth(20)
-  //   }
-  // }, [getStates().unmemorable.previewMode])
+
   return (
     <>
-      {/* <DraggableBox> */}
       <div
         ref={monacoEditorRef}
         id="monaco-editor"
         style={{ width: resizableWidth, height: "100%" }}
       >
+        <Backdrop
+          sx={{ backgroundColor: "transparent", color: "#fff", zIndex: 9999 }}
+          open={openBackdrop}
+        />
         <ResizableBox
           className="custom-resizable"
           width={resizableWidth}
           height={resizableHeight}
-          draggableOpts={{ grid: [5, 15] }}
-          minConstraints={[100, resizableHeight]}
+          draggableOpts={{ grid: [2, 5] }}
+          onResizeStart={handleResizeStart}
           onResizeStop={handleResizeStop}
-          onResize={(e) => {
-            setEditorOptions((pre) => {
-              return { ...pre, minimap: { enabled: false } }
-            })
-            // @ts-ignore
-            setResizableWidth(e.x)
-            // }
-            // @ts-ignore
-          }}
-          // resizeHandles={(e)=>{}}
-          // maxConstraints={[1000, 1800]}
+          onResize={handleResize}
           axis="x"
         >
           <Editor
@@ -230,10 +261,8 @@ export default observer(function MonacoEditor() {
             beforeMount={handleBeforeMount}
           />
         </ResizableBox>
-
-        {/* <div style={{width:size.width}}>2323</div> */}
       </div>
-      {/* </DraggableBox> */}
     </>
   )
 })
+export default MonacoEditor

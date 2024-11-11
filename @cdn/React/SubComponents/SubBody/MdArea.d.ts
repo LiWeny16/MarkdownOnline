@@ -1,1 +1,1 @@
-export default function MdArea(): import("react/jsx-runtime").JSX.Element;
+export default function MdArea({ setMarkdownViewerWidth }: any): import("react/jsx-runtime").JSX.Element;

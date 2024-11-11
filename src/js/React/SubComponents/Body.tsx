@@ -14,14 +14,10 @@ const LazyEmojiPicker = React.lazy(
 const LazyPromptPanel = React.lazy(() => import("@Com/myCom/Prompt/Prompt"))
 const LazyPromptAIPanel = React.lazy(() => import("@Com/myCom/Prompt/AIPanel"))
 export default observer(function Body() {
-  const [content, setContent] = React.useState("")
-  const articleRef = React.useRef(null)
-  const [showWelcome, setShowWelcome] = React.useState(true)
-
-  const handleEnter = () => {
-    setShowWelcome(false)
-  }
+  const mdViewerRef: any = React.useRef(null)
+  const [markdownViewerWidth, setMarkdownViewerWidth] = React.useState("100%")
   React.useEffect(() => {
+    // setMarkdownViewerWidth(mdViewerRef.current.clientWidth / 2 + "px")
     fastKeyEvent()
   }, [])
   return (
@@ -31,13 +27,16 @@ export default observer(function Body() {
           id="editor"
           className={`${getTheme() == "light" ? "theme-light" : "theme-dark"} FLEX ROW`}
         >
-          <MdArea />
+          <MdArea setMarkdownViewerWidth={setMarkdownViewerWidth} />
           <article id="view-area-hidden" className="hidden-pre"></article>
           <article
-            ref={articleRef}
+            ref={mdViewerRef}
             id="view-area"
             style={{
-              padding: getStates().unmemorable.previewMode ? "0px 5px" : "26px 38px",
+              width: markdownViewerWidth,
+              padding: getStates().unmemorable.previewMode
+                ? "0px 5px"
+                : "26px 38px",
             }}
             className={
               "markdown-body " +

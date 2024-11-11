@@ -1,4 +1,4 @@
-import { jsx as _jsx, Fragment as _Fragment } from "react/jsx-runtime";
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 import React, { useState } from "react";
 import Editor, { loader } from "@monaco-editor/react";
 import allInit from "@Func/Init/allInit";
@@ -18,6 +18,7 @@ import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight";
 import monacoScrollEvent from "@Func/Events/scroll/monacoScroll";
 import { pollVariables } from "@App/basic/basic";
 import monacoDragEvent from "@Func/Events/drag/drag";
+import { Backdrop } from "@mui/material";
 const version = "0.45.0";
 loader.config({
     paths: {
@@ -41,18 +42,13 @@ const files = {
         value: "",
     },
 };
-export default observer(function MonacoEditor() {
+const MonacoEditor = observer(function MonacoEditor({ setMarkdownViewerWidth, }) {
     const monacoEditorRef = React.useRef(null);
+    const [fileName, setFileName] = useState("index.md");
+    const file = files[fileName];
     const [resizableWidth, setResizableWidth] = React.useState(640);
     const [resizableHeight, setResizableHeight] = React.useState(800);
-    const handleResizeStop = () => {
-        // mdConverter(true)
-        setTimeout(() => {
-            setEditorOptions((pre) => {
-                return { ...pre, minimap: { enabled: true } };
-            });
-        }, 300);
-    };
+    const [openBackdrop, setOpenBackdrop] = useState(false);
     const [editorOptions, setEditorOptions] = useState({
         fontSize: 16, // 设置字体大小
         wordWrap: getSettings().basic.editorAutoWrap ? "on" : "off",
@@ -77,14 +73,49 @@ export default observer(function MonacoEditor() {
         //     enabled: true, // 快速修复功能
         //  },
     });
-    const [fileName, setFileName] = useState("index.md");
-    // let previousValue = window.editor.getValue();
-    // window.setFileName = setFileName
-    const file = files[fileName];
-    // const editorRef = useRef(null)
-    function handleOnChange(e) {
+    // 禁用选择样式
+    const disableTextSelection = () => {
+        document.body.style.userSelect = "none"; // 禁用文本选择
+        document.body.style.cursor = "col-resize"; // 更改光标样式
+    };
+    // 恢复选择样式
+    const enableTextSelection = () => {
+        document.body.style.userSelect = "auto"; // 恢复文本选择
+        document.body.style.cursor = "default"; // 恢复光标样式
+    };
+    const handleOnChange = (e) => {
         triggerConverterEvent(4);
-    }
+    };
+    const handleResizeStart = () => {
+        setOpenBackdrop(true); // 开始拖拽时显示遮罩
+        disableTextSelection();
+        document.getElementsByClassName("react-resizable-handle")[0].style.backgroundColor = "#90caf9";
+    };
+    const handleResizeStop = () => {
+        setOpenBackdrop(false);
+        enableTextSelection();
+        document.getElementsByClassName("react-resizable-handle")[0].style.backgroundColor = "";
+        setTimeout(() => {
+            setEditorOptions((pre) => {
+                return { ...pre, minimap: { enabled: true } };
+            });
+        }, 300);
+    };
+    const handleResize = (e, data) => {
+        const pdfDivs = document.getElementsByClassName("pdf-preview");
+        const editor = document.getElementById("editor");
+        const newWidth = editor.clientWidth - data.size.width - 20 + "px";
+        // 遍历每一个具有 pdf-preview 类的元素并设置新宽度
+        Array.from(pdfDivs).forEach((pdfDiv) => {
+            ;
+            pdfDiv.style.width = newWidth;
+        });
+        setEditorOptions((pre) => {
+            return { ...pre, minimap: { enabled: false } };
+        });
+        // @ts-ignore
+        setResizableWidth(e.x);
+    };
     function monacoInit(editor, monaco) {
         getDeviceTyByProportion() == "PC"
             ? setResizableWidth(document.getElementById("editor").clientWidth / 2)
@@ -171,23 +202,8 @@ export default observer(function MonacoEditor() {
             }
         };
     }, []);
-    // React.useEffect(() => {
-    //   if (getStates().unmemorable.previewMode) {
-    //     setResizableWidth(20)
-    //   }
-    // }, [getStates().unmemorable.previewMode])
-    return (_jsx(_Fragment, { children: _jsx("div", { ref: monacoEditorRef, id: "monaco-editor", style: { width: resizableWidth, height: "100%" }, children: _jsx(ResizableBox, { className: "custom-resizable", width: resizableWidth, height: resizableHeight, draggableOpts: { grid: [5, 15] }, minConstraints: [100, resizableHeight], onResizeStop: handleResizeStop, onResize: (e) => {
-                    setEditorOptions((pre) => {
-                        return { ...pre, minimap: { enabled: false } };
-                    });
-                    // @ts-ignore
-                    setResizableWidth(e.x);
-                    // }
-                    // @ts-ignore
-                }, 
-                // resizeHandles={(e)=>{}}
-                // maxConstraints={[1000, 1800]}
-                axis: "x", children: _jsx(Editor, { className: "monaco-editor-inner", height: "100%", width: resizableWidth, theme: getTheme() === "light" ? "vs-light" : "vs-dark", path: file.name, 
-                    // language="markdown"
-                    defaultLanguage: file.language, defaultValue: file.value, onMount: handleEditorDidMount, onChange: handleOnChange, options: editorOptions, beforeMount: handleBeforeMount }) }) }) }));
+    return (_jsx(_Fragment, { children: _jsxs("div", { ref: monacoEditorRef, id: "monaco-editor", style: { width: resizableWidth, height: "100%" }, children: [_jsx(Backdrop, { sx: { backgroundColor: "transparent", color: "#fff", zIndex: 9999 }, open: openBackdrop }), _jsx(ResizableBox, { className: "custom-resizable", width: resizableWidth, height: resizableHeight, draggableOpts: { grid: [2, 5] }, onResizeStart: handleResizeStart, onResizeStop: handleResizeStop, onResize: handleResize, axis: "x", children: _jsx(Editor, { className: "monaco-editor-inner", height: "100%", width: resizableWidth, theme: getTheme() === "light" ? "vs-light" : "vs-dark", path: file.name, 
+                        // language="markdown"
+                        defaultLanguage: file.language, defaultValue: file.value, onMount: handleEditorDidMount, onChange: handleOnChange, options: editorOptions, beforeMount: handleBeforeMount }) })] }) }));
 });
+export default MonacoEditor;

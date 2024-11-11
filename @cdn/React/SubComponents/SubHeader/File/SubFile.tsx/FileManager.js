@@ -100,8 +100,10 @@ const CustomTreeItemContent = styled(TreeItem2Content)(({ theme }) => ({
 function TransitionComponent(props) {
     return _jsx(Collapse, { ...props });
 }
-const CustomLabel = ({ icon: Icon, expandable = false, children, draggable = false, onClick, }) => {
-    return (_jsx(_Fragment, { children: _jsx(TreeItem2Label, { onClick: onClick, draggable: draggable, children: _jsxs(Box, { sx: {
+const CustomLabel = ({ icon: Icon, expandable = false, children, draggable = false,
+// onClick,
+ }) => {
+    return (_jsx(_Fragment, { children: _jsx(TreeItem2Label, { draggable: draggable, children: _jsxs(Box, { sx: {
                     display: "flex",
                     alignItems: "center",
                     cursor: "pointer",
@@ -149,7 +151,6 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
     else if (item.fileType) {
         icon = getIconFromFileType(item.fileType);
     }
-    // Function to handle click events on folder/file
     const handleClickFolderFile = async (_event) => {
         if (item.fileType === "file" && folderManager.fileState === 1) {
             try {
@@ -176,7 +177,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
             }
         }
     };
-    return (_jsx(_Fragment, { children: _jsx(TreeItem2Provider, { itemId: itemId, children: _jsxs(StyledTreeItemRoot, { draggable: false, ...getRootProps(other), children: [_jsxs(CustomTreeItemContent, { draggable: canItDrag(item), onDragStart: (e) => {
+    return (_jsx(_Fragment, { children: _jsx(TreeItem2Provider, { itemId: itemId, children: _jsxs(StyledTreeItemRoot, { onClick: handleClickFolderFile, draggable: false, ...getRootProps(other), children: [_jsxs(CustomTreeItemContent, { draggable: canItDrag(item), onDragStart: (e) => {
                             if (isImage(item)) {
                                 setTimeout(() => {
                                     setIsDragging(true);
@@ -191,7 +192,7 @@ const CustomTreeItem = React.forwardRef(function CustomTreeItem(props, ref) {
                                 "Mui-focused": status.focused,
                                 "Mui-disabled": status.disabled,
                             }),
-                        }), children: [_jsx(TreeItem2IconContainer, { ...getIconContainerProps(), children: _jsx(TreeItem2Icon, { status: status }) }), _jsx(CustomLabel, { draggable: false, onClick: handleClickFolderFile, ...getLabelProps({
+                        }), children: [_jsx(TreeItem2IconContainer, { ...getIconContainerProps(), children: _jsx(TreeItem2Icon, { status: status }) }), _jsx(CustomLabel, { draggable: false, ...getLabelProps({
                                     icon,
                                     expandable: expandable && status.expanded,
                                 }) })] }), children && _jsx(TransitionComponent, { ...getGroupTransitionProps() })] }) }) }));

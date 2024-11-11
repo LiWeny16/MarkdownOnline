@@ -1,3 +1,3 @@
 import "react-resizable/css/styles.css";
-declare const _default: () => import("react/jsx-runtime").JSX.Element;
-export default _default;
+declare const MonacoEditor: ({ setMarkdownViewerWidth, }: any) => import("react/jsx-runtime").JSX.Element;
+export default MonacoEditor;
