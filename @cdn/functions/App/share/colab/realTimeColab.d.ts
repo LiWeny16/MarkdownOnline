@@ -1,17 +1,28 @@
 declare class RealTimeColab {
+    private static instance;
+    private static userId;
+    private static peers;
+    private dataChannels;
     private ws;
-    private userId;
-    constructor();
-    isConnected(): Promise<boolean>;
-    connect(url: string, setMsgFromSharing: Function): Promise<void>;
+    private constructor();
+    static getInstance(): RealTimeColab;
+    getUniqId(): string | null;
+    connect(url: string, setMsgFromSharing: Function, updateConnectedUsers: Function): Promise<void>;
     disconnect(): Promise<void>;
-    sendPrivateMessage(targetId: string, message: string): Promise<void>;
-    sendBroadCastMessage(message: string): Promise<void>;
-    getUserId(): string;
-    getAllUsers(): Promise<void>;
+    private cleanUpConnections;
+    private handleSignal;
+    private createPeerConnection;
+    broadcastSignal(signal: any): void;
+    getAllUsers(): string[];
+    private handleOffer;
+    private handleAnswer;
+    private handleCandidate;
+    private setupDataChannel;
+    connectToUser(id: string): Promise<void>;
+    sendMessageToUser(id: string, message: string): Promise<void>;
     private generateUUID;
-    private handleMessage;
-    private receiveBroadCastMsg;
+    isConnected(): boolean;
+    getConnectedUserIds(): string[];
 }
 declare const realTimeColab: RealTimeColab;
 export default realTimeColab;

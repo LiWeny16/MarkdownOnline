@@ -23,6 +23,7 @@ type StateUnmemorable = {
 type StateMemorable = {
   languageChanged: Boolean
   welcomeAnimationState: boolean
+  localLANId:string
 }
 export type States = {
   [key: string]: any

@@ -62,15 +62,6 @@ export function markdownParser() {
         .use(markdownItLatex)
         .use(importFilePlugin)
         .use(window.markdownitIncrementalDOM);
-    // if (window.katex) {
-    // markdownItParser.use(markdownItLatex)
-    // console.log(markdownItParser.inline.ruler.getRules(""))
-    // }
-    // if (window.markdownitIncrementalDOM) {
-    //   markdownItParser.use(window.markdownitIncrementalDOM)
-    // }
-    // @ts-ignore
-    // window.markdownItParser = markdownItParser
     return markdownItParser;
 }
 /**
@@ -184,6 +175,7 @@ const defaultConfig = {
         memorable: {
             languageChanged: false,
             welcomeAnimationState: true,
+            localLANId: "none"
         },
     },
     states: {

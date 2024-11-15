@@ -5,7 +5,7 @@ export default function monacoMouseEvent(editor, monaco) {
     function onSelectionEnd(e) {
         changeStates({
             unmemorable: {
-                promptPanelState: true,
+                promptPanelState: false,
                 selectEndPos: mousePosition,
             },
         });

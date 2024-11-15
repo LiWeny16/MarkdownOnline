@@ -11,40 +11,40 @@ import mermaid from "mermaid";
 import { mdConverter } from "@Root/js";
 import kit from "@cdn-kit";
 import { useTranslation } from "react-i18next";
+export const settingsBodyContentBoxStyle = {
+    transition: "background-color 0.4s ease, box-shadow 0.4s ease",
+    position: "relative",
+    padding: "5px",
+    borderRadius: "3px",
+    display: "flex",
+    flexDirection: "column",
+    mt: "10px",
+    mb: "5px",
+    ml: "0px",
+    pl: "25px",
+    willChange: "background-color, box-shadow",
+    "&::before": {
+        content: '""',
+        position: "absolute",
+        left: 0,
+        top: 0,
+        height: "100%",
+        width: 4,
+        backgroundColor: "transparent",
+        transition: "background-color 0.2s cubic-bezier(0.5, 0.05, 1, 0.5)",
+    },
+    "&:hover::before": {
+        backgroundColor: getTheme() === "light" ? "#840084" : "#d2d2d2",
+    },
+    "&:hover": {
+        backgroundColor: getTheme() === "light" ? "#E7E6E5" : "",
+        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", // 增加细微阴影增强效果
+    },
+};
 export default observer(function SettingsBody() {
     const { t, i18n } = useTranslation();
     const theme = getTheme();
     const muiTheme = useTheme();
-    const settingsBodyContentBoxStyle = {
-        transition: "background-color 0.4s ease, box-shadow 0.4s ease",
-        position: "relative",
-        padding: "5px",
-        borderRadius: "3px",
-        display: "flex",
-        flexDirection: "column",
-        mt: "10px",
-        mb: "5px",
-        ml: "0px",
-        pl: "25px",
-        willChange: "background-color, box-shadow",
-        "&::before": {
-            content: '""',
-            position: "absolute",
-            left: 0,
-            top: 0,
-            height: "100%",
-            width: 4,
-            backgroundColor: "transparent",
-            transition: "background-color 0.2s cubic-bezier(0.5, 0.05, 1, 0.5)",
-        },
-        "&:hover::before": {
-            backgroundColor: theme === "light" ? "#840084" : "#d2d2d2",
-        },
-        "&:hover": {
-            backgroundColor: theme === "light" ? "#E7E6E5" : "",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", // 增加细微阴影增强效果
-        },
-    };
     const secondSettingsBodyContentBoxStyle = {
         ...settingsBodyContentBoxStyle,
         transition: "background-color 2s ease, box-shadow 0.4s ease",

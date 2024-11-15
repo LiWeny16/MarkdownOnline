@@ -1,2 +1,2 @@
-declare const TemporaryDrawer: (props: any) => import("react/jsx-runtime").JSX.Element;
+declare const TemporaryDrawer: () => import("react/jsx-runtime").JSX.Element;
 export default TemporaryDrawer;
