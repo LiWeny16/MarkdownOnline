@@ -19,7 +19,7 @@ import ScrollableBox from "@Root/js/React/Components/myCom/Layout/ScrollBox";
 import { settingsBodyContentBoxStyle } from "../Settings/Subsettings/SettingsBody";
 import LR from "@Root/js/React/Components/myCom/Layout/LR";
 import kit from "bigonion-kit";
-const url = "ws://192.168.1.8:9000";
+const url = "ws://md-server-md-server-bndnqhexdf.cn-hangzhou.fcapp.run";
 export default function Settings(props) {
     const buttonStyle = {
         borderRadius: "12px",

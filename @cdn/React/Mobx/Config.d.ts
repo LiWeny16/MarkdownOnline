@@ -38,6 +38,7 @@ export type Settings = {
 };
 type SettingsBasic = {
     syncScroll: boolean;
+    fontFamily: string;
     speechLanguage: "zh-CN" | "en-US" | "ja-JP" | "yue-Hant-HK";
     fileEditLocal: boolean;
     fontSize: number;

@@ -148,6 +148,11 @@ export default observer(function SettingsBody() {
             wordWrap: getSettings().basic.editorAutoWrap ? "on" : "off",
         });
     }
+    function handleOnChangeFontFamily(e) {
+        changeSettings({
+            basic: { fontFamily: e.target.value === 1 ? "Times New Roman" : `-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"` },
+        });
+    }
     function handleOnChangeLanguage(e) {
         let lang = e.target.value;
         i18n.changeLanguage(e.target.value);
@@ -190,7 +195,10 @@ export default observer(function SettingsBody() {
                                         }, children: "Font Size" }) }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u6E32\u67D3\u540E\u6587\u5B57\u5B57\u4F53\u5927\u5C0F" }), _jsx(Select, { value: getSettings().basic.fontSize, defaultChecked: true, fullWidth: true, size: "small", onChange: handleOnChangeFontSize, children: [...Array(10).keys()].map((i) => {
                                         const size = 8 + i * 2; // 从9开始，每次增加2得到奇数
                                         return (_jsxs(MenuItem, { value: size, children: [size, " px"] }, size));
-                                    }) })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {
+                                    }) })] }), _jsxs(Box, { sx: secondSettingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {
+                                            fontSize: "0.89rem",
+                                            fontWeight: 500,
+                                        }, children: "Font Family" }) }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u66F4\u6539\u6E32\u67D3\u540E\u6587\u5B57\u5B57\u4F53" }), _jsxs(Select, { value: getSettings().basic.fontFamily === "Times New Roman" ? 1 : 0, defaultChecked: true, fullWidth: true, size: "small", onChange: handleOnChangeFontFamily, children: [_jsx(MenuItem, { value: 0, children: "Defualt" }), _jsx(MenuItem, { value: 1, children: "Times New Roman" })] })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {
                                             fontSize: "0.89rem",
                                             fontWeight: 500,
                                         }, children: "Synchronous Scrolling" }) }), _jsx(Typography, { sx: ContentDescriptionTextStyle, children: "\u540C\u6B65\u6EDA\u52A8\u5DE6\u8FB9\u7F16\u8F91\u533A\u548C\u9884\u89C8\u533A\u57DF\u3002" }), _jsx(SwitchIOS, { checked: getSettings().basic.syncScroll, size: "small", inputProps: { "aria-label": "controlled" }, onChange: handleOnChangeSyncScrollSwitch })] }), _jsxs(Box, { sx: settingsBodyContentBoxStyle, children: [_jsx(Box, { className: "FLEX ROW", children: _jsx(Typography, { sx: {

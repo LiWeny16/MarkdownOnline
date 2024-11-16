@@ -66,7 +66,7 @@ export default observer(function SettingsBody() {
   const { t, i18n } = useTranslation()
   const theme = getTheme()
   const muiTheme = useTheme()
-  
+
   const secondSettingsBodyContentBoxStyle = {
     ...settingsBodyContentBoxStyle,
     transition: "background-color 2s ease, box-shadow 0.4s ease",
@@ -179,6 +179,11 @@ export default observer(function SettingsBody() {
     })
     window.editor.updateOptions({
       wordWrap: getSettings().basic.editorAutoWrap ? "on" : "off",
+    })
+  }
+  function handleOnChangeFontFamily(e: any) {
+    changeSettings({
+      basic: { fontFamily: e.target.value === 1 ? "Times New Roman" : `-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"` },
     })
   }
   function handleOnChangeLanguage(e: any) {
@@ -305,7 +310,31 @@ export default observer(function SettingsBody() {
               })}
             </Select>
           </Box>
-
+          <Box sx={secondSettingsBodyContentBoxStyle}>
+            <Box className="FLEX ROW">
+              <Typography
+                sx={{
+                  fontSize: "0.89rem",
+                  fontWeight: 500,
+                }}
+              >
+                Font Family
+              </Typography>
+            </Box>
+            <Typography sx={ContentDescriptionTextStyle}>
+              更改渲染后文字字体
+            </Typography>
+            <Select
+              value={getSettings().basic.fontFamily === "Times New Roman" ? 1 : 0}
+              defaultChecked={true}
+              fullWidth
+              size="small"
+              onChange={handleOnChangeFontFamily}
+            >
+              <MenuItem value={0}>Defualt</MenuItem>
+              <MenuItem value={1}>Times New Roman</MenuItem>
+            </Select>
+          </Box>
           <Box sx={settingsBodyContentBoxStyle}>
             <Box className="FLEX ROW">
               <Typography

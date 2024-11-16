@@ -3,7 +3,7 @@ import React from "react";
 import fastKeyEvent from "@Func/Events/key/fastKey";
 import MdArea from "./SubBody/MdArea";
 import { observer } from "mobx-react";
-import { getEmojiPickerState, getStates, getTheme } from "@App/config/change";
+import { getEmojiPickerState, getSettings, getStates, getTheme } from "@App/config/change";
 import { Suspense } from "react";
 import WelcomeAnimation from "../Components/myCom/Prompt/WelcomeAni";
 // 使用 React.lazy 懒加载组件
@@ -18,6 +18,7 @@ export default observer(function Body() {
         fastKeyEvent();
     }, []);
     return (_jsx(_Fragment, { children: _jsxs("div", { style: { marginTop: "1.3vh" }, id: "bodyTopBox", children: [_jsxs("div", { id: "editor", className: `${getTheme() == "light" ? "theme-light" : "theme-dark"} FLEX ROW`, children: [_jsx(MdArea, { setMarkdownViewerWidth: setMarkdownViewerWidth }), _jsx("article", { id: "view-area-hidden", className: "hidden-pre" }), _jsx("article", { ref: mdViewerRef, id: "view-area", style: {
+                                fontFamily: getSettings().basic.fontFamily,
                                 width: markdownViewerWidth,
                                 padding: getStates().unmemorable.previewMode
                                     ? "0px 5px"

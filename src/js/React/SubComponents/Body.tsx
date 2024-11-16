@@ -3,7 +3,7 @@ import React from "react"
 import fastKeyEvent from "@Func/Events/key/fastKey"
 import MdArea from "./SubBody/MdArea"
 import { observer } from "mobx-react"
-import { getEmojiPickerState, getStates, getTheme } from "@App/config/change"
+import { getEmojiPickerState, getSettings, getStates, getTheme } from "@App/config/change"
 import { Suspense } from "react"
 import WelcomeAnimation from "../Components/myCom/Prompt/WelcomeAni"
 
@@ -33,6 +33,7 @@ export default observer(function Body() {
             ref={mdViewerRef}
             id="view-area"
             style={{
+              fontFamily: getSettings().basic.fontFamily,
               width: markdownViewerWidth,
               padding: getStates().unmemorable.previewMode
                 ? "0px 5px"

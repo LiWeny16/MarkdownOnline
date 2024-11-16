@@ -5,7 +5,7 @@ import { mdConverter } from "@Root/js"
 import markdownIt from "markdown-it"
 import mdItMultimdTable from "markdown-it-multimd-table"
 // @ts-ignore
-import markdownItGithubToc from "markdown-it-github-toc"
+// import markdownItGithubToc from "markdown-it-github-toc"
 // @ts-ignore
 import markdownItTaskLists from "markdown-it-task-lists"
 // @ts-ignore
@@ -36,6 +36,8 @@ import noteUseArco from "@App/message/note"
 import { mergeObjects } from "@App/basic/basic"
 import importFilePlugin from "@Func/Parser/mdItPlugin/file"
 import i18n from "i18next"
+import markdownItTOCPlugin from "@Func/Parser/mdItPlugin/TOC"
+import tocPlugin from "@Func/Parser/mdItPlugin/TOC"
 
 // import { excelParser } from "@App/fileSystem/excel"
 /**
@@ -50,10 +52,11 @@ export function markdownParser() {
     breaks: true,
   })
     .use(markdownitLineNumber)
-    .use(markdownItGithubToc, {
-      anchorLinkSymbol: "",
-      anchorLinkBefore: false,
-    })
+    // .use(markdownItGithubToc, {
+    //   anchorLinkSymbol: "",
+    //   anchorLinkBefore: false,
+    // })
+    .use(tocPlugin)
     .use(myPlugin)
     .use(imagePlugin)
     .use(mdItMultimdTable, {
@@ -79,7 +82,7 @@ export function markdownParser() {
  * @description other libs init
  */
 class settingsClass {
-  constructor() {}
+  constructor() { }
   mermaidInit() {
     const mermaidConfig: MermaidConfig = {
       securityLevel: "loose",
@@ -93,7 +96,7 @@ class settingsClass {
       },
       theme: getSettings().advanced.mermaidTheme,
     }
-    mermaid.parseError = (e) => {}
+    mermaid.parseError = (e) => { }
     mermaid.initialize(mermaidConfig)
     mermaid.mermaidAPI.initialize(mermaidConfig)
   }
@@ -207,12 +210,12 @@ const defaultConfig: IConfig = {
     memorable: {
       languageChanged: false,
       welcomeAnimationState: true,
-      localLANId:"none"
+      localLANId: "none"
     },
   },
   states: {
     unmemorable: {
-      isDragging:false,
+      isDragging: false,
       loading: true,
       previewMode: false,
       aiPanelState: false,
@@ -226,6 +229,7 @@ const defaultConfig: IConfig = {
       language: "zh",
       editorAutoWrap: true,
       fontSize: 16,
+      fontFamily:`-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji"`,
       syncScroll: false,
       speechLanguage: "zh-CN",
       fileEditLocal: true,
