@@ -5,7 +5,7 @@ import { mdConverter } from "@Root/js";
 import markdownIt from "markdown-it";
 import mdItMultimdTable from "markdown-it-multimd-table";
 // @ts-ignore
-// import markdownItGithubToc from "markdown-it-github-toc"
+import markdownItGithubToc from "markdown-it-github-toc";
 // @ts-ignore
 import markdownItTaskLists from "markdown-it-task-lists";
 // @ts-ignore
@@ -26,7 +26,6 @@ import noteUseArco from "@App/message/note";
 import { mergeObjects } from "@App/basic/basic";
 import importFilePlugin from "@Func/Parser/mdItPlugin/file";
 import i18n from "i18next";
-import tocPlugin from "@Func/Parser/mdItPlugin/TOC";
 // import { excelParser } from "@App/fileSystem/excel"
 /**
  * @description markdownParser init plugin && settings
@@ -40,11 +39,11 @@ export function markdownParser() {
         breaks: true,
     })
         .use(markdownitLineNumber)
-        // .use(markdownItGithubToc, {
-        //   anchorLinkSymbol: "",
-        //   anchorLinkBefore: false,
-        // })
-        .use(tocPlugin)
+        .use(markdownItGithubToc, {
+        anchorLinkSymbol: "",
+        anchorLinkBefore: false,
+    })
+        // .use(tocPlugin)
         .use(myPlugin)
         .use(imagePlugin)
         .use(mdItMultimdTable, {

@@ -5,7 +5,7 @@ import { mdConverter } from "@Root/js"
 import markdownIt from "markdown-it"
 import mdItMultimdTable from "markdown-it-multimd-table"
 // @ts-ignore
-// import markdownItGithubToc from "markdown-it-github-toc"
+import markdownItGithubToc from "markdown-it-github-toc"
 // @ts-ignore
 import markdownItTaskLists from "markdown-it-task-lists"
 // @ts-ignore
@@ -52,11 +52,11 @@ export function markdownParser() {
     breaks: true,
   })
     .use(markdownitLineNumber)
-    // .use(markdownItGithubToc, {
-    //   anchorLinkSymbol: "",
-    //   anchorLinkBefore: false,
-    // })
-    .use(tocPlugin)
+    .use(markdownItGithubToc, {
+      anchorLinkSymbol: "",
+      anchorLinkBefore: false,
+    })
+    // .use(tocPlugin)
     .use(myPlugin)
     .use(imagePlugin)
     .use(mdItMultimdTable, {
