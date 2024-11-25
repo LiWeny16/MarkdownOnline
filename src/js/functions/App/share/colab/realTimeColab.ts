@@ -34,19 +34,23 @@ class RealTimeColab {
     setMsgFromSharing: Function,
     updateConnectedUsers: Function
   ): Promise<void> {
-    const userId = this.getUniqId()
-    this.ws = new WebSocket(url)
+    try {
+      const userId = this.getUniqId()
+      this.ws = new WebSocket(url)
 
-    this.ws.onopen = () => {
-      this.broadcastSignal({ type: "discover", id: userId })
+      this.ws.onopen = () => {
+        this.broadcastSignal({ type: "discover", id: userId })
+      }
+
+      this.ws.onmessage = (event) =>
+        this.handleSignal(event, setMsgFromSharing, updateConnectedUsers)
+
+      this.ws.onclose = () => this.cleanUpConnections()
+
+      this.ws.onerror = (error: Event) => console.error("WebSocket error:", error)
+    } catch (error) {
+      console.log(error);
     }
-
-    this.ws.onmessage = (event) =>
-      this.handleSignal(event, setMsgFromSharing, updateConnectedUsers)
-
-    this.ws.onclose = () => this.cleanUpConnections()
-
-    this.ws.onerror = (error: Event) => console.error("WebSocket error:", error)
   }
 
   public async disconnect(): Promise<void> {

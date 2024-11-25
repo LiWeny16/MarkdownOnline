@@ -32,7 +32,7 @@ import { settingsBodyContentBoxStyle } from "../Settings/Subsettings/SettingsBod
 import LR from "@Root/js/React/Components/myCom/Layout/LR"
 import kit from "bigonion-kit"
 
-const url = "ws://md-server-md-server-bndnqhexdf.cn-hangzhou.fcapp.run"
+const url = "wss://md-server-md-server-bndnqhexdf.cn-hangzhou.fcapp.run"
 
 export default function Settings(props: any) {
   const buttonStyle = {

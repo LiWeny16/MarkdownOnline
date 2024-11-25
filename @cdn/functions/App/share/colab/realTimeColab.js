@@ -32,14 +32,19 @@ class RealTimeColab {
         return RealTimeColab.userId;
     }
     async connect(url, setMsgFromSharing, updateConnectedUsers) {
-        const userId = this.getUniqId();
-        this.ws = new WebSocket(url);
-        this.ws.onopen = () => {
-            this.broadcastSignal({ type: "discover", id: userId });
-        };
-        this.ws.onmessage = (event) => this.handleSignal(event, setMsgFromSharing, updateConnectedUsers);
-        this.ws.onclose = () => this.cleanUpConnections();
-        this.ws.onerror = (error) => console.error("WebSocket error:", error);
+        try {
+            const userId = this.getUniqId();
+            this.ws = new WebSocket(url);
+            this.ws.onopen = () => {
+                this.broadcastSignal({ type: "discover", id: userId });
+            };
+            this.ws.onmessage = (event) => this.handleSignal(event, setMsgFromSharing, updateConnectedUsers);
+            this.ws.onclose = () => this.cleanUpConnections();
+            this.ws.onerror = (error) => console.error("WebSocket error:", error);
+        }
+        catch (error) {
+            console.log(error);
+        }
     }
     async disconnect() {
         this.cleanUpConnections();
