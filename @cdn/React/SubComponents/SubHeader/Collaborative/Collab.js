@@ -1,5 +1,5 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ScreenShareIcon from "@mui/icons-material/ScreenShare";
 import Dialog from "@mui/material/Dialog";
 import CachedIcon from "@mui/icons-material/Cached";
@@ -19,6 +19,7 @@ import ScrollableBox from "@Root/js/React/Components/myCom/Layout/ScrollBox";
 import { settingsBodyContentBoxStyle } from "../Settings/Subsettings/SettingsBody";
 import LR from "@Root/js/React/Components/myCom/Layout/LR";
 import kit from "bigonion-kit";
+import { getMdTextFromMonaco } from "@App/text/getMdText";
 const url = "wss://md-server-md-server-bndnqhexdf.cn-hangzhou.fcapp.run";
 export default function Settings(props) {
     const buttonStyle = {
@@ -27,25 +28,28 @@ export default function Settings(props) {
     };
     const { t } = useTranslation();
     const theme = getTheme();
-    const [mailSharePanelState, setMailSharePanelState] = useState(false);
     const [msgFromSharing, setMsgFromSharing] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
-    const [receivingEnabled, setReceivingEnabled] = useState(true);
     const [connectedUserIds, setConnectedUserIds] = useState([]);
-    const [loading, setLoading] = React.useState(false);
+    const [loading, setLoading] = useState(false);
+    // 搜索同WIFI下用户逻辑
     async function handleClickSearch() {
         setLoading(true);
-        if (!(await realTimeColab.isConnected())) {
-            await realTimeColab.connect(url, setMsgFromSharing, setConnectedUserIds);
-        }
-        else {
+        try {
+            if (!realTimeColab.isConnected()) {
+                await realTimeColab.connect(url, setMsgFromSharing, setConnectedUserIds);
+            }
             realTimeColab.broadcastSignal({
                 type: "discover",
                 id: realTimeColab.getUniqId(),
             });
-            kit.sleep(500).then(() => {
-                setLoading(false);
-            });
+            await kit.sleep(500);
+        }
+        catch (error) {
+            console.error("Search error:", error);
+        }
+        finally {
+            setLoading(false);
         }
     }
     const handleClickRippleBox = useCallback((event) => {
@@ -76,37 +80,50 @@ export default function Settings(props) {
                 ease: "power2.out",
                 delay: delay,
                 onComplete: () => {
-                    rippleElement.remove(); // Clean up the DOM by removing the ripple
+                    rippleElement.remove();
                 },
             });
         };
-        // Create multiple ripple effects with staggered timings
         createRipple(0, 2);
         createRipple(0.2, 2);
     }, []);
-    const handleClickOtherClients = (_e, targetUserId) => {
-        const message = "Hello, user!"; // 要发送的消息
-        // 连接到另一个用户
-        realTimeColab.connectToUser(targetUserId).then(() => {
+    const handleClickOtherClients = async (_e, targetUserId) => {
+        const message = JSON.stringify({ message: getMdTextFromMonaco() });
+        try {
+            await realTimeColab.connectToUser(targetUserId);
             console.log(`Connected to user ${targetUserId}`);
-            realTimeColab.sendMessageToUser(targetUserId, message);
-        });
+            await realTimeColab.sendMessageToUser(targetUserId, message);
+            console.log(`Message sent to user ${targetUserId}`);
+        }
+        catch (error) {
+            console.error(`Failed to send message to user ${targetUserId}:`, error);
+        }
     };
     useEffect(() => {
         realTimeColab
-            .connect(url, setMsgFromSharing, setConnectedUserIds)
-            .then(async (e) => { })
+            .connect(url, (incomingMsg) => {
+            // 当接收到新消息时，显示对话框以便用户决定是否接受
+            setMsgFromSharing(incomingMsg);
+            setOpenDialog(true);
+        }, setConnectedUserIds)
             .catch((err) => {
             console.error("Failed to connect:", err);
         });
         return () => {
+            // 组件卸载时断开连接，通知其他用户
             realTimeColab.disconnect();
         };
     }, []);
     const handleAcceptMessage = () => {
         try {
             if (msgFromSharing) {
-                replaceMonacoAll(window.monaco, window.editor, JSON.parse(msgFromSharing).message);
+                const parsed = JSON.parse(msgFromSharing);
+                if (parsed.message) {
+                    replaceMonacoAll(window.monaco, window.editor, parsed.message);
+                }
+                else {
+                    replaceMonacoAll(window.monaco, window.editor, msgFromSharing);
+                }
             }
             setOpenDialog(false);
             setMsgFromSharing(null);
@@ -116,7 +133,6 @@ export default function Settings(props) {
         }
     };
     const handleCloseAll = (e) => {
-        setMailSharePanelState(false);
         props.onClick(e);
         props.closeAll();
     };
@@ -166,7 +182,7 @@ export default function Settings(props) {
                                                             borderRadius: "50%",
                                                             pointerEvents: "none",
                                                             transform: "scale(0)",
-                                                        } })] }, index))) }), _jsx(Box, { className: "FLEX ALI-CEN JUS-CEN", children: _jsxs("p", { color: "#8B8A8A", children: ["\u4F60\u7684ID: ", realTimeColab.getUniqId()] }) })] })] })] }) }), _jsxs(Dialog, { hideBackdrop: true, open: openDialog, onClose: () => {
+                                                        } })] }, index))) }), _jsx(Box, { className: "FLEX ALI-CEN JUS-CEN", children: _jsxs("p", { style: { color: "#8B8A8A" }, children: ["\u4F60\u7684ID: ", realTimeColab.getUniqId()] }) })] })] })] }) }), _jsxs(Dialog, { hideBackdrop: true, open: openDialog, onClose: () => {
                     setOpenDialog(false);
                     setMsgFromSharing(null);
                 }, children: [_jsx(DialogTitle, { children: "\u2728\u65B0\u5206\u4EAB" }), _jsx(DialogContent, { children: _jsx(DialogContentText, { children: "\u60A8\u6709\u6765\u81EA\u5916\u90E8\u7684\u6D88\u606F\uFF0C\u662F\u5426\u63A5\u53D7\uFF1F" }) }), _jsxs(DialogActions, { children: [_jsx(Button, { onClick: () => {

@@ -4,13 +4,17 @@ declare class RealTimeColab {
     private static peers;
     private dataChannels;
     private ws;
+    private knownUsers;
+    private setMsgFromSharing;
     private constructor();
     static getInstance(): RealTimeColab;
     getUniqId(): string | null;
-    connect(url: string, setMsgFromSharing: Function, updateConnectedUsers: Function): Promise<void>;
+    connect(url: string, setMsgFromSharing: (msg: string | null) => void, updateConnectedUsers: (users: string[]) => void): Promise<void>;
     disconnect(): Promise<void>;
     private cleanUpConnections;
     private handleSignal;
+    private handleDiscover;
+    private handleLeave;
     private createPeerConnection;
     broadcastSignal(signal: any): void;
     getAllUsers(): string[];
