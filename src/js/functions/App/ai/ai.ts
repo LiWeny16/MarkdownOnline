@@ -19,7 +19,7 @@ class BigModel {
     onError: (error: any) => void
   ) {
     const data = {
-      model: "glm-4-plus",
+      model: "glm-4-flash",
       tool: "web-search-pro",
       stream: true, // 启用流式响应
       messages: [
@@ -31,6 +31,7 @@ class BigModel {
     }
 
     try {
+      console.log(data);
       const response = await fetch(url, {
         method: "POST",
         headers: {  
