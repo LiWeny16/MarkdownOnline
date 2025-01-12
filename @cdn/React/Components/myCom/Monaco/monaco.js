@@ -18,12 +18,29 @@ import monacoResizeHeightEvent from "@Func/Events/resize/monacoResizeHeight";
 import monacoScrollEvent from "@Func/Events/scroll/monacoScroll";
 import { pollVariables } from "@App/basic/basic";
 import monacoDragEvent from "@Func/Events/drag/drag";
+import "monaco-editor/esm/vs/basic-languages/markdown/markdown.contribution";
+import "monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution";
 import { Backdrop } from "@mui/material";
 const version = "0.45.0";
 loader.config({
     paths: {
-        vs: `https://${window._cdn.cdn[0]}/npm/monaco-editor@${version}/dev/vs`,
+        vs: `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs`,
     },
+    // @ts-ignore
+    'vs/editor/editor.main': `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs/editor/editor.main.js`,
+});
+loader.init().then((monaco) => {
+    self.MonacoEnvironment = {
+        getWorkerUrl: function (moduleId, label) {
+            if (label === "html") {
+                return `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs/language/html/html.worker.js`;
+            }
+            if (label === "typescript" || label === "javascript") {
+                return `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs/language/typescript/ts.worker.js`;
+            }
+            return `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs/editor/editor.worker.js`;
+        },
+    };
 });
 const files = {
     "index.py": {
@@ -56,6 +73,7 @@ const MonacoEditor = observer(function MonacoEditor({ setMarkdownViewerWidth, })
         formatOnPaste: false,
         // scrollBeyondLastLine:false,
         // scrollBeyondLastColumn:10,
+        quickSuggestions: false, // 禁用快速建议
         fontLigatures: true,
         autoSurround: "quotes",
         autoClosingQuotes: "always",
