@@ -6,7 +6,7 @@ import CachedIcon from "@mui/icons-material/Cached";
 import DevicesIcon from "@mui/icons-material/Devices";
 import gsap from "gsap";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { Box, Button, Typography, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, } from "@mui/material";
+import { Box, Button, Typography, DialogActions, DialogContent, DialogContentText, DialogTitle, Divider, Badge, } from "@mui/material";
 import { getTheme } from "@App/config/change";
 import { useTranslation } from "react-i18next";
 import realTimeColab from "@App/share/colab/realTimeColab";
@@ -29,15 +29,41 @@ export default function Settings(props) {
     const { t } = useTranslation();
     const theme = getTheme();
     const [msgFromSharing, setMsgFromSharing] = useState(null);
+    const [fileFromSharing, setFileFromSharing] = useState(null);
     const [openDialog, setOpenDialog] = useState(false);
     const [connectedUserIds, setConnectedUserIds] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [selectedButton, setSelectedButton] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [selectedText, setSelectedText] = useState(null);
+    const handleFileSelect = (event) => {
+        const file = event.target.files?.[0] || null;
+        if (file) {
+            setSelectedFile(file);
+            setSelectedButton("file");
+        }
+    };
+    const handleTextSelect = () => {
+        setSelectedText(getMdTextFromMonaco());
+        setSelectedButton("text");
+    };
+    const handleSendFile = (targetUserId) => {
+        if (selectedFile) {
+            realTimeColab.sendFileToUser(targetUserId, selectedFile);
+            alert(`文件 ${selectedFile.name} 已发送！`);
+            setSelectedFile(null); // 清除选中文件
+            setSelectedButton(null); // 清除角标
+        }
+        else {
+            alert("未选择文件！");
+        }
+    };
     // 搜索同WIFI下用户逻辑
     async function handleClickSearch() {
         setLoading(true);
         try {
             if (!realTimeColab.isConnected()) {
-                await realTimeColab.connect(url, setMsgFromSharing, setConnectedUserIds);
+                await realTimeColab.connect(url, setMsgFromSharing, setFileFromSharing, setConnectedUserIds);
             }
             realTimeColab.broadcastSignal({
                 type: "discover",
@@ -92,7 +118,15 @@ export default function Settings(props) {
         try {
             await realTimeColab.connectToUser(targetUserId);
             console.log(`Connected to user ${targetUserId}`);
-            await realTimeColab.sendMessageToUser(targetUserId, message);
+            if (selectedButton === "file" && selectedFile) {
+                await realTimeColab.sendFileToUser(targetUserId, selectedFile);
+            }
+            else if (selectedButton === "text" && selectedText) {
+                await realTimeColab.sendMessageToUser(targetUserId, selectedText);
+            }
+            else {
+                await realTimeColab.sendMessageToUser(targetUserId, message);
+            }
             console.log(`Message sent to user ${targetUserId}`);
         }
         catch (error) {
@@ -104,6 +138,9 @@ export default function Settings(props) {
             .connect(url, (incomingMsg) => {
             // 当接收到新消息时，显示对话框以便用户决定是否接受
             setMsgFromSharing(incomingMsg);
+            setOpenDialog(true);
+        }, (incomingFile) => {
+            setFileFromSharing(incomingFile);
             setOpenDialog(true);
         }, setConnectedUserIds)
             .catch((err) => {
@@ -125,8 +162,25 @@ export default function Settings(props) {
                     replaceMonacoAll(window.monaco, window.editor, msgFromSharing);
                 }
             }
+            else if (fileFromSharing) {
+                const blob = new Blob([fileFromSharing]);
+                // 生成文件名（可根据需求自定义）
+                const fileName = realTimeColab.fileMetaInfo.name;
+                // 创建下载链接
+                const url = URL.createObjectURL(blob);
+                // 自动触发下载（或其他处理方式）
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                // 释放 URL 对象
+                URL.revokeObjectURL(url);
+            }
             setOpenDialog(false);
             setMsgFromSharing(null);
+            setFileFromSharing(null);
         }
         catch (error) {
             console.error("Failed to accept message:", error);
@@ -155,7 +209,17 @@ export default function Settings(props) {
                                 justifyContent: "flex-start",
                                 display: "flex",
                                 gap: "12px",
-                            }, children: [_jsx(Button, { variant: "outlined", startIcon: _jsx(FileIcon, {}), sx: buttonStyle, children: "\u6587\u4EF6" }), _jsx(Button, { variant: "outlined", startIcon: _jsx(FolderIcon, {}), sx: buttonStyle, children: "\u6587\u4EF6\u5939" }), _jsx(Button, { variant: "outlined", startIcon: _jsx(TextIcon, {}), sx: buttonStyle, children: "\u6587\u672C" }), _jsx(Button, { variant: "outlined", startIcon: _jsx(ClipboardIcon, {}), sx: buttonStyle, children: "\u526A\u8D34\u677F" })] }), _jsxs(Box, { sx: {
+                            }, children: [_jsx(Badge, { color: "primary", badgeContent: selectedButton === "file" ? 1 : 0, overlap: "circular", sx: {
+                                        "& .MuiBadge-badge": {
+                                            top: "-2px", // 向上移动
+                                            right: "-2px", // 向右移动
+                                        },
+                                    }, children: _jsx(Button, { variant: "outlined", sx: buttonStyle, startIcon: _jsx(FileIcon, {}), onClick: () => document.getElementById("file-input")?.click(), children: "\u6587\u4EF6" }) }), _jsx("input", { id: "file-input", type: "file", style: { display: "none" }, onChange: handleFileSelect }), _jsx(Button, { disabled: true, variant: "outlined", startIcon: _jsx(FolderIcon, {}), sx: buttonStyle, children: "\u6587\u4EF6\u5939" }), _jsx(Badge, { sx: {
+                                        "& .MuiBadge-badge": {
+                                            top: "-2px", // 向上移动
+                                            right: "-2px", // 向右移动
+                                        },
+                                    }, color: "primary", badgeContent: selectedButton === "text" ? 1 : 0, overlap: "circular", children: _jsx(Button, { onClick: handleTextSelect, variant: "outlined", startIcon: _jsx(TextIcon, {}), sx: buttonStyle, children: "Markdown\u6587\u672C" }) }), _jsx(Button, { variant: "outlined", startIcon: _jsx(ClipboardIcon, {}), sx: buttonStyle, children: "\u526A\u8D34\u677F" })] }), _jsxs(Box, { sx: {
                                 width: "100%",
                                 height: "100%",
                                 justifyContent: "flex-start",

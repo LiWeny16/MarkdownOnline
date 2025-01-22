@@ -6,10 +6,14 @@ declare class RealTimeColab {
     private ws;
     private knownUsers;
     private setMsgFromSharing;
+    private setFileFromSharing;
+    fileMetaInfo: {
+        name: string;
+    };
     private constructor();
     static getInstance(): RealTimeColab;
     getUniqId(): string | null;
-    connect(url: string, setMsgFromSharing: (msg: string | null) => void, updateConnectedUsers: (users: string[]) => void): Promise<void>;
+    connect(url: string, setMsgFromSharing: (msg: string | null) => void, setFileFromSharing: (file: Blob | null) => void, updateConnectedUsers: (users: string[]) => void): Promise<void>;
     disconnect(): Promise<void>;
     private cleanUpConnections;
     private handleSignal;
@@ -24,6 +28,7 @@ declare class RealTimeColab {
     private setupDataChannel;
     connectToUser(id: string): Promise<void>;
     sendMessageToUser(id: string, message: string): Promise<void>;
+    sendFileToUser(id: string, file: File): Promise<void>;
     private generateUUID;
     isConnected(): boolean;
     getConnectedUserIds(): string[];

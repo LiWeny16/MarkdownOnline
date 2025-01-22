@@ -8,6 +8,8 @@ class RealTimeColab {
   private ws: WebSocket | null = null;
   private knownUsers: Set<string> = new Set();
   private setMsgFromSharing: (msg: string | null) => void = () => { }
+  private setFileFromSharing: (file: Blob | null) => void = () => { }
+  public fileMetaInfo = { name: "default_received_file" }
   private constructor() {
     const currentState = getStatesMemorable().memorable;
     RealTimeColab.userId =
@@ -35,10 +37,12 @@ class RealTimeColab {
   public async connect(
     url: string,
     setMsgFromSharing: (msg: string | null) => void,
+    setFileFromSharing: (file: Blob | null) => void,
     updateConnectedUsers: (users: string[]) => void
   ): Promise<void> {
     try {
       this.setMsgFromSharing = setMsgFromSharing
+      this.setFileFromSharing = setFileFromSharing
       const userId = this.getUniqId();
       this.ws = new WebSocket(url);
 
@@ -47,7 +51,7 @@ class RealTimeColab {
       };
 
       this.ws.onmessage = (event) =>
-        this.handleSignal(event, setMsgFromSharing, updateConnectedUsers);
+        this.handleSignal(event, updateConnectedUsers);
 
       this.ws.onclose = () => this.cleanUpConnections(updateConnectedUsers);
 
@@ -88,7 +92,6 @@ class RealTimeColab {
 
   private async handleSignal(
     event: MessageEvent,
-    setMsgFromSharing: (msg: string | null) => void,
     updateConnectedUsers: (users: string[]) => void
   ): Promise<void> {
     const reader = new FileReader();
@@ -235,27 +238,76 @@ class RealTimeColab {
   }
 
   private setupDataChannel(channel: RTCDataChannel, id: string): void {
+    channel.binaryType = "arraybuffer"; // 设置数据通道为二进制模式
     channel.onopen = () => {
       console.log(`Data channel with user ${id} is open`);
     };
-    // tag
+    let receivingFile: {
+      name: string;
+      size: number;
+      receivedSize: number;
+      chunks: ArrayBuffer[];
+    } | null = null;
+
     channel.onmessage = (event) => {
-      this.setMsgFromSharing(event.data)
-      console.log(`Message from ${id}:`, event.data);
+      if (typeof event.data === "string") {
+        // 接收文件元信息
+        const message = JSON.parse(event.data);
+        if (message.type === "file-meta") {
+          receivingFile = {
+            name: message.name,
+            size: message.size,
+            receivedSize: 0,
+            chunks: [],
+          };
+          realTimeColab.fileMetaInfo.name = message.name
+          // console.log(`Receiving file: ${message.name}, size: ${message.size} bytes`);
+        } else {
+          // 处理普通文本消息
+          this.setMsgFromSharing(event.data);
+        }
+      } else if (event.data instanceof ArrayBuffer) {
+        // 接收文件块
+        if (receivingFile) {
+          receivingFile.chunks.push(event.data);
+          receivingFile.receivedSize += event.data.byteLength;
+
+          // console.log(
+          //   `Received chunk: ${event.data.byteLength} bytes, Total: ${receivingFile.receivedSize}/${receivingFile.size}`
+          // );
+
+          // 检查是否接收完成
+          if (receivingFile.receivedSize >= receivingFile.size) {
+            // 合并所有块
+            const blob = new Blob(receivingFile.chunks);
+            const fileUrl = URL.createObjectURL(blob);
+
+            // 设置文件数据
+            this.setFileFromSharing(blob);
+
+            // console.log(`File transfer complete: ${receivingFile.name}`);
+            receivingFile = null; // 重置状态
+          }
+        } else {
+          console.error("Received file data but no file metadata available.");
+        }
+      }
     };
+
 
     channel.onclose = () => {
       console.log(`Data channel with user ${id} is closed`);
       this.dataChannels.delete(id);
     };
-
     this.dataChannels.set(id, channel);
   }
+
 
   public async connectToUser(id: string): Promise<void> {
     if (!RealTimeColab.peers.has(id)) {
       const peer = this.createPeerConnection(id);
       const dataChannel = peer.createDataChannel("chat");
+      // const dataChannel = peer.createDataChannel("file");
       this.setupDataChannel(dataChannel, id);
 
       const offer = await peer.createOffer();
@@ -277,6 +329,55 @@ class RealTimeColab {
       console.error(`Data channel with user ${id} is not available.`);
     }
   }
+  public async sendFileToUser(id: string, file: File): Promise<void> {
+    const channel = this.dataChannels.get(id);
+    if (!channel || channel.readyState !== "open") {
+      console.error(`Data channel with user ${id} is not available.`);
+      return;
+    }
+
+    const chunkSize = 16 * 1024; // 每块大小16KB
+    let offset = 0;
+
+    const sendNextChunk = () => {
+      const slice = file.slice(offset, offset + chunkSize);
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        if (reader.result) {
+          channel.send(reader.result as ArrayBuffer); // 发送当前块
+          offset += chunkSize;
+
+          if (offset < file.size) {
+            sendNextChunk(); // 继续发送下一块
+          } else {
+            // console.log("File transfer complete.");
+          }
+        }
+      };
+
+      reader.onerror = (err) => {
+        console.error("File read error:", err);
+      };
+
+      reader.readAsArrayBuffer(slice); // 将文件块读取为 ArrayBuffer
+    };
+
+    // 发送文件元数据（如文件名）
+    channel.send(
+      JSON.stringify({
+        type: "file-meta",
+        name: file.name,
+        size: file.size,
+      })
+    );
+
+    // 开始分块发送文件数据
+    sendNextChunk();
+  }
+
+
+
 
   private generateUUID(): string {
     return "ID" + Math.random().toString(36).substring(2, 11);

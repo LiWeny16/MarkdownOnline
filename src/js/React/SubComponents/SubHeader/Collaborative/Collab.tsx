@@ -15,6 +15,7 @@ import {
   DialogContentText,
   DialogTitle,
   Divider,
+  Badge,
 } from "@mui/material";
 import { getTheme } from "@App/config/change";
 import { useTranslation } from "react-i18next";
@@ -41,16 +42,42 @@ export default function Settings(props: any) {
   const theme = getTheme();
 
   const [msgFromSharing, setMsgFromSharing] = useState<string | null>(null);
+  const [fileFromSharing, setFileFromSharing] = useState<Blob | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [connectedUserIds, setConnectedUserIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedButton, setSelectedButton] = useState<"file" | "text" | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedText, setSelectedText] = useState<string | null>(null);
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null;
+    if (file) {
+      setSelectedFile(file);
+      setSelectedButton("file");
+    }
+  };
+  const handleTextSelect = () => {
+    setSelectedText(getMdTextFromMonaco());
+    setSelectedButton("text");
+  };
+
+  const handleSendFile = (targetUserId: string) => {
+    if (selectedFile) {
+      realTimeColab.sendFileToUser(targetUserId, selectedFile);
+      alert(`文件 ${selectedFile.name} 已发送！`);
+      setSelectedFile(null); // 清除选中文件
+      setSelectedButton(null); // 清除角标
+    } else {
+      alert("未选择文件！");
+    }
+  };
 
   // 搜索同WIFI下用户逻辑
   async function handleClickSearch() {
     setLoading(true);
     try {
       if (!realTimeColab.isConnected()) {
-        await realTimeColab.connect(url, setMsgFromSharing, setConnectedUserIds);
+        await realTimeColab.connect(url, setMsgFromSharing, setFileFromSharing, setConnectedUserIds);
       }
       realTimeColab.broadcastSignal({
         type: "discover",
@@ -120,7 +147,14 @@ export default function Settings(props: any) {
     try {
       await realTimeColab.connectToUser(targetUserId);
       console.log(`Connected to user ${targetUserId}`);
-      await realTimeColab.sendMessageToUser(targetUserId, message);
+      if (selectedButton === "file" && selectedFile) {
+        await realTimeColab.sendFileToUser(targetUserId, selectedFile);
+      } else if (selectedButton === "text" && selectedText) {
+        await realTimeColab.sendMessageToUser(targetUserId, selectedText);
+      }
+      else {
+        await realTimeColab.sendMessageToUser(targetUserId, message);
+      }
       console.log(`Message sent to user ${targetUserId}`);
     } catch (error) {
       console.error(`Failed to send message to user ${targetUserId}:`, error);
@@ -134,6 +168,10 @@ export default function Settings(props: any) {
         (incomingMsg: string | null) => {
           // 当接收到新消息时，显示对话框以便用户决定是否接受
           setMsgFromSharing(incomingMsg);
+          setOpenDialog(true);
+        },
+        (incomingFile: Blob | null) => {
+          setFileFromSharing(incomingFile);
           setOpenDialog(true);
         },
         setConnectedUserIds
@@ -157,9 +195,27 @@ export default function Settings(props: any) {
         } else {
           replaceMonacoAll(window.monaco, window.editor, msgFromSharing);
         }
+      } else if (fileFromSharing) {
+        const blob = new Blob([fileFromSharing]);
+        // 生成文件名（可根据需求自定义）
+        const fileName = realTimeColab.fileMetaInfo.name
+        // 创建下载链接
+        const url = URL.createObjectURL(blob);
+        // 自动触发下载（或其他处理方式）
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        // 释放 URL 对象
+        URL.revokeObjectURL(url);
+
       }
       setOpenDialog(false);
       setMsgFromSharing(null);
+      setFileFromSharing(null);
     } catch (error) {
       console.error("Failed to accept message:", error);
     }
@@ -205,15 +261,54 @@ export default function Settings(props: any) {
               gap: "12px",
             }}
           >
-            <Button variant="outlined" startIcon={<FileIcon />} sx={buttonStyle}>
-              文件
-            </Button>
-            <Button variant="outlined" startIcon={<FolderIcon />} sx={buttonStyle}>
+            {/* 文件按钮 */}
+            <Badge
+              color="primary"
+              badgeContent={selectedButton === "file" ? 1 : 0}
+              overlap="circular"
+              sx={{
+                "& .MuiBadge-badge": {
+                  top: "-2px", // 向上移动
+                  right: "-2px", // 向右移动
+                },
+              }}
+            >
+              <Button
+                variant="outlined"
+                sx={buttonStyle}
+                startIcon={<FileIcon />}
+                onClick={() => document.getElementById("file-input")?.click()}
+              >
+                文件
+              </Button>
+            </Badge>
+            <input
+              id="file-input"
+              type="file"
+              style={{ display: "none" }}
+              onChange={handleFileSelect}
+            />
+
+
+            <Button disabled variant="outlined" startIcon={<FolderIcon />} sx={buttonStyle}>
               文件夹
             </Button>
-            <Button variant="outlined" startIcon={<TextIcon />} sx={buttonStyle}>
-              文本
-            </Button>
+            <Badge
+              sx={{
+                "& .MuiBadge-badge": {
+                  top: "-2px", // 向上移动
+                  right: "-2px", // 向右移动
+                },
+              }}
+              color="primary"
+              badgeContent={selectedButton === "text" ? 1 : 0}
+              overlap="circular"
+            >
+              <Button onClick={handleTextSelect} variant="outlined" startIcon={<TextIcon />} sx={buttonStyle}>
+                Markdown文本
+              </Button>
+            </Badge>
+
             <Button variant="outlined" startIcon={<ClipboardIcon />} sx={buttonStyle}>
               剪贴板
             </Button>
