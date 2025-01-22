@@ -264,7 +264,7 @@ class RealTimeColab {
           // console.log(`Receiving file: ${message.name}, size: ${message.size} bytes`);
         } else {
           // 处理普通文本消息
-          this.setMsgFromSharing(event.data);
+          this.setMsgFromSharing(message.msg);
         }
       } else if (event.data instanceof ArrayBuffer) {
         // 接收文件块
@@ -324,7 +324,7 @@ class RealTimeColab {
   public async sendMessageToUser(id: string, message: string): Promise<void> {
     const channel = this.dataChannels.get(id);
     if (channel?.readyState === "open") {
-      channel.send(message);
+      channel.send(JSON.stringify({ msg: message, type: "text" }));
     } else {
       console.error(`Data channel with user ${id} is not available.`);
     }

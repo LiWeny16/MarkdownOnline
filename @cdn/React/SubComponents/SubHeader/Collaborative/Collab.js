@@ -20,6 +20,8 @@ import { settingsBodyContentBoxStyle } from "../Settings/Subsettings/SettingsBod
 import LR from "@Root/js/React/Components/myCom/Layout/LR";
 import kit from "bigonion-kit";
 import { getMdTextFromMonaco } from "@App/text/getMdText";
+import { readClipboard } from "@App/text/clipboard";
+import alertUseArco from "@App/message/alert";
 const url = "wss://md-server-md-server-bndnqhexdf.cn-hangzhou.fcapp.run";
 export default function Settings(props) {
     const buttonStyle = {
@@ -114,7 +116,7 @@ export default function Settings(props) {
         createRipple(0.2, 2);
     }, []);
     const handleClickOtherClients = async (_e, targetUserId) => {
-        const message = JSON.stringify({ message: getMdTextFromMonaco() });
+        const message = getMdTextFromMonaco();
         try {
             await realTimeColab.connectToUser(targetUserId);
             console.log(`Connected to user ${targetUserId}`);
@@ -123,6 +125,10 @@ export default function Settings(props) {
             }
             else if (selectedButton === "text" && selectedText) {
                 await realTimeColab.sendMessageToUser(targetUserId, selectedText);
+            }
+            else if (selectedButton === "clip") {
+                let clipText = readClipboard();
+                await realTimeColab.sendMessageToUser(targetUserId, await clipText);
             }
             else {
                 await realTimeColab.sendMessageToUser(targetUserId, message);
@@ -154,9 +160,10 @@ export default function Settings(props) {
     const handleAcceptMessage = () => {
         try {
             if (msgFromSharing) {
-                const parsed = JSON.parse(msgFromSharing);
-                if (parsed.message) {
-                    replaceMonacoAll(window.monaco, window.editor, parsed.message);
+                if (msgFromSharing) {
+                    // writeClipboard(msgFromSharing)
+                    alertUseArco("成功收到文本", 2000, { kind: "success" });
+                    replaceMonacoAll(window.monaco, window.editor, msgFromSharing);
                 }
                 else {
                     replaceMonacoAll(window.monaco, window.editor, msgFromSharing);
@@ -179,8 +186,10 @@ export default function Settings(props) {
                 URL.revokeObjectURL(url);
             }
             setOpenDialog(false);
-            setMsgFromSharing(null);
-            setFileFromSharing(null);
+            kit.sleep(500).then(() => {
+                setFileFromSharing(null);
+                setMsgFromSharing(null);
+            });
         }
         catch (error) {
             console.error("Failed to accept message:", error);
@@ -219,7 +228,12 @@ export default function Settings(props) {
                                             top: "-2px", // 向上移动
                                             right: "-2px", // 向右移动
                                         },
-                                    }, color: "primary", badgeContent: selectedButton === "text" ? 1 : 0, overlap: "circular", children: _jsx(Button, { onClick: handleTextSelect, variant: "outlined", startIcon: _jsx(TextIcon, {}), sx: buttonStyle, children: "Markdown\u6587\u672C" }) }), _jsx(Button, { variant: "outlined", startIcon: _jsx(ClipboardIcon, {}), sx: buttonStyle, children: "\u526A\u8D34\u677F" })] }), _jsxs(Box, { sx: {
+                                    }, color: "primary", badgeContent: selectedButton === "text" ? 1 : 0, overlap: "circular", children: _jsx(Button, { onClick: handleTextSelect, variant: "outlined", startIcon: _jsx(TextIcon, {}), sx: buttonStyle, children: "Markdown\u6587\u672C" }) }), _jsx(Badge, { sx: {
+                                        "& .MuiBadge-badge": {
+                                            top: "-2px", // 向上移动
+                                            right: "-2px", // 向右移动
+                                        },
+                                    }, color: "primary", badgeContent: selectedButton === "clip" ? 1 : 0, overlap: "circular", children: _jsx(Button, { onClick: () => { setSelectedButton("clip"); }, variant: "outlined", startIcon: _jsx(ClipboardIcon, {}), sx: buttonStyle, children: "\u526A\u8D34\u677F" }) })] }), _jsxs(Box, { sx: {
                                 width: "100%",
                                 height: "100%",
                                 justifyContent: "flex-start",
@@ -248,9 +262,26 @@ export default function Settings(props) {
                                                             transform: "scale(0)",
                                                         } })] }, index))) }), _jsx(Box, { className: "FLEX ALI-CEN JUS-CEN", children: _jsxs("p", { style: { color: "#8B8A8A" }, children: ["\u4F60\u7684ID: ", realTimeColab.getUniqId()] }) })] })] })] }) }), _jsxs(Dialog, { hideBackdrop: true, open: openDialog, onClose: () => {
                     setOpenDialog(false);
-                    setMsgFromSharing(null);
-                }, children: [_jsx(DialogTitle, { children: "\u2728\u65B0\u5206\u4EAB" }), _jsx(DialogContent, { children: _jsx(DialogContentText, { children: "\u60A8\u6709\u6765\u81EA\u5916\u90E8\u7684\u6D88\u606F\uFF0C\u662F\u5426\u63A5\u53D7\uFF1F" }) }), _jsxs(DialogActions, { children: [_jsx(Button, { onClick: () => {
+                    kit.sleep(500).then(() => {
+                        setFileFromSharing(null);
+                        setMsgFromSharing(null);
+                    });
+                }, children: [_jsx(DialogTitle, { children: "\u2728\u65B0\u5206\u4EAB" }), _jsxs(DialogContent, { children: [_jsx(DialogContentText, { children: "\u60A8\u6709\u6765\u81EA\u5916\u90E8\u7684\u6D88\u606F\uFF0C\u662F\u5426\u63A5\u53D7\uFF1F" }), msgFromSharing ? _jsx(Box, { sx: {
+                                    width: "100%", // 设置宽度
+                                    height: 300, // 限制高度
+                                    overflow: "auto", // 使内容可滚动
+                                    padding: 2, // 内边距
+                                    border: "1px solid #ccc", // 边框
+                                    borderRadius: "4px", // 圆角
+                                    backgroundColor: "#f9f9f9", // 背景色
+                                    whiteSpace: "pre-wrap", // 保留换行符和空格
+                                    fontFamily: "monospace", // 字体
+                                    fontSize: 14, // 字体大小
+                                }, children: msgFromSharing }) : _jsx(_Fragment, {})] }), _jsxs(DialogActions, { children: [_jsx(Button, { onClick: () => {
                                     setOpenDialog(false);
-                                    setMsgFromSharing(null);
+                                    kit.sleep(500).then(() => {
+                                        setFileFromSharing(null);
+                                        setMsgFromSharing(null);
+                                    });
                                 }, color: "secondary", children: "\u62D2\u7EDD" }), _jsx(Button, { onClick: handleAcceptMessage, color: "primary", autoFocus: true, children: "\u63A5\u53D7" })] })] }), _jsx(ScreenShareIcon, {}), _jsx(Typography, { children: t("t-collaborative-office") })] }));
 }

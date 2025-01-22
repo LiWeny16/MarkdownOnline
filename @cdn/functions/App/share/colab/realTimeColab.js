@@ -243,7 +243,7 @@ class RealTimeColab {
                 }
                 else {
                     // 处理普通文本消息
-                    this.setMsgFromSharing(event.data);
+                    this.setMsgFromSharing(message.msg);
                 }
             }
             else if (event.data instanceof ArrayBuffer) {
@@ -294,7 +294,7 @@ class RealTimeColab {
     async sendMessageToUser(id, message) {
         const channel = this.dataChannels.get(id);
         if (channel?.readyState === "open") {
-            channel.send(message);
+            channel.send(JSON.stringify({ msg: message, type: "text" }));
         }
         else {
             console.error(`Data channel with user ${id} is not available.`);

@@ -30,6 +30,8 @@ import { settingsBodyContentBoxStyle } from "../Settings/Subsettings/SettingsBod
 import LR from "@Root/js/React/Components/myCom/Layout/LR";
 import kit from "bigonion-kit";
 import { getMdTextFromMonaco } from "@App/text/getMdText";
+import { readClipboard, writeClipboard } from "@App/text/clipboard";
+import alertUseArco from "@App/message/alert";
 
 const url = "wss://md-server-md-server-bndnqhexdf.cn-hangzhou.fcapp.run";
 
@@ -46,7 +48,7 @@ export default function Settings(props: any) {
   const [openDialog, setOpenDialog] = useState(false);
   const [connectedUserIds, setConnectedUserIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedButton, setSelectedButton] = useState<"file" | "text" | null>(null);
+  const [selectedButton, setSelectedButton] = useState<"file" | "text" | "clip" | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedText, setSelectedText] = useState<string | null>(null);
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -143,7 +145,7 @@ export default function Settings(props: any) {
     _e: React.MouseEvent,
     targetUserId: string
   ) => {
-    const message = JSON.stringify({ message: getMdTextFromMonaco() })
+    const message = getMdTextFromMonaco()
     try {
       await realTimeColab.connectToUser(targetUserId);
       console.log(`Connected to user ${targetUserId}`);
@@ -151,6 +153,9 @@ export default function Settings(props: any) {
         await realTimeColab.sendFileToUser(targetUserId, selectedFile);
       } else if (selectedButton === "text" && selectedText) {
         await realTimeColab.sendMessageToUser(targetUserId, selectedText);
+      } else if (selectedButton === "clip") {
+        let clipText = readClipboard()
+        await realTimeColab.sendMessageToUser(targetUserId, await clipText);
       }
       else {
         await realTimeColab.sendMessageToUser(targetUserId, message);
@@ -189,9 +194,10 @@ export default function Settings(props: any) {
   const handleAcceptMessage = () => {
     try {
       if (msgFromSharing) {
-        const parsed = JSON.parse(msgFromSharing);
-        if (parsed.message) {
-          replaceMonacoAll(window.monaco, window.editor, parsed.message);
+        if (msgFromSharing) {
+          // writeClipboard(msgFromSharing)
+          alertUseArco("成功收到文本", 2000, { kind: "success" })
+          replaceMonacoAll(window.monaco, window.editor, msgFromSharing);
         } else {
           replaceMonacoAll(window.monaco, window.editor, msgFromSharing);
         }
@@ -214,8 +220,10 @@ export default function Settings(props: any) {
 
       }
       setOpenDialog(false);
-      setMsgFromSharing(null);
-      setFileFromSharing(null);
+      kit.sleep(500).then(() => {
+        setFileFromSharing(null);
+        setMsgFromSharing(null);
+      })
     } catch (error) {
       console.error("Failed to accept message:", error);
     }
@@ -308,10 +316,21 @@ export default function Settings(props: any) {
                 Markdown文本
               </Button>
             </Badge>
-
-            <Button variant="outlined" startIcon={<ClipboardIcon />} sx={buttonStyle}>
-              剪贴板
-            </Button>
+            <Badge
+              sx={{
+                "& .MuiBadge-badge": {
+                  top: "-2px", // 向上移动
+                  right: "-2px", // 向右移动
+                },
+              }}
+              color="primary"
+              badgeContent={selectedButton === "clip" ? 1 : 0}
+              overlap="circular"
+            >
+              <Button onClick={() => { setSelectedButton("clip") }} variant="outlined" startIcon={<ClipboardIcon />} sx={buttonStyle}>
+                剪贴板
+              </Button>
+            </Badge>
           </Box>
           <Box
             sx={{
@@ -397,18 +416,42 @@ export default function Settings(props: any) {
         open={openDialog}
         onClose={() => {
           setOpenDialog(false);
-          setMsgFromSharing(null);
+          kit.sleep(500).then(() => {
+            setFileFromSharing(null);
+            setMsgFromSharing(null);
+          })
         }}
       >
         <DialogTitle>✨新分享</DialogTitle>
         <DialogContent>
           <DialogContentText>您有来自外部的消息，是否接受？</DialogContentText>
+
+          {msgFromSharing ? <Box
+            sx={{
+              width: "100%", // 设置宽度
+              height: 300, // 限制高度
+              overflow: "auto", // 使内容可滚动
+              padding: 2, // 内边距
+              border: "1px solid #ccc", // 边框
+              borderRadius: "4px", // 圆角
+              backgroundColor: "#f9f9f9", // 背景色
+              whiteSpace: "pre-wrap", // 保留换行符和空格
+              fontFamily: "monospace", // 字体
+              fontSize: 14, // 字体大小
+            }}
+          >
+            {msgFromSharing}
+          </Box> : <></>}
         </DialogContent>
         <DialogActions>
           <Button
             onClick={() => {
               setOpenDialog(false);
-              setMsgFromSharing(null);
+              kit.sleep(500).then(() => {
+                setFileFromSharing(null);
+                setMsgFromSharing(null);
+              })
+
             }}
             color="secondary"
           >
