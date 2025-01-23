@@ -22,7 +22,11 @@ export async function testCdns(): Promise<void> {
     ): Promise<CdnResult> {
       const controller = new AbortController()
       const signal = controller.signal
-      const url = `https://${domain}/npm/bigonion-kit@0.12.6/.vscode/settings.json`
+      let url = `https://${domain}/npm/bigonion-kit@0.12.6/.vscode/settings.json`
+      if (domain === "cdn.jsdmirror.com") {
+        url = `https://${domain}/npm/bigonion-kit@0.12.6/.vscode/settings.jso`
+
+      }
 
 
       // 设置一个定时器在指定的超时时间后中止请求
@@ -60,9 +64,17 @@ export async function testCdns(): Promise<void> {
     async function testAndSortCDNs(
       cdnDomains: string[],
       timeout: number = 3000
-    ): Promise<void> {
+    ): Promise<string[]> {
       const results: CdnResult[] = await Promise.all(
-        cdnDomains.map((domain) => checkCDNConnectivity(domain, timeout))
+        cdnDomains.map((domain) => {
+          try {
+            return checkCDNConnectivity(domain, timeout)
+          } catch (error) {
+            console.log(error);
+            return null
+          }
+
+        })
       )
       // 过滤掉 CDN，
       const sortedResults: CdnResult[] = results
@@ -73,16 +85,16 @@ export async function testCdns(): Promise<void> {
         .sort((a, b) => a.latency - b.latency)
       const sortedCDNDomains = sortedResults.map((result) => result!.domain)
       window._cdn.cdn = sortedCDNDomains
-
+      return sortedCDNDomains
     }
     try {
-      await testAndSortCDNs(cdnDomains)
+      // await testAndSortCDNs(cdnDomains)
+      resolve()
     } catch (error) {
       console.log("hifuck", error);
       resolve()
     }
-    resolve()
-
+    
   })
 }
 

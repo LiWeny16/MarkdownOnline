@@ -249,6 +249,70 @@ sequenceDiagram
               monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
           },
           {
+            label: "/any-font-size-text (任意大小文字)",
+            detail: "你能任意掌控大小的文字",
+            kind: monaco.languages.CompletionItemKind.Function,
+            sortText: "a3",
+            range: rangeWithFirstLetter,
+            insertText: `
+<p style="font-size:\${1:16}px">\${2:}</p>
+`,
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          },
+          {
+            label: "/any-center-text (居中文本)",
+            detail: "你能任意掌控位置的文字",
+            kind: monaco.languages.CompletionItemKind.Function,
+            sortText: "a4",
+            range: rangeWithFirstLetter,
+            insertText: `
+<p style="text-align:center">\${1:}</p>
+`,
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          },
+          {
+            label: "/any-color-text (任意颜色文本)",
+            detail: "你能任意掌控颜色的文字",
+            kind: monaco.languages.CompletionItemKind.Function,
+            sortText: "a5",
+            range: rangeWithFirstLetter,
+            insertText: `
+<p style="color:red">\${1:}</p>
+`,
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          },
+          {
+            label: "/any-text (任意文本)",
+            detail: "你能任意掌控的文字",
+            kind: monaco.languages.CompletionItemKind.Function,
+            sortText: "a6",
+            range: rangeWithFirstLetter,
+            insertText: `
+<p style="font-size:16px;text-align:center;color:black;font-weight:bold;font-style:italic;">
+\${1:}
+</p>
+`,
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          },
+          {
+            label: "/title-text (图表题注释文本)",
+            detail: "图片、表格下的小字",
+            kind: monaco.languages.CompletionItemKind.Function,
+            sortText: "a6",
+            range: rangeWithFirstLetter,
+            insertText: `
+<p style="font-size:16px;text-align:center;font-style:italic;">
+\${1:}
+</p>
+`,
+            insertTextRules:
+              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+          },
+          {
             label: "/prettier-ignore (忽略格式化行)",
             detail: "下一行不进行prettier格式化",
             kind: monaco.languages.CompletionItemKind.Function,

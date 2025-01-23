@@ -15,7 +15,10 @@ export async function testCdns() {
         async function checkCDNConnectivity(domain, timeout = 1300) {
             const controller = new AbortController();
             const signal = controller.signal;
-            const url = `https://${domain}/npm/bigonion-kit@0.12.6/.vscode/settings.json`;
+            let url = `https://${domain}/npm/bigonion-kit@0.12.6/.vscode/settings.json`;
+            if (domain === "cdn.jsdmirror.com") {
+                url = `https://${domain}/npm/bigonion-kit@0.12.6/.vscode/settings.jso`;
+            }
             // 设置一个定时器在指定的超时时间后中止请求
             const timeoutId = setTimeout(() => {
                 controller.abort();
@@ -47,22 +50,31 @@ export async function testCdns() {
         }
         // 主函数，测试所有 CDN 域名，挑选并排序
         async function testAndSortCDNs(cdnDomains, timeout = 3000) {
-            const results = await Promise.all(cdnDomains.map((domain) => checkCDNConnectivity(domain, timeout)));
+            const results = await Promise.all(cdnDomains.map((domain) => {
+                try {
+                    return checkCDNConnectivity(domain, timeout);
+                }
+                catch (error) {
+                    console.log(error);
+                    return null;
+                }
+            }));
             // 过滤掉 CDN，
             const sortedResults = results
                 .filter((result) => result !== null)
                 .sort((a, b) => a.latency - b.latency);
             const sortedCDNDomains = sortedResults.map((result) => result.domain);
             window._cdn.cdn = sortedCDNDomains;
+            return sortedCDNDomains;
         }
         try {
-            await testAndSortCDNs(cdnDomains);
+            // await testAndSortCDNs(cdnDomains)
+            resolve();
         }
         catch (error) {
             console.log("hifuck", error);
             resolve();
         }
-        resolve();
     });
 }
 /**
