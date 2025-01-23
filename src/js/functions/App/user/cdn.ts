@@ -24,6 +24,7 @@ export async function testCdns(): Promise<void> {
       const signal = controller.signal
       const url = `https://${domain}/npm/bigonion-kit@0.12.6/.vscode/settings.json`
 
+
       // 设置一个定时器在指定的超时时间后中止请求
       const timeoutId = setTimeout(() => {
         controller.abort()
@@ -72,15 +73,16 @@ export async function testCdns(): Promise<void> {
         .sort((a, b) => a.latency - b.latency)
       const sortedCDNDomains = sortedResults.map((result) => result!.domain)
       window._cdn.cdn = sortedCDNDomains
-      // console.log("排序", sortedCDNDomains)
+
     }
     try {
       await testAndSortCDNs(cdnDomains)
-      resolve()
     } catch (error) {
+      console.log("hifuck", error);
       resolve()
-      console.error("Failed to test and sort CDNs:", (error as Error).message)
     }
+    resolve()
+
   })
 }
 
@@ -118,31 +120,37 @@ export async function loadScripts(): Promise<void> {
     tagId: string,
     tagUrl: string | URL | Request
   ): Promise<void> => {
-    const db = await openIndexedDB()
-    const tableName = tagType + "s"
-    let tagData = await getDataFromIndexedDB(db, tableName, tagId)
+    const db = await openIndexedDB();
+    const tableName = tagType + "s";
+    let tagData = await getDataFromIndexedDB(db, tableName, tagId);
+
     if (!tagData) {
-      const response = await fetch(tagUrl)
-      if (!response.ok) throw new Error(`Failed to fetch ${tagUrl}`)
-      const tagContent = await response.text()
-      await saveDataToIndexedDB(db, tableName, tagId, tagContent)
-      tagData = { content: tagContent }
+      const response = await fetch(tagUrl);
+      if (!response.ok) throw new Error(`Failed to fetch ${tagUrl}`);
+      const tagContent = await response.text();
+
+      // 检查是否有多个匿名 define 调用
+      const defineCount = (tagContent.match(/define$/g) || []).length;
+      if (defineCount > 1) {
+        throw new Error(
+          `Script at ${tagUrl} has multiple anonymous define calls`
+        );
+      }
+
+      await saveDataToIndexedDB(db, tableName, tagId, tagContent);
+      tagData = { content: tagContent };
     }
 
-    const tagElement = document.createElement(tagType)
-    tagElement.textContent = tagData.content
-    document.head.appendChild(tagElement)
-  }
+    // 避免重复加载
+    if (!document.querySelector(`script[data-id="${tagId}"]`)) {
+      const tagElement = document.createElement(tagType);
+      tagElement.textContent = tagData.content;
+      tagElement.setAttribute("data-id", tagId);
+      document.head.appendChild(tagElement);
+    }
+  };
   const usefulDomain = window._cdn.cdn[0]
   const scripts = [
-    // {
-    //   id: "react",
-    //   cdnUrl: `https://${usefulDomain}/npm/react@18.2.0/umd/react.production.min.js`,
-    // },
-    // {
-    //   id: "react-dom",
-    //   cdnUrl: `https://${usefulDomain}/npm/react-dom@18.2.0/umd/react-dom.production.min.js`,
-    // },
     {
       id: "katex",
       cdnUrl: `https://${usefulDomain}/npm/katex@0.16.7/dist/katex.min.js`,
@@ -169,7 +177,7 @@ export async function loadScripts(): Promise<void> {
       id: "arco-design",
       cdnUrl: `https://${usefulDomain}/npm/@arco-design/web-react@2.58.3/dist/css/arco.min.css`,
     },
-    
+
   ]
   async function loadOrFetchResource(
     resource: any,
@@ -238,16 +246,6 @@ export async function preload() {
     }
   }
   const scriptsToLoad = [
-    // {
-    //   id: "react",
-    //   cdnUrl:
-    //     "https://cdn.jsdelivr.net/npm/react@18.2.0/umd/react.production.min.js",
-    // },
-    // {
-    //   id: "react-dom",
-    //   cdnUrl:
-    //     "https://cdn.jsdelivr.net/npm/react-dom@18.2.0/umd/react-dom.production.min.js",
-    // },
     {
       id: "katex",
       cdnUrl: "https://fastly.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js",

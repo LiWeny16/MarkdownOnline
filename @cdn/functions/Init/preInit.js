@@ -7,6 +7,6 @@ const languageInit = () => {
     languageInit();
     await cdnInit();
     await testCdns();
-    await preload();
     await loadScripts();
+    await preload();
 })();
