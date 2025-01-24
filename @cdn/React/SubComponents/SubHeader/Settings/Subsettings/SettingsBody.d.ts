@@ -20,13 +20,6 @@ export declare const settingsBodyContentBoxStyle: {
         backgroundColor: string;
         transition: string;
     };
-    "&:hover::before": {
-        backgroundColor: string;
-    };
-    "&:hover": {
-        backgroundColor: string;
-        boxShadow: string;
-    };
 };
 declare const _default: () => import("react/jsx-runtime").JSX.Element;
 export default _default;

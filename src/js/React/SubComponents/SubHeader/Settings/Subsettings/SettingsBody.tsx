@@ -54,14 +54,17 @@ export const settingsBodyContentBoxStyle = {
     backgroundColor: "transparent",
     transition: "background-color 0.2s cubic-bezier(0.5, 0.05, 1, 0.5)",
   },
+
+}
+const settingsBodyContentBoxStyleFromTheme = (theme: string) => ({
   "&:hover::before": {
     backgroundColor: getTheme() === "light" ? "#840084" : "#d2d2d2",
   },
   "&:hover": {
-    backgroundColor: getTheme() === "light" ? "#E7E6E5" : "",
-    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)", // 增加细微阴影增强效果
+    backgroundColor: getTheme() === "light" ? "#EAEAEA" : "#393939",
+    boxShadow: "0px 4px 12px rgba(20, 15, 15, 0.1)", // 增加细微阴影增强效果
   },
-}
+});
 export default observer(function SettingsBody() {
   const { t, i18n } = useTranslation()
   const theme = getTheme()
@@ -231,7 +234,9 @@ export default observer(function SettingsBody() {
         </Typography>
 
         <Divider></Divider>
-        <Box id="settings_1_1" sx={settingsBodyContentBoxStyle}>
+        <Box id="settings_1_1" sx={{
+          ...settingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme())
+        }}>
           {/* <LightTooltip title="编辑器主题" placement="bottom"> */}
           <Typography
             sx={{
@@ -251,7 +256,9 @@ export default observer(function SettingsBody() {
             onChange={handleOnChangeThemeSwitch}
           ></SwitchTheme>
         </Box>
-        <Box id="settings_1_2" sx={settingsBodyContentBoxStyle}>
+        <Box id="settings_1_2" sx={{
+          ...settingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme())
+        }}>
           <Typography
             sx={{
               fontSize: "0.89rem",
@@ -278,8 +285,10 @@ export default observer(function SettingsBody() {
           id="settings_1_3"
           content="编辑器设置"
         ></SecondaryHeading>
-        <Box sx={settingsBodyContentBoxStyle} id="settings_1_2">
-          <Box sx={secondSettingsBodyContentBoxStyle}>
+        <Box sx={{
+          ...settingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme())
+        }} id="settings_1_2">
+          <Box sx={{ ...secondSettingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme()) }}>
             <Box className="FLEX ROW">
               <Typography
                 sx={{
@@ -310,7 +319,7 @@ export default observer(function SettingsBody() {
               })}
             </Select>
           </Box>
-          <Box sx={secondSettingsBodyContentBoxStyle}>
+          <Box sx={{ ...secondSettingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme()) }}>
             <Box className="FLEX ROW">
               <Typography
                 sx={{
@@ -335,7 +344,9 @@ export default observer(function SettingsBody() {
               <MenuItem value={1}>Times New Roman</MenuItem>
             </Select>
           </Box>
-          <Box sx={settingsBodyContentBoxStyle}>
+          <Box sx={{
+            ...settingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme())
+          }}>
             <Box className="FLEX ROW">
               <Typography
                 sx={{
@@ -356,7 +367,9 @@ export default observer(function SettingsBody() {
               onChange={handleOnChangeSyncScrollSwitch}
             ></SwitchIOS>
           </Box>
-          <Box sx={settingsBodyContentBoxStyle}>
+          <Box sx={{
+            ...settingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme())
+          }}>
             <Box className="FLEX ROW">
               <Typography
                 sx={{
@@ -382,7 +395,9 @@ export default observer(function SettingsBody() {
             </Select>
           </Box>
         </Box>
-        <Box id="settings_1_4" sx={settingsBodyContentBoxStyle}>
+        <Box id="settings_1_4" sx={{
+          ...settingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme())
+        }}>
           <Typography
             sx={{
               fontSize: "0.89rem",
@@ -421,7 +436,9 @@ export default observer(function SettingsBody() {
         </Typography>
         <Divider></Divider>
 
-        <Box id="settings_2_1" sx={settingsBodyContentBoxStyle}>
+        <Box id="settings_2_1" sx={{
+          ...settingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme())
+        }}>
           <Typography
             sx={{
               fontSize: "0.89rem",
@@ -440,7 +457,9 @@ export default observer(function SettingsBody() {
           ></SwitchIOS>
         </Box>
 
-        <Box sx={settingsBodyContentBoxStyle}>
+        <Box sx={{
+          ...settingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme())
+        }}>
           <Typography
             id="settings_2_2"
             sx={{
@@ -473,8 +492,10 @@ export default observer(function SettingsBody() {
           id="settings_2_3"
           content="图片设置"
         ></SecondaryHeading>
-        <Box sx={settingsBodyContentBoxStyle}>
-          <Box sx={secondSettingsBodyContentBoxStyle}>
+        <Box sx={{
+          ...settingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme())
+        }}>
+          <Box sx={{ ...secondSettingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme()) }}>
             <Typography
               id="settings_2_3"
               sx={{
@@ -523,7 +544,7 @@ export default observer(function SettingsBody() {
               </RadioGroup>
             </FormControl>
           </Box>
-          <Box sx={secondSettingsBodyContentBoxStyle}>
+          <Box sx={{ ...secondSettingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme()) }}>
             <Typography
               id="settings_2_4"
               sx={{
@@ -546,7 +567,7 @@ export default observer(function SettingsBody() {
               onChange={handleOnChangeImageStyle}
             />
           </Box>
-          <Box sx={secondSettingsBodyContentBoxStyle}>
+          <Box sx={{ ...secondSettingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme()) }}>
             <Typography
               id="settings_2_5"
               sx={{
