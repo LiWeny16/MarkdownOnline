@@ -146,7 +146,7 @@ function math_block(state: any, start: any, end: any, silent: any) {
     found = true
   }
 
-  for (next = start; !found; ) {
+  for (next = start; !found;) {
     next++
 
     if (next >= end) {

@@ -1,5 +1,6 @@
 /**
- * @description Replace the page breaker.
- * @param {MD} md the text
+ * @description Replace the page breaker and properly format math formulas.
+ * @param {string} md - The markdown text.
+ * @returns {string} The processed markdown text.
  */
-export default function PageBreaker(md: MD): string;
+export default function PageBreaker(md: string): string;
