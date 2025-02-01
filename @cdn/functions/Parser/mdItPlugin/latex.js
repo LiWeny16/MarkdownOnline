@@ -6,9 +6,6 @@ https://github.com/runarberg/markdown-it-math
 It differs in that it takes (a subset of) LaTeX as input and relies on KaTeX
 for rendering output.
 */
-/*jslint node: true */
-// Test if potential opening or closing delimieter
-// Assumes that there is a "$" at state.src[pos]
 function isValidDelim(state, pos) {
     var prevChar, nextChar, max = state.posMax, can_open = true, can_close = true;
     prevChar = pos > 0 ? state.src.charCodeAt(pos - 1) : -1;

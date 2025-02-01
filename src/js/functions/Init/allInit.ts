@@ -38,6 +38,7 @@ import importFilePlugin from "@Func/Parser/mdItPlugin/file"
 import i18n from "i18next"
 import markdownItTOCPlugin from "@Func/Parser/mdItPlugin/TOC"
 import tocPlugin from "@Func/Parser/mdItPlugin/TOC"
+import latexFix from "@Func/Parser/mdItPlugin/latexFix"
 
 // import { excelParser } from "@App/fileSystem/excel"
 /**
@@ -73,6 +74,7 @@ export function markdownParser() {
     .use(customAlignPluginHeading)
     .use(markdownItEmoji)
     .use(markdownItTaskLists)
+    .use(latexFix)
     .use(markdownItLatex)
     .use(importFilePlugin)
     .use(window.markdownitIncrementalDOM)

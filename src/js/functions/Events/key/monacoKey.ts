@@ -18,6 +18,7 @@ import exeItalicsAction from "./actions/markdownTextFastKey/italics"
 import exeUnderlineAction from "./actions/markdownTextFastKey/underline"
 import exeDeleteLinection from "./actions/markdownTextFastKey/delete"
 import exeHeadingAction from "./actions/markdownTextFastKey/headings"
+import exeAskAI from "./actions/askAI"
 
 export default function monacoKeyEvent(
   editor: editor.IStandaloneCodeEditor,
@@ -39,6 +40,8 @@ export default function monacoKeyEvent(
     pageBreaker:
       monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.Enter,
     latexBlock: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyM,
+    askAI:
+      monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyJ,
     voice2Words:
       monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyV,
     syncScroll: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyQ,
@@ -73,7 +76,7 @@ export default function monacoKeyEvent(
     label: "打开表情包超市 🤪",
     keybindings: [],
     contextMenuGroupId: "navigation",
-    contextMenuOrder: -100,
+    contextMenuOrder: 1,
     run: () => {
       exeEmojiPickerAction(editor, monaco)
     },
@@ -226,7 +229,7 @@ export default function monacoKeyEvent(
     label: "标题1",
     keybindings: [keyMap.markdownTextEditFastKey.h1],
     run: () => {
-      exeHeadingAction(editor,monaco,1)
+      exeHeadingAction(editor, monaco, 1)
     },
   })
   editor.addAction({
@@ -234,7 +237,7 @@ export default function monacoKeyEvent(
     label: "标题2",
     keybindings: [keyMap.markdownTextEditFastKey.h2],
     run: () => {
-      exeHeadingAction(editor,monaco,2)
+      exeHeadingAction(editor, monaco, 2)
     },
   })
   editor.addAction({
@@ -242,7 +245,7 @@ export default function monacoKeyEvent(
     label: "标题3",
     keybindings: [keyMap.markdownTextEditFastKey.h3],
     run: () => {
-      exeHeadingAction(editor,monaco,3)
+      exeHeadingAction(editor, monaco, 3)
     },
   })
   editor.addAction({
@@ -250,7 +253,7 @@ export default function monacoKeyEvent(
     label: "标题4",
     keybindings: [keyMap.markdownTextEditFastKey.h4],
     run: () => {
-      exeHeadingAction(editor,monaco,4)
+      exeHeadingAction(editor, monaco, 4)
     },
   })
   editor.addAction({
@@ -261,6 +264,16 @@ export default function monacoKeyEvent(
     contextMenuOrder: 100,
     run: () => {
       window.location.reload()
+    },
+  })
+  editor.addAction({
+    id: "AI",
+    label: "✨Ask AI",
+    keybindings: [keyMap.askAI],
+    contextMenuGroupId: "navigation",
+    contextMenuOrder: 0,
+    run: () => {
+      exeAskAI(window.editor, window.monaco)
     },
   })
 }

@@ -3,17 +3,18 @@ import React from "react";
 import fastKeyEvent from "@Func/Events/key/fastKey";
 import MdArea from "./SubBody/MdArea";
 import { observer } from "mobx-react";
-import { getEmojiPickerState, getSettings, getStates, getTheme } from "@App/config/change";
+import { getEmojiPickerState, getSettings, getStates, getStatesMemorable, getTheme } from "@App/config/change";
 import { Suspense } from "react";
 import WelcomeAnimation from "../Components/myCom/Prompt/WelcomeAni";
 // 使用 React.lazy 懒加载组件
 const LazyEmojiPicker = React.lazy(() => import("@Root/js/React/Components/myCom/EmojiPicker"));
-const LazyPromptPanel = React.lazy(() => import("@Com/myCom/Prompt/Prompt"));
+// const LazyPromptPanel = React.lazy(() => import("@Com/myCom/Prompt/Prompt"))
 const LazyPromptAIPanel = React.lazy(() => import("@Com/myCom/Prompt/AIPanel"));
 export default observer(function Body() {
     const mdViewerRef = React.useRef(null);
     const [markdownViewerWidth, setMarkdownViewerWidth] = React.useState("100%");
     React.useEffect(() => {
+        console.log(getStatesMemorable().memorable.welcomeAnimationState);
         // setMarkdownViewerWidth(mdViewerRef.current.clientWidth / 2 + "px")
         fastKeyEvent();
     }, []);
@@ -25,5 +26,5 @@ export default observer(function Body() {
                                     : "26px 38px",
                             }, className: "markdown-body " +
                                 `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}` })] }), _jsx("div", { id: "aboutBox", children: _jsx("div", { id: "markdownParser", children: _jsx("div", { id: "aboutMd", className: "aboutViewArea markdown-body " +
-                                `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}` }) }) }), _jsx(WelcomeAnimation, {}), _jsx(Suspense, { fallback: _jsx(_Fragment, {}), children: _jsx(LazyEmojiPicker, { open: getEmojiPickerState() === "on" ? true : false }) }), _jsx(Suspense, { fallback: _jsx(_Fragment, {}), children: _jsx(LazyPromptPanel, { open: getStates().unmemorable.promptPanelState }) }), _jsx(Suspense, { children: _jsx(LazyPromptAIPanel, { open: getStates().unmemorable.aiPanelState }) })] }) }));
+                                `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}` }) }) }), getStatesMemorable().memorable.welcomeAnimationState ? _jsx(WelcomeAnimation, {}) : _jsx(_Fragment, {}), _jsx(Suspense, { fallback: _jsx(_Fragment, {}), children: _jsx(LazyEmojiPicker, { open: getEmojiPickerState() === "on" ? true : false }) }), _jsx(Suspense, { children: _jsx(LazyPromptAIPanel, { open: getStates().unmemorable.aiPanelState }) })] }) }));
 });

@@ -3,7 +3,7 @@ import React from "react"
 import fastKeyEvent from "@Func/Events/key/fastKey"
 import MdArea from "./SubBody/MdArea"
 import { observer } from "mobx-react"
-import { getEmojiPickerState, getSettings, getStates, getTheme } from "@App/config/change"
+import { getEmojiPickerState, getSettings, getStates, getStatesMemorable, getTheme } from "@App/config/change"
 import { Suspense } from "react"
 import WelcomeAnimation from "../Components/myCom/Prompt/WelcomeAni"
 
@@ -11,12 +11,13 @@ import WelcomeAnimation from "../Components/myCom/Prompt/WelcomeAni"
 const LazyEmojiPicker = React.lazy(
   () => import("@Root/js/React/Components/myCom/EmojiPicker")
 )
-const LazyPromptPanel = React.lazy(() => import("@Com/myCom/Prompt/Prompt"))
+// const LazyPromptPanel = React.lazy(() => import("@Com/myCom/Prompt/Prompt"))
 const LazyPromptAIPanel = React.lazy(() => import("@Com/myCom/Prompt/AIPanel"))
 export default observer(function Body() {
   const mdViewerRef: any = React.useRef(null)
   const [markdownViewerWidth, setMarkdownViewerWidth] = React.useState("100%")
   React.useEffect(() => {
+    console.log(getStatesMemorable().memorable.welcomeAnimationState);
     // setMarkdownViewerWidth(mdViewerRef.current.clientWidth / 2 + "px")
     fastKeyEvent()
   }, [])
@@ -56,15 +57,15 @@ export default observer(function Body() {
             ></div>
           </div>
         </div>
-        <WelcomeAnimation />
+        {getStatesMemorable().memorable.welcomeAnimationState ? <WelcomeAnimation /> : <></>}
         <Suspense fallback={<></>}>
           <LazyEmojiPicker
             open={getEmojiPickerState() === "on" ? true : false}
           />
         </Suspense>
-        <Suspense fallback={<></>}>
+        {/* <Suspense fallback={<></>}>
           <LazyPromptPanel open={getStates().unmemorable.promptPanelState} />
-        </Suspense>
+        </Suspense> */}
         <Suspense>
           <LazyPromptAIPanel open={getStates().unmemorable.aiPanelState} />
         </Suspense>

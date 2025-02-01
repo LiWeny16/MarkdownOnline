@@ -16,6 +16,7 @@ import exeItalicsAction from "./actions/markdownTextFastKey/italics";
 import exeUnderlineAction from "./actions/markdownTextFastKey/underline";
 import exeDeleteLinection from "./actions/markdownTextFastKey/delete";
 import exeHeadingAction from "./actions/markdownTextFastKey/headings";
+import exeAskAI from "./actions/askAI";
 export default function monacoKeyEvent(editor, monaco) {
     // // 假设你已经有了 Monaco Editor 实例的引用，名为 editor
     // const actions = window.editor.getActions()
@@ -30,6 +31,7 @@ export default function monacoKeyEvent(editor, monaco) {
         format: monaco.KeyMod.Shift | monaco.KeyCode.KeyF,
         pageBreaker: monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.Enter,
         latexBlock: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyM,
+        askAI: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyJ,
         voice2Words: monaco.KeyMod.CtrlCmd | monaco.KeyMod.Alt | monaco.KeyCode.KeyV,
         syncScroll: monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyQ,
         fileManager: monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyF,
@@ -62,7 +64,7 @@ export default function monacoKeyEvent(editor, monaco) {
         label: "打开表情包超市 🤪",
         keybindings: [],
         contextMenuGroupId: "navigation",
-        contextMenuOrder: -100,
+        contextMenuOrder: 1,
         run: () => {
             exeEmojiPickerAction(editor, monaco);
         },
@@ -249,6 +251,16 @@ export default function monacoKeyEvent(editor, monaco) {
         contextMenuOrder: 100,
         run: () => {
             window.location.reload();
+        },
+    });
+    editor.addAction({
+        id: "AI",
+        label: "✨Ask AI",
+        keybindings: [keyMap.askAI],
+        contextMenuGroupId: "navigation",
+        contextMenuOrder: 0,
+        run: () => {
+            exeAskAI(window.editor, window.monaco);
         },
     });
 }

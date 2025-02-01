@@ -1,3 +1,5 @@
+import getSelectionText from "@App/text/getSelection";
+
 // BigModel.ts
 const token = "409f1e38b0d8586919166aa6117243f7.AVQTIQqUbGI1g8B5"
 const url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
@@ -14,27 +16,66 @@ class BigModel {
    */
   public async askAI(
     content: string,
+    promptText: string,
     onMessage: (message: string) => void,
     onComplete: (finalMessage: string) => void,
-    onError: (error: any) => void
+    onError: (error: any) => void,
+    base64: string
   ) {
+    const getContent = () => {
+      if (base64) {
+        return [
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": base64
+            }
+          },
+          {
+            "type": "text",
+            "text": content
+          }
+        ]
+      } else {
+        return content
+      }
+    }
     const data = {
-      model: "glm-4-flash",
+      model: base64 ? "glm-4v-plus-0111" : "glm-4-flash",
       tool: "web-search-pro",
       stream: true, // 启用流式响应
       messages: [
         {
+          role: "system",
+          content: "你是一个专门为markdown写作输出内容的AI助手，严禁废话，若用户问换行符号怎么写，你的回答只需要：<br>"
+        },
+        {
+          role: "system",
+          content: "你作为一个markdownAI助手，只需要回答markdown格式纯文本即可，不要用markdown代码包裹回答，除非用户主动要求"
+        },
+        {
+          role: "system",
+          content: "所有数学/公式/定律/方程必须遵循:行内公式用单$包裹，公式块用两个$$包裹！严谨直接打印出来"
+        },
+        {
+          role: "system",
+          content: "用户问你思维导图/饼图等mermaid的语法图怎么写，你需要回答正确语法的mermaid内容，如```mermaid \n graph TD;\nA[人工智能学习思维导图] --> B[基础知识];\nB --> B1[数学基础];```"
+        },
+        {
+          role: "system",
+          content: promptText ?? `用户鼠标选中了这一段文本：${promptText}可能需要修改，扩写等对这段文本操作，你只需要回答修改后的文本即可`
+        },
+        {
           role: "user",
-          content: content,
+          content: getContent(),
         },
       ],
     }
 
     try {
-      console.log(data);
       const response = await fetch(url, {
         method: "POST",
-        headers: {  
+        headers: {
           "Content-Type": "application/json",
           Authorization: `${token}`,
         },

@@ -7,7 +7,7 @@ declare class BigModel {
      * @param onComplete 接收完整响应的回调函数
      * @param onError 处理错误的回调函数
      */
-    askAI(content: string, onMessage: (message: string) => void, onComplete: (finalMessage: string) => void, onError: (error: any) => void): Promise<void>;
+    askAI(content: string, promptText: string, onMessage: (message: string) => void, onComplete: (finalMessage: string) => void, onError: (error: any) => void, base64: string): Promise<void>;
 }
 declare const bigModel: BigModel;
 export default bigModel;

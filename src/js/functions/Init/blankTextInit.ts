@@ -14,7 +14,7 @@ export default function blankTextInit() {
         window.editor.setValue(list[0].contentText)
         resolve()
       } else {
-        changeStatesMemorable({ memorable: { welcomeAnimationState: true } })
+        // changeStatesMemorable({ memorable: { welcomeAnimationState: true } })
         // fetch(
         //   "https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@main/src/assets/welcome.md"
         // )

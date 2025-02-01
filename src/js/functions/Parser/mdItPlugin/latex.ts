@@ -11,7 +11,7 @@ for rendering output.
 
 // Test if potential opening or closing delimieter
 // Assumes that there is a "$" at state.src[pos]
-
+import MarkdownIt from "markdown-it/lib"
 
 function isValidDelim(state: any, pos: any) {
   var prevChar,
@@ -181,7 +181,7 @@ function math_block(state: any, start: any, end: any, silent: any) {
   return true
 }
 
-export default function markdownItLatex(md: any, options: any) {
+export default function markdownItLatex(md: MarkdownIt, options: any) {
   // Default options
 
   options = options || { throwOnError: false, strict: false }

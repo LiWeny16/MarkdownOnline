@@ -195,7 +195,7 @@ const WelcomeAnimation = () => {
   }, [])
 
   const handleEnter = () => {
-    changeStatesMemorable({ memorable: { welcomeAnimationState: false } })
+
 
     const tl = gsap.timeline()
 
@@ -230,6 +230,9 @@ const WelcomeAnimation = () => {
       },
       ">-0.2"
     )
+    kit.sleep(1500).then(() => {
+      changeStatesMemorable({ memorable: { welcomeAnimationState: false } })
+    })
   }
 
   const handleCardClick = (index: number) => {

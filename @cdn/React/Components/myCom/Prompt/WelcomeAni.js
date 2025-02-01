@@ -172,7 +172,6 @@ const WelcomeAnimation = () => {
         return () => ctx.revert();
     }, []);
     const handleEnter = () => {
-        changeStatesMemorable({ memorable: { welcomeAnimationState: false } });
         const tl = gsap.timeline();
         featuresRefs.current.forEach((ref, index) => {
             if (ref) {
@@ -195,6 +194,9 @@ const WelcomeAnimation = () => {
             opacity: 0,
             duration: 0.2,
         }, ">-0.2");
+        kit.sleep(1500).then(() => {
+            changeStatesMemorable({ memorable: { welcomeAnimationState: false } });
+        });
     };
     const handleCardClick = (index) => {
         if (!isInitialAnimationComplete)

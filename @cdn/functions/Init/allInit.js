@@ -26,6 +26,7 @@ import noteUseArco from "@App/message/note";
 import { mergeObjects } from "@App/basic/basic";
 import importFilePlugin from "@Func/Parser/mdItPlugin/file";
 import i18n from "i18next";
+import latexFix from "@Func/Parser/mdItPlugin/latexFix";
 // import { excelParser } from "@App/fileSystem/excel"
 /**
  * @description markdownParser init plugin && settings
@@ -60,6 +61,7 @@ export function markdownParser() {
         .use(customAlignPluginHeading)
         .use(markdownItEmoji)
         .use(markdownItTaskLists)
+        .use(latexFix)
         .use(markdownItLatex)
         .use(importFilePlugin)
         .use(window.markdownitIncrementalDOM);
