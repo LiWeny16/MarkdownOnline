@@ -5,6 +5,7 @@ import { gsap } from "gsap"
 import { changeStatesMemorable, getStatesMemorable } from "@App/config/change"
 import i18n from "i18next"
 import { useTranslation } from "react-i18next"
+import kit from "@cdn-kit"
 
 const WelcomeAnimation = () => {
   const { t } = useTranslation()
