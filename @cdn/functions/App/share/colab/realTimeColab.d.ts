@@ -1,3 +1,4 @@
+/// <reference types="react" />
 declare class RealTimeColab {
     private static instance;
     private static userId;
@@ -14,7 +15,7 @@ declare class RealTimeColab {
     static getInstance(): RealTimeColab;
     getUniqId(): string | null;
     connect(url: string, setMsgFromSharing: (msg: string | null) => void, setFileFromSharing: (file: Blob | null) => void, updateConnectedUsers: (users: string[]) => void): Promise<void>;
-    disconnect(): Promise<void>;
+    disconnect(setMsgFromSharing?: React.Dispatch<React.SetStateAction<string | null>>, setFileFromSharing?: React.Dispatch<React.SetStateAction<Blob | null>>): Promise<void>;
     private cleanUpConnections;
     private handleSignal;
     private handleDiscover;

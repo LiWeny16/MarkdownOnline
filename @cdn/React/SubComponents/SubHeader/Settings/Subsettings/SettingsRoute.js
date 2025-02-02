@@ -42,6 +42,7 @@ const StyledTreeItem = styled(TreeItem)(({ theme }) => ({
 const CustomTreeItem = React.forwardRef((props, ref) => (
 // @ts-ignore
 _jsx(StyledTreeItem, { ...props, slots: { groupTransition: TransitionComponent, ...props.slots }, ref: ref })));
+export { CustomTreeItem };
 export default function SettingsRoute() {
     // 在组件中使用 useTranslation 钩子
     const { t } = useTranslation();

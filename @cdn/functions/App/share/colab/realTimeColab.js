@@ -76,7 +76,11 @@ class RealTimeColab {
             console.log(error);
         }
     }
-    async disconnect() {
+    async disconnect(setMsgFromSharing, setFileFromSharing) {
+        if (setFileFromSharing && setMsgFromSharing) {
+            setFileFromSharing(null);
+            setMsgFromSharing(null);
+        }
         // 向其他用户广播leave消息，让他们清除自己
         this.broadcastSignal({ type: "leave", id: this.getUniqId() });
         this.cleanUpConnections();

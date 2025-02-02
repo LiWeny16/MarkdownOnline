@@ -22,11 +22,9 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import ImageManger from "./SubHeader/SubImgManager/ImageManager";
 import HomeIcon from "@mui/icons-material/Home";
-import { enObj } from "@Root/js/index";
 import kit from "@cdn-kit";
 import MyButton from "../Components/myCom/CustomButton";
 import myPrint from "@App/export/myPrint";
-import aboutBox from "@Func/Events/aboutBox";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { observer } from "mobx-react";
 import { useTheme } from "@mui/material";
@@ -34,6 +32,7 @@ import FileDrawer from "./SubHeader/File/File";
 import alertUseArco from "@App/message/alert";
 import { Suspense } from "react";
 import { useTranslation } from "react-i18next";
+import GuideDialog from "./SubHeader/Directory/Directory";
 const LazyMenu = React.lazy(() => import("./SubHeader/Menu"));
 const runTo = (url, delay) => {
     kit.sleep(delay).then(() => {
@@ -51,6 +50,7 @@ const DrawerAppBar = observer((props) => {
     const { window } = props;
     // const image = useImage()
     const [mobileOpen, setMobileOpen] = React.useState(false);
+    const [guideDialogOpen, setGuideDialogOpen] = React.useState(false);
     const handleDrawerToggle = () => {
         setMobileOpen((prevState) => !prevState);
     };
@@ -65,7 +65,7 @@ const DrawerAppBar = observer((props) => {
                     textAlign: "center",
                     boxShadow: boxShadow,
                 }, children: "Markdown+ Online View" }), _jsxs(List, { sx: { height: "100%", bgcolor: "background.paper" }, children: [_jsx(ListItem, { children: _jsxs(ListItemButton, { onClick: handleHomeClick, children: [_jsx(ListItemAvatar, { children: _jsx(Avatar, { children: _jsx(HomeIcon, {}) }) }), _jsx(ListItemText, { primary: "Home", secondary: "" })] }) }), _jsx(ListItem, { children: _jsxs(ListItemButton, { onClick: handleAlert, children: [_jsx(ListItemAvatar, { children: _jsx(Avatar, { children: _jsx(ImageIcon, {}) }) }), _jsx(ListItemText, { primary: "Photos", secondary: "" })] }) }), _jsx(ListItem, { children: _jsxs(ListItemButton, { onClick: myPrint, children: [_jsx(ListItemAvatar, { children: _jsx(Avatar, { children: _jsx(GetAppIcon, {}) }) }), _jsx(ListItemText, { primary: "Export", secondary: "" })] }) }), _jsx(ListItem, { children: _jsxs(ListItemButton, { onClick: () => {
-                                enObj.enAboutBox ? aboutBox() : undefined;
+                                // enObj.enAboutBox ? aboutBox() : undefined
                             }, children: [_jsx(ListItemAvatar, { children: _jsx(Avatar, { children: _jsx(InfoIcon, {}) }) }), _jsx(ListItemText, { primary: "About", secondary: "" })] }) })] })] })
     // </ThemeProvider>
     );
@@ -92,7 +92,8 @@ const DrawerAppBar = observer((props) => {
                                     letterSpacing: ".3rem",
                                     textDecoration: "none",
                                 }, children: _jsx("h2", { style: { fontSize: "28px" }, children: "Markdown+ Online View" }) }), _jsxs(Box, { sx: { display: { xs: "none", sm: "flex", flexDirection: "row" } }, children: [_jsx(MyButton, { href: "https://bigonion.cn", startIcon: _jsx(LinkIcon, {}), children: t("t-home") }), _jsx(MyButton, { onClick: () => {
-                                            enObj.enAboutBox ? aboutBox() : undefined;
+                                            // enObj.enAboutBox ? aboutBox() : undefined
+                                            setGuideDialogOpen(true);
                                         }, startIcon: _jsx(HelpOutlineIcon, {}), children: t("t-about") }), _jsx(Suspense, { fallback: _jsx(MyButton, { open: open, endIcon: _jsx(MoreVertIcon, {}), children: t("t-more") }), children: _jsx(LazyMenu, {}) }), _jsx(ImageManger, {}), _jsx(FileDrawer, {})] })] }) }), _jsx(Box, { sx: { display: { xs: "flex", sm: "none" } }, component: "nav", children: _jsx(Drawer, { container: container, variant: "temporary", open: mobileOpen, onClose: handleDrawerToggle, ModalProps: {
                             keepMounted: true, // Better open performance on mobile.
                         }, sx: {
@@ -101,6 +102,8 @@ const DrawerAppBar = observer((props) => {
                                 boxSizing: "border-box",
                                 width: drawerWidth,
                             },
-                        }, children: drawer }) })] }) }));
+                        }, children: drawer }) }), _jsx(GuideDialog, { open: guideDialogOpen, onClose: () => {
+                        setGuideDialogOpen(false);
+                    } })] }) }));
 });
 export default DrawerAppBar;

@@ -14,8 +14,6 @@ export default observer(function Body() {
     const mdViewerRef = React.useRef(null);
     const [markdownViewerWidth, setMarkdownViewerWidth] = React.useState("100%");
     React.useEffect(() => {
-        console.log(getStatesMemorable().memorable.welcomeAnimationState);
-        // setMarkdownViewerWidth(mdViewerRef.current.clientWidth / 2 + "px")
         fastKeyEvent();
     }, []);
     return (_jsx(_Fragment, { children: _jsxs("div", { style: { marginTop: "1.3vh" }, id: "bodyTopBox", children: [_jsxs("div", { id: "editor", className: `${getTheme() == "light" ? "theme-light" : "theme-dark"} FLEX ROW`, children: [_jsx(MdArea, { setMarkdownViewerWidth: setMarkdownViewerWidth }), _jsx("article", { id: "view-area-hidden", className: "hidden-pre" }), _jsx("article", { ref: mdViewerRef, id: "view-area", style: {
@@ -25,6 +23,5 @@ export default observer(function Body() {
                                     ? "0px 5px"
                                     : "26px 38px",
                             }, className: "markdown-body " +
-                                `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}` })] }), _jsx("div", { id: "aboutBox", children: _jsx("div", { id: "markdownParser", children: _jsx("div", { id: "aboutMd", className: "aboutViewArea markdown-body " +
-                                `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}` }) }) }), getStatesMemorable().memorable.welcomeAnimationState ? _jsx(WelcomeAnimation, {}) : _jsx(_Fragment, {}), _jsx(Suspense, { fallback: _jsx(_Fragment, {}), children: _jsx(LazyEmojiPicker, { open: getEmojiPickerState() === "on" ? true : false }) }), _jsx(Suspense, { children: _jsx(LazyPromptAIPanel, { open: getStates().unmemorable.aiPanelState }) })] }) }));
+                                `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}` })] }), getStatesMemorable().memorable.welcomeAnimationState ? _jsx(WelcomeAnimation, {}) : _jsx(_Fragment, {}), _jsx(Suspense, { fallback: _jsx(_Fragment, {}), children: _jsx(LazyEmojiPicker, { open: getEmojiPickerState() === "on" ? true : false }) }), _jsx(Suspense, { children: _jsx(LazyPromptAIPanel, { open: getStates().unmemorable.aiPanelState }) })] }) }));
 });

@@ -167,29 +167,31 @@ export default function Settings(props: any) {
   };
 
   useEffect(() => {
-    realTimeColab
-      .connect(
-        url,
-        (incomingMsg: string | null) => {
-          // 当接收到新消息时，显示对话框以便用户决定是否接受
-          setMsgFromSharing(incomingMsg);
-          setOpenDialog(true);
-        },
-        (incomingFile: Blob | null) => {
-          setFileFromSharing(incomingFile);
-          setOpenDialog(true);
-        },
-        setConnectedUserIds
-      )
-      .catch((err) => {
-        console.error("Failed to connect:", err);
-      });
+    if (props.open) {
+      realTimeColab
+        .connect(
+          url,
+          (incomingMsg: string | null) => {
+            // 当接收到新消息时，显示对话框以便用户决定是否接受
+            setMsgFromSharing(incomingMsg);
+            setOpenDialog(true);
+          },
+          (incomingFile: Blob | null) => {
+            setFileFromSharing(incomingFile);
+            setOpenDialog(true);
+          },
+          setConnectedUserIds
+        )
+        .catch((err) => {
+          console.error("Failed to connect:", err);
+        });
+    }
 
     return () => {
       // 组件卸载时断开连接，通知其他用户
-      realTimeColab.disconnect();
+      realTimeColab.disconnect(setMsgFromSharing, setFileFromSharing);
     };
-  }, []);
+  }, [props.open]);
 
   const handleAcceptMessage = () => {
     try {

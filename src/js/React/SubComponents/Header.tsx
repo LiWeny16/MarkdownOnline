@@ -1,6 +1,6 @@
 import * as React from "react"
 import AppBar from "@mui/material/AppBar"
-import { Box } from "@mui/material/"
+import { Box, Dialog } from "@mui/material/"
 import CssBaseline from "@mui/material/CssBaseline"
 import Drawer from "@mui/material/Drawer"
 import IconButton from "@mui/material/IconButton"
@@ -25,7 +25,6 @@ import { enObj } from "@Root/js/index"
 import kit from "@cdn-kit"
 import MyButton from "../Components/myCom/CustomButton"
 import myPrint from "@App/export/myPrint"
-import aboutBox from "@Func/Events/aboutBox"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { observer } from "mobx-react"
 import { useTheme } from "@mui/material"
@@ -33,6 +32,7 @@ import FileDrawer from "./SubHeader/File/File"
 import alertUseArco from "@App/message/alert"
 import { Suspense } from "react"
 import { useTranslation } from "react-i18next"
+import GuideDialog from "./SubHeader/Directory/Directory"
 const LazyMenu = React.lazy(() => import("./SubHeader/Menu"))
 
 interface Props {
@@ -62,7 +62,7 @@ const DrawerAppBar = observer((props: Props) => {
   const { window } = props
   // const image = useImage()
   const [mobileOpen, setMobileOpen] = React.useState(false)
-
+  const [guideDialogOpen, setGuideDialogOpen] = React.useState(false)
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState)
   }
@@ -126,7 +126,7 @@ const DrawerAppBar = observer((props: Props) => {
         <ListItem>
           <ListItemButton
             onClick={() => {
-              enObj.enAboutBox ? aboutBox() : undefined
+              // enObj.enAboutBox ? aboutBox() : undefined
             }}
           >
             <ListItemAvatar>
@@ -160,7 +160,7 @@ const DrawerAppBar = observer((props: Props) => {
             transition:
               "background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
           }}
-          // sx={{ bgcolor: "black" }}
+        // sx={{ bgcolor: "black" }}
         >
           <Toolbar>
             <IconButton
@@ -206,7 +206,8 @@ const DrawerAppBar = observer((props: Props) => {
               </MyButton>
               <MyButton
                 onClick={() => {
-                  enObj.enAboutBox ? aboutBox() : undefined
+                  // enObj.enAboutBox ? aboutBox() : undefined
+                  setGuideDialogOpen(true)
                 }}
                 startIcon={<HelpOutlineIcon />}
               >
@@ -247,6 +248,9 @@ const DrawerAppBar = observer((props: Props) => {
             {drawer}
           </Drawer>
         </Box>
+        <GuideDialog open={guideDialogOpen} onClose={() => {
+          setGuideDialogOpen(false)
+        }}></GuideDialog>
       </Box>
     </>
   )

@@ -97,13 +97,11 @@ export default observer(function SettingsBody() {
         if (b) {
             changeTheme("dark");
             setThemeState(e.target.checked);
-            console.log(markdownBodyElement.style.cssText);
             markdownBodyElement.style.cssText = "";
         }
         else {
             changeTheme("light");
             setThemeState(e.target.checked);
-            console.log(markdownBodyElement.style.cssText);
         }
     }
     function handleOnChangeSyncScrollSwitch(_e, b) {

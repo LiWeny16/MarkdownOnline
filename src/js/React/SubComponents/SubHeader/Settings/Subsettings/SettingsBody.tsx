@@ -7,13 +7,11 @@ import {
 } from "@App/config/change"
 import SwitchTheme from "@Root/js/React/Components/myCom/Switches/SwitchTheme"
 import SwitchIOS from "@Root/js/React/Components/myCom/Switches/SwitchIOS"
-import { LightTooltip } from "@Root/js/React/Components/myCom/Tooltips"
 import {
   Box,
   Divider,
   FormControl,
   FormControlLabel,
-  FormLabel,
   MenuItem,
   Radio,
   RadioGroup,
@@ -28,9 +26,7 @@ import { speechLanguageMap } from "@App/voice/speech"
 import { normalMermaidTheme, normalMermaidThemeMap } from "@Func/Init/allInit"
 import mermaid from "mermaid"
 import { mdConverter } from "@Root/js"
-import ShortcutExample from "@Root/js/React/Components/Mui/keyboard"
 import kit from "@cdn-kit"
-import { settings } from "firebase/analytics"
 import { useTranslation } from "react-i18next"
 export const settingsBodyContentBoxStyle = {
   transition: "background-color 0.4s ease, box-shadow 0.4s ease",
@@ -130,12 +126,10 @@ export default observer(function SettingsBody() {
     if (b) {
       changeTheme("dark")
       setThemeState(e.target.checked)
-      console.log(markdownBodyElement.style.cssText)
       markdownBodyElement.style.cssText = ""
     } else {
       changeTheme("light")
       setThemeState(e.target.checked)
-      console.log(markdownBodyElement.style.cssText)
     }
   }
   function handleOnChangeSyncScrollSwitch(_e: any, b: any) {

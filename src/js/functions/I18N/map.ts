@@ -2,7 +2,7 @@ const map = {
   en: {
     translation: {
       "t-more": "More",
-      "t-about": "About",
+      "t-about": "Help",
       "t-home": "Home",
       "t-image-manager": "Image Manager",
       "t-file-manager": "File Manager",
@@ -74,7 +74,7 @@ const map = {
   zh: {
     translation: {
       "t-more": "更多",
-      "t-about": "关于",
+      "t-about": "帮助",
       "t-home": "首页",
       "t-image-manager": "图片管理器 (浏览器)",
       "t-file-manager": "文件管理器✨",

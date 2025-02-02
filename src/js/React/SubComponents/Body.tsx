@@ -17,8 +17,6 @@ export default observer(function Body() {
   const mdViewerRef: any = React.useRef(null)
   const [markdownViewerWidth, setMarkdownViewerWidth] = React.useState("100%")
   React.useEffect(() => {
-    console.log(getStatesMemorable().memorable.welcomeAnimationState);
-    // setMarkdownViewerWidth(mdViewerRef.current.clientWidth / 2 + "px")
     fastKeyEvent()
   }, [])
   return (
@@ -46,7 +44,7 @@ export default observer(function Body() {
             }
           ></article>
         </div>
-        <div id="aboutBox">
+        {/* <div id="aboutBox">
           <div id="markdownParser">
             <div
               id="aboutMd"
@@ -56,7 +54,7 @@ export default observer(function Body() {
               }
             ></div>
           </div>
-        </div>
+        </div> */}
         {getStatesMemorable().memorable.welcomeAnimationState ? <WelcomeAnimation /> : <></>}
         <Suspense fallback={<></>}>
           <LazyEmojiPicker

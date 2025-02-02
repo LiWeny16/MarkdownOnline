@@ -58,6 +58,7 @@ const CustomTreeItem = React.forwardRef(
     />
   )
 )
+export { CustomTreeItem }
 
 export default function SettingsRoute() {
   // 在组件中使用 useTranslation 钩子
