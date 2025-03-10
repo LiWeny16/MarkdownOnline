@@ -11,7 +11,7 @@ export default function exeSpeechPanelAction(editor, monaco) {
         /**
          * @description 停止识别
          * */
-        alertUseArco("语音识别已关闭，嗯你闭嘴吧，我不听...", 2000);
+        alertUseArco("语音识别已关闭，我不听...", 2000);
         window._speechData.processing = false;
         window._speechData.speech.stopRecognition();
         window._speechData.speech = null;
