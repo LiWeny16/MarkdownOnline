@@ -1,0 +1,73 @@
+/* 电脑端 */
+@media (min-width: 769px) {
+  #aboutMd {
+    width: 44%;
+    /* height: 6%; */
+  }
+  #md-area {
+    width: 100%;
+  }
+}
+/* 手机端 */
+@media (max-width: 769px) {
+  body{
+    overflow: scroll;
+  }
+  #aboutMd {
+    width: 98%;
+    /* height: 6%; */
+  }
+  #editor {
+    flex-direction: column-reverse;
+    // height: 164vh !important;
+  }
+
+  #md-area {
+    flex: 0 0 48%;
+  }
+  .headerP {
+    font-size: 2.5vh;
+  }
+  #pdfButton > button {
+    font-size: 2.5vh;
+  }
+  #pdfButton {
+    font-size: 2.5vh;
+  }
+}
+@media (min-width: 471px) and (max-width: 769px) {
+  #md-area {
+    flex: 0 0 50% !important;
+  }
+}
+@media (min-width: 1px) and (max-width: 413px) {
+  #md-area {
+    flex: 0 0 50% !important;
+  }
+  #headerRight{
+    a{
+      display: none;
+    }
+  }
+}
+
+/* 响应式布局 */
+
+/* 手机端 */
+/* 
+@media (max-width: 462px) {
+  .headerP {
+    font-size: 1.8vh;
+  }
+  #pdfButton > button {
+    font-size: 1.8vh;
+  }
+  #md-area {
+    padding: 8px 13px !important;
+  }
+} */
+@media (max-width: 767px) {
+  .markdown-body {
+    padding: 15px;
+  }
+}

@@ -1,0 +1,112 @@
+@import url("./ui/print/print.css");
+@import url("./ui/base/header.less");
+@import url("./ui/base/response.less");
+@import url("./ui/base/aboutBox.css");
+@import url("./ui/base/body.less");
+@import url("./ui/base/scrollBar.less");
+
+@import url("./markdown/TOC.less");
+@import url("./markdown/code.patch.less");
+@import url("./markdown/latex.patch.less");
+@import url("./markdown/table.less");
+@import url("./markdown/footnotes.patch.less");
+@import url("./lib/hljs.user.less");
+
+// @import url("https://fastly.jsdelivr.net/npm/clue-parser@1.0.4/index.min.css");
+// @import url("https://fastly.jsdelivr.net/npm/clue-parser@1.0.3/src/githubMd.min.css");
+@import url("https://fastly.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.css");
+// @import url("https://fastly.jsdelivr.net/npm/@arco-design/web-react@2.58.3/dist/css/arco.min.css");
+// @import url("https://fastly.jsdelivr.net/npm/react-photo-view@1.2.4/dist/react-photo-view.min.css");
+
+.draggable-box {
+  width: fit-content;
+  // height: 60svh;
+  background-color: rgb(0, 0, 0);
+  position: absolute;
+  user-select: none;
+  cursor: grab;
+  z-index: 9999;
+}
+
+.custom-resizable .react-resizable-handle {
+  height: 100%;
+  transform: translateX(0.9svw);
+  width: 0.9svw;
+  border-right: black;
+  transition: 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+  // background: skyblue !important;
+  // 提高优先级, 防止被覆盖无法拖动
+  z-index: 10;
+}
+.custom-resizable .react-resizable-handle:hover {
+  background-color: #90caf9 !important;
+}
+.react-resizable-handle-se {
+  cursor: col-resize !important;
+}
+
+// 主布局
+
+body {
+  margin: 0;
+  width: 100svw;
+  height: 100svh;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  // 隐藏全局滚动条
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+#root {
+  width: 100svw;
+  height: 100svh;
+}
+#view-area {
+  overflow-y: auto;
+  width: 100%;
+  height: 90svh;
+  /* 设置 transform 让当前容器为包含块 */
+  transform: translateX(0);
+}
+#editor {
+  height: 90svh;
+}
+.HILIGHT-MONACO {
+  background-color: #fff7af;
+  animation-name: fadeOut;
+  animation-duration: 1300ms; /* 持续时间为 1 秒 */
+  animation-fill-mode: forwards; /* 保持动画结束时的状态 */
+}
+@keyframes fadeOut {
+  0% {
+    background-color: #fff7af;
+  }
+  50% {
+    background-color: #000000;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.img_resize_transition {
+  transition: 0.4s;
+}
+
+.PhotoView-Slider__Backdrop {
+  background: rgba(24, 24, 24, 0.591) !important;
+  // backdrop-filter: blur(5px);
+}
+
+.line-hilight:hover {
+  background: #dedede;
+  border-radius: 2.5px;
+  transform: translateX(2px);
+  padding-left: 5px;
+}
+.line-hilight {
+  transition: 0.3s;
+}

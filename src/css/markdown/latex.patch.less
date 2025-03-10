@@ -1,0 +1,48 @@
+/* // Markdown github */
+/* Markdown Compatibility - Markdown渲染补丁
+该补丁的作用是调整容器的显示, 让局部滚动条固定在页面右边, 而不是跟随内容区域的拖动而拖动.
+*/
+article.markdown-body {
+  max-width: none;
+  // display: flex;
+  // flex-flow: column;
+  // align-items: center;
+
+  // 设置所有子节点的宽度, 以匹配之前的样式
+  // 即最小100px宽度, 最大980px宽度
+  & > * {
+    width: 100%;
+    min-width: 200px;
+    max-width: 980px;
+  }
+
+  // 防止代码块的高度发生异常
+  pre {
+    overflow: unset;
+  }
+}
+
+.markdown-body .footnotes {
+  border-top: none !important;
+}
+
+.markdown-it-code-copy {
+  display: none;
+}
+
+.code-container:hover button.markdown-it-code-copy {
+  display: block;
+}
+
+// LateX Compatibility - lateX补丁
+.katex span.katex-mathml {
+  // fix: `.katex .katex-mathml` not exist position config
+  top: 0;
+}
+
+// markdown 补丁
+.markdown-body {
+  pre {
+    padding: 14px !important;
+  }
+}

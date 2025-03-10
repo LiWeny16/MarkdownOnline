@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebRTC Example</title>
+    <style>
+      textarea {
+        width: 100%;
+        height: 100px;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="local-text" placeholder="Type here..."></textarea>
+    <textarea
+      id="remote-text"
+      placeholder="Received messages..."
+      readonly
+    ></textarea>
+    <script>
+      let peerConnection
+      const ws = new WebSocket("wss://webrtc-wabmmfcxmo.cn-shanghai.fcapp.run")
+      const localText = document.getElementById("local-text")
+      const remoteText = document.getElementById("remote-text")
+
+      const createPeerConnection = async () => {
+        peerConnection = new RTCPeerConnection()
+
+        // 监听 ice 候选项事件
+        peerConnection.onicecandidate = (event) => {
+          if (event.candidate) {
+            ws.send(
+              JSON.stringify({
+                type: "iceCandidate",
+                candidate: event.candidate,
+              })
+            )
+          }
+        }
+
+        // 监听获取远程数据通道
+        peerConnection.ondatachannel = (event) => {
+          const dataChannel = event.channel
+          dataChannel.onmessage = (event) => {
+            remoteText.value = event.data + "\n"
+          }
+        }
+
+        ws.onmessage = async (event) => {
+          const reader = new FileReader()
+          reader.readAsText(event.data, "utf-8")
+          reader.onload = async () => {
+            const data = JSON.parse(reader.result) // 从 FileReader 中提取实际消息内容并解析为 JSON
+            console.log(data)
+
+            if (data.type === "offer") {
+              await peerConnection.setRemoteDescription(data.offer)
+              const answer = await peerConnection.createAnswer()
+              await peerConnection.setLocalDescription(answer)
+              ws.send(JSON.stringify({ type: "answer", answer }))
+            } else if (data.type === "answer") {
+              await peerConnection.setRemoteDescription(data.answer)
+            } else if (data.type === "iceCandidate") {
+              await peerConnection.addIceCandidate(data.candidate)
+            }
+          }
+        }
+      }
+
+      const startCall = async () => {
+        console.log("startCalls")
+
+        const dataChannel = peerConnection.createDataChannel("messageChannel")
+        dataChannel.onopen = () => {
+          localText.addEventListener("input", (event) => {
+            dataChannel.send(event.target.value)
+          })
+        }
+        const offer = await peerConnection.createOffer()
+        await peerConnection.setLocalDescription(offer)
+        ws.send(JSON.stringify({ type: "offer", offer }))
+      }
+
+      const main = async () => {
+        await createPeerConnection()
+        ws.onopen = startCall
+      }
+
+      main()
+    </script>
+  </body>
+</html>

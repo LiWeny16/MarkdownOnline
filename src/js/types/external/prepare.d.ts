@@ -1,0 +1,3 @@
+interface IPrePare {
+  srcMap: Object
+}

@@ -1,0 +1,56 @@
+{
+  "compilerOptions": {
+    // TypeScript 默认会把代码编译为 ECMAScript 3
+    // esnext 表示仅仅校验转换 TypeScript 类型，不进行语法编译
+    "module": "esnext",
+    "lib": ["DOM", "ESNext"],
+    "target": "ES2020",
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    // 开启严格模式，这使得对“this”的数据属性进行更严格的推断成为可能
+    "strict": true,
+    "declaration": true,
+    // "emitDeclarationOnly": true,
+    // "declarationDir": "allTypes",
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": false,
+    "isolatedModules": true,
+    "noEmit": false,
+    "jsx": "react-jsx",
+    "useDefineForClassFields": true,
+    "paths": {
+      "@Asset": ["./src/assets"],
+      "@Asset/*": ["./src/assets/*"],
+      "@App": ["./src/js/functions/App/"],
+      "@App/*": ["./src/js/functions/App/*"],
+      "@Func": ["./src/js/functions"],
+      "@Func/*": ["./src/js/functions/*"],
+      "@Root": ["./src/"],
+      "@Root/*": ["./src/*"],
+      "@Com": ["./src/js/React/Components"],
+      "@Com/*": ["./src/js/React/Components/*"],
+      "@Mobx": ["./src/js/React/Mobx"],
+      "@Mobx/*": ["./src/js/React/Mobx/*"],
+      "@Css": ["./src/js/React/Css"],
+      "@Css/*": ["./src/js/React/Css/*"],
+      "@Plugins": ["./src/js/functions/Plugins"],
+      "@Plugins/*": ["./src/js/functions/Plugins/*"],
+    },
+    "outDir": "./@cdn",
+  },
+
+  // 配置需要校验的文件
+  "include": [
+    "src/**/*.ts",
+    "src/js/types/*.d.ts",
+    "src/js/types/external/*.d.ts",
+    "src",
+    "src/functions/*.ts",
+    "Layout",
+    // "allTypes/*.d.ts ",
+  ],
+
+  // 排除不需要 TypeScript 校验的文件
+  "exclude": ["node_modules", "docs"],
+}
