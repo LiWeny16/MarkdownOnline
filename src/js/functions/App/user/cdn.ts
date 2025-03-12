@@ -94,7 +94,7 @@ export async function testCdns(): Promise<void> {
       console.log("hifuck", error);
       resolve()
     }
-    
+
   })
 }
 
@@ -107,6 +107,7 @@ export async function loadScripts(): Promise<void> {
     const onUpgradeNeeded = (db: IDBDatabase) => {
       db.createObjectStore("scripts", { keyPath: "id" })
       db.createObjectStore("styles", { keyPath: "id" })
+      db.createObjectStore("data", { keyPath: "id" })
     }
     return openDB("cache_DB", 1, onUpgradeNeeded)
   }
@@ -219,6 +220,7 @@ export async function preload() {
   dbPromise.onupgradeneeded = (event: any) => {
     event.target.result.createObjectStore("scripts", { keyPath: "id" })
     event.target.result.createObjectStore("styles", { keyPath: "id" })
+    event.target.result.createObjectStore("data", { keyPath: "id" })
   }
   const getScriptFromDB = (db: any, id: any) =>
     new Promise((resolve, reject) => {
@@ -234,7 +236,8 @@ export async function preload() {
       dbPromise.onsuccess = () => resolve(dbPromise.result)
     })
     let storeNames: any = db.objectStoreNames
-    if (!storeNames.contains("scripts") || !storeNames.contains("styles")) {
+    // 保证最新数据库
+    if (!storeNames.contains("scripts") || !storeNames.contains("styles") || !storeNames.contains("data")) {
       let deleteRequest = window.indexedDB.deleteDatabase("cache_DB")
       deleteRequest.onsuccess = function (event) {
         window.location.reload()

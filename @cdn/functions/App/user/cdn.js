@@ -86,6 +86,7 @@ export async function loadScripts() {
         const onUpgradeNeeded = (db) => {
             db.createObjectStore("scripts", { keyPath: "id" });
             db.createObjectStore("styles", { keyPath: "id" });
+            db.createObjectStore("data", { keyPath: "id" });
         };
         return openDB("cache_DB", 1, onUpgradeNeeded);
     };
@@ -171,6 +172,7 @@ export async function preload() {
     dbPromise.onupgradeneeded = (event) => {
         event.target.result.createObjectStore("scripts", { keyPath: "id" });
         event.target.result.createObjectStore("styles", { keyPath: "id" });
+        event.target.result.createObjectStore("data", { keyPath: "id" });
     };
     const getScriptFromDB = (db, id) => new Promise((resolve, reject) => {
         const transaction = db
@@ -185,7 +187,8 @@ export async function preload() {
             dbPromise.onsuccess = () => resolve(dbPromise.result);
         });
         let storeNames = db.objectStoreNames;
-        if (!storeNames.contains("scripts") || !storeNames.contains("styles")) {
+        // 保证最新数据库
+        if (!storeNames.contains("scripts") || !storeNames.contains("styles") || !storeNames.contains("data")) {
             let deleteRequest = window.indexedDB.deleteDatabase("cache_DB");
             deleteRequest.onsuccess = function (event) {
                 window.location.reload();

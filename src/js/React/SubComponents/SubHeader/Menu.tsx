@@ -27,6 +27,7 @@ import myPrint from "@App/export/myPrint"
 import FolderOpenOutlinedIcon from "@mui/icons-material/Folder"
 import { changeFileManagerState, getFileManagerState } from "@App/config/change"
 import { useTranslation } from "react-i18next"
+import Lab from "./Lab/Lab"
 // import domtoimg from "@App/export/domToImg"
 
 const CustomizedMenus = observer(() => {
@@ -47,6 +48,9 @@ const CustomizedMenus = observer(() => {
   // 5协同办公 anchor
   const [anchorEl5, setAnchorEl5] = React.useState<null | HTMLElement>(null)
 
+  // 6前端实验室 anchor
+  const [anchorEl6, setAnchorEl6] = React.useState<null | HTMLElement>(null)
+
   // 保存提示
   const [modalState, setModalState] = React.useState<boolean>(false)
   const open = Boolean(anchorEl)
@@ -54,6 +58,7 @@ const CustomizedMenus = observer(() => {
   const open3 = Boolean(anchorEl3)
   const open4 = Boolean(anchorEl4)
   const open5 = Boolean(anchorEl5)
+  const open6 = Boolean(anchorEl6)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -78,6 +83,9 @@ const CustomizedMenus = observer(() => {
   const handleClick5 = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl5(event.currentTarget)
   }
+  const handleClick6 = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl6(event.currentTarget)
+  }
   const handleCloseMenu = () => {
     setAnchorEl(null)
   }
@@ -95,6 +103,10 @@ const CustomizedMenus = observer(() => {
   }
   const handleCloseCollab = (e: React.MouseEvent<HTMLElement>) => {
     setAnchorEl5(null)
+    e.stopPropagation()
+  }
+  const handleCloseLab = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl6(null)
     e.stopPropagation()
   }
   const handleImageManager = () => {
@@ -163,12 +175,12 @@ const CustomizedMenus = observer(() => {
         <MenuItem onClick={handleImageManager} disableRipple>
           <EditIcon />
           {/* // 图片管理器 (浏览器) / Image Manager (Browser) */}
-          {t("t-image-manager")} 
+          {t("t-image-manager")}
         </MenuItem>
         <MenuItem onClick={handleFileManager} disableRipple>
           <FolderOpenOutlinedIcon />
           {/* // 文件管理器 / File Manager */}
-          {t("t-file-manager")} 
+          {t("t-file-manager")}
         </MenuItem>
         <MenuItem
           onClick={(e) => {
@@ -214,6 +226,18 @@ const CustomizedMenus = observer(() => {
         </MenuItem>
         <MenuItem
           onClick={(e) => {
+            handleClick6(e)
+          }}
+          disableRipple
+        >
+          <Lab closeAll={handleCloseMenu}
+            anchorEl={anchorEl6}
+            closeMenu={handleCloseLab}
+            open={open6}
+            onClick={handleCloseLab} />
+        </MenuItem>
+        <MenuItem
+          onClick={(e) => {
             handleClick4(e)
           }}
           disableRipple
@@ -234,7 +258,7 @@ const CustomizedMenus = observer(() => {
         >
           <MoreHorizIcon />
           {/* // 更多 (敬请期待) / More (Coming Soon) */}
-          {t("t-more-coming-soon")} 
+          {t("t-more-coming-soon")}
         </MenuItem>
       </StyledMenu>
     </div>

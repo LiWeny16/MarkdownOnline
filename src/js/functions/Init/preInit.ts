@@ -9,4 +9,5 @@ const languageInit = () => {
   await testCdns()
   await loadScripts()
   await preload()
+
 })()

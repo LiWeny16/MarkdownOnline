@@ -1,8 +1,11 @@
+// import words from "an-array-of-english-words";
 import { accents1, delimiters0, delimeterSizing0, greekLetters0, otherLetters0, annotation1, verticalLayout0, verticalLayout1, verticalLayout2, overlap1, spacing0, spacing1, logicAndSetTheory0, logicAndSetTheory1, macros0, bigOperators0, binaryOperators0, fractions0, fractions2, binomialCoefficients0, binomialCoefficients2, mathOperators0, mathOperators1, sqrt1, relations0, negatedRelations0, arrows0, extensibleArrows1, braketNotation1, classAssignment1, color2, font0, font1, size0, style0, symbolsAndPunctuation0, debugging0, envs, } from "@cdn-latex-map";
 import { FileFolderManager } from "@App/fileSystem/file";
 import { getSettings } from "@App/config/change";
 import { getFormattedDate } from "@App/user/date";
-export function monacoSnippets(editor, monaco) {
+import { fetchStoredJSON } from "@App/db";
+// let words: any[] = []
+export async function monacoSnippets(editor, monaco) {
     /**
      * @补全普通提示，采用“/”触发提示
      *
@@ -304,6 +307,103 @@ sequenceDiagram
                 return { suggestions: _suggestions };
             }
         },
+    });
+    /**
+     * @description 补全单词
+    */ class TrieNode {
+        constructor() {
+            Object.defineProperty(this, "children", {
+                enumerable: true,
+                configurable: true,
+                writable: true,
+                value: void 0
+            });
+            Object.defineProperty(this, "isEndOfWord", {
+                enumerable: true,
+                configurable: true,
+                writable: true,
+                value: void 0
+            });
+            this.children = {};
+            this.isEndOfWord = false;
+        }
+    }
+    class Trie {
+        constructor() {
+            Object.defineProperty(this, "root", {
+                enumerable: true,
+                configurable: true,
+                writable: true,
+                value: void 0
+            });
+            this.root = new TrieNode(); // ✅ 定义 this.root
+        }
+        insert(word) {
+            let node = this.root;
+            for (let char of word) {
+                if (!node.children[char]) {
+                    node.children[char] = new TrieNode();
+                }
+                node = node.children[char];
+            }
+            node.isEndOfWord = true;
+        }
+        search(prefix) {
+            let node = this.root;
+            for (let char of prefix) {
+                if (!node.children[char]) {
+                    return [];
+                }
+                node = node.children[char];
+            }
+            return this._findAllWords(node, prefix);
+        }
+        _findAllWords(node, prefix) {
+            let words = [];
+            if (node.isEndOfWord) {
+                words.push(prefix);
+            }
+            for (let char in node.children) {
+                words = words.concat(this._findAllWords(node.children[char], prefix + char));
+            }
+            return words;
+        }
+    }
+    // 示例：构建字典树并搜索前缀
+    const trie = new Trie();
+    /**
+     * @description 字典补全
+    */
+    monaco.languages.registerCompletionItemProvider("markdown", {
+        triggerCharacters: "abcdefghijklmnopqrstuvwxyz".split(""),
+        // @ts-ignore
+        provideCompletionItems: async (model, position) => {
+            const textUntilPosition = model.getValueInRange({
+                startLineNumber: 1,
+                startColumn: 1,
+                endLineNumber: position.lineNumber,
+                endColumn: position.column,
+            });
+            let words = await fetchStoredJSON("spelling_data_json");
+            if (words) {
+                words.forEach((word) => trie.insert(word));
+            }
+            // console.log(words);
+            const lastWord = words ? textUntilPosition.split(/\s+/).pop() : "";
+            let suggestions;
+            if (words) {
+                suggestions = trie.search(lastWord.toLowerCase()).map(word => ({
+                    label: word,
+                    kind: monaco.languages.CompletionItemKind.Text,
+                    insertText: word,
+                    detail: `Suggested word: ${word}`
+                }));
+            }
+            else {
+                suggestions = [];
+            }
+            return { suggestions };
+        }
     });
     /**
      * @补全Latex

@@ -1,5 +1,7 @@
 import { Monaco } from "@monaco-editor/react"
 import { editor } from "monaco-editor"
+// import words from "an-array-of-english-words";
+
 import {
   accents1,
   delimiters0,
@@ -44,10 +46,14 @@ import { type Position } from "monaco-editor/esm/vs/editor/editor.api"
 import { FileFolderManager } from "@App/fileSystem/file"
 import { getSettings } from "@App/config/change"
 import { getFormattedDate } from "@App/user/date"
-export function monacoSnippets(
+import { fetchStoredJSON, getDataByKey } from "@App/db";
+
+// let words: any[] = []
+export async function monacoSnippets(
   editor: editor.IStandaloneCodeEditor,
   monaco: Monaco
 ) {
+
   /**
    * @补全普通提示，采用“/”触发提示
    *
@@ -371,6 +377,102 @@ sequenceDiagram
       }
     },
   })
+  /**
+   * @description 补全单词
+  */class TrieNode {
+    children: { [key: string]: TrieNode };
+    isEndOfWord: boolean;
+
+    constructor() {
+      this.children = {};
+      this.isEndOfWord = false;
+    }
+  }
+
+  class Trie {
+    root: TrieNode;
+
+    constructor() {
+      this.root = new TrieNode(); // ✅ 定义 this.root
+    }
+
+    insert(word: string): void {
+      let node: TrieNode = this.root;
+      for (let char of word) {
+        if (!node.children[char]) {
+          node.children[char] = new TrieNode();
+        }
+        node = node.children[char];
+      }
+      node.isEndOfWord = true;
+    }
+
+    search(prefix: string): string[] {
+      let node: TrieNode = this.root;
+      for (let char of prefix) {
+        if (!node.children[char]) {
+          return [];
+        }
+        node = node.children[char];
+      }
+      return this._findAllWords(node, prefix);
+    }
+
+    private _findAllWords(node: TrieNode, prefix: string): string[] {
+      let words: string[] = [];
+      if (node.isEndOfWord) {
+        words.push(prefix);
+      }
+      for (let char in node.children) {
+        words = words.concat(this._findAllWords(node.children[char], prefix + char));
+      }
+      return words;
+    }
+  }
+
+
+  // 示例：构建字典树并搜索前缀
+  const trie = new Trie();
+
+
+  /**
+   * @description 字典补全
+  */
+  monaco.languages.registerCompletionItemProvider("markdown", {
+    triggerCharacters: "abcdefghijklmnopqrstuvwxyz".split(""),
+    // @ts-ignore
+    provideCompletionItems: async (model, position) => {
+      const textUntilPosition = model.getValueInRange({
+        startLineNumber: 1,
+        startColumn: 1,
+        endLineNumber: position.lineNumber,
+        endColumn: position.column,
+      });
+      let words = await fetchStoredJSON("spelling_data_json")
+      if (words) {
+        words.forEach((word: string) => trie.insert(word));
+      }
+      // console.log(words);
+      const lastWord = words ? textUntilPosition.split(/\s+/).pop() : "";
+
+      let suggestions: any[]
+      if (words) {
+        suggestions = trie.search(lastWord!.toLowerCase()).map(word => ({
+          label: word,
+          kind: monaco.languages.CompletionItemKind.Text,
+          insertText: word,
+          detail: `Suggested word: ${word}`
+        }));
+        
+      } else {
+        suggestions = []
+      }
+      return { suggestions };
+
+    }
+  });
+
+
   /**
    * @补全Latex
    */

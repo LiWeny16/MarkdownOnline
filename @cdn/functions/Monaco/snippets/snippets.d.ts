@@ -1,7 +1,7 @@
 import { Monaco } from "@monaco-editor/react";
 import { editor } from "monaco-editor";
 import { type Position } from "monaco-editor/esm/vs/editor/editor.api";
-export declare function monacoSnippets(editor: editor.IStandaloneCodeEditor, monaco: Monaco): void;
+export declare function monacoSnippets(editor: editor.IStandaloneCodeEditor, monaco: Monaco): Promise<void>;
 /**
  * @description 判断是否需要启用LaTex提示
  * @param textUntilPosition string

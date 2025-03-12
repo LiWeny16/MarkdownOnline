@@ -308,7 +308,7 @@ export function cursorDelete(
       cursor.continue()
     }
   }
-  request.onerror = function (e) {}
+  request.onerror = function (e) { }
 }
 
 /**
@@ -323,5 +323,101 @@ export function deleteDBAll(dbName: string) {
   }
   deleteRequest.onsuccess = function (event) {
     console.log("删除成功")
+  }
+}
+
+/**
+ * 从URL下载JSON并存入indexedDB的cache_db数据库下的data表
+ * @param url JSON文件的URL
+ */
+export async function fetchAndStoreJSON(
+  url: string,
+  name: string,
+  onProgress?: (progress: number) => void // 进度回调函数
+): Promise<void> {
+  try {
+    // 1. 发起网络请求
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`网络请求失败: ${response.status}`);
+    }
+
+    // 2. 获取内容长度 (用于计算进度)
+    const contentLength = response.headers.get("Content-Length");
+    if (!contentLength) {
+      console.warn("无法获取 Content-Length，无法计算下载进度");
+    }
+
+    // 3. 逐步读取流数据
+    const reader = response.body?.getReader();
+    if (!reader) {
+      throw new Error("读取流失败");
+    }
+
+    let receivedLength = 0;
+    const chunks: Uint8Array[] = [];
+    const totalLength = contentLength ? parseInt(contentLength, 10) : 0;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      receivedLength += value.length;
+
+      // 计算并回调进度
+      if (totalLength && onProgress) {
+        const progress = Math.round((receivedLength / totalLength) * 100);
+        onProgress(progress);
+      }
+    }
+
+    // 4. 合并数据并解析 JSON
+    const concatenatedChunks = new Uint8Array(receivedLength);
+    let position = 0;
+    for (const chunk of chunks) {
+      concatenatedChunks.set(chunk, position);
+      position += chunk.length;
+    }
+
+    const jsonData = JSON.parse(new TextDecoder("utf-8").decode(concatenatedChunks));
+
+    // 5. 存入 IndexedDB
+    const db = await openDB("cache_DB", 1, (db, event) => {
+      if (!db.objectStoreNames.contains("data")) {
+        db.createObjectStore("data", { keyPath: "id", autoIncrement: true });
+      }
+    });
+
+    await addData(db, "data", { id: name, data: jsonData });
+
+    // 确保进度为100%（防止 UI 误差）
+    if (onProgress) onProgress(100);
+
+    console.log("JSON数据已成功存入 IndexedDB");
+  } catch (error) {
+    console.error("获取或存储 JSON 数据时出错:", error);
+    if (onProgress) onProgress(-1); // 下载失败时传递-1
+  }
+}
+
+
+/**
+ * 根据 ID 读取 IndexedDB 的 data 表中存储的 JSON 数据
+ * @param id 存储时的 ID (比如 "spelling_check" 或 "check_spell")
+ */
+export async function fetchStoredJSON(id: string): Promise<any | null> {
+  try {
+    const db = await openDB("cache_DB", 1);
+    const data = await getDataByKey(db, "data", id);
+    if (data) {
+      // console.log(`读取 ID:${id} 的数据:`, data);
+      return data.data; // 只返回存储的 JSON 数据
+    } else {
+      // console.log(`未找到 ID:${id} 的数据`);
+      return null;
+    }
+  } catch (error) {
+    // console.error(`读取 ID:${id} 的 JSON 数据时出错:`, error);
+    return null;
   }
 }

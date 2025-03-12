@@ -78,9 +78,14 @@ const MonacoEditor = observer(function MonacoEditor({
       wordWrap: getSettings().basic.editorAutoWrap ? "on" : "off",
       formatOnType: true,
       formatOnPaste: false,
+      stickyScroll: {
+        enabled: true,
+        defaultModel: 'outlineModel', 
+        maxLineCount: 5
+      },
       // scrollBeyondLastLine:false,
       // scrollBeyondLastColumn:10,
-      quickSuggestions: false, // 禁用快速建议
+      quickSuggestions: true, // 禁用快速建议
       fontLigatures: true,
       autoSurround: "quotes",
       autoClosingQuotes: "always",
@@ -115,20 +120,20 @@ const MonacoEditor = observer(function MonacoEditor({
   const handleResizeStart = () => {
     setOpenBackdrop(true) // 开始拖拽时显示遮罩
     disableTextSelection()
-    ;(
-      document.getElementsByClassName(
-        "react-resizable-handle"
-      )[0] as HTMLElement
-    ).style.backgroundColor = "#90caf9"
+      ; (
+        document.getElementsByClassName(
+          "react-resizable-handle"
+        )[0] as HTMLElement
+      ).style.backgroundColor = "#90caf9"
   }
   const handleResizeStop = () => {
     setOpenBackdrop(false)
     enableTextSelection()
-    ;(
-      document.getElementsByClassName(
-        "react-resizable-handle"
-      )[0] as HTMLElement
-    ).style.backgroundColor = ""
+      ; (
+        document.getElementsByClassName(
+          "react-resizable-handle"
+        )[0] as HTMLElement
+      ).style.backgroundColor = ""
     setTimeout(() => {
       setEditorOptions((pre) => {
         return { ...pre, minimap: { enabled: true } }
@@ -142,7 +147,7 @@ const MonacoEditor = observer(function MonacoEditor({
 
     // 遍历每一个具有 pdf-preview 类的元素并设置新宽度
     Array.from(pdfDivs).forEach((pdfDiv) => {
-      ;(pdfDiv as HTMLElement).style.width = newWidth
+      ; (pdfDiv as HTMLElement).style.width = newWidth
     })
 
     setEditorOptions((pre) => {
@@ -182,8 +187,59 @@ const MonacoEditor = observer(function MonacoEditor({
         ],
       },
     })
+    monaco.languages.registerFoldingRangeProvider('markdown', {
+      provideFoldingRanges(model, context, token) {
+        const lineCount = model.getLineCount();
+        const headings: { level: number, line: number }[] = [];
+        let inCodeBlock = false;  // 是否在代码块内
+
+        // 1. 遍历文档，查找标题并忽略代码块内的 #
+        for (let lineNumber = 1; lineNumber <= lineCount; lineNumber++) {
+          const lineContent = model.getLineContent(lineNumber).trim();
+
+          // 检测代码块开始/结束
+          if (/^```/.test(lineContent)) {
+            inCodeBlock = !inCodeBlock; // 切换代码块状态
+            continue; // 跳过代码块行
+          }
+
+          if (!inCodeBlock) { // 只有在代码块外才处理标题
+            const match = /^(#{1,6})\s+/.exec(lineContent);
+            if (match) {
+              const level = match[1].length; // 获取标题级别
+              headings.push({ level, line: lineNumber });
+            }
+          }
+        }
+
+        // 2. 计算折叠区域
+        const ranges = [];
+        for (let i = 0; i < headings.length; i++) {
+          const { level, line: startLine } = headings[i];
+          let endLine = lineCount;  // 默认折叠到文档末尾
+
+          for (let j = i + 1; j < headings.length; j++) {
+            if (headings[j].level <= level) {
+              endLine = headings[j].line - 1;
+              break;
+            }
+          }
+
+          // 处理空行，避免露出多余空行
+          while (endLine > startLine && model.getLineContent(endLine).trim() === '') {
+            endLine--;
+          }
+
+          if (endLine > startLine) {
+            ranges.push({ start: startLine, end: endLine });
+          }
+        }
+        return ranges;
+      }
+    });
+
   }
-  function handleBeforeMount() {}
+  function handleBeforeMount() { }
   /**
    * @description do sth. after mounted.
    */

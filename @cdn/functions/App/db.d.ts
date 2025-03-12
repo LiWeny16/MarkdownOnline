@@ -80,3 +80,13 @@ export declare function cursorDelete(db: IDBDatabase, storeName: string, indexNa
  * @param object dbName 数据库名称
  */
 export declare function deleteDBAll(dbName: string): void;
+/**
+ * 从URL下载JSON并存入indexedDB的cache_db数据库下的data表
+ * @param url JSON文件的URL
+ */
+export declare function fetchAndStoreJSON(url: string, name: string, onProgress?: (progress: number) => void): Promise<void>;
+/**
+ * 根据 ID 读取 IndexedDB 的 data 表中存储的 JSON 数据
+ * @param id 存储时的 ID (比如 "spelling_check" 或 "check_spell")
+ */
+export declare function fetchStoredJSON(id: string): Promise<any | null>;
