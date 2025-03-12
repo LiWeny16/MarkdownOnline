@@ -1,23 +1,35 @@
-// import { insertTextMonacoAtCursor } from "@App/text/insertTextAtCursor"
-import { Monaco } from "@monaco-editor/react"
-import { editor } from "monaco-editor"
+import { isCursorInHtmlBlock } from "@App/text/cursor";
+import { Monaco } from "@monaco-editor/react";
+import { editor } from "monaco-editor";
 
 export default function exeBoldAction(
   editor: editor.IStandaloneCodeEditor,
   monaco: Monaco
 ) {
-  const selection = editor.getSelection()!;
-  const model = editor.getModel()!;
-  let selectedText = model.getValueInRange(selection);
-  let newText;
-  let isBold = selectedText.startsWith("**") && selectedText.endsWith("**");
+  const selection = editor.getSelection();
+  if (!selection) return;
 
-  if (isBold) {
-    // 如果已经加粗，则去除加粗
-    newText = selectedText.slice(2, -2);
+  const model = editor.getModel();
+  if (!model) return;
+
+  let selectedText = model.getValueInRange(selection);
+  let trimmedText = selectedText.trim();
+  let newText;
+
+  // 获取光标位置
+  const position = selection.getStartPosition();
+
+  // 判断是否在 HTML 块级标签内
+  const isInHtmlTag = isCursorInHtmlBlock(model, position);
+
+  if (isInHtmlTag) {
+    // 如果在 HTML 块内，使用 <b></b> 进行加粗
+    const isBoldHtml = trimmedText.startsWith("<b>") && trimmedText.endsWith("</b>");
+    newText = isBoldHtml ? trimmedText.slice(3, -4) : `<b>${trimmedText}</b>`;
   } else {
-    // 如果未加粗，则添加加粗
-    newText = `**${selectedText}**`;
+    // 否则使用 Markdown ** 进行加粗
+    const isFullyBold = trimmedText.startsWith("**") && trimmedText.endsWith("**");
+    newText = isFullyBold ? trimmedText.slice(2, -2) : `**${trimmedText}**`;
   }
 
   var range = new monaco.Range(
@@ -32,14 +44,12 @@ export default function exeBoldAction(
     { range: range, text: newText, forceMoveMarkers: false },
   ]);
 
-  // 如果我们改变了文本，更新选择区域以保持选中的文本高亮显示
-  if (newText !== selectedText) {
-    const newSelection = new monaco.Selection(
-      selection.startLineNumber,
-      selection.startColumn,
-      selection.endLineNumber,
-      selection.startColumn + newText.length // 注意保持endColumn更新正确
-    );
-    editor.setSelection(newSelection);
-  }
+  // 更新选中区域，确保加粗或去掉加粗后依然保持文本高亮
+  const newSelection = new monaco.Selection(
+    selection.startLineNumber,
+    selection.startColumn,
+    selection.startLineNumber,
+    selection.startColumn + newText.length
+  );
+  editor.setSelection(newSelection);
 }
