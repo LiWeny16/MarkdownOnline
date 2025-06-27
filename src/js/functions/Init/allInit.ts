@@ -36,9 +36,11 @@ import noteUseArco from "@App/message/note"
 import { mergeObjects } from "@App/basic/basic"
 import importFilePlugin from "@Func/Parser/mdItPlugin/file"
 import i18n from "i18next"
-import markdownItTOCPlugin from "@Func/Parser/mdItPlugin/TOC"
-import tocPlugin from "@Func/Parser/mdItPlugin/TOC"
+// import markdownItTOCPlugin from "@Func/Parser/mdItPlugin/TOC"
+// import tocPlugin from "@Func/Parser/mdItPlugin/TOC"
 import latexFix from "@Func/Parser/mdItPlugin/latexFix"
+import { tablePlugin } from "@Func/Parser/mdItPlugin/table"
+// import incrementalDomPlugin from "@Func/Parser/mdItPlugin/incremental"
 
 // import { excelParser } from "@App/fileSystem/excel"
 /**
@@ -77,7 +79,9 @@ export function markdownParser() {
     .use(latexFix)
     .use(markdownItLatex)
     .use(importFilePlugin)
+    .use(tablePlugin)
     .use(window.markdownitIncrementalDOM)
+    // .use(incrementalDomPlugin)
   return markdownItParser
 }
 /**
@@ -184,14 +188,14 @@ export default function allInit(
         kind: "info",
       }
     )
-    await kit.sleep(680)
-    noteUseArco(
-      "由于edge最新版bug",
-      "语音识别暂时在edge不可用！",
-      {
-        kind: "error",
-      }
-    )
+    // await kit.sleep(680)
+    // noteUseArco(
+    //   "由于edge最新版bug",
+    //   "语音识别暂时在edge不可用！",
+    //   {
+    //     kind: "error",
+    //   }
+    // )
   })
 
   /**
