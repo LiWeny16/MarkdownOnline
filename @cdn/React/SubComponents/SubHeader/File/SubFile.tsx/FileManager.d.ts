@@ -16,5 +16,8 @@ export default function FileExplorer(props: {
     folderManager: FileFolderManager;
     setIsDragging: Function;
     fillText: Function;
+    onRefresh?: () => void;
+    currentEditingFile?: string;
+    onFileSelect?: (filePath: string) => void;
 }): import("react/jsx-runtime").JSX.Element;
 export {};

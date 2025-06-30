@@ -21,6 +21,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { deleteDBAll, openDB, cursorDelete } from "@App/db.js";
 import { getTheme } from "@App/config/change";
+import { useTranslation } from "react-i18next";
 // THEME
 const theme = createTheme({
     palette: {
@@ -28,6 +29,7 @@ const theme = createTheme({
     },
 });
 const TemporaryDrawer = observer(() => {
+    const { t } = useTranslation();
     const image = useImage();
     const [drawerState, setDrawerState] = React.useState(false);
     const [openConfirmDelState, setOpenConfirmDelState] = React.useState(false);
@@ -56,16 +58,16 @@ const TemporaryDrawer = observer(() => {
     const imgSrc = image.getImages();
     return (_jsxs(_Fragment, { children: [_jsxs(Dialog, { open: openConfirmDelState, onClose: () => {
                     setOpenConfirmDelState(false);
-                }, style: { zIndex: 9999 }, children: [_jsx(DialogTitle, { id: "alert-dialog-title", children: "Ready to delete all the images?" }), _jsx(DialogContent, { children: _jsx(DialogContentText, { id: "alert-dialog-description", children: "Once you have clicked the \"yes\" button, your pictures and your text will be deleted!" }) }), _jsxs(DialogActions, { children: [_jsx(Button, { onClick: () => {
+                }, style: { zIndex: 9999 }, children: [_jsx(DialogTitle, { id: "alert-dialog-title", children: t("t-image-manager-delete-all-title") }), _jsx(DialogContent, { children: _jsx(DialogContentText, { id: "alert-dialog-description", children: t("t-image-manager-delete-all-content") }) }), _jsxs(DialogActions, { children: [_jsx(Button, { onClick: () => {
                                     setOpenConfirmDelState(false);
                                     deleteDBAll("md_content");
                                     // 刷新图片列表而不是重新加载页面
                                     image.refreshImages();
-                                }, children: "YES" }), _jsx(Button, { onClick: () => {
+                                }, children: t("t-image-manager-confirm-yes") }), _jsx(Button, { onClick: () => {
                                     setOpenConfirmDelState(false);
-                                }, autoFocus: true, children: "NO" })] })] }), _jsx(Drawer, { anchor: "bottom", open: drawerState, elevation: 16, onClose: () => {
+                                }, autoFocus: true, children: t("t-image-manager-confirm-no") })] })] }), _jsx(Drawer, { anchor: "bottom", open: drawerState, elevation: 16, onClose: () => {
                     image.hidden();
-                }, children: _jsxs("div", { style: { height: "60vh", overflow: "auto" }, children: [_jsx("div", { children: _jsx(ThemeProvider, { theme: theme, children: _jsx(MyBox, { children: _jsxs(LR, { space: [90], children: [_jsxs(MyBox, { min: 1, move: { x: "5vw" }, children: [_jsx("p", { children: "\u56FE\u7247\u7BA1\u7406\u5668" }), _jsx(Tooltip, { title: _jsxs("div", { children: ["\u7BA1\u7406\u7C98\u8D34\u4E0A\u4F20\u7684\u56FE\u7247", _jsxs("ul", { style: { margin: "2px" }, children: [_jsx("li", { children: "\u6309\u4F4FCtrl\u70B9\u51FB\u56FE\u7247\u63D2\u5165" }), _jsx("li", { children: "\u53CC\u51FB\u56FE\u7247\u653E\u5927\u9884\u89C8" }), _jsx("li", { children: "\u6309\u4F4FAlt\u70B9\u51FB\u56FE\u7247\u590D\u5236\u56FE\u7247" })] })] }), children: _jsx(IconButton, { children: _jsx(HelpOutlineIcon, { color: "primary" }) }) })] }), _jsx(MyBox, { children: _jsx(Tooltip, { title: "\u5220\u9664\u5168\u90E8\u56FE\u7247\u548C\u50A8\u5B58\u7684\u6587\u5B57", children: _jsx(IconButton, { onClick: handleDeleteImg, children: _jsx(DeleteIcon, { color: "primary" }) }) }) })] }) }) }) }), _jsx(Divider, { style: { marginBottom: "1.3vh" } }), imgSrc.length > 0 ? (_jsx("div", { style: {
+                }, children: _jsxs("div", { style: { height: "60vh", overflow: "auto" }, children: [_jsx("div", { children: _jsx(ThemeProvider, { theme: theme, children: _jsx(MyBox, { children: _jsxs(LR, { space: [90], children: [_jsxs(MyBox, { min: 1, move: { x: "5vw" }, children: [_jsx("p", { children: t("t-image-manager-title") }), _jsx(Tooltip, { title: _jsxs("div", { children: [t("t-image-manager-tooltip-title"), _jsxs("ul", { style: { margin: "2px" }, children: [_jsx("li", { children: t("t-image-manager-tooltip-ctrl-click") }), _jsx("li", { children: t("t-image-manager-tooltip-double-click") }), _jsx("li", { children: t("t-image-manager-tooltip-alt-click") })] })] }), children: _jsx(IconButton, { children: _jsx(HelpOutlineIcon, { color: "primary" }) }) })] }), _jsx(MyBox, { children: _jsx(Tooltip, { title: t("t-image-manager-tooltip-delete-all"), children: _jsx(IconButton, { onClick: handleDeleteImg, children: _jsx(DeleteIcon, { color: "primary" }) }) }) })] }) }) }) }), _jsx(Divider, { style: { marginBottom: "1.3vh" } }), imgSrc.length > 0 ? (_jsx("div", { style: {
                                 display: "grid",
                                 gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
                                 gap: "1rem",
@@ -80,7 +82,7 @@ const TemporaryDrawer = observer(() => {
                                     padding: "1rem",
                                     transition: "all 0.2s ease",
                                     border: `1px solid ${currentTheme === "light" ? "#e0e0e0" : "#404040"}`,
-                                }, children: [_jsx(Tooltip, { title: "\u5220\u9664\u6B64\u56FE\u7247", children: _jsx(IconButton, { size: "small", onClick: () => handleDeleteSingleImg(value.uuid), style: {
+                                }, children: [_jsx(Tooltip, { title: t("t-image-manager-tooltip-delete-single"), children: _jsx(IconButton, { size: "small", onClick: () => handleDeleteSingleImg(value.uuid), style: {
                                                 position: "absolute",
                                                 top: "8px",
                                                 right: "8px",
@@ -116,6 +118,6 @@ const TemporaryDrawer = observer(() => {
                                         fontSize: "48px",
                                         marginBottom: "1rem",
                                         opacity: 0.5
-                                    } }), _jsx("h3", { style: { margin: "0 0 0.5rem 0", fontWeight: "normal" }, children: "\u6682\u65E0\u56FE\u7247" }), _jsx("p", { style: { margin: 0, fontSize: "14px" }, children: "\u8BF7\u7C98\u8D34\u56FE\u7247\u5230\u7F16\u8F91\u5668\u4E2D\uFF0C\u56FE\u7247\u5C06\u81EA\u52A8\u4FDD\u5B58\u5230\u6B64\u5904" })] }))] }) })] }));
+                                    } }), _jsx("h3", { style: { margin: "0 0 0.5rem 0", fontWeight: "normal" }, children: t("t-image-manager-no-images-title") }), _jsx("p", { style: { margin: 0, fontSize: "14px" }, children: t("t-image-manager-no-images-description") })] }))] }) })] }));
 });
 export default TemporaryDrawer;

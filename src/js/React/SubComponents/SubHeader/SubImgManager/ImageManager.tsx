@@ -20,6 +20,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { deleteDBAll, openDB, cursorDelete } from "@App/db.js";
 import { getTheme } from "@App/config/change";
+import { useTranslation } from "react-i18next";
 
 // THEME
 const theme = createTheme({
@@ -29,6 +30,7 @@ const theme = createTheme({
 });
 
 const TemporaryDrawer = observer(() => {
+  const { t } = useTranslation();
   const image = useImage();
   const [drawerState, setDrawerState] = React.useState(false);
   const [openConfirmDelState, setOpenConfirmDelState] = React.useState(false);
@@ -68,10 +70,10 @@ const TemporaryDrawer = observer(() => {
         }}
         style={{ zIndex: 9999 }}
       >
-        <DialogTitle id="alert-dialog-title">{"Ready to delete all the images?"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{t("t-image-manager-delete-all-title")}</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Once you have clicked the "yes" button, your pictures and your text will be deleted!
+            {t("t-image-manager-delete-all-content")}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -83,7 +85,7 @@ const TemporaryDrawer = observer(() => {
               image.refreshImages();
             }}
           >
-            YES
+            {t("t-image-manager-confirm-yes")}
           </Button>
           <Button
             onClick={() => {
@@ -91,7 +93,7 @@ const TemporaryDrawer = observer(() => {
             }}
             autoFocus
           >
-            NO
+            {t("t-image-manager-confirm-no")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -109,15 +111,15 @@ const TemporaryDrawer = observer(() => {
               <MyBox>
                 <LR space={[90]}>
                   <MyBox min={1} move={{ x: "5vw" }}>
-                    <p>图片管理器</p>
+                    <p>{t("t-image-manager-title")}</p>
                     <Tooltip
                       title={
                         <div>
-                          管理粘贴上传的图片
+                          {t("t-image-manager-tooltip-title")}
                           <ul style={{ margin: "2px" }}>
-                            <li>按住Ctrl点击图片插入</li>
-                            <li>双击图片放大预览</li>
-                            <li>按住Alt点击图片复制图片</li>
+                            <li>{t("t-image-manager-tooltip-ctrl-click")}</li>
+                            <li>{t("t-image-manager-tooltip-double-click")}</li>
+                            <li>{t("t-image-manager-tooltip-alt-click")}</li>
                           </ul>
                         </div>
                       }
@@ -128,7 +130,7 @@ const TemporaryDrawer = observer(() => {
                     </Tooltip>
                   </MyBox>
                   <MyBox>
-                    <Tooltip title="删除全部图片和储存的文字">
+                    <Tooltip title={t("t-image-manager-tooltip-delete-all")}>
                       <IconButton onClick={handleDeleteImg}>
                         <DeleteIcon color="primary" />
                       </IconButton>
@@ -165,7 +167,7 @@ const TemporaryDrawer = observer(() => {
                   }}
                 >
                   {/* 删除按钮 */}
-                  <Tooltip title="删除此图片">
+                  <Tooltip title={t("t-image-manager-tooltip-delete-single")}>
                     <IconButton
                       size="small"
                       onClick={() => handleDeleteSingleImg(value.uuid)}
@@ -232,10 +234,10 @@ const TemporaryDrawer = observer(() => {
                 opacity: 0.5
               }} />
               <h3 style={{ margin: "0 0 0.5rem 0", fontWeight: "normal" }}>
-                暂无图片
+                {t("t-image-manager-no-images-title")}
               </h3>
               <p style={{ margin: 0, fontSize: "14px" }}>
-                请粘贴图片到编辑器中，图片将自动保存到此处
+                {t("t-image-manager-no-images-description")}
               </p>
             </div>
           )}

@@ -39,7 +39,7 @@ import i18n from "i18next"
 // import markdownItTOCPlugin from "@Func/Parser/mdItPlugin/TOC"
 // import tocPlugin from "@Func/Parser/mdItPlugin/TOC"
 import latexFix from "@Func/Parser/mdItPlugin/latexFix"
-import { tablePlugin } from "@Func/Parser/mdItPlugin/table"
+// import { tablePlugin } from "@Func/Parser/mdItPlugin/table"
 // import incrementalDomPlugin from "@Func/Parser/mdItPlugin/incremental"
 
 // import { excelParser } from "@App/fileSystem/excel"
@@ -188,14 +188,6 @@ export default function allInit(
         kind: "info",
       }
     )
-    // await kit.sleep(680)
-    // noteUseArco(
-    //   "由于edge最新版bug",
-    //   "语音识别暂时在edge不可用！",
-    //   {
-    //     kind: "error",
-    //   }
-    // )
   })
 
   /**

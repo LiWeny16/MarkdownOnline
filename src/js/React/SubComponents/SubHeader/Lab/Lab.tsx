@@ -80,7 +80,7 @@ export default function Lab(props: any) {
                     // 还没到 2 秒，等待剩余时间
                     setTimeout(() => {
                         if (!isCancelled) {
-                            alertUseArco("成功安装字典！", 2000, { kind: "success" })
+                            alertUseArco(t("t-lab-install-success"), 2000, { kind: "success" })
 
                             setInstallStatus((prev) => ({ ...prev, [id]: "installed" }));
                             setEnabledStatus((prev) => ({ ...prev, [id]: true }));
@@ -89,7 +89,7 @@ export default function Lab(props: any) {
                 } else {
                     // 下载已经超过 2 秒，直接进入“已安装”状态
                     if (!isCancelled) {
-                        alertUseArco("成功安装字典！", 2000, { kind: "success" })
+                        alertUseArco(t("t-lab-install-success"), 2000, { kind: "success" })
 
                         setInstallStatus((prev) => ({ ...prev, [id]: "installed" }));
                         setEnabledStatus((prev) => ({ ...prev, [id]: true }));
@@ -141,14 +141,14 @@ export default function Lab(props: any) {
     // 卡片数据
     const cardData = [
         {
-            title: "Spelling Association",
-            description: "拼写补全(只支持英文),安装会在本地下载词典",
+            title: t("t-lab-card-spelling-association-title"),
+            description: t("t-lab-card-spelling-association-desc"),
             url: `https://${window._cdn.cdn[0]}/npm/an-array-of-english-words@2.0.0/index.json`,
             id: "spelling_data_json"
         },
         {
-            title: "Spelling Check",
-            description: "拼写检查,经费不足,咱不用了！",
+            title: t("t-lab-card-spelling-check-title"),
+            description: t("t-lab-card-spelling-check-desc"),
             url: "https://jsonplaceholder.typicode.com/todos/2",
             id: "check_spell"
         }
@@ -187,7 +187,7 @@ export default function Lab(props: any) {
                 >
                     {/* 标题部分 */}
                     <Typography fontSize={30} fontWeight="bold" textAlign="center">
-                        前端实验室
+                        {t("t-lab-title")}
                     </Typography>
                     <Divider sx={{ width: "100%", my: 2 }} />
 
@@ -243,7 +243,7 @@ export default function Lab(props: any) {
                                                 }}
                                                 onClick={() => handleCardAction(index, "install")}
                                             >
-                                                安装
+                                                {t("t-lab-button-install")}
                                             </Button>
                                         )}
 
@@ -272,7 +272,7 @@ export default function Lab(props: any) {
                                                     sx={{ flex: 1 }}
                                                     onClick={() => handleCardAction(index, "uninstall")}
                                                 >
-                                                    卸载
+                                                    {t("t-lab-button-uninstall")}
                                                 </Button>
                                                 <Button
                                                     variant="contained"
@@ -280,7 +280,7 @@ export default function Lab(props: any) {
                                                     sx={{ flex: 1 }}
                                                     onClick={() => handleCardAction(index, "toggleEnable")}
                                                 >
-                                                    {isEnabled ? "禁用" : "启用"}
+                                                    {isEnabled ? t("t-lab-button-disable") : t("t-lab-button-enable")}
                                                 </Button>
                                             </>
                                         )}
@@ -293,7 +293,7 @@ export default function Lab(props: any) {
                 </Box>
             </Dialog>
             <ScienceIcon />
-            <Typography>{"前端实验室"}</Typography>
+            <Typography>{t("t-lab-title")}</Typography>
         </>
     );
 }

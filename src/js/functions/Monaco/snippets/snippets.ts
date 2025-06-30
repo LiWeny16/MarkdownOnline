@@ -55,7 +55,7 @@ export async function monacoSnippets(
 ) {
 
   /**
-   * @补全普通提示，采用“/”触发提示
+   * @补全普通提示，采用"/"触发提示
    *
    */
   monaco.languages.registerCompletionItemProvider("markdown", {
@@ -68,12 +68,115 @@ export async function monacoSnippets(
         endLineNumber: position.lineNumber,
         endColumn: position.column,
       })
+      
+      // 获取当前行光标前的文本
+      const currentLineText = model.getValueInRange({
+        startLineNumber: position.lineNumber,
+        startColumn: 1,
+        endLineNumber: position.lineNumber,
+        endColumn: position.column,
+      })
+      
       const rangeWithFirstLetter = {
         startLineNumber: position.lineNumber,
         startColumn: position.column - 1, // 包括"/"字符
         endLineNumber: position.lineNumber,
         endColumn: position.column,
       }
+      
+      // 检查是否是动态表格模式 (支持多种输入状态)
+      const tablePatterns = [
+        { pattern: /\/table(\d+)x(\d+)$/i, type: 'complete' },  // /table5x8
+        { pattern: /\/table(\d+)x$/i, type: 'partial' },        // /table5x
+        { pattern: /\/table(\d+)$/i, type: 'square' },          // /table5 (默认正方形)
+        { pattern: /\/table$/i, type: 'basic' }                 // /table
+      ]
+      
+      for (const tablePattern of tablePatterns) {
+        const match = currentLineText.match(tablePattern.pattern)
+        if (match && !isInLatexBlock(textUntilPosition)) {
+          const dynamicRange = {
+            startLineNumber: position.lineNumber,
+            startColumn: position.column - currentLineText.length + currentLineText.lastIndexOf('/'),
+            endLineNumber: position.lineNumber,
+            endColumn: position.column,
+          }
+          
+          let suggestions: any[] = []
+          
+          if (tablePattern.type === 'complete') {
+            // /table5x8 - 完整格式
+            const rows = parseInt(match[1])
+            const cols = parseInt(match[2])
+            if (rows > 0 && cols > 0 && rows <= 20 && cols <= 20) {
+              suggestions.push({
+                label: `/table${rows}x${cols} (${rows}行${cols}列表格)`,
+                detail: `插入一个${rows}行${cols}列的表格`,
+                kind: monaco.languages.CompletionItemKind.Function,
+                insertText: generateDynamicTable(rows, cols),
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                sortText: "0",
+                range: dynamicRange,
+              })
+            }
+          } else if (tablePattern.type === 'partial') {
+            // /table5x - 等待列数
+            const rows = parseInt(match[1])
+            if (rows > 0 && rows <= 20) {
+              suggestions.push({
+                label: `/table${rows}x... (${rows}行表格)`,
+                detail: `继续输入列数，如 /table${rows}x3`,
+                kind: monaco.languages.CompletionItemKind.Function,
+                insertText: `table${rows}x`,
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                sortText: "0",
+                range: dynamicRange,
+              })
+            }
+          } else if (tablePattern.type === 'square') {
+            // /table5 - 默认正方形表格
+            const size = parseInt(match[1])
+            if (size > 0 && size <= 20) {
+              suggestions.push({
+                label: `/table${size} (${size}x${size}正方形表格)`,
+                detail: `插入一个${size}行${size}列的正方形表格`,
+                kind: monaco.languages.CompletionItemKind.Function,
+                insertText: generateDynamicTable(size, size),
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                sortText: "0",
+                range: dynamicRange,
+              })
+              // 同时提供继续输入x的选项
+              suggestions.push({
+                label: `/table${size}x... (自定义${size}行表格)`,
+                detail: `输入x后继续指定列数`,
+                kind: monaco.languages.CompletionItemKind.Function,
+                insertText: `table${size}x`,
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                sortText: "1",
+                range: dynamicRange,
+              })
+            }
+          } else if (tablePattern.type === 'basic') {
+            // /table - 基础提示
+            suggestions.push({
+              label: "/table (n行m列表格)",
+              detail: "如 /table3 或 /table3x5",
+              kind: monaco.languages.CompletionItemKind.Function,
+              insertText: "table",
+              insertTextRules:
+                monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              sortText: "2",
+              range: dynamicRange,
+            })
+          }
+          
+          if (suggestions.length > 0) {
+            return { suggestions }
+          }
+        }
+      }
+      
       if (!isInLatexBlock(textUntilPosition) && position.column === 2) {
         let _suggestions = [
           {
@@ -101,31 +204,13 @@ export async function monacoSnippets(
             range: rangeWithFirstLetter,
           },
           {
-            label: "/table-2x2 (表格)",
-            detail: "插入一个2行2列的表格",
+            label: "/table (n行m列表格)",
+            detail: "如 /table3 或 /table3x5",
             kind: monaco.languages.CompletionItemKind.Function,
-            insertText: `
-|\${1:}    |\${1:}     |
-|--- |---  |
-|\${1:}    |\${1:}     |
-`,
+            insertText: "table",
             insertTextRules:
               monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             sortText: "2",
-            range: rangeWithFirstLetter,
-          },
-          {
-            label: "/table-2x4 (表格)",
-            detail: "插入一个2行4列的表格",
-            kind: monaco.languages.CompletionItemKind.Function,
-            insertText: `
-|\${1:}    |\${1:}    |\${1:}    |\${1:}    |
-|--- |--- |--- |--- |
-|\${1:}    |\${1:}    |\${1:}    |\${1:}    |
-`,
-            insertTextRules:
-              monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            sortText: "3",
             range: rangeWithFirstLetter,
           },
           {
@@ -875,4 +960,41 @@ export function isNeedToUseCodeIntellisense(textUntilPosition: string) {
     window.monaco.editor.setModelLanguage(window.editor.getModel(), "markdown")
     return false
   }
+}
+
+/**
+ * @description 生成动态表格文本
+ * @param rows 行数
+ * @param cols 列数
+ * @returns 表格的markdown文本
+ */
+export function generateDynamicTable(rows: number, cols: number): string {
+  if (rows <= 0 || cols <= 0) return ""
+  
+  let tableText = "\n"
+  
+  // 生成表头
+  let headerRow = "|"
+  for (let col = 0; col < cols; col++) {
+    headerRow += `\${${col + 1}:}    |`
+  }
+  tableText += headerRow + "\n"
+  
+  // 生成分隔行
+  let separatorRow = "|"
+  for (let col = 0; col < cols; col++) {
+    separatorRow += "--- |"
+  }
+  tableText += separatorRow + "\n"
+  
+  // 生成数据行
+  for (let row = 1; row < rows; row++) {
+    let dataRow = "|"
+    for (let col = 0; col < cols; col++) {
+      dataRow += `\${${cols + row * cols + col + 1}:}    |`
+    }
+    tableText += dataRow + "\n"
+  }
+  
+  return tableText
 }

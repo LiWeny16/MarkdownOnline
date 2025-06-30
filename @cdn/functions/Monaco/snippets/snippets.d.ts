@@ -12,3 +12,10 @@ export declare function isInLatexBlock(textUntilPosition: string): boolean;
 export declare function isInLatexInline(model: editor.ITextModel, position: Position, textUntilPosition: string): boolean;
 export declare function isNeedToUseClueIntellisense(textUntilPosition: string): boolean;
 export declare function isNeedToUseCodeIntellisense(textUntilPosition: string): boolean;
+/**
+ * @description 生成动态表格文本
+ * @param rows 行数
+ * @param cols 列数
+ * @returns 表格的markdown文本
+ */
+export declare function generateDynamicTable(rows: number, cols: number): string;

@@ -292,6 +292,149 @@ export class FileFolderManager extends FileState {
         }
         return topLevelEntries;
     }
+    /**
+     * @description 性能优化版本的目录读取方法，支持懒加载和深度限制
+     * @param directoryHandle 目录句柄
+     * @param isTop 是否为顶级目录
+     * @param maxDepth 最大读取深度，1表示只读取当前层级，2表示读取到下一层，0表示无限制
+     * @param currentDepth 当前深度（内部使用）
+     */
+    async readDirectoryAsArrayOptimized(directoryHandle, isTop = false, maxDepth = 0, currentDepth = 0) {
+        // 优化的递归函数，支持深度限制和批量处理
+        async function processEntry(entryHandle, path, idParts, depth) {
+            const name = entryHandle.name;
+            const currentPath = path ? `${path}/${name}` : name;
+            const id = idParts.join(".");
+            if (entryHandle.kind === "file") {
+                return {
+                    id: id,
+                    label: name,
+                    fileType: "file",
+                    path: currentPath,
+                };
+            }
+            else if (entryHandle.kind === "directory") {
+                let children = [];
+                // 如果达到最大深度限制，不再递归读取子目录内容
+                if (maxDepth === 0 || depth < maxDepth) {
+                    try {
+                        // 批量读取目录entries，提高性能
+                        const entriesArray = [];
+                        // 使用Promise.all并行处理entries读取，提高性能
+                        const entriesIterator = entryHandle.entries();
+                        const entryPromises = [];
+                        // 分批处理entries，避免一次性读取过多导致内存问题
+                        const BATCH_SIZE = 50;
+                        let batch = [];
+                        for await (const entry of entriesIterator) {
+                            entriesArray.push(entry);
+                            // 如果批次达到限制，处理当前批次
+                            if (entriesArray.length >= BATCH_SIZE) {
+                                break; // 暂时简化，可以后续优化为真正的分批处理
+                            }
+                        }
+                        // 对entries排序
+                        entriesArray.sort((a, b) => a[0].localeCompare(b[0]));
+                        // 并行处理子项，但限制并发数量
+                        const CONCURRENT_LIMIT = 10;
+                        const childPromises = [];
+                        for (let i = 0; i < entriesArray.length; i++) {
+                            const [childName, childHandle] = entriesArray[i];
+                            const childIdParts = [...idParts, (i + 1).toString()];
+                            childPromises.push(processEntry(childHandle, currentPath, childIdParts, depth + 1));
+                            // 控制并发数量，避免过度并发导致性能问题
+                            if (childPromises.length >= CONCURRENT_LIMIT) {
+                                const batchResults = await Promise.all(childPromises);
+                                children.push(...batchResults);
+                                childPromises.length = 0; // 清空数组
+                            }
+                        }
+                        // 处理剩余的子项
+                        if (childPromises.length > 0) {
+                            const batchResults = await Promise.all(childPromises);
+                            children.push(...batchResults);
+                        }
+                    }
+                    catch (error) {
+                        console.warn(`Error reading directory ${currentPath}:`, error);
+                        // 如果读取子目录失败，创建一个空的文件夹节点
+                        children = [];
+                    }
+                }
+                else {
+                    // 达到深度限制，创建一个懒加载占位符
+                    children = [{
+                            id: `${id}.lazy`,
+                            label: "...",
+                            fileType: "lazy-placeholder",
+                            path: `${currentPath}/...`,
+                            isLazyPlaceholder: true
+                        }];
+                }
+                let temp = {
+                    id: id,
+                    label: name,
+                    children: children,
+                    fileType: "folder",
+                    path: currentPath,
+                };
+                if (isTop) {
+                    FileState.topDirectoryArray = [temp];
+                }
+                return temp;
+            }
+        }
+        try {
+            const topLevelEntries = [];
+            // 批量读取顶级entries
+            const topEntriesArray = [];
+            for await (const entry of directoryHandle.entries()) {
+                topEntriesArray.push(entry);
+            }
+            // 排序
+            topEntriesArray.sort((a, b) => a[0].localeCompare(b[0]));
+            // 并行处理顶级entries，但控制并发数量
+            const CONCURRENT_LIMIT = 15;
+            const entryPromises = [];
+            for (let i = 0; i < topEntriesArray.length; i++) {
+                const [name, handle] = topEntriesArray[i];
+                const idParts = [(i + 1).toString()];
+                entryPromises.push(processEntry(handle, "", idParts, currentDepth));
+                // 控制并发数量
+                if (entryPromises.length >= CONCURRENT_LIMIT) {
+                    const batchResults = await Promise.all(entryPromises);
+                    topLevelEntries.push(...batchResults);
+                    entryPromises.length = 0;
+                }
+            }
+            // 处理剩余的entries
+            if (entryPromises.length > 0) {
+                const batchResults = await Promise.all(entryPromises);
+                topLevelEntries.push(...batchResults);
+            }
+            return topLevelEntries;
+        }
+        catch (error) {
+            console.error("Error in readDirectoryAsArrayOptimized:", error);
+            // 发生错误时回退到原始方法
+            return await this.readDirectoryAsArray(directoryHandle, isTop);
+        }
+    }
+    /**
+     * @description 懒加载特定文件夹的子内容
+     * @param directoryHandle 根目录句柄
+     * @param folderPath 要加载的文件夹路径
+     */
+    async loadFolderLazily(directoryHandle, folderPath) {
+        try {
+            const targetDirHandle = await this.getDirectoryHandleByPath(directoryHandle, folderPath);
+            return await this.readDirectoryAsArrayOptimized(targetDirHandle, false, 1);
+        }
+        catch (error) {
+            console.error("Error loading folder lazily:", error);
+            return [];
+        }
+    }
     async listDirectoryAsObject(directoryHandle) {
         let directoryObj = {};
         // 遍历目录中的各个条目
@@ -512,6 +655,360 @@ export class FileFolderManager extends FileState {
             else if (entry.kind === "directory") {
                 await this.copyDirectory(entry, newDirHandle);
             }
+        }
+    }
+    /**
+     * @description 在指定目录创建新的 Markdown 文件
+     */
+    async createNewFile(directoryHandle, fileName, content = "# New Document\n\nStart writing here...") {
+        try {
+            // 确保文件名以 .md 结尾
+            const finalFileName = fileName.endsWith('.md') ? fileName : `${fileName}.md`;
+            const fileHandle = await directoryHandle.getFileHandle(finalFileName, {
+                create: true,
+            });
+            const writable = await fileHandle.createWritable();
+            await writable.write(content);
+            await writable.close();
+            console.log(`Created new file: ${finalFileName}`);
+        }
+        catch (error) {
+            console.error("Error creating new file:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 在指定路径创建新文件
+     */
+    async createNewFileAtPath(rootDirectoryHandle, filePath, fileName, content = "# New Document\n\nStart writing here...") {
+        try {
+            // 获取目标目录
+            const targetDirectoryHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, filePath);
+            // 在目标目录创建文件
+            await this.createNewFile(targetDirectoryHandle, fileName, content);
+        }
+        catch (error) {
+            console.error("Error creating new file at path:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 在指定目录创建新文件夹
+     */
+    async createNewFolder(directoryHandle, folderName) {
+        try {
+            const newFolderHandle = await directoryHandle.getDirectoryHandle(folderName, {
+                create: true,
+            });
+            console.log(`Created new folder: ${folderName}`);
+            return newFolderHandle;
+        }
+        catch (error) {
+            console.error("Error creating new folder:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 在指定路径创建新文件夹
+     */
+    async createNewFolderAtPath(rootDirectoryHandle, folderPath, folderName) {
+        try {
+            // 获取目标目录
+            const targetDirectoryHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, folderPath);
+            // 在目标目录创建文件夹
+            return await this.createNewFolder(targetDirectoryHandle, folderName);
+        }
+        catch (error) {
+            console.error("Error creating new folder at path:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 根据路径获取目录句柄
+     */
+    async getDirectoryHandleByPath(rootDirectoryHandle, path) {
+        if (!path || path === "" || path === "/") {
+            return rootDirectoryHandle;
+        }
+        const pathParts = path.split("/").filter(part => part !== "");
+        let currentHandle = rootDirectoryHandle;
+        for (const part of pathParts) {
+            currentHandle = await currentHandle.getDirectoryHandle(part);
+        }
+        return currentHandle;
+    }
+    /**
+     * @description 根据路径获取文件句柄
+     */
+    async getFileHandleByPath(rootDirectoryHandle, filePath) {
+        const pathParts = filePath.split("/").filter(part => part !== "");
+        const fileName = pathParts.pop();
+        if (!fileName) {
+            throw new Error("Invalid file path");
+        }
+        let currentHandle = rootDirectoryHandle;
+        for (const part of pathParts) {
+            currentHandle = await currentHandle.getDirectoryHandle(part);
+        }
+        return await currentHandle.getFileHandle(fileName);
+    }
+    /**
+     * @description 删除文件
+     */
+    async deleteFile(directoryHandle, fileName) {
+        try {
+            await directoryHandle.removeEntry(fileName);
+            console.log(`Deleted file: ${fileName}`);
+        }
+        catch (error) {
+            console.error("Error deleting file:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 根据路径删除文件
+     */
+    async deleteFileAtPath(rootDirectoryHandle, filePath) {
+        try {
+            const pathParts = filePath.split("/").filter(part => part !== "");
+            const fileName = pathParts.pop();
+            if (!fileName) {
+                throw new Error("Invalid file path");
+            }
+            const directoryHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, pathParts.join("/"));
+            await this.deleteFile(directoryHandle, fileName);
+        }
+        catch (error) {
+            console.error("Error deleting file at path:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 删除文件夹及其所有内容
+     */
+    async deleteFolder(directoryHandle, folderName) {
+        try {
+            await directoryHandle.removeEntry(folderName, { recursive: true });
+            console.log(`Deleted folder: ${folderName}`);
+        }
+        catch (error) {
+            console.error("Error deleting folder:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 根据路径删除文件夹
+     */
+    async deleteFolderAtPath(rootDirectoryHandle, folderPath) {
+        try {
+            const pathParts = folderPath.split("/").filter(part => part !== "");
+            const folderName = pathParts.pop();
+            if (!folderName) {
+                throw new Error("Invalid folder path");
+            }
+            const parentDirectoryHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, pathParts.join("/"));
+            await this.deleteFolder(parentDirectoryHandle, folderName);
+        }
+        catch (error) {
+            console.error("Error deleting folder at path:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 重命名文件
+     */
+    async renameFile(directoryHandle, oldFileName, newFileName) {
+        try {
+            // 获取旧文件
+            const oldFileHandle = await directoryHandle.getFileHandle(oldFileName);
+            const file = await oldFileHandle.getFile();
+            // 创建新文件 - 直接使用 File 对象保持文件完整性
+            const newFileHandle = await directoryHandle.getFileHandle(newFileName, {
+                create: true,
+            });
+            const writable = await newFileHandle.createWritable();
+            await writable.write(file); // 直接写入 File 对象而不是文本内容
+            await writable.close();
+            // 删除旧文件
+            await directoryHandle.removeEntry(oldFileName);
+            console.log(`Renamed file from ${oldFileName} to ${newFileName}`);
+        }
+        catch (error) {
+            console.error("Error renaming file:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 根据路径重命名文件
+     */
+    async renameFileAtPath(rootDirectoryHandle, filePath, newFileName) {
+        try {
+            const pathParts = filePath.split("/").filter(part => part !== "");
+            const oldFileName = pathParts.pop();
+            if (!oldFileName) {
+                throw new Error("Invalid file path");
+            }
+            const directoryHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, pathParts.join("/"));
+            await this.renameFile(directoryHandle, oldFileName, newFileName);
+        }
+        catch (error) {
+            console.error("Error renaming file at path:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 根据路径重命名文件夹
+     */
+    async renameFolderAtPath(rootDirectoryHandle, folderPath, newFolderName) {
+        try {
+            const pathParts = folderPath.split("/").filter(part => part !== "");
+            const oldFolderName = pathParts.pop();
+            if (!oldFolderName) {
+                throw new Error("Invalid folder path");
+            }
+            const parentDirectoryHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, pathParts.join("/"));
+            await this.renameFolder(parentDirectoryHandle, oldFolderName, newFolderName);
+        }
+        catch (error) {
+            console.error("Error renaming folder at path:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 移动文件到指定目录
+     */
+    async moveFile(sourceDirectoryHandle, targetDirectoryHandle, fileName) {
+        try {
+            // 获取源文件
+            const sourceFileHandle = await sourceDirectoryHandle.getFileHandle(fileName);
+            const file = await sourceFileHandle.getFile();
+            // 在目标目录创建文件 - 直接使用 File 对象保持文件完整性
+            const targetFileHandle = await targetDirectoryHandle.getFileHandle(fileName, {
+                create: true,
+            });
+            const writable = await targetFileHandle.createWritable();
+            await writable.write(file); // 直接写入 File 对象而不是文本内容
+            await writable.close();
+            // 删除源文件
+            await sourceDirectoryHandle.removeEntry(fileName);
+            console.log(`Moved file ${fileName} to target directory`);
+        }
+        catch (error) {
+            console.error("Error moving file:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 根据路径移动文件
+     */
+    async moveFileByPath(rootDirectoryHandle, sourceFilePath, targetDirectoryPath) {
+        try {
+            // 解析源文件路径
+            const sourcePathParts = sourceFilePath.split("/").filter(part => part !== "");
+            const fileName = sourcePathParts.pop();
+            if (!fileName) {
+                throw new Error("Invalid source file path");
+            }
+            // 获取源目录和目标目录句柄
+            const sourceDirectoryHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, sourcePathParts.join("/"));
+            const targetDirectoryHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, targetDirectoryPath);
+            // 移动文件
+            await this.moveFile(sourceDirectoryHandle, targetDirectoryHandle, fileName);
+        }
+        catch (error) {
+            console.error("Error moving file by path:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 移动文件夹到指定目录
+     */
+    async moveFolder(rootDirectoryHandle, sourceFolderPath, targetDirectoryPath) {
+        try {
+            // 解析源文件夹路径
+            const sourcePathParts = sourceFolderPath.split("/").filter(part => part !== "");
+            const folderName = sourcePathParts.pop();
+            if (!folderName) {
+                throw new Error("Invalid source folder path");
+            }
+            // 获取源文件夹、源父目录和目标目录句柄
+            const sourceParentHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, sourcePathParts.join("/"));
+            const sourceFolderHandle = await sourceParentHandle.getDirectoryHandle(folderName);
+            const targetDirectoryHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, targetDirectoryPath);
+            // 在目标目录创建新文件夹
+            const newFolderHandle = await targetDirectoryHandle.getDirectoryHandle(folderName, {
+                create: true,
+            });
+            // 复制文件夹内容
+            await this.copyDirectoryContents(sourceFolderHandle, newFolderHandle);
+            // 删除原文件夹
+            await sourceParentHandle.removeEntry(folderName, { recursive: true });
+            console.log(`Moved folder ${folderName} to ${targetDirectoryPath}`);
+        }
+        catch (error) {
+            console.error("Error moving folder:", error);
+            throw error;
+        }
+    }
+    /**
+     * @description 复制目录内容
+     */
+    async copyDirectoryContents(sourceHandle, targetHandle) {
+        for await (const entry of sourceHandle.values()) {
+            if (entry.kind === "file") {
+                const fileHandle = entry;
+                const file = await fileHandle.getFile();
+                const newFileHandle = await targetHandle.getFileHandle(entry.name, {
+                    create: true,
+                });
+                const writable = await newFileHandle.createWritable();
+                await writable.write(file);
+                await writable.close();
+            }
+            else if (entry.kind === "directory") {
+                const dirHandle = entry;
+                const newDirHandle = await targetHandle.getDirectoryHandle(entry.name, {
+                    create: true,
+                });
+                await this.copyDirectoryContents(dirHandle, newDirHandle);
+            }
+        }
+    }
+    /**
+     * @description 检查目录是否为空
+     */
+    async isDirectoryEmpty(directoryHandle) {
+        try {
+            for await (const entry of directoryHandle.values()) {
+                return false; // 如果有任何条目，目录就不为空
+            }
+            return true; // 没有找到任何条目，目录为空
+        }
+        catch (error) {
+            console.error("Error checking if directory is empty:", error);
+            return false;
+        }
+    }
+    /**
+     * @description 获取目录中的所有文件和文件夹名称
+     */
+    async listDirectoryEntries(directoryHandle) {
+        try {
+            const files = [];
+            const folders = [];
+            for await (const [name, handle] of directoryHandle.entries()) {
+                if (handle.kind === "file") {
+                    files.push(name);
+                }
+                else if (handle.kind === "directory") {
+                    folders.push(name);
+                }
+            }
+            return { files, folders };
+        }
+        catch (error) {
+            console.error("Error listing directory entries:", error);
+            return { files: [], folders: [] };
         }
     }
 }

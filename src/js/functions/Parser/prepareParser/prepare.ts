@@ -11,6 +11,26 @@ import { importRegex } from "../mdItPlugin/file"
  */
 export default async function prepareParser(originalMd: string) {
   /**
+   * @description 渲染mermaid, 等待更新，全量渲染性能消耗巨大
+   */
+  async function prepareMermaid(mermaidToken: { content: any }) {
+    let src = mermaidToken.content
+    let parsedSrc
+    try {
+      await mermaid.parse(src, { suppressErrors: false })
+      if (await mermaid.parse(src, { suppressErrors: true })) {
+        parsedSrc = await mermaid.render(
+          `_mermaidSvg_${kit.getUUID().slice(0, 5)}`,
+          src
+        )
+      }
+      return parsedSrc!.svg
+    } catch (error) {
+      return `<pre class="ERR">Mermaid 渲染失败</pre>`
+    }
+  }
+
+  /**
    * 处理 PDF 文件的导入并生成 Base64 URL
    * @param {string} filePath - 文件路径
    * @returns {Promise<string>} - Base64 编码的 PDF URL
@@ -30,9 +50,11 @@ export default async function prepareParser(originalMd: string) {
 
         // 将 PDF 内容转换为 Base64 URL
         return `${pdfContent}`
-      } 
+      } else {
+        return `<div class="ERR">PDF 读取失败：请先打开本地文件夹</div>`
+      }
     } catch (error) {
-      console.log(error);
+      return `<div class="ERR">PDF 读取失败：文件不存在或路径错误</div>`
     }
   }
 
@@ -42,41 +64,64 @@ export default async function prepareParser(originalMd: string) {
   async function prepareImage(imageToken: { attrGet: (arg0: string) => any }) {
     let src = imageToken.attrGet("src")
     if (src.startsWith("/vf/")) {
-      let imgId = src.match(/\d+/)[0]
+      // VF 图片处理保持原样
+      let imgId = src.match(/\d+/)?.[0]
+      if (!imgId) {
+        return undefined
+      }
+      
       return await readMemoryImg("uuid", parseInt(imgId)).then((e) => {
-        return e[0].imgBase64
+        if (e && e[0] && e[0].imgBase64) {
+          return e[0].imgBase64
+        } else {
+          return undefined
+        }
+      }).catch(() => {
+        return undefined
       })
     } else if (src.startsWith("./")) {
-      const folderManager = new FileFolderManager()
+      // 相对路径图片处理
+      try {
+        const folderManager = new FileFolderManager()
 
-      if (folderManager.getTopDirectoryHandle()) {
-        return await folderManager.readFileContent(
-          folderManager.getTopDirectoryHandle()!,
-          decodeURIComponent(src).slice(2),
-          true
-        )
+        if (folderManager.getTopDirectoryHandle()) {
+          return await folderManager.readFileContent(
+            folderManager.getTopDirectoryHandle()!,
+            decodeURIComponent(src).slice(2),
+            true
+          )
+        } else {
+          // 未打开文件夹的提示 - 双语错误提示
+          const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120">
+            <rect width="400" height="120" fill="#f5f5f5" stroke="#d9d9d9" stroke-width="1" rx="4"/>
+            <text x="200" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#d32f2f">Image Error</text>
+            <text x="200" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">Please check if local folder is opened</text>
+            <text x="200" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">or path is correct</text>
+            <text x="200" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">请检查是否打开本地文件夹或路径是否正确</text>
+          </svg>`
+          // 手动编码为 base64，避免 btoa 中文问题
+          const base64 = btoa(unescape(encodeURIComponent(svgContent)))
+          return `data:image/svg+xml;base64,${base64}`
+        }
+      } catch (error) {
+        // 路径错误或文件不存在的提示 - 双语错误提示  
+        const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120">
+          <rect width="400" height="120" fill="#f5f5f5" stroke="#d9d9d9" stroke-width="1" rx="4"/>
+          <text x="200" y="35" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#d32f2f">Image Error</text>
+          <text x="200" y="60" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">Please check if local folder is opened</text>
+          <text x="200" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#666">or path is correct</text>
+          <text x="200" y="105" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" fill="#999">请检查是否打开本地文件夹或路径是否正确</text>
+        </svg>`
+        // 手动编码为 base64，避免 btoa 中文问题
+        const base64 = btoa(unescape(encodeURIComponent(svgContent)))
+        return `data:image/svg+xml;base64,${base64}`
       }
+    } else {
+      // 其他类型的 src，返回原始值
+      return src
     }
   }
-  /**
-   * @description 渲染mermaid, 等待更新，全量渲染性能消耗巨大
-   */
-  async function prepareMermaid(mermaidToken: { content: any }) {
-    let src = mermaidToken.content
-    let parsedSrc
-    try {
-      await mermaid.parse(src, { suppressErrors: false })
-      if (await mermaid.parse(src, { suppressErrors: true })) {
-        parsedSrc = await mermaid.render(
-          `_mermaidSvg_${kit.getUUID().slice(0, 5)}`,
-          src
-        )
-      }
-      return parsedSrc!.svg
-    } catch (error) {
-      return `<pre class="ERR">${error}</pre>`
-    }
-  }
+
   /**
    * @description 预渲染设计思路，首先需要window._prepareData.envCache这个变量，并且是存储在indexedDB中的
    * 其次还需要window._prepareData.srcMap并且每次预渲染都要重建，在每次预渲染中比对srcMap的一致性，如果一致，
@@ -120,14 +165,20 @@ export default async function prepareParser(originalMd: string) {
     return ""
   }
   md.render(originalMd, {}) //预先解析一次找出所有图片token
+  
+  // 处理图片 token
   for (const imageToken of imageTokens) {
     let temp = await prepareImage(imageToken) //异步获取图片链接并替换
     vfImgSrcArr.push(temp)
   }
+  
+  // 处理 mermaid token
   for (const mermaidToken of mermaidTokens) {
     let temp = await prepareMermaid(mermaidToken)
     mermaidParsedArr.push(temp)
   }
+  
+  // 处理 PDF token
   for (const pdfToken of pdfTokens) {
     let temp = await preparePDF(pdfToken)
     pdfParsedArr.push(temp)

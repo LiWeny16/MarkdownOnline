@@ -7,6 +7,7 @@ import {
 import { FileFolderManager, FileManager } from "@App/fileSystem/file"
 import { getMdTextFromMonaco } from "@App/text/getMdText"
 import { replaceMonacoAll, replaceMonacoAllForce } from "@App/text/replaceText"
+import { mdConverter } from "@Root/js"
 import {
   Backdrop,
   Box,
@@ -47,14 +48,19 @@ const FileDrawer = observer(function FileDrawer() {
   const { t } = useTranslation()
   const [fileDirectoryArr, setFileDirectoryArr] = React.useState<any>([])
   const [editingFileName, setEditingFileName] = React.useState("")
+  const [currentEditingFilePath, setCurrentEditingFilePath] = React.useState<string>("")
   const [isPinned, setIsPinned] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   window._setIsDragging = setIsDragging
   const theme = useTheme()
+
+  const debouncedRefreshRef = React.useRef<NodeJS.Timeout>()
+  
   const fillText = (content: string | undefined, fileName: string) => {
     // 使用 Monaco 编辑器显示文件内容
     replaceMonacoAll(window.monaco, window.editor, content)
-    alertUseArco(`打开${fileName}成功！😀`)
+    alertUseArco(`${t("t-file-manager-open-success")}${fileName}！😀`)
   }
   const toggleDrawer = (newOpen: boolean) => () => {
     if (!isPinned) {
@@ -83,10 +89,12 @@ const FileDrawer = observer(function FileDrawer() {
         return
       }
       setEditingFileName(fileHandle.name)
+      setCurrentEditingFilePath(fileHandle.name)
       setFileDirectoryArr([
         {
           id: "1." + fileHandle.name,
           label: fileHandle.name,
+          path: fileHandle.name,
           fileType: fileHandle.kind,
         },
       ])
@@ -102,34 +110,139 @@ const FileDrawer = observer(function FileDrawer() {
     }
   }
 
-  // 改进的 onClickOpenFolder 函数
+  // 优化的 onClickOpenFolder 函数 - 添加懒加载和性能优化
   const onClickOpenFolder = async () => {
-    let fileFolderManager = folderManager
+    try {
+      setIsLoading(true)
+      let fileFolderManager = folderManager
 
-    // 先停止旧文件夹的监控（如果存在）
-    fileFolderManager.stopWatching()
+      // 先停止旧文件夹的监控（如果存在）
+      fileFolderManager.stopWatching()
 
-    const directoryHandle = await fileFolderManager.openDirectory()
-    if (directoryHandle) {
-      let folderTopStackArray = await fileFolderManager.readDirectoryAsArray(
-        directoryHandle,
-        true
-      )
-
-      // 启动新的文件夹监控
-      fileFolderManager.watchDirectory(async () => {
-        let folderTopStackArray = await fileFolderManager.readDirectoryAsArray(
+      const directoryHandle = await fileFolderManager.openDirectory()
+      if (directoryHandle) {
+        // 显示加载提示
+        alertUseArco(t("t-file-manager-loading"), 1000, { kind: "info" })
+        
+        // 使用优化的懒加载方法读取目录
+        let folderTopStackArray = await fileFolderManager.readDirectoryAsArrayOptimized(
           directoryHandle,
-          true
+          true,
+          1 // 只加载第一层，后续懒加载
         )
+
+        // 启动优化的文件夹监控 - 增加监控间隔，减少性能开销
+        fileFolderManager.watchDirectory(async () => {
+          // 清除之前的防抖定时器
+          if (debouncedRefreshRef.current) {
+            clearTimeout(debouncedRefreshRef.current)
+          }
+          
+          // 防抖刷新，避免频繁更新
+          debouncedRefreshRef.current = setTimeout(async () => {
+            try {
+              let folderTopStackArray = await fileFolderManager.readDirectoryAsArrayOptimized(
+                directoryHandle,
+                true,
+                1 // 保持懒加载模式
+              )
+              fileFolderManager.topDirectoryArray = folderTopStackArray
+              setFileDirectoryArr(folderTopStackArray)
+            } catch (error) {
+              console.error("Error during watch refresh:", error)
+            }
+          }, 500) // 500ms防抖延迟
+        }, 3000) // 增加监控间隔到3秒，减少性能开销
+
         fileFolderManager.topDirectoryArray = folderTopStackArray
         setFileDirectoryArr(folderTopStackArray)
-      }, 1700)
-
-      fileFolderManager.topDirectoryArray = folderTopStackArray
-      setFileDirectoryArr(folderTopStackArray)
+        
+        // 检查是否为空文件夹
+        if (!folderTopStackArray || folderTopStackArray.length === 0) {
+          alertUseArco(t("t-file-manager-empty-folder"), 2000, { kind: "info" })
+        }
+        
+        // 异步重新渲染markdown，避免阻塞UI
+        setTimeout(async () => {
+          try {
+            await mdConverter(false)
+            console.log('Markdown re-rendered after opening folder')
+          } catch (error) {
+            console.error('Error re-rendering markdown:', error)
+          }
+        }, 100)
+      }
+    } catch (error) {
+      console.error("Error opening folder:", error)
+      alertUseArco(t("t-error-opening-folder"), 2000, { kind: "error" })
+    } finally {
+      setIsLoading(false)
     }
   }
+
+  // 优化的刷新文件目录函数
+  const refreshDirectory = async () => {
+    const directoryHandle = folderManager.getTopDirectoryHandle()
+    if (directoryHandle) {
+      try {
+        setIsLoading(true)
+        // 使用优化的方法刷新，只刷新当前展开的层级
+        let folderTopStackArray = await folderManager.readDirectoryAsArrayOptimized(
+          directoryHandle,
+          true,
+          1 // 保持懒加载模式
+        )
+        folderManager.topDirectoryArray = folderTopStackArray
+        setFileDirectoryArr(folderTopStackArray)
+        
+        // 如果当前编辑的文件不存在于新的文件树中，清空选中状态
+        if (currentEditingFilePath) {
+          const fileExists = checkFileExistsInTree(folderTopStackArray, currentEditingFilePath)
+          if (!fileExists) {
+            console.log(`Current editing file '${currentEditingFilePath}' no longer exists, clearing selection`)
+            setCurrentEditingFilePath("")
+          }
+        }
+      } catch (error) {
+        console.error("Error refreshing directory:", error)
+        // 发生错误时也清空选中状态，确保不显示已不存在的文件
+        if (currentEditingFilePath) {
+          console.log("Error occurred during refresh, clearing file selection")
+          setCurrentEditingFilePath("")
+        }
+      } finally {
+        setIsLoading(false)
+      }
+    }
+  }
+
+  // 辅助函数：递归检查文件是否存在于文件树中
+  const checkFileExistsInTree = (tree: any[], filePath: string): boolean => {
+    if (!tree || tree.length === 0) return false
+    
+    for (const item of tree) {
+      // 直接匹配路径
+      if (item.path === filePath) {
+        return true
+      }
+      // 递归检查子项
+      if (item.children && Array.isArray(item.children)) {
+        if (checkFileExistsInTree(item.children, filePath)) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
+  // 清理防抖定时器
+  React.useEffect(() => {
+    return () => {
+      if (debouncedRefreshRef.current) {
+        clearTimeout(debouncedRefreshRef.current)
+      }
+    }
+  }, [])
 
   const startButtonStyle = { width: "53%", height: "6svh", mb: "10px" }
   const TransparentBackdrop = styled(Backdrop)({
@@ -137,8 +250,22 @@ const FileDrawer = observer(function FileDrawer() {
     // pointerEvents: "none", // 使点击事件穿透
   })
 
+  // 文件选中回调函数
+  const handleFileSelect = React.useCallback((filePath: string) => {
+    setCurrentEditingFilePath(filePath)
+    console.log('Current editing file set to:', filePath)
+  }, [])
+
   return (
     <>
+      <style>
+        {`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}
+      </style>
       <Drawer
         PaperProps={{
           style: {
@@ -291,6 +418,9 @@ const FileDrawer = observer(function FileDrawer() {
                       fillText={fillText}
                       setIsDragging={setIsDragging}
                       fileDirectoryArr={fileDirectoryArr}
+                      onRefresh={refreshDirectory}
+                      currentEditingFile={currentEditingFilePath}
+                      onFileSelect={handleFileSelect}
                     />
                   </ScrollableBox>
                 </>
@@ -302,6 +432,20 @@ const FileDrawer = observer(function FileDrawer() {
                       width: "100%",
                     }}
                   >
+                    {isLoading && (
+                      <Box sx={{ mb: 2, display: "flex", alignItems: "center", gap: 1 }}>
+                        <div style={{ 
+                          animation: 'spin 1s linear infinite', 
+                          fontSize: '1.2rem',
+                          color: theme.palette.primary.main 
+                        }}>
+                          ⟳
+                        </div>
+                        <Typography variant="body2" color="primary">
+                          {t("t-file-manager-loading")}
+                        </Typography>
+                      </Box>
+                    )}
                     <Typography>
                       {getSettings().basic.fileEditLocal ? editingFileName : ""}
                     </Typography>
@@ -310,6 +454,7 @@ const FileDrawer = observer(function FileDrawer() {
                       onClick={onClickOpenSingleFile}
                       variant="contained"
                       color="primary"
+                      disabled={isLoading}
                     >
                       {/* 打开文件 */}
                       {t("t-file-manager-open-file")}
@@ -319,6 +464,7 @@ const FileDrawer = observer(function FileDrawer() {
                       variant="contained"
                       color="primary"
                       onClick={onClickOpenFolder}
+                      disabled={isLoading}
                     >
                       {/* 打开文件夹 */}
                       {t("t-file-manager-open-folder")}
@@ -329,6 +475,7 @@ const FileDrawer = observer(function FileDrawer() {
                       onClick={() => {
                         fileManager.saveAsFile(getMdTextFromMonaco())
                       }}
+                      disabled={isLoading}
                     >
                       {/* 另存为 */}
                       {t("t-file-manager-saveAs")}

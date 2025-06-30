@@ -110,3 +110,38 @@ body {
 .line-hilight {
   transition: 0.3s;
 }
+
+// 统一滚动条样式类
+.uniform-scroller {
+  &::-webkit-scrollbar {
+    width: 6px; /* 更窄的滚动条宽度 */
+    height: 6px; /* 水平滚动条高度 */
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent; /* 无背景track */
+    border-radius: 0;
+    margin: 0; /* 去掉边距 */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2); /* 半透明的滚动条 */
+    border-radius: 3px;
+    transition: background 0.2s ease;
+    border: none; /* 去掉边框 */
+    margin: 0; /* 去掉边距 */
+    
+    &:hover {
+      background: rgba(0, 0, 0, 0.4); /* 悬停时更明显 */
+    }
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+    margin: 0; /* 去掉边距 */
+  }
+
+  /* 确保滚动条紧贴右边 */
+  scrollbar-width: thin; /* Firefox 支持 */
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent; /* Firefox 滚动条颜色 */
+}

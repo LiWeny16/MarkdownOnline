@@ -1,7 +1,8 @@
 import welcomeText from "@Asset/welcome.md?raw"
+import welcomeTextEn from "@Asset/welcome-en.md?raw"
 // import getMdText from "@App/text/getMdText"
 import { fillInMemoryText, readMemoryText } from "@App/memory/memory"
-import { changeStatesMemorable } from "@App/config/change"
+import { changeStatesMemorable, getSettings } from "@App/config/change"
 // let welcomeText
 
 /**
@@ -14,6 +15,10 @@ export default function blankTextInit() {
         window.editor.setValue(list[0].contentText)
         resolve()
       } else {
+        // 根据语言设置选择对应的欢迎文本
+        const currentLanguage = getSettings().basic.language || "zh"
+        const selectedWelcomeText = currentLanguage === "en" ? welcomeTextEn : welcomeText
+        
         // changeStatesMemorable({ memorable: { welcomeAnimationState: true } })
         // fetch(
         //   "https://jsd.onmicrosoft.cn/gh/LiWeny16/MarkdownOnline@main/src/assets/welcome.md"
@@ -26,7 +31,7 @@ export default function blankTextInit() {
         //   .catch((error) => {
         //     console.error("Error fetching markdown:", error)
         //   })
-        window.editor.setValue(welcomeText)
+        window.editor.setValue(selectedWelcomeText)
         resolve()
       }
     })

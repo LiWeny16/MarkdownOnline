@@ -71,7 +71,7 @@ export default function Lab(props) {
                     // 还没到 2 秒，等待剩余时间
                     setTimeout(() => {
                         if (!isCancelled) {
-                            alertUseArco("成功安装字典！", 2000, { kind: "success" });
+                            alertUseArco(t("t-lab-install-success"), 2000, { kind: "success" });
                             setInstallStatus((prev) => ({ ...prev, [id]: "installed" }));
                             setEnabledStatus((prev) => ({ ...prev, [id]: true }));
                         }
@@ -80,7 +80,7 @@ export default function Lab(props) {
                 else {
                     // 下载已经超过 2 秒，直接进入“已安装”状态
                     if (!isCancelled) {
-                        alertUseArco("成功安装字典！", 2000, { kind: "success" });
+                        alertUseArco(t("t-lab-install-success"), 2000, { kind: "success" });
                         setInstallStatus((prev) => ({ ...prev, [id]: "installed" }));
                         setEnabledStatus((prev) => ({ ...prev, [id]: true }));
                     }
@@ -120,14 +120,14 @@ export default function Lab(props) {
     // 卡片数据
     const cardData = [
         {
-            title: "Spelling Association",
-            description: "拼写补全(只支持英文),安装会在本地下载词典",
+            title: t("t-lab-card-spelling-association-title"),
+            description: t("t-lab-card-spelling-association-desc"),
             url: `https://${window._cdn.cdn[0]}/npm/an-array-of-english-words@2.0.0/index.json`,
             id: "spelling_data_json"
         },
         {
-            title: "Spelling Check",
-            description: "拼写检查,经费不足,咱不用了！",
+            title: t("t-lab-card-spelling-check-title"),
+            description: t("t-lab-card-spelling-check-desc"),
             url: "https://jsonplaceholder.typicode.com/todos/2",
             id: "check_spell"
         }
@@ -148,7 +148,7 @@ export default function Lab(props) {
                         padding: "24px",
                         boxShadow: "0 8px 16px rgba(0, 0, 0, 0.2)",
                         alignItems: "center",
-                    }, children: [_jsx(Typography, { fontSize: 30, fontWeight: "bold", textAlign: "center", children: "\u524D\u7AEF\u5B9E\u9A8C\u5BA4" }), _jsx(Divider, { sx: { width: "100%", my: 2 } }), _jsx(Box, { sx: {
+                    }, children: [_jsx(Typography, { fontSize: 30, fontWeight: "bold", textAlign: "center", children: t("t-lab-title") }), _jsx(Divider, { sx: { width: "100%", my: 2 } }), _jsx(Box, { sx: {
                                 display: "flex",
                                 flexWrap: "wrap",
                                 justifyContent: "center",
@@ -170,12 +170,12 @@ export default function Lab(props) {
                                                         flex: 1,
                                                         minWidth: "64px", // 使按钮宽度保持一致
                                                         height: "42px", // 统一按钮高度
-                                                    }, onClick: () => handleCardAction(index, "install"), children: "\u5B89\u88C5" })), status === "downloading" && (_jsx(Button, { variant: "contained", color: "error", sx: {
+                                                    }, onClick: () => handleCardAction(index, "install"), children: t("t-lab-button-install") })), status === "downloading" && (_jsx(Button, { variant: "contained", color: "error", sx: {
                                                         flex: 1,
                                                         display: "flex",
                                                         minWidth: "64px", // 使按钮宽度保持一致
                                                         height: "42px", // 统一按钮高度
                                                         alignItems: "center", justifyContent: "center"
-                                                    }, onClick: () => handleCardAction(index, "stop"), children: _jsx(CircularProgress, { size: 20, sx: { color: "white", marginRight: 1 } }) })), status === "installed" && (_jsxs(_Fragment, { children: [_jsx(Button, { variant: "contained", color: "secondary", sx: { flex: 1 }, onClick: () => handleCardAction(index, "uninstall"), children: "\u5378\u8F7D" }), _jsx(Button, { variant: "contained", color: isEnabled ? "success" : "warning", sx: { flex: 1 }, onClick: () => handleCardAction(index, "toggleEnable"), children: isEnabled ? "禁用" : "启用" })] }))] })] }, index));
-                            }) })] }) }), _jsx(ScienceIcon, {}), _jsx(Typography, { children: "前端实验室" })] }));
+                                                    }, onClick: () => handleCardAction(index, "stop"), children: _jsx(CircularProgress, { size: 20, sx: { color: "white", marginRight: 1 } }) })), status === "installed" && (_jsxs(_Fragment, { children: [_jsx(Button, { variant: "contained", color: "secondary", sx: { flex: 1 }, onClick: () => handleCardAction(index, "uninstall"), children: t("t-lab-button-uninstall") }), _jsx(Button, { variant: "contained", color: isEnabled ? "success" : "warning", sx: { flex: 1 }, onClick: () => handleCardAction(index, "toggleEnable"), children: isEnabled ? t("t-lab-button-disable") : t("t-lab-button-enable") })] }))] })] }, index));
+                            }) })] }) }), _jsx(ScienceIcon, {}), _jsx(Typography, { children: t("t-lab-title") })] }));
 }
