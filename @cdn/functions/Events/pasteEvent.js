@@ -2,8 +2,10 @@ import { insertTextMonacoAtCursor } from "@App/text/insertTextAtCursor";
 import { fillInMemoryImgs, } from "@App/memory/memory";
 import { getSettings } from "@App/config/change";
 import { FileFolderManager, supportedImageExtensions, } from "@App/fileSystem/file";
+import { useImage } from "@Mobx/Image";
 const basicStyle = getSettings().advanced.imageSettings.basicStyle;
 const folderManager = new FileFolderManager();
+const imageStore = useImage(); // 获取图片store实例
 /**
  * @description handle native event
  */
@@ -28,6 +30,8 @@ export function monacoPasteEvent(editor, monaco) {
                         insertImgText += `![${basicStyle}](/vf/${timeStamp + i})`;
                     }
                     fillInMemoryImgs(base64Arr, timeStamp);
+                    // 刷新图片列表
+                    imageStore.refreshImages();
                 }
                 else {
                     let path = getSettings().advanced.imageSettings.imgStorePath;

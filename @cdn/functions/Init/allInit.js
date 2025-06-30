@@ -29,7 +29,6 @@ import i18n from "i18next";
 // import markdownItTOCPlugin from "@Func/Parser/mdItPlugin/TOC"
 // import tocPlugin from "@Func/Parser/mdItPlugin/TOC"
 import latexFix from "@Func/Parser/mdItPlugin/latexFix";
-import { tablePlugin } from "@Func/Parser/mdItPlugin/table";
 // import incrementalDomPlugin from "@Func/Parser/mdItPlugin/incremental"
 // import { excelParser } from "@App/fileSystem/excel"
 /**
@@ -68,7 +67,7 @@ export function markdownParser() {
         .use(latexFix)
         .use(markdownItLatex)
         .use(importFilePlugin)
-        .use(tablePlugin)
+        // .use(tablePlugin)
         .use(window.markdownitIncrementalDOM);
     // .use(incrementalDomPlugin)
     return markdownItParser;

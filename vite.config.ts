@@ -15,6 +15,7 @@ export default defineConfig({
   build: {
     target: "esnext",
     rollupOptions: {
+      treeshake:true,
       // 配置rollup的一些构建策略
       external: [
         "react",

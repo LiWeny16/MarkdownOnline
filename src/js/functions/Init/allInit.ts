@@ -79,7 +79,7 @@ export function markdownParser() {
     .use(latexFix)
     .use(markdownItLatex)
     .use(importFilePlugin)
-    .use(tablePlugin)
+    // .use(tablePlugin)
     .use(window.markdownitIncrementalDOM)
     // .use(incrementalDomPlugin)
   return markdownItParser
