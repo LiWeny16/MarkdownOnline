@@ -1,4 +1,43 @@
 import alertUseArco from "@App/message/alert";
+// 全局ID生成器，确保整个应用中ID的唯一性
+class UniqueIdGenerator {
+    constructor() {
+        Object.defineProperty(this, "counter", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: 0
+        });
+        Object.defineProperty(this, "baseTimestamp", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: void 0
+        });
+        this.baseTimestamp = Date.now();
+    }
+    static getInstance() {
+        if (!UniqueIdGenerator.instance) {
+            UniqueIdGenerator.instance = new UniqueIdGenerator();
+        }
+        return UniqueIdGenerator.instance;
+    }
+    generateId(path, isLazyPlaceholder = false) {
+        // 使用路径作为id基础，将特殊字符转换为安全字符
+        const basedId = path
+            .replace(/[\/\\]/g, '_') // 替换路径分隔符
+            .replace(/[^a-zA-Z0-9_-]/g, '_') // 替换其他特殊字符
+            .replace(/_+/g, '_') // 合并连续的下划线
+            .replace(/^_|_$/g, '') || 'root'; // 去除首尾下划线，空路径使用'root'
+        // 使用基础时间戳、递增计数器和随机数确保唯一性
+        this.counter++;
+        const randomSuffix = Math.floor(Math.random() * 10000);
+        const suffix = isLazyPlaceholder ? '.lazy' : '';
+        return `${basedId}_${this.baseTimestamp}_${this.counter}_${randomSuffix}${suffix}`;
+    }
+}
+// 导出单例实例
+const idGenerator = UniqueIdGenerator.getInstance();
 // 基础扩展名数组（不包含点号）
 export const supportFileTypes = [
     "md",
@@ -185,6 +224,12 @@ export class FileFolderManager extends FileState {
             writable: true,
             value: null
         });
+        Object.defineProperty(this, "lastLazyLoadTime", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: 0
+        }); // 添加懒加载时间戳跟踪
     }
     // Getter for fileState
     get topDirectoryArray() {
@@ -236,10 +281,10 @@ export class FileFolderManager extends FileState {
     }
     async readDirectoryAsArray(directoryHandle, isTop = false) {
         // 递归函数来读取和处理子目录及文件
-        async function processEntry(entryHandle, path, idParts) {
+        async function processEntry(entryHandle, path) {
             const name = entryHandle.name;
             const currentPath = path ? `${path}/${name}` : name;
-            const id = idParts.join(".");
+            const id = idGenerator.generateId(currentPath);
             if (entryHandle.kind === "file") {
                 return {
                     id: id,
@@ -258,8 +303,7 @@ export class FileFolderManager extends FileState {
                 }
                 entriesArray.sort((a, b) => a[0].localeCompare(b[0]));
                 for (const [childName, childHandle] of entriesArray) {
-                    const childIdParts = [...idParts, index.toString()];
-                    const childEntry = await processEntry(childHandle, currentPath, childIdParts);
+                    const childEntry = await processEntry(childHandle, currentPath);
                     children.push(childEntry);
                     index++;
                 }
@@ -284,9 +328,9 @@ export class FileFolderManager extends FileState {
             topEntriesArray.push([name, handle]);
         }
         topEntriesArray.sort((a, b) => a[0].localeCompare(b[0]));
-        for (const [name, handle] of topEntriesArray) {
-            const idParts = [index.toString()];
-            const entry = await processEntry(handle, "", idParts);
+        for (let i = 0; i < topEntriesArray.length; i++) {
+            const [name, handle] = topEntriesArray[i];
+            const entry = await processEntry(handle, "");
             topLevelEntries.push(entry);
             index++;
         }
@@ -301,10 +345,10 @@ export class FileFolderManager extends FileState {
      */
     async readDirectoryAsArrayOptimized(directoryHandle, isTop = false, maxDepth = 0, currentDepth = 0) {
         // 优化的递归函数，支持深度限制和批量处理
-        async function processEntry(entryHandle, path, idParts, depth) {
+        async function processEntry(entryHandle, path, depth) {
             const name = entryHandle.name;
             const currentPath = path ? `${path}/${name}` : name;
-            const id = idParts.join(".");
+            const id = idGenerator.generateId(currentPath);
             if (entryHandle.kind === "file") {
                 return {
                     id: id,
@@ -340,8 +384,7 @@ export class FileFolderManager extends FileState {
                         const childPromises = [];
                         for (let i = 0; i < entriesArray.length; i++) {
                             const [childName, childHandle] = entriesArray[i];
-                            const childIdParts = [...idParts, (i + 1).toString()];
-                            childPromises.push(processEntry(childHandle, currentPath, childIdParts, depth + 1));
+                            childPromises.push(processEntry(childHandle, currentPath, depth + 1));
                             // 控制并发数量，避免过度并发导致性能问题
                             if (childPromises.length >= CONCURRENT_LIMIT) {
                                 const batchResults = await Promise.all(childPromises);
@@ -349,27 +392,26 @@ export class FileFolderManager extends FileState {
                                 childPromises.length = 0; // 清空数组
                             }
                         }
-                        // 处理剩余的子项
+                        // 处理剩余的promises
                         if (childPromises.length > 0) {
                             const batchResults = await Promise.all(childPromises);
                             children.push(...batchResults);
                         }
                     }
                     catch (error) {
-                        console.warn(`Error reading directory ${currentPath}:`, error);
-                        // 如果读取子目录失败，创建一个空的文件夹节点
-                        children = [];
+                        console.error(`Error reading directory ${currentPath}:`, error);
+                        // 出错时返回空子项，但不影响整体结构
                     }
                 }
                 else {
-                    // 达到深度限制，创建一个懒加载占位符
-                    children = [{
-                            id: `${id}.lazy`,
-                            label: "...",
-                            fileType: "lazy-placeholder",
-                            path: `${currentPath}/...`,
-                            isLazyPlaceholder: true
-                        }];
+                    // 达到深度限制，添加懒加载占位符
+                    const lazyPlaceholderId = idGenerator.generateId(`${currentPath}/[lazy-placeholder]`, true);
+                    children.push({
+                        id: lazyPlaceholderId,
+                        label: "...",
+                        fileType: "lazy-placeholder",
+                        path: `${currentPath}/[lazy-placeholder]`,
+                    });
                 }
                 let temp = {
                     id: id,
@@ -383,13 +425,15 @@ export class FileFolderManager extends FileState {
                 }
                 return temp;
             }
+            // 添加默认返回值以防止编译错误
+            return null;
         }
         try {
             const topLevelEntries = [];
-            // 批量读取顶级entries
+            // 读取顶级目录entries
             const topEntriesArray = [];
-            for await (const entry of directoryHandle.entries()) {
-                topEntriesArray.push(entry);
+            for await (const [name, handle] of directoryHandle.entries()) {
+                topEntriesArray.push([name, handle]);
             }
             // 排序
             topEntriesArray.sort((a, b) => a[0].localeCompare(b[0]));
@@ -398,8 +442,7 @@ export class FileFolderManager extends FileState {
             const entryPromises = [];
             for (let i = 0; i < topEntriesArray.length; i++) {
                 const [name, handle] = topEntriesArray[i];
-                const idParts = [(i + 1).toString()];
-                entryPromises.push(processEntry(handle, "", idParts, currentDepth));
+                entryPromises.push(processEntry(handle, "", currentDepth));
                 // 控制并发数量
                 if (entryPromises.length >= CONCURRENT_LIMIT) {
                     const batchResults = await Promise.all(entryPromises);
@@ -427,11 +470,70 @@ export class FileFolderManager extends FileState {
      */
     async loadFolderLazily(directoryHandle, folderPath) {
         try {
+            // 更新懒加载时间戳
+            this.lastLazyLoadTime = Date.now();
             const targetDirHandle = await this.getDirectoryHandleByPath(directoryHandle, folderPath);
-            return await this.readDirectoryAsArrayOptimized(targetDirHandle, false, 1);
+            // 修复：传入正确的基础路径，这样生成的文件路径会包含完整的相对路径
+            const children = await this.readDirectoryAsArrayLazilyWithPath(targetDirHandle, folderPath, 1);
+            return children;
         }
         catch (error) {
             console.error("Error loading folder lazily:", error);
+            return [];
+        }
+    }
+    /**
+     * @description 懒加载的专用方法，正确处理路径
+     */
+    async readDirectoryAsArrayLazilyWithPath(directoryHandle, basePath, maxDepth = 1) {
+        try {
+            // 递归处理目录条目
+            async function processEntry(entryHandle, parentPath) {
+                const name = entryHandle.name;
+                const currentPath = parentPath ? `${parentPath}/${name}` : name;
+                const fullPath = basePath ? `${basePath}/${currentPath}` : currentPath;
+                const id = idGenerator.generateId(fullPath);
+                if (entryHandle.kind === "file") {
+                    return {
+                        id: id,
+                        label: name,
+                        fileType: "file",
+                        path: fullPath,
+                    };
+                }
+                else if (entryHandle.kind === "directory") {
+                    // 对于懒加载，目前只读取一层深度
+                    const lazyPlaceholderId = idGenerator.generateId(`${fullPath}/[lazy-placeholder]`, true);
+                    return {
+                        id: id,
+                        label: name,
+                        fileType: "folder",
+                        path: fullPath,
+                        children: [{
+                                id: lazyPlaceholderId,
+                                label: "...",
+                                fileType: "lazy-placeholder",
+                                path: `${fullPath}/[lazy-placeholder]`,
+                            }]
+                    };
+                }
+            }
+            const children = [];
+            // 读取目录entries
+            const entriesArray = [];
+            for await (const [name, handle] of directoryHandle.entries()) {
+                entriesArray.push([name, handle]);
+            }
+            // 排序
+            entriesArray.sort((a, b) => a[0].localeCompare(b[0]));
+            for (const [name, handle] of entriesArray) {
+                const entry = await processEntry(handle, "");
+                children.push(entry);
+            }
+            return children;
+        }
+        catch (error) {
+            console.error("Error in readDirectoryAsArrayLazilyWithPath:", error);
             return [];
         }
     }
@@ -452,26 +554,42 @@ export class FileFolderManager extends FileState {
         return directoryObj;
     }
     async readFileContent(directoryHandle, filePath, isFile = false) {
+        console.log('readFileContent called with filePath:', filePath); // 添加调试信息
         // 解码文件路径，确保包含中文和空格的路径可以正确处理
         // console.log(filePath);
         const decodedFilePath = decodeURIComponent(filePath);
+        console.log('decodedFilePath:', decodedFilePath); // 添加调试信息
         const pathParts = decodedFilePath.split("/");
+        console.log('pathParts:', pathParts); // 添加调试信息
         let currentHandle = directoryHandle;
         // 递归遍历目录以找到目标文件
         for (let i = 0; i < pathParts.length - 1; i++) {
             const part = pathParts[i];
             if (part) {
+                console.log('Navigating to directory:', part); // 添加调试信息
                 currentHandle = await currentHandle.getDirectoryHandle(part);
             }
         }
         // 获取文件名
         const fileName = pathParts[pathParts.length - 1];
+        console.log('Getting file:', fileName); // 添加调试信息
+        // 调试：列出当前目录的所有文件
+        console.log('Current directory contents:');
+        try {
+            for await (const [name, handle] of currentHandle.entries()) {
+                console.log('  -', name, handle.kind);
+            }
+        }
+        catch (error) {
+            console.error('Error listing directory contents:', error);
+        }
         // 检查文件扩展名
         const fileExtension = fileName.split(".").pop()?.toLowerCase();
         if (!fileExtension) {
             throw new Error("无法识别文件扩展名。");
         }
         // 获取文件句柄
+        console.log('Attempting to get file handle for:', fileName);
         const fileHandle = await currentHandle.getFileHandle(fileName);
         // 检查文件类型是否支持
         if (isFile) {
@@ -882,8 +1000,11 @@ export class FileFolderManager extends FileState {
             // 获取源文件
             const sourceFileHandle = await sourceDirectoryHandle.getFileHandle(fileName);
             const file = await sourceFileHandle.getFile();
-            // 在目标目录创建文件 - 直接使用 File 对象保持文件完整性
-            const targetFileHandle = await targetDirectoryHandle.getFileHandle(fileName, {
+            // 检查目标目录中是否有重名文件
+            const { files } = await this.listDirectoryEntries(targetDirectoryHandle);
+            const uniqueFileName = this.generateUniqueFileName(files, fileName);
+            // 在目标目录创建文件 - 使用唯一文件名
+            const targetFileHandle = await targetDirectoryHandle.getFileHandle(uniqueFileName, {
                 create: true,
             });
             const writable = await targetFileHandle.createWritable();
@@ -891,7 +1012,8 @@ export class FileFolderManager extends FileState {
             await writable.close();
             // 删除源文件
             await sourceDirectoryHandle.removeEntry(fileName);
-            console.log(`Moved file ${fileName} to target directory`);
+            console.log(`Moved file ${fileName} to target directory as ${uniqueFileName}`);
+            return uniqueFileName; // 返回实际使用的文件名
         }
         catch (error) {
             console.error("Error moving file:", error);
@@ -912,8 +1034,9 @@ export class FileFolderManager extends FileState {
             // 获取源目录和目标目录句柄
             const sourceDirectoryHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, sourcePathParts.join("/"));
             const targetDirectoryHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, targetDirectoryPath);
-            // 移动文件
-            await this.moveFile(sourceDirectoryHandle, targetDirectoryHandle, fileName);
+            // 移动文件并返回实际使用的文件名
+            const actualFileName = await this.moveFile(sourceDirectoryHandle, targetDirectoryHandle, fileName);
+            return actualFileName;
         }
         catch (error) {
             console.error("Error moving file by path:", error);
@@ -935,15 +1058,19 @@ export class FileFolderManager extends FileState {
             const sourceParentHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, sourcePathParts.join("/"));
             const sourceFolderHandle = await sourceParentHandle.getDirectoryHandle(folderName);
             const targetDirectoryHandle = await this.getDirectoryHandleByPath(rootDirectoryHandle, targetDirectoryPath);
-            // 在目标目录创建新文件夹
-            const newFolderHandle = await targetDirectoryHandle.getDirectoryHandle(folderName, {
+            // 检查目标目录中是否有重名文件夹
+            const { folders } = await this.listDirectoryEntries(targetDirectoryHandle);
+            const uniqueFolderName = this.generateUniqueFolderName(folders, folderName);
+            // 在目标目录创建新文件夹 - 使用唯一文件夹名
+            const newFolderHandle = await targetDirectoryHandle.getDirectoryHandle(uniqueFolderName, {
                 create: true,
             });
             // 复制文件夹内容
             await this.copyDirectoryContents(sourceFolderHandle, newFolderHandle);
             // 删除原文件夹
             await sourceParentHandle.removeEntry(folderName, { recursive: true });
-            console.log(`Moved folder ${folderName} to ${targetDirectoryPath}`);
+            console.log(`Moved folder ${folderName} to ${targetDirectoryPath} as ${uniqueFolderName}`);
+            return uniqueFolderName; // 返回实际使用的文件夹名
         }
         catch (error) {
             console.error("Error moving folder:", error);
@@ -1010,5 +1137,39 @@ export class FileFolderManager extends FileState {
             console.error("Error listing directory entries:", error);
             return { files: [], folders: [] };
         }
+    }
+    /**
+     * @description 生成唯一文件名，避免重名冲突
+     */
+    generateUniqueFileName(existingNames, baseName) {
+        if (!existingNames.includes(baseName)) {
+            return baseName;
+        }
+        // 分离文件名和扩展名
+        const lastDotIndex = baseName.lastIndexOf('.');
+        const nameWithoutExt = lastDotIndex > 0 ? baseName.substring(0, lastDotIndex) : baseName;
+        const extension = lastDotIndex > 0 ? baseName.substring(lastDotIndex) : '';
+        let counter = 2;
+        let newName;
+        do {
+            newName = `${nameWithoutExt} (${counter})${extension}`;
+            counter++;
+        } while (existingNames.includes(newName) && counter < 1000); // 防止无限循环
+        return newName;
+    }
+    /**
+     * @description 生成唯一文件夹名，避免重名冲突
+     */
+    generateUniqueFolderName(existingNames, baseName) {
+        if (!existingNames.includes(baseName)) {
+            return baseName;
+        }
+        let counter = 2;
+        let newName;
+        do {
+            newName = `${baseName} (${counter})`;
+            counter++;
+        } while (existingNames.includes(newName) && counter < 1000); // 防止无限循环
+        return newName;
     }
 }

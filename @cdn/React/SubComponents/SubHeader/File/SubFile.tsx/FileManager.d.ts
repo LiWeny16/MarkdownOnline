@@ -17,7 +17,9 @@ export default function FileExplorer(props: {
     setIsDragging: Function;
     fillText: Function;
     onRefresh?: () => void;
+    onManualRefresh?: (operationType?: string) => Promise<void>;
     currentEditingFile?: string;
     onFileSelect?: (filePath: string) => void;
+    onLoadLazily?: (itemId: string, folderPath: string) => Promise<void>;
 }): import("react/jsx-runtime").JSX.Element;
 export {};

@@ -51,6 +51,7 @@ export declare class FileFolderManager extends FileState {
     protected currentDirectoryHandle: FileSystemDirectoryHandle | undefined;
     protected isWatching: boolean;
     watchInterval: ReturnType<typeof setInterval> | null;
+    lastLazyLoadTime: number;
     constructor(directoryHandle?: FileSystemDirectoryHandle);
     get topDirectoryArray(): Array<any>;
     set topDirectoryArray(state: any);
@@ -79,6 +80,10 @@ export declare class FileFolderManager extends FileState {
      * @param folderPath 要加载的文件夹路径
      */
     loadFolderLazily(directoryHandle: FileSystemDirectoryHandle, folderPath: string): Promise<any[]>;
+    /**
+     * @description 懒加载的专用方法，正确处理路径
+     */
+    private readDirectoryAsArrayLazilyWithPath;
     listDirectoryAsObject(directoryHandle: any): Promise<any>;
     readFileContent(directoryHandle: FileSystemDirectoryHandle, filePath: string, isFile?: boolean): Promise<string>;
     /**
@@ -150,15 +155,15 @@ export declare class FileFolderManager extends FileState {
     /**
      * @description 移动文件到指定目录
      */
-    moveFile(sourceDirectoryHandle: FileSystemDirectoryHandle, targetDirectoryHandle: FileSystemDirectoryHandle, fileName: string): Promise<void>;
+    moveFile(sourceDirectoryHandle: FileSystemDirectoryHandle, targetDirectoryHandle: FileSystemDirectoryHandle, fileName: string): Promise<string>;
     /**
      * @description 根据路径移动文件
      */
-    moveFileByPath(rootDirectoryHandle: FileSystemDirectoryHandle, sourceFilePath: string, targetDirectoryPath: string): Promise<void>;
+    moveFileByPath(rootDirectoryHandle: FileSystemDirectoryHandle, sourceFilePath: string, targetDirectoryPath: string): Promise<string>;
     /**
      * @description 移动文件夹到指定目录
      */
-    moveFolder(rootDirectoryHandle: FileSystemDirectoryHandle, sourceFolderPath: string, targetDirectoryPath: string): Promise<void>;
+    moveFolder(rootDirectoryHandle: FileSystemDirectoryHandle, sourceFolderPath: string, targetDirectoryPath: string): Promise<string>;
     /**
      * @description 复制目录内容
      */
@@ -174,5 +179,13 @@ export declare class FileFolderManager extends FileState {
         files: string[];
         folders: string[];
     }>;
+    /**
+     * @description 生成唯一文件名，避免重名冲突
+     */
+    private generateUniqueFileName;
+    /**
+     * @description 生成唯一文件夹名，避免重名冲突
+     */
+    private generateUniqueFolderName;
 }
 export {};

@@ -46,6 +46,40 @@ import { useTranslation } from "react-i18next"
 import alertUseArco from "@App/message/alert"
 import { createPortal } from "react-dom"
 
+// 懒加载配置常量
+const MAX_EAGER_DEPTH = 3 // 超过此深度的目录将使用懒加载
+
+// 路径标准化工具函数 (与File.tsx保持一致)
+const normalizePath = (path: string): string => {
+  if (!path) return ""
+  
+  // 移除多余的斜杠并标准化路径分隔符
+  return path
+    .replace(/[\/\\]+/g, '/')  // 将多个斜杠或反斜杠替换为单个正斜杠
+    .replace(/^\/+|\/+$/g, '') // 移除开头和结尾的斜杠
+    .trim()
+}
+
+// 生成基于路径的稳定ID
+const generateStableId = (path: string, fileType: string): string => {
+  const normalizedPath = normalizePath(path)
+  return `${fileType}:${normalizedPath}` // 使用文件类型和路径作为稳定ID
+}
+
+// 计算路径深度
+const getPathDepth = (path: string): number => {
+  const normalizedPath = normalizePath(path)
+  if (!normalizedPath) return 0
+  return normalizedPath.split('/').length
+}
+
+// 检查是否应该懒加载
+const shouldLazyLoad = (path: string, fileType: string): boolean => {
+  if (fileType !== 'folder') return false
+  const depth = getPathDepth(path)
+  return depth >= MAX_EAGER_DEPTH
+}
+
 // 添加样式支持懒加载动画
 const GlobalStyles = styled('div')`
   @keyframes spin {
@@ -655,6 +689,7 @@ interface CustomTreeItemProps
   setExpandedFolderState: Function
   setIsDragging: Function
   onRefresh: () => void
+  onManualRefresh?: (operationType?: string) => Promise<void> // 手动操作刷新回调 - 支持操作类型参数
   // 右键菜单相关
   contextMenuState: { mouseX: number; mouseY: number; itemId: string } | null
   onShowContextMenu: (event: React.MouseEvent, itemId: string) => void
@@ -696,6 +731,7 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
       folderManager,
       setExpandedFolderState,
       onRefresh,
+      onManualRefresh,
       contextMenuState,
       onShowContextMenu,
       onCloseContextMenu,
@@ -758,8 +794,9 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
       if (item.fileType === 'lazy-placeholder' && onLoadLazily) {
         setIsLoading(true)
         try {
-          // 获取父文件夹路径
-          const parentPath = item.path.replace('/...', '')
+          // 标准化路径并获取父文件夹路径：从懒加载占位符路径中去掉 '/[lazy-placeholder]'
+          const parentPath = normalizePath(item.path.replace('/[lazy-placeholder]', ''))
+          console.log('Lazy loading triggered for:', parentPath, 'from placeholder:', item.path)
           await onLoadLazily(itemId, parentPath)
         } catch (error) {
           console.error('Error loading lazily:', error)
@@ -1066,27 +1103,56 @@ const CustomTreeItem = React.forwardRef<HTMLLIElement, CustomTreeItemProps>(
         const isMovingCurrentlyEditingFile = currentEditingFile === draggedPath
         const isMovingCurrentlyEditingFolder = draggedFileType === 'folder' && currentEditingFile && currentEditingFile.startsWith(draggedPath + '/')
 
+        let actualUsedName = draggedLabel // 默认使用原始名称
+        
         if (draggedFileType === 'folder') {
-          await folderManager.moveFolder(topDirHandle, draggedPath, item.path)
+          actualUsedName = await folderManager.moveFolder(topDirHandle, draggedPath, item.path)
         } else {
-          await folderManager.moveFileByPath(topDirHandle, draggedPath, item.path)
+          actualUsedName = await folderManager.moveFileByPath(topDirHandle, draggedPath, item.path)
         }
 
-        // 如果移动的是当前正在编辑的文件或其所在文件夹，更新高亮状态中的路径
+        // 如果移动的是当前正在编辑的文件或其所在文件夹，更新或清理状态
         if (isMovingCurrentlyEditingFile) {
-          const newPath = item.path ? `${item.path}/${draggedLabel}` : draggedLabel
-          console.log(`Moved currently editing file, updating path from '${draggedPath}' to '${newPath}'`)
-          onFileSelect?.(newPath)
+          if (actualUsedName !== draggedLabel) {
+            // 文件被重命名了，清除当前编辑状态（因为文件名已变）
+            console.log(`Moved currently editing file was renamed from '${draggedLabel}' to '${actualUsedName}', clearing editing state`)
+            onFileSelect?.('') // 清空当前编辑文件状态
+          } else {
+            // 文件名未变，更新路径
+            const newPath = item.path ? `${item.path}/${actualUsedName}` : actualUsedName
+            console.log(`Moved currently editing file, updating path from '${draggedPath}' to '${newPath}'`)
+            onFileSelect?.(newPath)
+          }
         } else if (isMovingCurrentlyEditingFolder && currentEditingFile) {
-          // 更新文件夹内文件的路径
-          const relativePath = currentEditingFile.substring(draggedPath.length + 1)
-          const newPath = item.path ? `${item.path}/${draggedLabel}/${relativePath}` : `${draggedLabel}/${relativePath}`
-          console.log(`Moved folder containing currently editing file, updating path from '${currentEditingFile}' to '${newPath}'`)
-          onFileSelect?.(newPath)
+          if (actualUsedName !== draggedLabel) {
+            // 文件夹被重命名了，清除当前编辑状态
+            console.log(`Moved folder containing currently editing file was renamed from '${draggedLabel}' to '${actualUsedName}', clearing editing state`)
+            onFileSelect?.('') // 清空当前编辑文件状态
+          } else {
+            // 文件夹名未变，更新文件夹内文件的路径
+            const relativePath = currentEditingFile.substring(draggedPath.length + 1)
+            const newPath = item.path ? `${item.path}/${actualUsedName}/${relativePath}` : `${actualUsedName}/${relativePath}`
+            console.log(`Moved folder containing currently editing file, updating path from '${currentEditingFile}' to '${newPath}'`)
+            onFileSelect?.(newPath)
+          }
         }
 
-        alertUseArco(t("t-file-manager-move-success"), 2000, { kind: "success" })
-        onRefresh()
+        // 显示移动成功消息，包含实际使用的名称信息
+        if (actualUsedName !== draggedLabel) {
+          alertUseArco(`${t("t-file-manager-move-success")} (${draggedLabel} → ${actualUsedName})`, 3000, { kind: "success" })
+        } else {
+          alertUseArco(t("t-file-manager-move-success"), 2000, { kind: "success" })
+        }
+        
+        // 强制立即刷新UI - 添加小延迟确保文件系统操作完全完成
+        setTimeout(async () => {
+          console.log('Executing immediate refresh after file move')
+          if (props.onManualRefresh) {
+            await props.onManualRefresh('file_move')
+          } else {
+            onRefresh()
+          }
+        }, 50) // 50ms延迟确保操作完成
       } catch (error) {
         console.error("Move error:", error)
         alertUseArco(t("t-file-manager-operation-failed"), 2000, { kind: "error" })
@@ -1215,9 +1281,11 @@ export default function FileExplorer(props: {
   folderManager: FileFolderManager
   setIsDragging: Function
   fillText: Function
-  onRefresh?: () => void // 添加刷新回调
+  onRefresh?: () => void // 普通刷新回调
+  onManualRefresh?: (operationType?: string) => Promise<void> // 手动操作刷新回调（立即执行）- 支持操作类型参数
   currentEditingFile?: string // 当前正在编辑的文件路径  
   onFileSelect?: (filePath: string) => void // 文件选中回调
+  onLoadLazily?: (itemId: string, folderPath: string) => Promise<void> // 懒加载回调
 }) {
   const { t } = useTranslation()
   let sortedFileDirectoryArr = sortFileDirectoryArr(props.fileDirectoryArr)
@@ -1269,50 +1337,114 @@ export default function FileExplorer(props: {
 
   // 懒加载处理函数
   const handleLoadLazily = React.useCallback(async (itemId: string, folderPath: string) => {
+    // 如果父组件提供了懒加载回调，优先使用父组件的
+    if (props.onLoadLazily) {
+      return props.onLoadLazily(itemId, folderPath)
+    }
+    
+    // 否则使用内部实现（保持向后兼容）
     try {
       const topDirHandle = props.folderManager.getTopDirectoryHandle()
       if (!topDirHandle) return
 
-      console.log('Loading folder lazily:', folderPath)
+      // 修复路径：移除懒加载占位符部分
+      const actualFolderPath = normalizePath(folderPath.replace('/[lazy-placeholder]', ''))
+      console.log('Loading folder lazily:', actualFolderPath, 'from placeholder:', folderPath)
       
       // 使用懒加载方法获取子内容
-      const children = await props.folderManager.loadFolderLazily(topDirHandle, folderPath)
+      const children = await props.folderManager.loadFolderLazily(topDirHandle, actualFolderPath)
+      
+      if (!children || children.length === 0) {
+        console.log('No children found for:', actualFolderPath)
+        return
+      }
+      
+      // 处理子项，为每个项目分配稳定ID和正确的懒加载状态
+      const processedChildren = children.map((child: any) => {
+        const childPath = normalizePath(child.path || `${actualFolderPath}/${child.label}`)
+        const childId = generateStableId(childPath, child.fileType)
+        
+        if (child.fileType === 'folder') {
+          // 根据深度决定是否添加懒加载占位符
+          const needsLazyLoading = shouldLazyLoad(childPath, 'folder')
+          return {
+            ...child,
+            id: childId,
+            path: childPath,
+            children: needsLazyLoading ? [{
+              id: generateStableId(`${childPath}/[lazy-placeholder]`, 'lazy-placeholder'),
+              label: "...",
+              fileType: "lazy-placeholder",
+              path: `${childPath}/[lazy-placeholder]`,
+            }] : child.children
+          }
+        } else {
+          return {
+            ...child,
+            id: childId,
+            path: childPath
+          }
+        }
+      })
       
       // 更新文件树结构，替换懒加载占位符
       const updateFileTree = (items: any[]): any[] => {
         return items.map(item => {
-          if (item.path === folderPath && item.fileType === 'folder') {
-            // 找到目标文件夹，更新其子项
+          // 找到目标文件夹进行更新（基于标准化路径匹配）
+          if (normalizePath(item.path) === actualFolderPath && item.fileType === 'folder') {
+            console.log('Found target folder, updating children:', item.path)
+            
+            // 过滤掉懒加载占位符
+            const existingChildren = item.children?.filter((child: any) => 
+              child.fileType !== 'lazy-placeholder'
+            ) || []
+            
+            // 检查是否有重复的子项（基于标准化路径）
+            const existingPaths = new Set(existingChildren.map((child: any) => normalizePath(child.path)))
+            const newChildren = processedChildren.filter((child: any) => !existingPaths.has(normalizePath(child.path)))
+            
+            // 合并现有子项和新子项
+            const allChildren = [...existingChildren, ...newChildren]
+            
             return {
               ...item,
-              children: children
+              children: allChildren.length > 0 ? allChildren : undefined
             }
-          } else if (item.children) {
-            // 递归更新子项
+          }
+          
+          // 递归处理子项
+          if (item.children && Array.isArray(item.children)) {
             return {
               ...item,
               children: updateFileTree(item.children)
             }
           }
+          
           return item
         })
       }
-
-      // 更新文件树
-      const updatedTree = updateFileTree(sortedFileDirectoryArr)
+      
+      // 更新状态，但不触发完整刷新
+      // 直接更新 folderManager 的状态
+      const currentTree = Array.isArray(props.fileDirectoryArr) ? props.fileDirectoryArr : []
+      const updatedTree = updateFileTree(currentTree)
+      console.log('File tree updated with lazy loaded content')
+      
+      // 更新 folderManager 的状态，防止监听器覆盖更改
       props.folderManager.topDirectoryArray = updatedTree
       
-      // 标记文件夹为已展开
-      setExpandedFolders(prev => new Set([...prev, folderPath]))
+      // 触发父组件刷新，这会更新显示的文件树
+      if (props.onRefresh) {
+        props.onRefresh()
+      }
       
-      // 触发刷新
-      props.onRefresh?.()
+      // 标记文件夹为已展开
+      setExpandedFolders(prev => new Set([...prev, actualFolderPath]))
       
     } catch (error) {
-      console.error('Error in handleLoadLazily:', error)
-      alertUseArco(t("t-file-manager-operation-failed"), 2000, { kind: "error" })
+      console.error('Error loading folder lazily:', error)
     }
-  }, [props.folderManager, props.onRefresh, sortedFileDirectoryArr, t])
+  }, [props.folderManager, props.fileDirectoryArr, props.onRefresh, props.onLoadLazily])
 
   // 根目录右键菜单处理
   const handleRootContextMenu = (event: React.MouseEvent) => {
@@ -1416,6 +1548,8 @@ export default function FileExplorer(props: {
         return
       }
 
+      let operationType: string = inputDialog.type
+      
       switch (inputDialog.type) {
         case 'newFile':
           if (currentItem && currentItem.fileType === 'folder') {
@@ -1426,6 +1560,7 @@ export default function FileExplorer(props: {
             await props.folderManager.createNewFile(topDirHandle, value)
           }
           alertUseArco(t("t-file-manager-create-success"), 2000, { kind: "success" })
+          operationType = 'create_file'
           break
 
         case 'newFolder':
@@ -1437,21 +1572,29 @@ export default function FileExplorer(props: {
             await props.folderManager.createNewFolder(topDirHandle, value)
           }
           alertUseArco(t("t-file-manager-create-success"), 2000, { kind: "success" })
+          operationType = 'create_folder'
           break
 
         case 'rename':
           if (currentItem) {
             if (currentItem.fileType === 'folder') {
               await props.folderManager.renameFolderAtPath(topDirHandle, currentItem.path, value)
+              operationType = 'rename_folder'
             } else {
               await props.folderManager.renameFileAtPath(topDirHandle, currentItem.path, value)
+              operationType = 'rename_file'
             }
             alertUseArco(t("t-file-manager-rename-success"), 2000, { kind: "success" })
           }
           break
       }
 
-      handleOptimizedRefresh()
+      // 使用手动刷新确保立即同步UI - 传递具体操作类型
+      if (props.onManualRefresh) {
+        await props.onManualRefresh(operationType)
+      } else {
+        handleOptimizedRefresh()
+      }
     } catch (error) {
       console.error("Operation error:", error)
       alertUseArco(t("t-file-manager-operation-failed"), 2000, { kind: "error" })
@@ -1498,14 +1641,59 @@ export default function FileExplorer(props: {
 
       console.log(`Moving ${draggedLabel} from "${draggedPath}" to root directory`)
 
+      // 检查是否移动的是当前正在编辑的文件或包含该文件的文件夹
+      const isMovingCurrentlyEditingFile = props.currentEditingFile === draggedPath
+      const isMovingCurrentlyEditingFolder = draggedFileType === 'folder' && props.currentEditingFile && props.currentEditingFile.startsWith(draggedPath + '/')
+
+      let actualUsedName = draggedLabel // 默认使用原始名称
+
       if (draggedFileType === 'folder') {
-        await props.folderManager.moveFolder(topDirHandle, draggedPath, '')
+        actualUsedName = await props.folderManager.moveFolder(topDirHandle, draggedPath, '')
       } else {
-        await props.folderManager.moveFileByPath(topDirHandle, draggedPath, '')
+        actualUsedName = await props.folderManager.moveFileByPath(topDirHandle, draggedPath, '')
       }
 
-      alertUseArco(t("t-file-manager-move-success"), 2000, { kind: "success" })
-      handleOptimizedRefresh()
+      // 如果移动的是当前正在编辑的文件或其所在文件夹，更新或清理状态
+      if (isMovingCurrentlyEditingFile) {
+        if (actualUsedName !== draggedLabel) {
+          // 文件被重命名了，清除当前编辑状态（因为文件名已变）
+          console.log(`Moved currently editing file to root was renamed from '${draggedLabel}' to '${actualUsedName}', clearing editing state`)
+          props.onFileSelect?.('') // 清空当前编辑文件状态
+        } else {
+          // 文件名未变，更新为根目录路径
+          console.log(`Moved currently editing file to root, updating path from '${draggedPath}' to '${actualUsedName}'`)
+          props.onFileSelect?.(actualUsedName)
+        }
+      } else if (isMovingCurrentlyEditingFolder && props.currentEditingFile) {
+        if (actualUsedName !== draggedLabel) {
+          // 文件夹被重命名了，清除当前编辑状态
+          console.log(`Moved folder containing currently editing file to root was renamed from '${draggedLabel}' to '${actualUsedName}', clearing editing state`)
+          props.onFileSelect?.('') // 清空当前编辑文件状态
+        } else {
+          // 文件夹名未变，更新文件夹内文件的路径
+          const relativePath = props.currentEditingFile.substring(draggedPath.length + 1)
+          const newPath = `${actualUsedName}/${relativePath}`
+          console.log(`Moved folder containing currently editing file to root, updating path from '${props.currentEditingFile}' to '${newPath}'`)
+          props.onFileSelect?.(newPath)
+        }
+      }
+
+      // 显示移动成功消息，包含实际使用的名称信息
+      if (actualUsedName !== draggedLabel) {
+        alertUseArco(`${t("t-file-manager-move-success")} (${draggedLabel} → ${actualUsedName})`, 3000, { kind: "success" })
+      } else {
+        alertUseArco(t("t-file-manager-move-success"), 2000, { kind: "success" })
+      }
+      
+      // 强制立即刷新UI - 添加小延迟确保文件系统操作完全完成
+      setTimeout(async () => {
+        console.log('Executing immediate refresh after move to root')
+        if (props.onManualRefresh) {
+          await props.onManualRefresh('move_to_root')
+        } else {
+          handleOptimizedRefresh()
+        }
+      }, 50) // 50ms延迟确保操作完成
     } catch (error) {
       console.error("Move to root error:", error)
       alertUseArco(t("t-file-manager-operation-failed"), 2000, { kind: "error" })
@@ -1527,7 +1715,12 @@ export default function FileExplorer(props: {
         const fileName = `新建文件${Date.now()}.md` // 添加时间戳避免重名
         await props.folderManager.createNewFile(topDirHandle, fileName)
         alertUseArco(t("t-file-manager-create-success"), 2000, { kind: "success" })
-        handleOptimizedRefresh()
+        // 传递操作类型
+        if (props.onManualRefresh) {
+          await props.onManualRefresh('empty_folder_create_file')
+        } else {
+          handleOptimizedRefresh()
+        }
       } catch (error) {
         console.error("Create file error:", error)
         alertUseArco(t("t-file-manager-operation-failed"), 2000, { kind: "error" })
@@ -1542,7 +1735,12 @@ export default function FileExplorer(props: {
         const folderName = `新建文件夹${Date.now()}` // 添加时间戳避免重名
         await props.folderManager.createNewFolder(topDirHandle, folderName)
         alertUseArco(t("t-file-manager-create-success"), 2000, { kind: "success" })
-        handleOptimizedRefresh()
+        // 传递操作类型
+        if (props.onManualRefresh) {
+          await props.onManualRefresh('empty_folder_create_folder')
+        } else {
+          handleOptimizedRefresh()
+        }
       } catch (error) {
         console.error("Create folder error:", error)
         alertUseArco(t("t-file-manager-operation-failed"), 2000, { kind: "error" })
@@ -1621,6 +1819,7 @@ export default function FileExplorer(props: {
       setExpandedFolderState={() => { }} // 添加空函数
       folderManager={props.folderManager}
       onRefresh={handleOptimizedRefresh} // 使用优化的刷新函数
+      onManualRefresh={props.onManualRefresh}
       contextMenuState={contextMenuState}
       onShowContextMenu={handleShowContextMenu}
       onCloseContextMenu={handleCloseContextMenu}
@@ -1654,7 +1853,8 @@ export default function FileExplorer(props: {
     handleCloseConfirmDialog,
     handleConfirmInput,
     handleConfirmDelete,
-    handleLoadLazily
+    handleLoadLazily,
+    props.onManualRefresh
   ])
 
   return (
