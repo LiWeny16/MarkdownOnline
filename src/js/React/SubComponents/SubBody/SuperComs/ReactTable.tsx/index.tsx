@@ -19,8 +19,17 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon
 } from '@mui/icons-material';
-import { TableData } from '@Func/Parser/mdItPlugin/table';
-import { getTableData, tableSyncManager } from '@App/text/tableEditor';
+import { 
+  TableData, 
+  StandardTableData, 
+  StandardTableAPI 
+} from '@Func/Parser/mdItPlugin/table';
+import { 
+  getTableData, 
+  tableSyncManager,
+  getStandardTableData,
+  standardTableSyncManager
+} from '@App/text/tableEditor';
 import { getTableMetadata } from '@App/text/tableEditor';
 
 interface ReactTableProps {
@@ -39,6 +48,8 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   const [data, setData] = useState<TableData>({ headers: [], rows: [] });
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  // 🚀 新增：标准化数据状态
+  const [standardData, setStandardData] = useState<StandardTableData | null>(null);
 
   // 默认示例数据（用于后备）
   const defaultTableData: TableData = useMemo(() => ({
@@ -51,30 +62,79 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     ]
   }), []);
 
-  // 🚀 新的同步机制：使用TableSyncManager进行双向数据绑定
-  const updateDataAndSync = useCallback((newData: TableData) => {
+  // 🚀 新的基于标准化数据的同步机制
+  const updateStandardDataAndSync = useCallback((newData: TableData) => {
     // 1. 更新本地状态
     setData(newData);
     
-    // 2. 如果有tableId，通过同步管理器触发Monaco更新
+    // 2. 如果有tableId，通过标准化同步管理器触发Monaco更新
     if (tableId) {
-      tableSyncManager.notifyTableDataChange(tableId, newData, 'react');
+      standardTableSyncManager.notifyStandardDataChange(tableId, newData, 'react');
     }
   }, [tableId]);
 
-  // Monaco → React 数据同步监听器
+  // 保持向后兼容的同步机制
+  const updateDataAndSync = useCallback((newData: TableData) => {
+    // 优先使用标准化数据同步
+    if (tableId && StandardTableAPI.getStandardData(tableId)) {
+      updateStandardDataAndSync(newData);
+    } else {
+      // 回退到传统同步机制
+      setData(newData);
+      if (tableId) {
+        tableSyncManager.notifyTableDataChange(tableId, newData, 'react');
+      }
+    }
+  }, [tableId, updateStandardDataAndSync]);
+
+  // 🚀 标准化数据监听器（Monaco → React）
+  useEffect(() => {
+    if (!tableId) return;
+
+    const handleStandardDataChange = (newStandardData: StandardTableData) => {
+      console.log(`ReactTable收到标准化数据更新 - tableId: ${tableId}, version: ${newStandardData.version}`);
+      
+      const newTableData = StandardTableAPI.standardToTable(newStandardData);
+      const dataChanged = JSON.stringify(data) !== JSON.stringify(newTableData);
+      
+      if (dataChanged) {
+        setStandardData(newStandardData);
+        setData(newTableData);
+        console.log(`ReactTable标准化数据已更新 - tableId: ${tableId}`, {
+          version: newStandardData.version,
+          headers: newTableData.headers.length,
+          rows: newTableData.rows.length
+        });
+      }
+    };
+
+    // 注册标准化数据监听器
+    standardTableSyncManager.addStandardDataListener(tableId, handleStandardDataChange);
+
+    return () => {
+      // 清理监听器
+      standardTableSyncManager.removeStandardDataListener(tableId, handleStandardDataChange);
+    };
+  }, [tableId, data]);
+
+  // 传统数据监听器（保持向后兼容）
   useEffect(() => {
     if (!tableId) return;
 
     const handleMonacoDataChange = (newData: TableData) => {
-      console.log(`ReactTable收到Monaco数据更新 - tableId: ${tableId}`);
+      // 如果已经有标准化数据监听器在处理，跳过传统监听器
+      if (StandardTableAPI.getStandardData(tableId)) {
+        return;
+      }
+      
+      console.log(`ReactTable收到传统数据更新 - tableId: ${tableId}`);
       const dataChanged = JSON.stringify(data) !== JSON.stringify(newData);
       if (dataChanged) {
         setData(newData);
       }
     };
 
-    // 注册监听器
+    // 注册传统监听器
     tableSyncManager.addTableListener(tableId, handleMonacoDataChange);
 
     return () => {
@@ -86,12 +146,21 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   // 初始化数据
   useEffect(() => {
     let initialData: TableData;
+    let initialStandardData: StandardTableData | null = null;
     
     if (tableId) {
-      // 尝试从registry获取真实表格数据
-      const registeredData = getTableData(tableId);
-      initialData = registeredData || defaultTableData;
-      console.log(`ReactTable初始化 - tableId: ${tableId}, 找到数据:`, !!registeredData, 'headers:', registeredData?.headers?.length || 0, 'rows:', registeredData?.rows?.length || 0);
+      // 🚀 优先尝试获取标准化数据
+      initialStandardData = getStandardTableData(tableId);
+      
+      if (initialStandardData) {
+        initialData = StandardTableAPI.standardToTable(initialStandardData);
+        console.log(`ReactTable初始化 - 使用标准化数据，tableId: ${tableId}, version: ${initialStandardData.version}`);
+      } else {
+        // 回退到传统方式
+        const registeredData = getTableData(tableId);
+        initialData = registeredData || defaultTableData;
+        console.log(`ReactTable初始化 - 使用传统数据，tableId: ${tableId}, 找到数据:`, !!registeredData);
+      }
     } else {
       // 使用props传入的数据或默认数据
       initialData = propTableData || defaultTableData;
@@ -100,14 +169,18 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     
     // 检查数据是否真的发生了变化，避免不必要的重新渲染
     const dataChanged = JSON.stringify(data) !== JSON.stringify(initialData);
-    if (dataChanged) {
+    const standardDataChanged = JSON.stringify(standardData) !== JSON.stringify(initialStandardData);
+    
+    if (dataChanged || standardDataChanged) {
       console.log(`ReactTable数据变化 - tableId: ${tableId}`, {
         oldData: { headers: data.headers.length, rows: data.rows.length },
-        newData: { headers: initialData.headers.length, rows: initialData.rows.length }
+        newData: { headers: initialData.headers.length, rows: initialData.rows.length },
+        standardData: !!initialStandardData
       });
       setData(initialData);
+      setStandardData(initialStandardData);
     }
-  }, [tableId, propTableData, defaultTableData]); // 移除data依赖，避免循环更新
+  }, [tableId, propTableData, defaultTableData]); // 移除data和standardData依赖，避免循环更新
 
   // 开始编辑单元格
   const startEdit = useCallback((rowIndex: number, colIndex: number) => {
@@ -146,7 +219,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       // 🚀 使用新的同步机制
       if (tableId) {
         setTimeout(() => {
-          tableSyncManager.notifyTableDataChange(tableId, newData, 'react');
+          updateDataAndSync(newData);
         }, 0);
       }
       
@@ -154,7 +227,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     });
 
     setEditingCell(null);
-  }, [editingCell, tableId]);
+  }, [editingCell, tableId, updateDataAndSync]);
 
   // 取消编辑
   const cancelEdit = useCallback(() => {
@@ -312,6 +385,13 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     return (
       <Paper sx={{ p: 2, textAlign: 'center', color: 'text.secondary' }}>
         Empty table - {tableId ? `Table ID: ${tableId}` : 'No data'}
+        {standardData && (
+          <div style={{ fontSize: '0.75rem', marginTop: '4px', color: '#666' }}>
+            Version: {standardData.version} | 
+            Columns: {standardData.schema.columnCount} | 
+            Rows: {standardData.schema.rowCount}
+          </div>
+        )}
       </Paper>
     );
   }
@@ -349,6 +429,11 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
         {tableId && (
           <Box sx={{ ml: 'auto', fontSize: '0.75rem', color: 'text.secondary', display: 'flex', alignItems: 'center' }}>
             Table ID: {tableId}
+            {standardData && (
+              <span style={{ marginLeft: '8px' }}>
+                v{standardData.version} | {standardData.schema.columnCount}×{standardData.schema.rowCount}
+              </span>
+            )}
           </Box>
         )}
       </Box>
