@@ -40,6 +40,7 @@ export default observer(function Body() {
                 : "26px 38px",
             }}
             className={
+              "uniform-scroller " +
               "markdown-body " +
               `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}`
             }

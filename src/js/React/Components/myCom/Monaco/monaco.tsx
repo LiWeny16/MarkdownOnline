@@ -22,6 +22,7 @@ import monacoDragEvent from "@Func/Events/drag/drag"
 import "monaco-editor/esm/vs/basic-languages/markdown/markdown.contribution";
 import "monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution";
 import { Backdrop, debounce } from "@mui/material"
+import { isCurrentlyWritingToMonaco, handleMonacoContentChange } from "@App/text/tableEditor"
 const version = "0.45.0"
 loader.config({
   paths: {
@@ -115,7 +116,7 @@ const MonacoEditor = observer(function MonacoEditor({
     document.body.style.cursor = "default" // 恢复光标样式
   }
   const handleOnChange = (e: any) => {
-    triggerConverterEvent(4)
+    // triggerConverterEvent(4) // 注释掉，避免与onDidChangeModelContent重复触发
   }
   const handleResizeStart = () => {
     setOpenBackdrop(true) // 开始拖拽时显示遮罩
@@ -251,6 +252,32 @@ const MonacoEditor = observer(function MonacoEditor({
     // 暴露出去
     window.editor = editor
     window.monaco = monaco
+    
+    // 添加内容变化监听器，用于左右同步 - 使用新的同步机制
+    editor.onDidChangeModelContent((event) => {
+      // 检查是否正在写入Monaco，避免循环触发
+      if (isCurrentlyWritingToMonaco()) {
+        console.log('跳过变化事件 - 正在写入Monaco');
+        return;
+      }
+      
+      console.log('Monaco内容变化，准备触发同步');
+      
+      // 防抖处理，避免过于频繁的更新
+      const debounceSync = debounce(() => {
+        console.log('执行Monaco内容变化同步');
+        
+        // 🚀 新的双向同步机制：
+        // 1. 处理表格数据变化同步（Monaco → React）
+        handleMonacoContentChange();
+        
+        // 2. 触发markdown解析和其他组件更新
+        triggerConverterEvent(2);
+      }, 150); // 增加延迟到150ms，确保表格同步完成后再进行全局更新
+      
+      debounceSync();
+    });
+    
     /**
      * @description allInit
      */

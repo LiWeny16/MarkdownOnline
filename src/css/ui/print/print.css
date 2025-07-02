@@ -2,11 +2,13 @@
   @page {
     size: A4 portrait;
   }
+
   ::-webkit-scrollbar {
     height: 0;
     width: 0;
     color: transparent;
   }
+
   #bodyTopBox {
     margin-top: 0 !important;
   }
@@ -27,9 +29,17 @@
   .arco-message-wrapper-top {
     display: none !important;
   }
-  #editor {
-    height: 100% !important ;
+
+  /* 隐藏表格控制面板和编辑工具 */
+  .react-table-toolbar {
+    display: none !important;
   }
+
+
+  #editor {
+    height: 100% !important;
+  }
+
   #view-area {
     display: block !important;
     margin: 0;
@@ -37,8 +47,16 @@
     width: 100% !important;
     height: 100% !important;
   }
-  embed{
+
+  embed {
     display: block !important;
+  }
+
+  /* 确保表格在打印时有合适的样式 */
+  .react-table-placeholder,
+  [data-react-table] {
+    page-break-inside: avoid;
+    break-inside: avoid;
   }
 
   /* s */

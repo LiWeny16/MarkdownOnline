@@ -1,0 +1,138 @@
+/* 学术风格表格样式 - 模仿LaTeX/Overleaf */
+
+/* 学术风格表格样式 */
+.academic-table {
+  font-family: 'Times New Roman', 'Liberation Serif', serif;
+  
+  .MuiPaper-root {
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+  }
+  
+  .MuiTable-root {
+    border-collapse: collapse;
+    
+    /* 表头样式 - LaTeX booktabs风格 */
+    .MuiTableHead-root {
+      .MuiTableRow-root {
+        border-top: 2px solid #000;
+        border-bottom: 1px solid #000;
+        
+        .MuiTableCell-head {
+          font-weight: bold;
+          font-size: 0.95rem;
+          padding: 8px 12px;
+          background: transparent !important;
+          border: none;
+          text-align: center;
+          vertical-align: middle;
+          color: #000 !important;
+          
+          /* 去除MUI默认样式 */
+          position: static !important;
+          z-index: auto !important;
+        }
+      }
+    }
+    
+    /* 表体样式 */
+    .MuiTableBody-root {
+      .MuiTableRow-root {
+        border: none;
+        background: transparent !important;
+        
+        &:hover {
+          background: transparent !important;
+        }
+        
+        &:nth-of-type(even) {
+          background: transparent !important;
+        }
+        
+        /* 最后一行添加底部边框 */
+        &:last-child {
+          border-bottom: 2px solid #000;
+        }
+        
+        .MuiTableCell-body {
+          border: none;
+          padding: 6px 12px;
+          font-size: 0.9rem;
+          text-align: center;
+          vertical-align: middle;
+          color: #000;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+  
+  /* 表格容器 */
+  .MuiTableContainer-root {
+    box-shadow: none !important;
+    border: none !important;
+    max-height: none !important;
+    margin: 1rem auto;
+    width: fit-content;
+    min-width: 300px;
+  }
+}
+
+/* 数值表格特殊样式 */
+.academic-table.numeric-table {
+  .MuiTableCell-body {
+    font-family: 'Courier New', 'Liberation Mono', monospace;
+    text-align: right;
+    
+    /* 数值对齐 */
+    &:not(:first-child) {
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}
+
+/* 表格标题样式 */
+.table-caption {
+  font-family: 'Times New Roman', 'Liberation Serif', serif;
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0.5rem 0 1rem 0;
+  font-style: italic;
+  color: #333;
+  
+  .table-number {
+    font-weight: bold;
+    font-style: normal;
+  }
+}
+
+/* 表格注释样式 */
+.table-notes {
+  font-family: 'Times New Roman', 'Liberation Serif', serif;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  padding: 0 1rem;
+  color: #666;
+  line-height: 1.3;
+  
+  .note-label {
+    font-style: italic;
+  }
+}
+
+/* 响应式设计 */
+@media screen and (max-width: 768px) {
+  .academic-table {
+    .MuiTableContainer-root {
+      width: 100%;
+      overflow-x: auto;
+    }
+    
+    .MuiTableCell-head,
+    .MuiTableCell-body {
+      padding: 4px 8px;
+      font-size: 0.85rem;
+    }
+  }
+} 
