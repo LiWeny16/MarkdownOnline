@@ -11,15 +11,21 @@ import {
   TextField,
   IconButton,
   Tooltip,
-  Box
+  Box,
+  TableSortLabel,
+  Checkbox,
+  alpha
 } from '@mui/material';
 import {
   Edit as EditIcon,
   Check as CheckIcon,
   Close as CloseIcon,
   Add as AddIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
+  FilterList as FilterListIcon,
+  HelpOutline as HelpIcon
 } from '@mui/icons-material';
+import { visuallyHidden } from '@mui/utils';
 import {
   TableData,
   StandardTableData,
@@ -44,6 +50,20 @@ interface EditingCell {
   value: string;
 }
 
+// 排序相关类型
+type Order = 'asc' | 'desc';
+
+interface SortConfig {
+  order: Order;
+  orderBy: string;
+}
+
+// 选中的单元格
+interface SelectedCell {
+  rowIndex: number;
+  colIndex: number;
+}
+
 const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: propTableData }) => {
   // 状态管理
   const [data, setData] = useState<TableData>({ headers: [], rows: [] });
@@ -51,6 +71,108 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   const [isEditMode, setIsEditMode] = useState(false);
   // 🚀 新增：标准化数据状态
   const [standardData, setStandardData] = useState<StandardTableData | null>(null);
+  
+  // 🚀 新增：排序状态
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ order: 'asc', orderBy: '' });
+  
+  // 🚀 新增：多选状态
+  const [selectedCells, setSelectedCells] = useState<SelectedCell[]>([]);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
+
+  // 🚀 排序比较函数
+  const descendingComparator = useCallback((a: string[], b: string[], orderBy: string) => {
+    const colIndex = data.headers.indexOf(orderBy);
+    if (colIndex === -1) return 0;
+    
+    const aVal = a[colIndex] || '';
+    const bVal = b[colIndex] || '';
+    
+    // 尝试数字比较
+    const aNum = parseFloat(aVal);
+    const bNum = parseFloat(bVal);
+    
+    if (!isNaN(aNum) && !isNaN(bNum)) {
+      return bNum - aNum;
+    }
+    
+    // 字符串比较
+    if (bVal < aVal) return -1;
+    if (bVal > aVal) return 1;
+    return 0;
+  }, [data.headers]);
+
+  const getComparator = useCallback((order: Order, orderBy: string) => {
+    return order === 'desc'
+      ? (a: string[], b: string[]) => descendingComparator(a, b, orderBy)
+      : (a: string[], b: string[]) => -descendingComparator(a, b, orderBy);
+  }, [descendingComparator]);
+
+  // 🚀 获取排序后的数据 - 现在直接使用data.rows，因为排序已经影响了底层数据
+  const sortedRows = useMemo(() => {
+    return data.rows; // 直接使用data.rows，因为排序已经真正改变了数据
+  }, [data.rows]);
+
+  // 🚀 多选处理
+  const handleSelectAllClick = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelected = data.rows.map((_, index) => index);
+      setSelectedRows(newSelected);
+      setLastSelectedIndex(newSelected.length > 0 ? newSelected[newSelected.length - 1] : null);
+    } else {
+      setSelectedRows([]);
+      setLastSelectedIndex(null);
+    }
+  }, [data.rows]);
+
+  // 🚀 增强多选处理：支持 Ctrl、Shift 键
+  const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
+
+  const handleRowClick = useCallback((event: React.MouseEvent<unknown>, rowIndex: number) => {
+    if (event.ctrlKey || event.metaKey) {
+      // Ctrl/Cmd点击：切换选择
+      const selectedIndex = selectedRows.indexOf(rowIndex);
+      let newSelected: number[] = [];
+
+      if (selectedIndex === -1) {
+        // 🚀 修复：避免重复添加
+        newSelected = [...selectedRows, rowIndex];
+      } else if (selectedIndex === 0) {
+        newSelected = selectedRows.slice(1);
+      } else if (selectedIndex === selectedRows.length - 1) {
+        newSelected = selectedRows.slice(0, -1);
+      } else if (selectedIndex > 0) {
+        newSelected = [
+          ...selectedRows.slice(0, selectedIndex),
+          ...selectedRows.slice(selectedIndex + 1)
+        ];
+      }
+      // 🚀 确保没有重复项
+      newSelected = Array.from(new Set(newSelected));
+      setSelectedRows(newSelected);
+      setLastSelectedIndex(rowIndex);
+    } else if (event.shiftKey && lastSelectedIndex !== null) {
+      // Shift点击：范围选择
+      const start = Math.min(lastSelectedIndex, rowIndex);
+      const end = Math.max(lastSelectedIndex, rowIndex);
+      const rangeSelected = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+      
+      // 🚀 修复：合并现有选择和范围选择，确保没有重复
+      const newSelected = Array.from(new Set([...selectedRows, ...rangeSelected])).sort((a, b) => a - b);
+      setSelectedRows(newSelected);
+    } else {
+      // 普通点击：单选
+      setSelectedRows([rowIndex]);
+      setLastSelectedIndex(rowIndex);
+    }
+  }, [selectedRows, lastSelectedIndex]);
+
+  const isCellSelected = useCallback((rowIndex: number, colIndex: number) => {
+    return selectedCells.some(cell => cell.rowIndex === rowIndex && cell.colIndex === colIndex);
+  }, [selectedCells]);
+
+  const isRowSelected = useCallback((rowIndex: number) => {
+    return selectedRows.includes(rowIndex);
+  }, [selectedRows]);
 
   // 默认示例数据（用于后备）
   const defaultTableData: TableData = useMemo(() => ({
@@ -172,7 +294,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     }
   }, [tableId, propTableData, defaultTableData]); // 移除data和standardData依赖，避免循环更新
 
-  // 开始编辑单元格
+  // 开始编辑单元格 - 改为单击编辑
   const startEdit = useCallback((rowIndex: number, colIndex: number) => {
     const isHeader = rowIndex === -1;
     const value = isHeader
@@ -294,7 +416,124 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     updateDataAndSync(newData);
   }, [data, updateDataAndSync]);
 
-  // 渲染编辑器
+  // 🚀 增强键盘快捷键处理
+  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (!isEditMode || editingCell) return;
+
+    // Ctrl+A: 全选
+    if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
+      event.preventDefault();
+      const allRowIndices = data.rows.map((_, index) => index);
+      setSelectedRows(allRowIndices);
+      return;
+    }
+
+    // Ctrl+D: 取消选择（反选）
+    if ((event.ctrlKey || event.metaKey) && event.key === 'd') {
+      event.preventDefault();
+      setSelectedRows([]);
+      setSelectedCells([]);
+      setLastSelectedIndex(null);
+      return;
+    }
+
+    // Delete: 删除选中的行
+    if (event.key === 'Delete' && selectedRows.length > 0) {
+      event.preventDefault();
+      // 从大到小删除，避免索引变化问题
+      const sortedIndices = [...selectedRows].sort((a, b) => b - a);
+      let newData = {
+        headers: [...data.headers],
+        rows: data.rows.map(row => [...row])
+      };
+      sortedIndices.forEach(index => {
+        newData.rows.splice(index, 1);
+      });
+      updateDataAndSync(newData);
+      setSelectedRows([]);
+      setLastSelectedIndex(null);
+      return;
+    }
+
+    // Escape: 取消选择
+    if (event.key === 'Escape') {
+      setSelectedRows([]);
+      setSelectedCells([]);
+      setLastSelectedIndex(null);
+      return;
+    }
+
+    // 🚀 新增：方向键选择（支持Shift扩展选择）
+    if (['ArrowUp', 'ArrowDown'].includes(event.key)) {
+      event.preventDefault();
+      
+      let targetIndex: number;
+      
+      if (selectedRows.length === 0) {
+        // 没有选择时，选择第一行或最后一行
+        targetIndex = event.key === 'ArrowDown' ? 0 : data.rows.length - 1;
+        setSelectedRows([targetIndex]);
+        setLastSelectedIndex(targetIndex);
+        return;
+      }
+
+      const currentIndex = lastSelectedIndex !== null ? lastSelectedIndex : selectedRows[selectedRows.length - 1];
+      
+      if (event.key === 'ArrowDown') {
+        targetIndex = Math.min(currentIndex + 1, data.rows.length - 1);
+      } else {
+        targetIndex = Math.max(currentIndex - 1, 0);
+      }
+
+      if (event.shiftKey) {
+        // Shift+方向键：扩展选择
+        const start = Math.min(lastSelectedIndex || currentIndex, targetIndex);
+        const end = Math.max(lastSelectedIndex || currentIndex, targetIndex);
+        const rangeSelected = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+        setSelectedRows(rangeSelected);
+      } else {
+        // 普通方向键：移动选择
+        setSelectedRows([targetIndex]);
+        setLastSelectedIndex(targetIndex);
+      }
+      return;
+    }
+  }, [isEditMode, editingCell, data, selectedRows, lastSelectedIndex, updateDataAndSync]);
+
+  // 🚀 排序处理 - 修改为真正影响底层数据，并清空选中状态
+  const handleRequestSort = useCallback((property: string) => {
+    const isAsc = sortConfig.orderBy === property && sortConfig.order === 'asc';
+    const newOrder = isAsc ? 'desc' : 'asc';
+    
+    console.log(`排序请求: ${property}, 方向: ${newOrder}`);
+    
+    // 🚀 立即对数据进行排序并更新
+    const sortedRows = [...data.rows].sort(getComparator(newOrder, property));
+    const newData = {
+      headers: [...data.headers],
+      rows: sortedRows
+    };
+    
+    console.log('排序前数据:', data.rows);
+    console.log('排序后数据:', sortedRows);
+    
+    // 🚀 更新排序状态
+    setSortConfig({
+      order: newOrder,
+      orderBy: property
+    });
+    
+    // 🚀 关键修复：排序后清空选中状态，因为行索引已经改变
+    setSelectedRows([]);
+    setSelectedCells([]);
+    setLastSelectedIndex(null);
+    
+    // 🚀 更新底层数据并同步到Monaco
+    updateDataAndSync(newData);
+    
+  }, [sortConfig, data, getComparator, updateDataAndSync]);
+
+  // 渲染编辑器 - 完全匹配单元格大小，不改变任何尺寸
   const renderEditor = useCallback((currentValue: string) => (
     <TextField
       value={editingCell?.value || ''}
@@ -313,15 +552,44 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       size="small"
       variant="outlined"
       sx={{
-        minWidth: '100px',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100%',
+        height: '100%',
         '& .MuiOutlinedInput-root': {
-          fontSize: '0.875rem'
+          fontSize: '0.875rem',
+          height: '100%',
+          padding: 0,
+          border: 'none',
+          borderRadius: 0,
+          backgroundColor: 'transparent',
+          '& fieldset': {
+            border: '1px solid #1976d2',
+            borderRadius: 0,
+            margin: 0,
+            padding: 0
+          },
+          '&:hover fieldset': {
+            border: '1px solid #1976d2'
+          },
+          '&.Mui-focused fieldset': {
+            border: '2px solid #1976d2',
+            borderRadius: 0
+          }
+        },
+        '& .MuiOutlinedInput-input': {
+          padding: '6px 8px',
+          height: 'calc(100% - 12px)',
+          boxSizing: 'border-box'
         }
       }}
     />
   ), [editingCell, commitEdit, cancelEdit]);
 
-  // 渲染单元格内容，空字符串显示为不间断空格
+  // 渲染单元格内容，空字符串显示为不间断空格，单击编辑
   const renderCellContent = useCallback((
     value: string,
     rowIndex: number,
@@ -329,10 +597,6 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     isHeader: boolean = false
   ) => {
     const isEditing = editingCell?.rowIndex === rowIndex && editingCell?.colIndex === colIndex;
-
-    if (isEditing) {
-      return renderEditor(value);
-    }
 
     // 空字符串显示为不间断空格
     const displayValue = value === '' ? '\u00A0' : value;
@@ -342,27 +606,25 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
           minHeight: '32px',
-          cursor: 'pointer',
+          height: '32px', // 🚀 固定高度，避免编辑时高度变化
+          cursor: isEditMode ? 'text' : 'default',
+          padding: isEditing ? 0 : '6px 8px', // 🚀 编辑时取消padding，让编辑器填满整个单元格
+          position: 'relative',
           '&:hover': {
-            backgroundColor: isHeader ? 'rgba(0,0,0,0.04)' : 'rgba(0,0,0,0.02)'
+            backgroundColor: isEditMode && !isHeader ? 'rgba(25, 118, 210, 0.08)' : 'transparent'
           }
         }}
-        onDoubleClick={() => startEdit(rowIndex, colIndex)}
+        onClick={() => {
+          if (isEditMode && !isHeader) {
+            startEdit(rowIndex, colIndex);
+          }
+        }}
       >
-        <span>{displayValue || (isHeader ? `Header ${colIndex + 1}` : '')}</span>
-        {isEditMode && (
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              startEdit(rowIndex, colIndex);
-            }}
-            sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}
-          >
-            <EditIcon fontSize="inherit" />
-          </IconButton>
+        {isEditing ? (
+          renderEditor(value)
+        ) : (
+          <span>{displayValue || (isHeader ? `Header ${colIndex + 1}` : '')}</span>
         )}
       </Box>
     );
@@ -374,7 +636,6 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
         Empty table - {tableId ? `Table ID: ${tableId}` : 'No data'}
         {standardData && (
           <div style={{ fontSize: '0.75rem', marginTop: '4px', color: '#666' }}>
-            Version: {standardData.version} |
             Columns: {standardData.schema.columnCount} |
             Rows: {standardData.schema.rowCount}
           </div>
@@ -384,13 +645,33 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   }
 
   return (
-    <Paper elevation={0} sx={{ width: '100%', overflow: 'hidden' }} className="academic-table">
+    <Paper 
+      elevation={0} 
+      sx={{ width: '100%', overflow: 'hidden' }} 
+      className="academic-table"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+    >
       {/* 工具栏 */}
-      <Box sx={{ p: 1, display: 'flex', gap: 1, borderBottom: '1px solid #e0e0e0' }} className="react-table-toolbar">
-        <Tooltip title={isEditMode ? "Exit Edit Mode" : "Enter Edit Mode"}>
+      <Box sx={{ 
+        p: 1, 
+        display: 'flex', 
+        gap: 1, 
+        borderBottom: '1px solid #e0e0e0',
+        backgroundColor: 'transparent'
+      }} className="react-table-toolbar">
+        <Tooltip title={isEditMode ? "Exit Edit Mode (多选：Ctrl+点击, Shift+点击范围选择)" : "Enter Edit Mode"}>
           <IconButton
             size="small"
-            onClick={() => setIsEditMode(!isEditMode)}
+            onClick={() => {
+              setIsEditMode(!isEditMode);
+              // 🚀 退出编辑模式时清除选择
+              if (isEditMode) {
+                setSelectedRows([]);
+                setSelectedCells([]);
+                setLastSelectedIndex(null);
+              }
+            }}
             color={isEditMode ? "primary" : "default"}
           >
             <EditIcon />
@@ -410,15 +691,59 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
                 <AddIcon sx={{ transform: 'rotate(90deg)' }} />
               </IconButton>
             </Tooltip>
+
+            {/* 🚀 简化：选中行时直接显示删除按钮和选中数量 */}
+            {selectedRows.length > 0 && (
+              <>
+                <Box sx={{ display: 'flex', alignItems: 'center', ml: 1, mr: 1 }}>
+                  <span style={{ fontWeight: 500, color: '#1976d2', fontSize: '0.875rem' }}>
+                    {selectedRows.length} row{selectedRows.length > 1 ? 's' : ''} selected
+                  </span>
+                </Box>
+                <Tooltip title="Delete Selected Rows">
+                  <IconButton
+                    size="small"
+                    onClick={() => {
+                      // 从大到小删除，避免索引变化问题
+                      const sortedIndices = [...selectedRows].sort((a, b) => b - a);
+                      sortedIndices.forEach(index => deleteRow(index));
+                      setSelectedRows([]);
+                      setLastSelectedIndex(null);
+                    }}
+                    color="error"
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Tooltip>
+              </>
+            )}
+
+            {/* 🚀 快捷键提示图标 */}
+            <Tooltip title={
+              <Box sx={{ fontSize: '0.75rem', lineHeight: 1.2 }}>
+                <div>快捷键:</div>
+                <div>• Ctrl+A: 全选</div>
+                <div>• Ctrl+D: 取消选择</div>
+                <div>• Delete: 删除选中行</div>
+                <div>• Ctrl+点击: 多选</div>
+                <div>• Shift+点击: 范围选择</div>
+                <div>• 方向键: 移动选择</div>
+                <div>• Shift+方向键: 扩展选择</div>
+              </Box>
+            }>
+              <IconButton size="small" sx={{ ml: 'auto' }}>
+                <HelpIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
           </>
         )}
 
         {tableId && (
-          <Box sx={{ ml: 'auto', fontSize: '0.75rem', color: 'text.secondary', display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ ml: isEditMode ? 1 : 'auto', fontSize: '0.75rem', color: 'text.secondary', display: 'flex', alignItems: 'center' }}>
             Table ID: {tableId}
             {standardData && (
               <span style={{ marginLeft: '8px' }}>
-                v{standardData.version} | {standardData.schema.columnCount}×{standardData.schema.rowCount}
+                {standardData.schema.columnCount}×{standardData.schema.rowCount}
               </span>
             )}
           </Box>
@@ -426,8 +751,11 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       </Box>
 
       {/* 表格 */}
-      <TableContainer sx={{ maxHeight: 440 }}>
-        <Table size="small" stickyHeader>
+      <TableContainer 
+        sx={{ maxHeight: 440 }} 
+        className="uniform-scroller"
+      >
+        <Table size="small" stickyHeader sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow sx={{
               backgroundColor: '#f5f5f5',
@@ -441,10 +769,77 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
                 zIndex: 10
               }
             }}>
+              {/* 🚀 新增：多选复选框列 */}
+              {isEditMode && (
+                <TableCell padding="checkbox" sx={{ width: 48 }}>
+                  <Checkbox
+                    color="primary"
+                    indeterminate={selectedRows.length > 0 && selectedRows.length < data.rows.length}
+                    checked={data.rows.length > 0 && selectedRows.length === data.rows.length}
+                    onChange={handleSelectAllClick}
+                    inputProps={{
+                      'aria-label': 'select all rows',
+                    }}
+                  />
+                </TableCell>
+              )}
+              
               {data.headers.map((header, colIndex) => (
                 <TableCell key={colIndex} sx={{ minWidth: 120 }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    {renderCellContent(header, -1, colIndex, true)}
+                    {/* 🚀 表头排序功能 - 只在编辑模式下启用 */}
+                    <TableSortLabel
+                      active={isEditMode && sortConfig.orderBy === header}
+                      direction={sortConfig.orderBy === header ? sortConfig.order : 'asc'}
+                      onClick={() => {
+                        if (isEditMode) {
+                          handleRequestSort(header);
+                        }
+                      }}
+                      disabled={!isEditMode}
+                      sx={{ 
+                        flex: 1,
+                        '& .MuiTableSortLabel-root': {
+                          flexDirection: 'row'
+                        },
+                        '&.Mui-disabled': {
+                          opacity: 1,
+                          color: 'inherit'
+                        }
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          minHeight: '32px',
+                          cursor: isEditMode ? 'text' : 'default',
+                          padding: '6px 8px',
+                          width: '100%',
+                          '&:hover': {
+                            backgroundColor: isEditMode ? 'rgba(25, 118, 210, 0.08)' : 'transparent'
+                          }
+                        }}
+                        onClick={(e) => {
+                          if (isEditMode) {
+                            e.stopPropagation(); // 阻止排序
+                            startEdit(-1, colIndex);
+                          }
+                        }}
+                      >
+                        {editingCell?.rowIndex === -1 && editingCell?.colIndex === colIndex ? (
+                          renderEditor(header)
+                        ) : (
+                          <span>{header || `Header ${colIndex + 1}`}</span>
+                        )}
+                      </Box>
+                      {isEditMode && sortConfig.orderBy === header ? (
+                        <Box component="span" sx={visuallyHidden}>
+                          {sortConfig.order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                        </Box>
+                      ) : null}
+                    </TableSortLabel>
+                    
                     {isEditMode && data.headers.length > 1 && (
                       <Tooltip title="Delete Column">
                         <IconButton
@@ -461,46 +856,114 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
                 </TableCell>
               ))}
               {isEditMode && (
-                <TableCell sx={{ width: 50 }}>Actions</TableCell>
+                <TableCell sx={{ width: 80 }}>Actions</TableCell>
               )}
             </TableRow>
           </TableHead>
 
           <TableBody>
-            {data.rows.map((row, rowIndex) => (
-              <TableRow
-                key={rowIndex}
-                sx={{
-                  '&:nth-of-type(even)': {
-                    backgroundColor: '#fafafa'
-                  },
-                  '&:hover': {
-                    backgroundColor: '#f0f0f0'
-                  }
-                }}
-              >
-                {row.map((cell, colIndex) => (
-                  <TableCell key={colIndex} sx={{ minWidth: 120 }}>
-                    {renderCellContent(cell, rowIndex, colIndex)}
-                  </TableCell>
-                ))}
+            {sortedRows.map((row, rowIndex) => {
+              // 🚀 修复：排序后直接使用rowIndex，因为数据已经真正排序
+              const isRowSelectedValue = isRowSelected(rowIndex);
+              
+              return (
+                <TableRow
+                  key={`row-${rowIndex}-${JSON.stringify(row).slice(0, 20)}`} // 使用行内容作为key的一部分
+                  hover
+                  role={isEditMode ? "checkbox" : undefined}
+                  aria-checked={isEditMode ? isRowSelectedValue : undefined}
+                  tabIndex={-1}
+                  selected={isEditMode ? isRowSelectedValue : false}
+                  sx={{
+                    '&:nth-of-type(even)': {
+                      backgroundColor: '#fafafa'
+                    },
+                    '&:hover': {
+                      backgroundColor: isEditMode ? alpha('#1976d2', 0.08) : '#f0f0f0'
+                    },
+                    cursor: isEditMode ? 'pointer' : 'default'
+                  }}
+                  onClick={(event) => {
+                    if (isEditMode) {
+                      // 🚀 确保传递完整的事件对象，包含键盘修饰键信息
+                      handleRowClick(event, rowIndex);
+                    }
+                  }}
+                >
+                  {/* 🚀 新增：多选复选框列 */}
+                  {isEditMode && (
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        checked={isRowSelectedValue}
+                        onChange={(event) => {
+                          event.stopPropagation();
+                          // 🚀 修复：复选框点击应该支持多选逻辑
+                          if (isRowSelectedValue) {
+                            // 取消选择：从选中列表中移除
+                            setSelectedRows(prev => prev.filter(index => index !== rowIndex));
+                            // 如果取消选择的是最后选择的行，重置lastSelectedIndex
+                            if (lastSelectedIndex === rowIndex) {
+                              setLastSelectedIndex(null);
+                            }
+                          } else {
+                            // 添加选择：添加到选中列表，避免重复
+                            setSelectedRows(prev => {
+                              if (prev.includes(rowIndex)) {
+                                return prev; // 如果已经存在，不重复添加
+                              }
+                              return [...prev, rowIndex];
+                            });
+                            setLastSelectedIndex(rowIndex);
+                          }
+                        }}
+                        inputProps={{
+                          'aria-labelledby': `enhanced-table-checkbox-${rowIndex}`,
+                        }}
+                      />
+                    </TableCell>
+                  )}
+                  
+                  {row.map((cell, colIndex) => (
+                    <TableCell 
+                      key={colIndex} 
+                      sx={{ 
+                        minWidth: 120,
+                        padding: 0,
+                        '&:hover': {
+                          backgroundColor: isEditMode ? alpha('#1976d2', 0.04) : 'transparent'
+                        }
+                      }}
+                      onClick={(event) => {
+                        if (isEditMode) {
+                          event.stopPropagation(); // 阻止行选择
+                        }
+                      }}
+                    >
+                      {renderCellContent(cell, rowIndex, colIndex)}
+                    </TableCell>
+                  ))}
 
-                {isEditMode && (
-                  <TableCell>
-                    <Tooltip title="Delete Row">
-                      <IconButton
-                        size="small"
-                        onClick={() => deleteRow(rowIndex)}
-                        color="error"
-                        sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}
-                      >
-                        <DeleteIcon fontSize="inherit" />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
+                  {isEditMode && (
+                    <TableCell>
+                      <Tooltip title="Delete Row">
+                        <IconButton
+                          size="small"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            deleteRow(rowIndex);
+                          }}
+                          color="error"
+                          sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}
+                        >
+                          <DeleteIcon fontSize="inherit" />
+                        </IconButton>
+                      </Tooltip>
+                    </TableCell>
+                  )}
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>

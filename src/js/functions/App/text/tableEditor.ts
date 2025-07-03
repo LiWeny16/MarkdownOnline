@@ -53,28 +53,38 @@ class StandardTableSyncManager {
 
     // 触发表格标准化数据同步（React → Monaco）
     notifyStandardDataChange(tableId: string, newData: TableData, source: 'react' | 'monaco' = 'react') {
-        if (this.isInternalUpdate) return;
+        if (this.isInternalUpdate) {
+            console.log(`跳过同步更新 ${tableId}，正在进行内部更新`);
+            return;
+        }
 
         this.isInternalUpdate = true;
 
-
+        console.log(`标准化数据同步: ${tableId}, source: ${source}`);
 
         try {
             if (source === 'react') {
                 // React → Monaco: 通过标准化数据更新Monaco编辑器
                 const success = StandardTableAPI.updateStandardData(tableId, newData, source);
                 if (success) {
-                    writeStandardTableToMonaco(tableId, newData);
+                    console.log(`准备写入Monaco: ${tableId}`);
+                    // 🚀 确保写入操作在下一个事件循环中执行，避免同步冲突
+                    setTimeout(() => {
+                        writeStandardTableToMonaco(tableId, newData);
+                    }, 50); // 减少延迟到50ms
+                } else {
+                    console.warn(`更新标准化数据失败: ${tableId}`);
                 }
             } else {
                 // Monaco → React: 通过标准化数据通知React组件更新
                 StandardTableAPI.updateStandardData(tableId, newData, source);
             }
         } finally {
-            // 延迟重置标记，确保所有相关事件处理完毕
+            // 🚀 减少重置延迟，提高响应速度
             setTimeout(() => {
                 this.isInternalUpdate = false;
-            }, 100);
+                console.log(`同步更新完成: ${tableId}`);
+            }, 200); // 从300ms减少到200ms
         }
     }
 
@@ -215,16 +225,17 @@ export function writeStandardTableToMonaco(tableId: string, newData: TableData):
 
         // 确保原始结束行号不超过当前模型的行数
         const modelLineCount = model.getLineCount();
-        const actualEndLine = Math.min(originalEndLine, modelLineCount - 1);
+        const safeEndLine = Math.min(originalEndLine, modelLineCount);
 
+        console.log(`写入Monaco: ${tableId}, startLine: ${startLine}, originalEndLine: ${originalEndLine}, safeEndLine: ${safeEndLine}`);
+        console.log(`新的Markdown内容:\n${newMarkdown}`);
 
-
-        // 创建替换范围：从表格开始行到原始结束行（或模型最大行）
+        // 🚀 修复：创建正确的替换范围
         const range = new window.monaco.Range(
             startLine + 1,  // Monaco行号从1开始
             1,
-            actualEndLine + 1,
-            model.getLineMaxColumn(actualEndLine + 1)
+            safeEndLine + 1,
+            model.getLineMaxColumn(safeEndLine + 1)
         );
 
         // 使用 executeEdits 而不是 applyEdits，以保持撤销栈
@@ -244,7 +255,8 @@ export function writeStandardTableToMonaco(tableId: string, newData: TableData):
         // 延长标记重置时间，确保所有相关事件都已处理完毕
         setTimeout(() => {
             isWritingToMonaco = false;
-        }, 300); // 增加到300ms
+            console.log(`Monaco写入完成: ${tableId}`);
+        }, 100); // 减少到100ms，提高响应速度
 
         return true;
     } catch (error) {
@@ -269,14 +281,11 @@ function updateStandardTableEndLine(tableId: string, newEndLine: number): void {
             ...standardData.metadata,
             endLine: newEndLine,
             updatedAt: Date.now()
-        },
-        version: standardData.version + 1
+        }
     };
 
     // 重新注册更新后的数据
     StandardTableAPI.registerStandardData(updatedStandardData);
-
-
 }
 
 // Monaco编辑器回写函数（保持向后兼容）
@@ -341,7 +350,6 @@ export function getStandardTableRegistryDebugInfo() {
     allStandardData.forEach((standardData, tableId) => {
         tables.push({
             tableId,
-            version: standardData.version,
             startLine: standardData.metadata.startLine,
             endLine: standardData.metadata.endLine,
             headers: standardData.data.headers,

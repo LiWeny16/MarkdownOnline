@@ -5,7 +5,6 @@ import MarkdownIt from "markdown-it/lib";
 // 定义标准化的表格JSON数据结构
 export interface StandardTableData {
     tableId: string;
-    version: number; // 数据版本号，用于同步控制
     metadata: {
         startLine: number;
         endLine: number;
@@ -128,7 +127,6 @@ class StandardTableDataManager {
     ): StandardTableData {
         const now = Date.now();
         const existing = this.standardDataRegistry.get(tableId);
-        const version = existing ? existing.version + 1 : 1;
 
         // 生成列schema
         const headers = data.headers.map((title, index) => ({
@@ -140,7 +138,6 @@ class StandardTableDataManager {
 
         const standardData: StandardTableData = {
             tableId,
-            version,
             metadata: {
                 startLine,
                 endLine,
@@ -184,16 +181,23 @@ class StandardTableDataManager {
             return false;
         }
 
+        // 🚀 修复：生成新的rawMarkdown
+        const newRawMarkdown = tableDataToMarkdown(newData);
+
         const updatedStandardData = this.createStandardData(
             tableId,
             newData,
             existing.metadata.startLine,
             existing.metadata.endLine,
-            existing.metadata.rawMarkdown
+            newRawMarkdown  // 使用新生成的markdown
         );
 
-        // 更新原始markdown
-        updatedStandardData.metadata.rawMarkdown = tableDataToMarkdown(newData);
+        // 🚀 修复：确保rawMarkdown使用最新的数据
+        updatedStandardData.metadata.rawMarkdown = newRawMarkdown;
+
+        console.log(`更新标准化数据 ${tableId} (source: ${source})`);
+        console.log('新的表格数据:', newData);
+        console.log('生成的Markdown:', newRawMarkdown);
 
         this.registerStandardData(updatedStandardData);
         return true;
@@ -259,6 +263,8 @@ function parseTableTokens(tableTokens: any[]): TableData {
     let inHeader = false;
     let inBody = false;
 
+    console.log('解析表格tokens:', tableTokens.map(t => ({ type: t.type, content: t.content })));
+
     for (const token of tableTokens) {
         switch (token.type) {
             case 'thead_open':
@@ -279,8 +285,10 @@ function parseTableTokens(tableTokens: any[]): TableData {
             case 'tr_close':
                 if (inHeader && currentRow.length > 0) {
                     headers.push(...currentRow);
+                    console.log('解析到表头:', currentRow);
                 } else if (inBody && currentRow.length > 0) {
                     rows.push([...currentRow]);
+                    console.log('解析到数据行:', currentRow);
                 }
                 break;
             case 'th_open':
@@ -294,14 +302,16 @@ function parseTableTokens(tableTokens: any[]): TableData {
             case 'inline':
                 // 单元格内容
                 if (token.content !== undefined) {
-                    currentRow.push(token.content.trim());
+                    const cellContent = token.content.trim();
+                    currentRow.push(cellContent);
+                    console.log('添加单元格内容:', cellContent);
                 }
                 break;
         }
     }
 
     // 确保所有行的列数一致，补全空字符串
-    const maxCols = Math.max(headers.length, ...rows.map(row => row.length));
+    const maxCols = Math.max(headers.length, ...rows.map(row => row.length), 1); // 至少一列
 
     // 补全headers
     while (headers.length < maxCols) {
@@ -315,12 +325,14 @@ function parseTableTokens(tableTokens: any[]): TableData {
         }
     });
 
-    return { headers, rows };
+    const result = { headers, rows };
+    console.log('最终解析结果:', result);
+    return result;
 }
 
 // 将表格数据转换为Markdown格式，空字符串用空格表示
 export function tableDataToMarkdown(data: TableData): string {
-    console.log("tableDataToMarkdown: \n", data);
+    console.log("tableDataToMarkdown输入: \n", data);
     if (!data.headers.length && !data.rows.length) return '';
 
     let markdown = '';
@@ -346,6 +358,7 @@ export function tableDataToMarkdown(data: TableData): string {
         markdown += '| ' + dataRow.join(' | ') + ' |\n';
     }
 
+    console.log("tableDataToMarkdown输出: \n", markdown);
     return markdown;
 }
 
@@ -409,12 +422,13 @@ let tablePlugin = function (md: MarkdownIt) {
                         startLine = startToken.map[0];
                     }
 
-                    // 安全地获取结束行号
+                    // 🚀 修复：更准确的结束行号计算
                     const endToken = tokens[tableCloseIndex];
                     if (endToken && endToken.map && endToken.map.length > 1) {
-                        endLine = endToken.map[1] - 1;
+                        endLine = endToken.map[1]; // 不减1，因为map[1]已经是下一行的开始
                     } else {
-                        endLine = startLine + 3; // 默认估算
+                        // 回退计算：基于开始行号和预估的表格行数
+                        endLine = startLine + 3; // 默认估算：表头 + 分隔符 + 至少一行数据
                     }
 
                     // 使用基于位置的ID生成机制
@@ -423,14 +437,17 @@ let tablePlugin = function (md: MarkdownIt) {
 
                     // 解析表格数据
                     const tableData = parseTableTokens(tableTokens);
-                    console.log("正确tableData: \n", tableData);
+                    console.log("解析的tableData: \n", tableData);
+                    
+                    // 🚀 修复：更准确的结束行计算，基于实际数据
+                    const actualDataLines = 2 + tableData.rows.length; // 表头行 + 分隔符行 + 数据行数
+                    if (endLine <= startLine || endLine - startLine < actualDataLines) {
+                        endLine = startLine + actualDataLines;
+                        console.log(`修正endLine: ${startLine} -> ${endLine} (${actualDataLines}行)`);
+                    }
+                    
                     // 计算原始Markdown（用于回写）
                     const rawMarkdown = tableDataToMarkdown(tableData);
-
-                    // 重新计算结束行（基于实际数据）
-                    if (endLine <= startLine) {
-                        endLine = startLine + Math.max(1, tableData.headers.length > 0 ? 1 : 0) + tableData.rows.length;
-                    }
 
                     // ===== 🚀 新增：生成标准化JSON数据 =====
                     const standardData = standardTableDataManager.createStandardData(
@@ -457,7 +474,7 @@ let tablePlugin = function (md: MarkdownIt) {
 
                     // 创建占位符token，包含标准化数据信息
                     const placeholderToken = new state.Token('html_block', '', 0);
-                    placeholderToken.content = `<div data-react-table data-table-id="${tableId}" data-table-hash="${standardData.metadata.tableHash}" data-table-version="${standardData.version}" data-start-line="${startLine}" data-end-line="${endLine}" class="react-table-placeholder" style="min-height: 100px; margin: 16px 0;"></div>`;
+                    placeholderToken.content = `<div data-react-table data-table-id="${tableId}" data-table-hash="${standardData.metadata.tableHash}" data-start-line="${startLine}" data-end-line="${endLine}" class="react-table-placeholder" style="min-height: 100px; margin: 16px 0;"></div>`;
 
                     // 替换整个表格token序列
                     tokens.splice(i, tableCloseIndex - i + 1, placeholderToken);
@@ -482,7 +499,6 @@ let tablePlugin = function (md: MarkdownIt) {
         // 解析表格属性
         const id = html.match(/data-table-id="([^"]+)"/)?.[1] ?? '';
         const hash = html.match(/data-table-hash="([^"]+)"/)?.[1] ?? '';
-        const version = html.match(/data-table-version="([^"]+)"/)?.[1] ?? '';
         const startLine = html.match(/data-start-line="([^"]+)"/)?.[1] ?? '';
         const endLine = html.match(/data-end-line="([^"]+)"/)?.[1] ?? '';
 
@@ -494,7 +510,6 @@ let tablePlugin = function (md: MarkdownIt) {
                 'data-react-table', 'true',
                 'data-table-id', id,
                 'data-table-hash', hash,
-                'data-table-version', version,
                 'data-start-line', startLine,
                 'data-end-line', endLine,
                 'style', 'min-height: 100px; margin: 16px 0;'
@@ -544,19 +559,16 @@ export function addIncrementalDOMTableSupport(md: MarkdownIt) {
                     // 解析表格属性
                     const idMatch = html.match(/data-table-id="([^"]+)"/);
                     const hashMatch = html.match(/data-table-hash="([^"]+)"/);
-                    const versionMatch = html.match(/data-table-version="([^"]+)"/);
 
                     if (idMatch && hashMatch) {
                         const tableId = idMatch[1];
                         const tableHash = hashMatch[1];
-                        const tableVersion = versionMatch?.[1] || '1';
 
                         // ⭐️ 核心：使用IncrementalDOM.skip()避免子树diff
                         window.IncrementalDOM.elementOpen('div', tableId, [
                             'data-react-table', 'true',
                             'data-table-id', tableId,
                             'data-table-hash', tableHash,
-                            'data-table-version', tableVersion,
                             'data-skip-dom', 'true',
                             'class', 'react-table-placeholder',
                             'style', 'min-height: 100px; margin: 16px 0;'
