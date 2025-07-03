@@ -1,3 +1,4 @@
+// src/js/functions/App/text/tableEditor.ts
 import {
     tableRegistry,
     tableDataToMarkdown,
@@ -11,20 +12,6 @@ import {
 // 全局标记，防止写入Monaco时触发循环更新
 let isWritingToMonaco = false;
 
-// 🚀 移除 parseMonacoTable 函数，统一使用 parseTableTokens 解析器
-// 右边回写左边时会触发 mdConverter，通过 tablePlugin -> parseTableTokens 获取正确数据
-
-// 解析表格行的辅助函数
-function parseTableRow(line: string): string[] {
-    // 移除首尾的空白字符和管道符
-    const trimmedLine = line.trim().replace(/^\|/, '').replace(/\|$/, '');
-    
-    // 按管道符分割
-    const cells = trimmedLine.split('|');
-    
-    // 清理每个单元格的空白字符
-    return cells.map(cell => cell.trim());
-}
 
 // ===== 🚀 新的基于标准化JSON数据的同步系统 =====
 class StandardTableSyncManager {
@@ -435,24 +422,3 @@ export function handleMonacoContentChange(): void {
     handleStandardMonacoContentChange();
 }
 
-// 全局调试工具（开发环境）
-if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-    (window as any).TableEditorDebug = {
-        // 传统API（向后兼容）
-        getTableData,
-        getTableMetadata,
-        getRegistryInfo: getTableRegistryDebugInfo,
-        writeTable: writeTableToMonaco,
-        normalizeData: normalizeTableData,
-        syncManager: tableSyncManager,
-        handleMonacoContentChange,
-
-        // 🚀 新的标准化API
-        getStandardTableData,
-        getStandardRegistryInfo: getStandardTableRegistryDebugInfo,
-        writeStandardTable: writeStandardTableToMonaco,
-        standardSyncManager: standardTableSyncManager,
-        handleStandardMonacoContentChange,
-        StandardTableAPI
-    };
-} 

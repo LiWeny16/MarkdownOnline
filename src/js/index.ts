@@ -1,3 +1,4 @@
+// src/js/index.ts
 import hljs from "@cdn-hljs"
 import { getMdTextFromMonaco } from "@App/text/getMdText"
 import pageBreaker from "@Func/Parser/pageBreaker"
@@ -41,17 +42,6 @@ export async function mdConverter(fully = false) {
 
   hljs.highlightAll()
 
-  // 🚀 优化后的表格管理流程：
-  // 只在fully渲染时或表格注册表为空时更新注册表
-  const needsRegistryUpdate = fully || !tableSyncManager || tableRegistry.size === 0;
-
-  if (needsRegistryUpdate) {
-    console.log('需要更新表格注册表，执行完整更新流程');
-    // 在DOM更新完成后，更新表格注册表信息并挂载React表格组件
-    updateTableRegistryFromMarkdown();
-  }
-
-  // 总是尝试挂载表格（智能检测是否需要实际更新）
   tableManager.mountTables()
 }
 

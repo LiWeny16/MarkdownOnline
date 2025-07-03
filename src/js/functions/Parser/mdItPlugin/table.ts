@@ -1,3 +1,4 @@
+// src/js/functions/Parser/mdItPlugin/table.ts
 import MarkdownIt from "markdown-it/lib";
 
 // ===== 标准化JSON数据结构 =====
@@ -165,7 +166,7 @@ class StandardTableDataManager {
     // 注册标准化数据
     registerStandardData(standardData: StandardTableData): void {
         this.standardDataRegistry.set(standardData.tableId, standardData);
-        
+
         // 通知监听器
         this.notifyDataChange(standardData.tableId, standardData);
     }
@@ -319,6 +320,7 @@ function parseTableTokens(tableTokens: any[]): TableData {
 
 // 将表格数据转换为Markdown格式，空字符串用空格表示
 export function tableDataToMarkdown(data: TableData): string {
+    console.log("tableDataToMarkdown: \n", data);
     if (!data.headers.length && !data.rows.length) return '';
 
     let markdown = '';
@@ -585,45 +587,28 @@ export function addIncrementalDOMTableSupport(md: MarkdownIt) {
 export const StandardTableAPI = {
     // 获取标准化数据
     getStandardData: (tableId: string) => standardTableDataManager.getStandardData(tableId),
-    
+
     // 更新标准化数据
-    updateStandardData: (tableId: string, data: TableData, source: 'react' | 'monaco' = 'react') => 
+    updateStandardData: (tableId: string, data: TableData, source: 'react' | 'monaco' = 'react') =>
         standardTableDataManager.updateStandardData(tableId, data, source),
-    
+
     // 🚀 直接注册标准化数据（用于元数据更新）
-    registerStandardData: (standardData: StandardTableData) => 
+    registerStandardData: (standardData: StandardTableData) =>
         standardTableDataManager.registerStandardData(standardData),
-    
+
     // 监听数据变化
-    onDataChange: (tableId: string, callback: (data: StandardTableData) => void) => 
+    onDataChange: (tableId: string, callback: (data: StandardTableData) => void) =>
         standardTableDataManager.addDataChangeListener(tableId, callback),
-    
+
     // 取消监听
-    offDataChange: (tableId: string, callback: (data: StandardTableData) => void) => 
+    offDataChange: (tableId: string, callback: (data: StandardTableData) => void) =>
         standardTableDataManager.removeDataChangeListener(tableId, callback),
-    
+
     // 获取所有标准化数据
     getAllStandardData: () => standardTableDataManager.getAllStandardData(),
-    
+
     // 数据转换工具
     standardToTable: standardDataToTableData,
     tableToStandard: tableDataToStandardData
 };
 
-// 开发者调试工具（仅在开发环境中添加到全局）
-if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-    (window as any).TablePluginDebug = {
-        getTableIdByPosition,
-        resetDocumentParsing,
-        cleanupOldPositions,
-        getCurrentDocumentId: () => currentDocumentId,
-        getDocumentTableCount: () => documentTableCount,
-        getPositionToIdMap: () => new Map(positionToId),
-        getTableRegistry: () => new Map(tableRegistry),
-        getTableRegistrySize: () => tableRegistry.size,
-        simpleHash,
-        // 新增标准化数据调试
-        standardAPI: StandardTableAPI,
-        standardManager: standardTableDataManager
-    };
-}

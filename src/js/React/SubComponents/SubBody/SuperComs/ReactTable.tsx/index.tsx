@@ -1,3 +1,4 @@
+// src/js/React/SubComponents/SubBody/SuperComs/ReactTable.tsx/index.tsx
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   Table,
@@ -246,7 +247,6 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       rows: data.rows.map(row => [...row])
     };
     newData.rows.splice(rowIndex, 1);
-
     // 🚀 使用新的同步更新机制
     updateDataAndSync(newData);
   }, [data, updateDataAndSync]);
@@ -265,7 +265,6 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     newData.rows.forEach(row => {
       row.push('');
     });
-    console.log("newData: \n", newData);
     // 🚀 使用新的同步更新机制
     updateDataAndSync(newData);
   }, [data, updateDataAndSync]);
@@ -719,13 +718,3 @@ class TableManager {
 export { ReactTable, TableManager };
 export default ReactTable;
 
-// 开发者调试工具（仅在开发环境中添加到全局）
-if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-  (window as any).TableManagerDebug = {
-    getInstance: () => TableManager.getInstance(),
-    getDebugInfo: () => TableManager.getInstance().getDebugInfo(),
-    forceRemount: () => TableManager.getInstance().forceRemountAllTables(),
-    unmountAll: () => TableManager.getInstance().unmountAllTables(),
-    syncManager: tableSyncManager
-  };
-}

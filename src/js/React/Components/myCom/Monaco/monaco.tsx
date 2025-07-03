@@ -1,3 +1,4 @@
+// src/js/React/Components/myCom/Monaco/monaco.tsx
 import React, { useRef, useState } from "react"
 import ReactDOM from "react-dom"
 import Editor, { loader, Monaco } from "@monaco-editor/react"
@@ -260,21 +261,12 @@ const MonacoEditor = observer(function MonacoEditor({
         console.log('跳过变化事件 - 正在写入Monaco');
         return;
       }
-      
-      console.log('Monaco内容变化，准备触发同步');
-      
       // 防抖处理，避免过于频繁的更新
       const debounceSync = debounce(() => {
         console.log('执行Monaco内容变化同步');
-        
-        // 🚀 新的双向同步机制：
-        // 1. 处理表格数据变化同步（Monaco → React）
         handleMonacoContentChange();
-        
-        // 2. 触发markdown解析和其他组件更新
         triggerConverterEvent(2);
-      }, 150); // 增加延迟到150ms，确保表格同步完成后再进行全局更新
-      
+      }, 150); 
       debounceSync();
     });
     
