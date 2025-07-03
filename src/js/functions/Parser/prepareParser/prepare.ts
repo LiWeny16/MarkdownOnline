@@ -3,7 +3,6 @@ import { readMemoryImg } from "@App/memory/memory"
 import { markdownParser } from "@Func/Init/allInit"
 import kit from "@cdn-kit"
 import mermaid from "mermaid"
-import { importRegex } from "../mdItPlugin/file"
 
 /**
  * @description 预解析，来处理异步信息，因为markdown-it天然不支持异步

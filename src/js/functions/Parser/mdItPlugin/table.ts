@@ -47,7 +47,6 @@ export function getTableIdByPosition(startLine: number, endLine: number, tableIn
         documentTableCount++;
         const tableId = `table-${documentTableCount}`;
         positionToId.set(positionKey, tableId);
-        console.log(`为位置 ${positionKey} 分配新ID: ${tableId}`);
     }
 
     return positionToId.get(positionKey)!;
@@ -58,7 +57,6 @@ export function resetDocumentParsing() {
     currentDocumentId++;
     documentTableCount = 0;
     // 不清空positionToId映射，保持历史ID的稳定性
-    console.log(`开始解析新文档，文档ID: ${currentDocumentId}`);
 }
 
 // 清理过期的位置映射（可选，用于内存管理）
@@ -76,7 +74,6 @@ export function cleanupOldPositions(maxDocuments: number = 10) {
     keysToDelete.forEach(key => positionToId.delete(key));
 
     if (keysToDelete.length > 0) {
-        console.log(`清理了 ${keysToDelete.length} 个过期位置映射`);
     }
 }
 
@@ -168,7 +165,6 @@ class StandardTableDataManager {
     // 注册标准化数据
     registerStandardData(standardData: StandardTableData): void {
         this.standardDataRegistry.set(standardData.tableId, standardData);
-        console.log(`注册标准化表格数据: ${standardData.tableId}, 版本: ${standardData.version}`);
         
         // 通知监听器
         this.notifyDataChange(standardData.tableId, standardData);
@@ -199,7 +195,6 @@ class StandardTableDataManager {
         updatedStandardData.metadata.rawMarkdown = tableDataToMarkdown(newData);
 
         this.registerStandardData(updatedStandardData);
-        console.log(`标准化数据已更新: ${tableId}, 来源: ${source}`);
         return true;
     }
 
@@ -426,7 +421,7 @@ let tablePlugin = function (md: MarkdownIt) {
 
                     // 解析表格数据
                     const tableData = parseTableTokens(tableTokens);
-
+                    console.log("正确tableData: \n", tableData);
                     // 计算原始Markdown（用于回写）
                     const rawMarkdown = tableDataToMarkdown(tableData);
 
@@ -457,8 +452,6 @@ let tablePlugin = function (md: MarkdownIt) {
                         data: tableData
                     };
                     tableRegistry.set(tableId, metadata);
-
-                    console.log(`注册表格: ${tableId}, 行号: ${startLine}-${endLine}, 版本: ${standardData.version}`);
 
                     // 创建占位符token，包含标准化数据信息
                     const placeholderToken = new state.Token('html_block', '', 0);

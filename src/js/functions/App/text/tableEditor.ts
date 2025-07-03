@@ -1,7 +1,7 @@
-import { 
-    tableRegistry, 
-    tableDataToMarkdown, 
-    TableData, 
+import {
+    tableRegistry,
+    tableDataToMarkdown,
+    TableData,
     TableMetadata,
     StandardTableData,
     standardTableDataManager,
@@ -11,102 +11,19 @@ import {
 // 全局标记，防止写入Monaco时触发循环更新
 let isWritingToMonaco = false;
 
-// 解析Monaco编辑器中的表格内容为TableData格式
-export function parseMonacoTable(content: string, tableId: string): TableData | null {
-    try {
-        // 首先尝试从标准化数据中获取元数据
-        const standardData = StandardTableAPI.getStandardData(tableId);
-        if (!standardData) {
-            // 回退到传统方式
-            const metadata = tableRegistry.get(tableId);
-            if (!metadata) {
-                console.warn(`Table ${tableId} not found in registry`);
-                return null;
-            }
-        }
+// 🚀 移除 parseMonacoTable 函数，统一使用 parseTableTokens 解析器
+// 右边回写左边时会触发 mdConverter，通过 tablePlugin -> parseTableTokens 获取正确数据
 
-        const metadata = standardData ? standardData.metadata : tableRegistry.get(tableId);
-        if (!metadata) {
-            console.warn(`Table ${tableId} metadata not found`);
-            return null;
-        }
-
-        // 获取表格所在的行内容
-        const lines = content.split('\n');
-        const startLine = metadata.startLine;
-        const endLine = Math.min(metadata.endLine, lines.length - 1);
-        
-        if (startLine >= lines.length || endLine < startLine) {
-            console.warn(`Invalid line range for table ${tableId}: ${startLine}-${endLine}`);
-            return null;
-        }
-
-        // 提取表格行
-        const tableLines = lines.slice(startLine, endLine + 1);
-        
-        // 过滤出真正的表格行（包含 | 的行）
-        const validTableLines = tableLines.filter(line => line.trim().includes('|') && !line.trim().match(/^\|[\s\-\|]*\|$/));
-        
-        if (validTableLines.length < 1) {
-            return { headers: [], rows: [] };
-        }
-
-        // 解析表头（第一行）
-        const headerLine = validTableLines[0];
-        const headers = parseTableRow(headerLine);
-        
-        // 解析数据行（跳过分隔行）
-        const rows: string[][] = [];
-        for (let i = 1; i < validTableLines.length; i++) {
-            const line = validTableLines[i];
-            // 跳过分隔行（形如 |---|---|）
-            if (line.trim().match(/^\|[\s\-\|]*\|$/)) {
-                continue;
-            }
-            const row = parseTableRow(line);
-            if (row.length > 0) {
-                rows.push(row);
-            }
-        }
-
-        // 确保所有行的列数一致
-        const maxCols = Math.max(headers.length, ...rows.map(row => row.length));
-        
-        // 补全headers
-        while (headers.length < maxCols) {
-            headers.push('');
-        }
-        
-        // 补全rows中的每一行
-        rows.forEach(row => {
-            while (row.length < maxCols) {
-                row.push('');
-            }
-            // 只保留与表头相同数量的列
-            row.splice(maxCols);
-        });
-
-        return { headers, rows };
-    } catch (error) {
-        console.error(`Failed to parse table ${tableId} from Monaco:`, error);
-        return null;
-    }
-}
-
-// 解析单行表格数据
+// 解析表格行的辅助函数
 function parseTableRow(line: string): string[] {
-    // 移除首尾的 | 字符并分割
-    const trimmed = line.trim();
-    if (!trimmed.startsWith('|') || !trimmed.endsWith('|')) {
-        return [];
-    }
+    // 移除首尾的空白字符和管道符
+    const trimmedLine = line.trim().replace(/^\|/, '').replace(/\|$/, '');
     
-    // 移除首尾的 | 并按 | 分割
-    const content = trimmed.slice(1, -1);
-    const cells = content.split('|').map(cell => cell.trim());
+    // 按管道符分割
+    const cells = trimmedLine.split('|');
     
-    // 过滤掉空的单元格（但保留有内容的空格）
-    return cells.map(cell => cell === ' ' ? '' : cell);
+    // 清理每个单元格的空白字符
+    return cells.map(cell => cell.trim());
 }
 
 // ===== 🚀 新的基于标准化JSON数据的同步系统 =====
@@ -128,7 +45,7 @@ class StandardTableSyncManager {
             this.syncCallbacks.set(tableId, new Set());
         }
         this.syncCallbacks.get(tableId)!.add(callback);
-        
+
         // 同时在标准化数据管理器中注册监听器
         StandardTableAPI.onDataChange(tableId, callback);
     }
@@ -142,7 +59,7 @@ class StandardTableSyncManager {
                 this.syncCallbacks.delete(tableId);
             }
         }
-        
+
         // 同时在标准化数据管理器中移除监听器
         StandardTableAPI.offDataChange(tableId, callback);
     }
@@ -150,11 +67,11 @@ class StandardTableSyncManager {
     // 触发表格标准化数据同步（React → Monaco）
     notifyStandardDataChange(tableId: string, newData: TableData, source: 'react' | 'monaco' = 'react') {
         if (this.isInternalUpdate) return;
-        
+
         this.isInternalUpdate = true;
-        
-        console.log(`StandardTableSyncManager: 通知表格 ${tableId} 标准化数据变化，来源: ${source}`);
-        
+
+
+
         try {
             if (source === 'react') {
                 // React → Monaco: 通过标准化数据更新Monaco编辑器
@@ -223,7 +140,7 @@ class TableSyncManager {
             this.syncListeners.set(tableId, new Set());
         }
         this.syncListeners.get(tableId)!.add(callback);
-        
+
         // 🚀 新增：同时注册标准化数据监听器
         const standardCallback = (standardData: StandardTableData) => {
             const tableData = StandardTableAPI.standardToTable(standardData);
@@ -272,7 +189,7 @@ export const tableSyncManager = TableSyncManager.getInstance();
 
 // ===== 🚀 基于标准化数据的Monaco编辑器回写函数 =====
 export function writeStandardTableToMonaco(tableId: string, newData: TableData): boolean {
-    console.log(`writeStandardTableToMonaco: 表格 ${tableId}`);
+
 
     // 设置写入标记，防止循环触发
     isWritingToMonaco = true;
@@ -308,18 +225,12 @@ export function writeStandardTableToMonaco(tableId: string, newData: TableData):
         // 🚀 修复范围计算逻辑
         const startLine = standardData.metadata.startLine;
         const originalEndLine = standardData.metadata.endLine;
-        
+
         // 确保原始结束行号不超过当前模型的行数
         const modelLineCount = model.getLineCount();
         const actualEndLine = Math.min(originalEndLine, modelLineCount - 1);
-        
-        console.log(`writeStandardTableToMonaco: 表格 ${tableId} 范围信息`, {
-            startLine,
-            originalEndLine,
-            actualEndLine,
-            modelLineCount,
-            newMarkdownLines: newMarkdown.trim().split('\n').length
-        });
+
+
 
         // 创建替换范围：从表格开始行到原始结束行（或模型最大行）
         const range = new window.monaco.Range(
@@ -341,7 +252,7 @@ export function writeStandardTableToMonaco(tableId: string, newData: TableData):
         const newEndLine = startLine + newMarkdownLines.length - 1;
         updateStandardTableEndLine(tableId, newEndLine);
 
-        console.log(`writeStandardTableToMonaco: 表格 ${tableId} 更新完成，新的endLine: ${newEndLine}`);
+
 
         // 延长标记重置时间，确保所有相关事件都已处理完毕
         setTimeout(() => {
@@ -377,13 +288,13 @@ function updateStandardTableEndLine(tableId: string, newEndLine: number): void {
 
     // 重新注册更新后的数据
     StandardTableAPI.registerStandardData(updatedStandardData);
-    
-    console.log(`更新表格 ${tableId} 的endLine: ${standardData.metadata.endLine} → ${newEndLine}`);
+
+
 }
 
 // Monaco编辑器回写函数（保持向后兼容）
 export function writeTableToMonaco(tableId: string, newData: TableData): boolean {
-    console.log(`writeTableToMonaco: 表格 ${tableId} (向后兼容)`);
+
     return writeStandardTableToMonaco(tableId, newData);
 }
 
@@ -424,7 +335,7 @@ export function getTableData(tableId: string): TableData | null {
     if (standardData) {
         return StandardTableAPI.standardToTable(standardData);
     }
-    
+
     // 回退到传统方式
     const metadata = tableRegistry.get(tableId);
     return metadata ? metadata.data : null;
@@ -439,7 +350,7 @@ export function getTableMetadata(tableId: string): TableMetadata | undefined {
 export function getStandardTableRegistryDebugInfo() {
     const tables: any[] = [];
     const allStandardData = StandardTableAPI.getAllStandardData();
-    
+
     allStandardData.forEach((standardData, tableId) => {
         tables.push({
             tableId,
@@ -475,37 +386,28 @@ export function getTableRegistryDebugInfo() {
 
 // 强制更新表格注册表数据（当Monaco内容变化时调用）
 export function updateTableRegistryFromMarkdown(): void {
-    console.log('强制更新表格注册表数据');
-    
+
+
     // 获取标准化数据数量
     const standardTableCount = StandardTableAPI.getAllStandardData().size;
     const traditionalTableCount = tableRegistry.size;
-    
-    console.log(`标准化表格注册表已更新，包含 ${standardTableCount} 个表格`);
-    console.log(`传统表格注册表已更新，包含 ${traditionalTableCount} 个表格`);
+
+
+
 
     // 打印所有标准化表格的信息用于调试
     const allStandardData = StandardTableAPI.getAllStandardData();
     allStandardData.forEach((standardData, tableId) => {
-        console.log(`标准化表格 ${tableId}:`, {
-            version: standardData.version,
-            headers: standardData.data.headers,
-            rowCount: standardData.data.rows.length,
-            columnCount: standardData.schema.columnCount,
-            hash: standardData.metadata.tableHash
-        });
+
     });
 }
 
 // ===== 🚀 基于标准化数据的Monaco内容变化处理 =====
 export function handleStandardMonacoContentChange(): void {
     if (isWritingToMonaco || standardTableSyncManager.isUpdating()) {
-        console.log('跳过Monaco内容变化同步 - 正在进行其他更新');
         return;
     }
 
-    console.log('处理Monaco内容变化，同步标准化表格数据');
-    
     const editor = window.editor;
     if (!editor) {
         console.warn('Monaco编辑器不可用');
@@ -518,26 +420,13 @@ export function handleStandardMonacoContentChange(): void {
         return;
     }
 
-    // 遍历所有注册的标准化表格，检查是否有变化
-    const allStandardData = StandardTableAPI.getAllStandardData();
-    allStandardData.forEach((standardData, tableId) => {
-        try {
-            const currentData = parseMonacoTable(content, tableId);
-            if (currentData) {
-                // 比较数据是否发生变化
-                const oldDataString = JSON.stringify(standardData.data);
-                const newDataString = JSON.stringify(currentData);
-                
-                if (oldDataString !== newDataString) {
-                    console.log(`标准化表格 ${tableId} 数据发生变化，通知React组件更新`);
-                    // 通过标准化API更新数据
-                    StandardTableAPI.updateStandardData(tableId, currentData, 'monaco');
-                }
-            }
-        } catch (error) {
-            console.error(`处理标准化表格 ${tableId} 的Monaco内容变化时出错:`, error);
-        }
-    });
+    // 🚀 简化逻辑：右边回写左边时，会触发 mdConverter 重新解析
+    // mdConverter 会使用正确的 parseTableTokens 来获取真实的表格数据
+    // 我们不需要在这里做额外的解析，直接让 mdConverter 处理即可
+    console.log('Monaco内容发生变化，将通过 mdConverter 重新解析所有表格数据');
+    
+    // 注意：这个函数主要用于检测内容变化，实际的表格数据更新
+    // 会通过 mdConverter -> tablePlugin -> parseTableTokens 的正确流程进行
 }
 
 // Monaco内容变化时触发表格同步的函数（保持向后兼容）
@@ -555,10 +444,9 @@ if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
         getRegistryInfo: getTableRegistryDebugInfo,
         writeTable: writeTableToMonaco,
         normalizeData: normalizeTableData,
-        parseMonacoTable,
         syncManager: tableSyncManager,
         handleMonacoContentChange,
-        
+
         // 🚀 新的标准化API
         getStandardTableData,
         getStandardRegistryInfo: getStandardTableRegistryDebugInfo,

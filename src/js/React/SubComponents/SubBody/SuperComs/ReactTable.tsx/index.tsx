@@ -19,13 +19,13 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon
 } from '@mui/icons-material';
-import { 
-  TableData, 
-  StandardTableData, 
-  StandardTableAPI 
+import {
+  TableData,
+  StandardTableData,
+  StandardTableAPI
 } from '@Func/Parser/mdItPlugin/table';
-import { 
-  getTableData, 
+import {
+  getTableData,
   tableSyncManager,
   getStandardTableData,
   standardTableSyncManager
@@ -56,8 +56,6 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     headers: ['Name', 'Age', 'City', 'Email'],
     rows: [
       ['John Doe', '25', 'New York', 'john@example.com'],
-      ['Jane Smith', '30', 'London', 'jane@example.com'],
-      ['Bob Johnson', '35', 'Tokyo', 'bob@example.com'],
       ['Alice Brown', '28', 'Paris', 'alice@example.com']
     ]
   }), []);
@@ -66,7 +64,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   const updateStandardDataAndSync = useCallback((newData: TableData) => {
     // 1. 更新本地状态
     setData(newData);
-    
+
     // 2. 如果有tableId，通过标准化同步管理器触发Monaco更新
     if (tableId) {
       standardTableSyncManager.notifyStandardDataChange(tableId, newData, 'react');
@@ -92,19 +90,14 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     if (!tableId) return;
 
     const handleStandardDataChange = (newStandardData: StandardTableData) => {
-      console.log(`ReactTable收到标准化数据更新 - tableId: ${tableId}, version: ${newStandardData.version}`);
-      
+
+
       const newTableData = StandardTableAPI.standardToTable(newStandardData);
       const dataChanged = JSON.stringify(data) !== JSON.stringify(newTableData);
-      
+
       if (dataChanged) {
         setStandardData(newStandardData);
         setData(newTableData);
-        console.log(`ReactTable标准化数据已更新 - tableId: ${tableId}`, {
-          version: newStandardData.version,
-          headers: newTableData.headers.length,
-          rows: newTableData.rows.length
-        });
       }
     };
 
@@ -126,8 +119,8 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       if (StandardTableAPI.getStandardData(tableId)) {
         return;
       }
-      
-      console.log(`ReactTable收到传统数据更新 - tableId: ${tableId}`);
+
+
       const dataChanged = JSON.stringify(data) !== JSON.stringify(newData);
       if (dataChanged) {
         setData(newData);
@@ -147,36 +140,32 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   useEffect(() => {
     let initialData: TableData;
     let initialStandardData: StandardTableData | null = null;
-    
+
     if (tableId) {
       // 🚀 优先尝试获取标准化数据
       initialStandardData = getStandardTableData(tableId);
-      
+
       if (initialStandardData) {
         initialData = StandardTableAPI.standardToTable(initialStandardData);
-        console.log(`ReactTable初始化 - 使用标准化数据，tableId: ${tableId}, version: ${initialStandardData.version}`);
+
       } else {
         // 回退到传统方式
         const registeredData = getTableData(tableId);
         initialData = registeredData || defaultTableData;
-        console.log(`ReactTable初始化 - 使用传统数据，tableId: ${tableId}, 找到数据:`, !!registeredData);
+
       }
     } else {
       // 使用props传入的数据或默认数据
       initialData = propTableData || defaultTableData;
-      console.log('ReactTable初始化 - 使用props或默认数据');
+
     }
-    
+
     // 检查数据是否真的发生了变化，避免不必要的重新渲染
     const dataChanged = JSON.stringify(data) !== JSON.stringify(initialData);
     const standardDataChanged = JSON.stringify(standardData) !== JSON.stringify(initialStandardData);
-    
+
     if (dataChanged || standardDataChanged) {
-      console.log(`ReactTable数据变化 - tableId: ${tableId}`, {
-        oldData: { headers: data.headers.length, rows: data.rows.length },
-        newData: { headers: initialData.headers.length, rows: initialData.rows.length },
-        standardData: !!initialStandardData
-      });
+
       setData(initialData);
       setStandardData(initialStandardData);
     }
@@ -185,10 +174,10 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   // 开始编辑单元格
   const startEdit = useCallback((rowIndex: number, colIndex: number) => {
     const isHeader = rowIndex === -1;
-    const value = isHeader 
+    const value = isHeader
       ? data.headers[colIndex] || ''
       : data.rows[rowIndex]?.[colIndex] || '';
-    
+
     setEditingCell({ rowIndex, colIndex, value });
   }, [data]);
 
@@ -197,14 +186,14 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     if (!editingCell) return;
 
     const { rowIndex, colIndex, value } = editingCell;
-    
+
     setData(prevData => {
       // 深拷贝数据，避免直接修改
       const newData = {
         headers: [...prevData.headers],
         rows: prevData.rows.map(row => [...row])
       };
-      
+
       if (rowIndex === -1) {
         // 编辑表头
         newData.headers[colIndex] = value;
@@ -215,14 +204,14 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
         }
         newData.rows[rowIndex][colIndex] = value;
       }
-      
+
       // 🚀 使用新的同步机制
       if (tableId) {
         setTimeout(() => {
           updateDataAndSync(newData);
         }, 0);
       }
-      
+
       return newData;
     });
 
@@ -240,12 +229,12 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       headers: [...data.headers],
       rows: data.rows.map(row => [...row])
     };
-    
+
     // 确保新行的列数与现有表头数量完全一致
     const colCount = newData.headers.length;
     const newRow = new Array(colCount).fill('');
     newData.rows.push(newRow);
-    
+
     // 🚀 使用新的同步更新机制
     updateDataAndSync(newData);
   }, [data, updateDataAndSync]);
@@ -257,7 +246,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       rows: data.rows.map(row => [...row])
     };
     newData.rows.splice(rowIndex, 1);
-    
+
     // 🚀 使用新的同步更新机制
     updateDataAndSync(newData);
   }, [data, updateDataAndSync]);
@@ -268,15 +257,15 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       headers: [...data.headers],
       rows: data.rows.map(row => [...row])
     };
-    
+
     // 添加新的表头
     newData.headers.push(`Col ${newData.headers.length + 1}`);
-    
+
     // 为每一行都添加一个空单元格，确保所有行都有相同的列数
     newData.rows.forEach(row => {
       row.push('');
     });
-    
+    console.log("newData: \n", newData);
     // 🚀 使用新的同步更新机制
     updateDataAndSync(newData);
   }, [data, updateDataAndSync]);
@@ -287,22 +276,21 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       // 不允许删除最后一列
       return;
     }
-    
+
     const newData = {
       headers: [...data.headers],
       rows: data.rows.map(row => [...row])
     };
-    
+
     // 删除表头中的列
     newData.headers.splice(colIndex, 1);
-    
     // 删除每行中对应的列
     newData.rows.forEach(row => {
       if (row.length > colIndex) {
         row.splice(colIndex, 1);
       }
     });
-    
+
     // 🚀 使用新的同步更新机制
     updateDataAndSync(newData);
   }, [data, updateDataAndSync]);
@@ -311,7 +299,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   const renderEditor = useCallback((currentValue: string) => (
     <TextField
       value={editingCell?.value || ''}
-      onChange={(e) => setEditingCell(prev => 
+      onChange={(e) => setEditingCell(prev =>
         prev ? { ...prev, value: e.target.value } : null
       )}
       onKeyDown={(e) => {
@@ -325,7 +313,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       autoFocus
       size="small"
       variant="outlined"
-      sx={{ 
+      sx={{
         minWidth: '100px',
         '& .MuiOutlinedInput-root': {
           fontSize: '0.875rem'
@@ -336,13 +324,13 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
 
   // 渲染单元格内容，空字符串显示为不间断空格
   const renderCellContent = useCallback((
-    value: string, 
-    rowIndex: number, 
-    colIndex: number, 
+    value: string,
+    rowIndex: number,
+    colIndex: number,
     isHeader: boolean = false
   ) => {
     const isEditing = editingCell?.rowIndex === rowIndex && editingCell?.colIndex === colIndex;
-    
+
     if (isEditing) {
       return renderEditor(value);
     }
@@ -387,8 +375,8 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
         Empty table - {tableId ? `Table ID: ${tableId}` : 'No data'}
         {standardData && (
           <div style={{ fontSize: '0.75rem', marginTop: '4px', color: '#666' }}>
-            Version: {standardData.version} | 
-            Columns: {standardData.schema.columnCount} | 
+            Version: {standardData.version} |
+            Columns: {standardData.schema.columnCount} |
             Rows: {standardData.schema.rowCount}
           </div>
         )}
@@ -401,15 +389,15 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       {/* 工具栏 */}
       <Box sx={{ p: 1, display: 'flex', gap: 1, borderBottom: '1px solid #e0e0e0' }} className="react-table-toolbar">
         <Tooltip title={isEditMode ? "Exit Edit Mode" : "Enter Edit Mode"}>
-          <IconButton 
-            size="small" 
+          <IconButton
+            size="small"
             onClick={() => setIsEditMode(!isEditMode)}
             color={isEditMode ? "primary" : "default"}
           >
             <EditIcon />
           </IconButton>
         </Tooltip>
-        
+
         {isEditMode && (
           <>
             <Tooltip title="Add Row">
@@ -417,7 +405,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
                 <AddIcon />
               </IconButton>
             </Tooltip>
-            
+
             <Tooltip title="Add Column">
               <IconButton size="small" onClick={addColumn}>
                 <AddIcon sx={{ transform: 'rotate(90deg)' }} />
@@ -425,7 +413,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
             </Tooltip>
           </>
         )}
-        
+
         {tableId && (
           <Box sx={{ ml: 'auto', fontSize: '0.75rem', color: 'text.secondary', display: 'flex', alignItems: 'center' }}>
             Table ID: {tableId}
@@ -442,7 +430,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table size="small" stickyHeader>
           <TableHead>
-            <TableRow sx={{ 
+            <TableRow sx={{
               backgroundColor: '#f5f5f5',
               '& .MuiTableCell-head': {
                 fontWeight: 600,
@@ -478,14 +466,14 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
               )}
             </TableRow>
           </TableHead>
-          
+
           <TableBody>
             {data.rows.map((row, rowIndex) => (
-              <TableRow 
+              <TableRow
                 key={rowIndex}
-                sx={{ 
-                  '&:nth-of-type(even)': { 
-                    backgroundColor: '#fafafa' 
+                sx={{
+                  '&:nth-of-type(even)': {
+                    backgroundColor: '#fafafa'
                   },
                   '&:hover': {
                     backgroundColor: '#f0f0f0'
@@ -497,7 +485,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
                     {renderCellContent(cell, rowIndex, colIndex)}
                   </TableCell>
                 ))}
-                
+
                 {isEditMode && (
                   <TableCell>
                     <Tooltip title="Delete Row">
@@ -540,73 +528,72 @@ class TableManager {
 
   // 智能挂载：避免不必要的DOM重建
   mountTables() {
-    console.log('=== TableManager.mountTables() 开始 ===');
-    
+
     // 查找当前所有表格占位符
     const placeholders = document.querySelectorAll('[data-react-table]') as NodeListOf<HTMLElement>;
     const currentTableIds = new Set<string>();
-    
-    console.log(`发现 ${placeholders.length} 个表格占位符`);
-    
+
+
+
     // 处理每个占位符
     placeholders.forEach((placeholder, index) => {
       const tableId = placeholder.getAttribute('data-table-id');
       const domTableHash = placeholder.getAttribute('data-table-hash'); // DOM中的哈希
-      
+
       if (!tableId) {
         console.warn(`表格占位符 ${index} 缺少 data-table-id`);
         return;
       }
-      
+
       currentTableIds.add(tableId);
-      
+
       // 从表格注册表获取当前的真实哈希
       const registryMetadata = getTableMetadata(tableId);
       const currentTableHash = registryMetadata?.tableHash || null;
-      
+
       const lastHash = this.lastTableStates.get(tableId);
       const existingRoot = this.mountedRoots.get(tableId);
       const hasContent = placeholder.children.length > 0;
-      
-      console.log(`表格 ${tableId}:`, {
-        domHash: domTableHash,
-        registryHash: currentTableHash,
-        lastHash: lastHash,
-        hasExistingRoot: !!existingRoot,
-        hasContent: hasContent,
-        needsUpdate: currentTableHash !== lastHash || !hasContent
-      });
-      
+
+      // 
+      //   domHash: domTableHash,
+      //   registryHash: currentTableHash,
+      //   lastHash: lastHash,
+      //   hasExistingRoot: !!existingRoot,
+      //   hasContent: hasContent,
+      //   needsUpdate: currentTableHash !== lastHash || !hasContent
+      // });
+
       // 如果没有找到注册表数据，跳过此表格
       if (!currentTableHash) {
         console.warn(`表格 ${tableId} 在注册表中未找到，跳过处理`);
         return;
       }
-      
+
       // 关键优化：使用注册表中的哈希进行比较
       if (existingRoot && currentTableHash === lastHash && hasContent) {
-        console.log(`表格 ${tableId} 内容未变且DOM完整，跳过更新`);
+
         return;
       }
-      
+
       // 如果有根节点但内容被清空了，或者哈希变化了，需要重新渲染
       if (existingRoot && (!hasContent || currentTableHash !== lastHash)) {
-        console.log(`表格 ${tableId} 需要更新 - DOM清空: ${!hasContent}, 哈希变化: ${currentTableHash !== lastHash}`);
+
         this.updateTable(tableId, currentTableHash);
         return;
       }
-      
+
       // 如果需要创建新的根节点
       if (!existingRoot) {
-        console.log(`为表格 ${tableId} 创建新的 React 根节点`);
+
         this.createTableRoot(placeholder, tableId, currentTableHash);
       }
     });
-    
+
     // 清理不再存在的表格
     this.cleanupUnusedRoots(currentTableIds);
-    
-    console.log('=== TableManager.mountTables() 完成 ===');
+
+
   }
 
   // 创建新的表格根节点
@@ -618,7 +605,7 @@ class TableManager {
       placeholder.style.minHeight = 'auto';
       placeholder.style.padding = '0';
       placeholder.style.margin = '16px 0';
-      
+
       // 动态导入 react-dom/client
       import('react-dom/client').then(({ createRoot }) => {
         // 再次检查占位符是否仍然存在
@@ -626,17 +613,17 @@ class TableManager {
           console.warn(`表格 ${tableId} 的占位符已被移除`);
           return;
         }
-        
+
         const root = createRoot(placeholder);
         root.render(React.createElement(ReactTable, { tableId }));
-        
+
         // 保存根节点和状态
         this.mountedRoots.set(tableId, root);
         if (tableHash) {
           this.lastTableStates.set(tableId, tableHash);
         }
-        
-        console.log(`成功挂载表格 ${tableId}`);
+
+
       }).catch(e => {
         console.error(`创建表格 ${tableId} 根节点失败:`, e);
       });
@@ -651,12 +638,12 @@ class TableManager {
     if (root && tableHash) {
       try {
         // 使用tableHash作为key，确保React能检测到变化
-        root.render(React.createElement(ReactTable, { 
+        root.render(React.createElement(ReactTable, {
           tableId,
           key: `${tableId}-${tableHash}` // 使用hash确保props变化时重新渲染
         }));
         this.lastTableStates.set(tableId, tableHash);
-        console.log(`成功更新表格 ${tableId}, 新hash: ${tableHash}`);
+
       } catch (e) {
         console.error(`更新表格 ${tableId} 失败:`, e);
       }
@@ -666,10 +653,10 @@ class TableManager {
   // 清理不再存在的表格根节点
   private cleanupUnusedRoots(currentTableIds: Set<string>) {
     const toDelete: string[] = [];
-    
+
     this.mountedRoots.forEach((root, tableId) => {
       if (!currentTableIds.has(tableId)) {
-        console.log(`清理不再存在的表格 ${tableId}`);
+
         try {
           root.unmount();
           toDelete.push(tableId);
@@ -678,7 +665,7 @@ class TableManager {
         }
       }
     });
-    
+
     // 从映射中删除
     toDelete.forEach(tableId => {
       this.mountedRoots.delete(tableId);
@@ -686,22 +673,22 @@ class TableManager {
       // 🚀 清理同步监听器
       tableSyncManager.clearTableListeners(tableId);
     });
-    
+
     if (toDelete.length > 0) {
-      console.log(`清理了 ${toDelete.length} 个废弃表格`);
+
     }
   }
 
   // 强制重新挂载所有表格（用于特殊情况）
   forceRemountAllTables() {
-    console.log('强制重新挂载所有表格');
+
     this.unmountAllTables();
     this.mountTables();
   }
 
   // 卸载所有表格
   unmountAllTables() {
-    console.log('卸载所有表格根节点');
+
     this.mountedRoots.forEach((root, tableId) => {
       try {
         root.unmount();
