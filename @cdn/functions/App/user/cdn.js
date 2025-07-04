@@ -1,7 +1,7 @@
 import { getDataByKey, openDB, updateDB } from "@App/db";
 export const cdnDomains = [
-    "fastly.jsdelivr.net",
     "cdn.jsdelivr.net",
+    "fastly.jsdelivr.net",
     // "jsd.onmicrosoft.cn",
     "cdn.jsdmirror.com",
 ];
@@ -216,15 +216,15 @@ export async function preload() {
     const scriptsToLoad = [
         {
             id: "katex",
-            cdnUrl: "https://fastly.jsdelivr.net/npm/katex@0.16.7/dist/katex.min.js",
+            cdnUrl: "https://cdn.jsdmirror.com/npm/katex@0.16.7/dist/katex.min.js",
         },
         {
             id: "incremental-dom",
-            cdnUrl: "https://fastly.jsdelivr.net/npm/incremental-dom@0.7.0/dist/incremental-dom-min.js",
+            cdnUrl: "https://cdn.jsdmirror.com/npm/incremental-dom@0.7.0/dist/incremental-dom-min.js",
         },
         {
             id: "markdown-it-incremental-dom",
-            cdnUrl: "https://fastly.jsdelivr.net/npm/markdown-it-incremental-dom/dist/markdown-it-incremental-dom.min.js",
+            cdnUrl: "https://cdn.jsdmirror.com/npm/markdown-it-incremental-dom/dist/markdown-it-incremental-dom.min.js",
         },
     ];
     await loadScripts(scriptsToLoad);

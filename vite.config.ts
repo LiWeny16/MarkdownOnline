@@ -15,18 +15,18 @@ export default defineConfig({
   build: {
     target: "esnext",
     rollupOptions: {
-      treeshake:true,
+      treeshake: true,
       // 配置rollup的一些构建策略
       external: [
-        "react",
-        "react-dom",
+        // "react",
+        // "react-dom",
         // "markdown-it-incremental-dom",
         // "IncrementalDOM",
       ],
       output: {
         globals: {
-          react: "React",
-          "react-dom": "ReactDOM",
+          // react: "React",
+          // "react-dom": "ReactDOM",
           // "markdown-it-incremental-dom": "markdownitIncrementalDOM",
           // "incremental-dom": "IncrementalDOM",
         },
@@ -77,8 +77,8 @@ export default defineConfig({
       threshold: 16000, // 对大于 32kb 的文件进行压缩
     }),
     viteExternalsPlugin({
-      react: "React",
-      "react-dom": "ReactDOM",
+      // react: "React",
+      // "react-dom": "ReactDOM",
       // "markdown-it-incremental-dom": "markdownitIncrementalDOM",
       // "incremental-dom": "IncrementalDOM",
     }),

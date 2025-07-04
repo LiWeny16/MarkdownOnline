@@ -1,35 +1,507 @@
+// ===== ID 管理器：基于位置的稳定ID生成 =====
+let currentDocumentId = 0; // 当前文档的唯一标识
+let documentTableCount = 0; // 当前文档中的表格计数
+const positionToId = new Map(); // 位置key -> tableId的映射
+// 生成基于位置的稳定key
+function getPositionKey(startLine, endLine, tableIndex) {
+    return `${currentDocumentId}-${startLine}-${endLine}-${tableIndex}`;
+}
+// 获取或创建表格ID（基于位置而不是内容）
+export function getTableIdByPosition(startLine, endLine, tableIndex) {
+    const positionKey = getPositionKey(startLine, endLine, tableIndex);
+    if (!positionToId.has(positionKey)) {
+        documentTableCount++;
+        const tableId = `table-${documentTableCount}`;
+        positionToId.set(positionKey, tableId);
+    }
+    return positionToId.get(positionKey);
+}
+// 重置文档解析状态（每次新的markdown解析开始时调用）
+export function resetDocumentParsing() {
+    currentDocumentId++;
+    documentTableCount = 0;
+    // 不清空positionToId映射，保持历史ID的稳定性
+}
+// 清理过期的位置映射（可选，用于内存管理）
+export function cleanupOldPositions(maxDocuments = 10) {
+    const currentDocId = currentDocumentId;
+    const keysToDelete = [];
+    positionToId.forEach((id, key) => {
+        const docId = parseInt(key.split('-')[0]);
+        if (currentDocId - docId > maxDocuments) {
+            keysToDelete.push(key);
+        }
+    });
+    keysToDelete.forEach(key => positionToId.delete(key));
+    if (keysToDelete.length > 0) {
+    }
+}
+// 简单的哈希函数，用于生成内容哈希（用于变更检测）
+function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // 转换为32位整数
+    }
+    return Math.abs(hash).toString(36).slice(0, 12); // 转换为36进制，取前12位
+}
+// ===== 标准化JSON数据管理器 =====
+class StandardTableDataManager {
+    constructor() {
+        Object.defineProperty(this, "standardDataRegistry", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: new Map()
+        });
+        Object.defineProperty(this, "dataChangeListeners", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: new Map()
+        });
+    }
+    static getInstance() {
+        if (!StandardTableDataManager.instance) {
+            StandardTableDataManager.instance = new StandardTableDataManager();
+        }
+        return StandardTableDataManager.instance;
+    }
+    // 将TableData转换为StandardTableData
+    createStandardData(tableId, data, startLine, endLine, rawMarkdown) {
+        const now = Date.now();
+        const existing = this.standardDataRegistry.get(tableId);
+        // 生成列schema
+        const headers = data.headers.map((title, index) => ({
+            id: `col_${index}`,
+            title: title || `Column ${index + 1}`,
+            type: 'text',
+            index
+        }));
+        const standardData = {
+            tableId,
+            metadata: {
+                startLine,
+                endLine,
+                tableHash: simpleHash(JSON.stringify({ headers: data.headers, rows: data.rows })),
+                rawMarkdown,
+                createdAt: existing?.metadata.createdAt || now,
+                updatedAt: now
+            },
+            schema: {
+                headers,
+                columnCount: data.headers.length,
+                rowCount: data.rows.length
+            },
+            data: {
+                headers: [...data.headers],
+                rows: data.rows.map(row => [...row])
+            }
+        };
+        return standardData;
+    }
+    // 注册标准化数据
+    registerStandardData(standardData) {
+        this.standardDataRegistry.set(standardData.tableId, standardData);
+        // 通知监听器
+        this.notifyDataChange(standardData.tableId, standardData);
+    }
+    // 获取标准化数据
+    getStandardData(tableId) {
+        return this.standardDataRegistry.get(tableId) || null;
+    }
+    // 更新标准化数据
+    updateStandardData(tableId, newData, source = 'react') {
+        const existing = this.standardDataRegistry.get(tableId);
+        if (!existing) {
+            console.warn(`尝试更新不存在的表格: ${tableId}`);
+            return false;
+        }
+        // 🚀 修复：生成新的rawMarkdown
+        const newRawMarkdown = tableDataToMarkdown(newData);
+        const updatedStandardData = this.createStandardData(tableId, newData, existing.metadata.startLine, existing.metadata.endLine, newRawMarkdown // 使用新生成的markdown
+        );
+        // 🚀 修复：确保rawMarkdown使用最新的数据
+        updatedStandardData.metadata.rawMarkdown = newRawMarkdown;
+        console.log(`更新标准化数据 ${tableId} (source: ${source})`);
+        console.log('新的表格数据:', newData);
+        console.log('生成的Markdown:', newRawMarkdown);
+        this.registerStandardData(updatedStandardData);
+        return true;
+    }
+    // 添加数据变化监听器
+    addDataChangeListener(tableId, callback) {
+        if (!this.dataChangeListeners.has(tableId)) {
+            this.dataChangeListeners.set(tableId, new Set());
+        }
+        this.dataChangeListeners.get(tableId).add(callback);
+    }
+    // 移除数据变化监听器
+    removeDataChangeListener(tableId, callback) {
+        const listeners = this.dataChangeListeners.get(tableId);
+        if (listeners) {
+            listeners.delete(callback);
+            if (listeners.size === 0) {
+                this.dataChangeListeners.delete(tableId);
+            }
+        }
+    }
+    // 通知数据变化
+    notifyDataChange(tableId, data) {
+        const listeners = this.dataChangeListeners.get(tableId);
+        if (listeners) {
+            listeners.forEach(callback => {
+                try {
+                    callback(data);
+                }
+                catch (error) {
+                    console.error(`标准化数据监听器回调出错 (${tableId}):`, error);
+                }
+            });
+        }
+    }
+    // 清理所有数据
+    clearAll() {
+        this.standardDataRegistry.clear();
+        this.dataChangeListeners.clear();
+    }
+    // 获取所有标准化数据（调试用）
+    getAllStandardData() {
+        return new Map(this.standardDataRegistry);
+    }
+}
+// 导出标准化数据管理器实例
+export const standardTableDataManager = StandardTableDataManager.getInstance();
+// 全局表格索引表（保持向后兼容）
+export const tableRegistry = new Map();
+// 解析表格token为数据结构，增强空行空列兼容性
+function parseTableTokens(tableTokens) {
+    const headers = [];
+    const rows = [];
+    let currentRow = [];
+    let inHeader = false;
+    let inBody = false;
+    // console.log('解析表格tokens:', tableTokens.map(t => ({ type: t.type, content: t.content })));
+    for (const token of tableTokens) {
+        switch (token.type) {
+            case 'thead_open':
+                inHeader = true;
+                break;
+            case 'thead_close':
+                inHeader = false;
+                break;
+            case 'tbody_open':
+                inBody = true;
+                break;
+            case 'tbody_close':
+                inBody = false;
+                break;
+            case 'tr_open':
+                currentRow = [];
+                break;
+            case 'tr_close':
+                if (inHeader && currentRow.length > 0) {
+                    headers.push(...currentRow);
+                    // console.log('解析到表头:', currentRow);
+                }
+                else if (inBody && currentRow.length > 0) {
+                    rows.push([...currentRow]);
+                    // console.log('解析到数据行:', currentRow);
+                }
+                break;
+            case 'th_open':
+            case 'td_open':
+                // 准备收集单元格内容
+                break;
+            case 'th_close':
+            case 'td_close':
+                // 单元格结束
+                break;
+            case 'inline':
+                // 单元格内容
+                if (token.content !== undefined) {
+                    const cellContent = token.content.trim();
+                    currentRow.push(cellContent);
+                    // console.log('添加单元格内容:', cellContent);
+                }
+                break;
+        }
+    }
+    // 确保所有行的列数一致，补全空字符串
+    const maxCols = Math.max(headers.length, ...rows.map(row => row.length), 1); // 至少一列
+    // 补全headers
+    while (headers.length < maxCols) {
+        headers.push('');
+    }
+    // 补全rows中的每一行
+    rows.forEach(row => {
+        while (row.length < maxCols) {
+            row.push('');
+        }
+    });
+    const result = { headers, rows };
+    // console.log('最终解析结果:', result);
+    return result;
+}
+// 将表格数据转换为Markdown格式，空字符串用空格表示
+export function tableDataToMarkdown(data) {
+    // console.log("tableDataToMarkdown输入: \n", data);
+    if (!data.headers.length && !data.rows.length)
+        return '';
+    let markdown = '';
+    // 生成表头
+    if (data.headers.length > 0) {
+        const headerRow = data.headers.map(h => h === '' ? ' ' : h);
+        markdown += '| ' + headerRow.join(' | ') + ' |\n';
+        // 生成分隔行
+        markdown += '| ' + data.headers.map(() => '---').join(' | ') + ' |\n';
+    }
+    // 生成数据行
+    const headerCount = data.headers.length;
+    for (const row of data.rows) {
+        // 确保每行都有足够的列，如果不够则补充空单元格
+        const normalizedRow = [...row];
+        while (normalizedRow.length < headerCount) {
+            normalizedRow.push('');
+        }
+        // 只保留与表头相同数量的列
+        const dataRow = normalizedRow.slice(0, headerCount).map(cell => cell === '' ? ' ' : cell);
+        markdown += '| ' + dataRow.join(' | ') + ' |\n';
+    }
+    // console.log("tableDataToMarkdown输出: \n", markdown);
+    return markdown;
+}
+// ===== 标准化数据转换工具函数 =====
+export function standardDataToTableData(standardData) {
+    return {
+        headers: [...standardData.data.headers],
+        rows: standardData.data.rows.map(row => [...row])
+    };
+}
+export function tableDataToStandardData(tableId, data, startLine, endLine, rawMarkdown) {
+    return standardTableDataManager.createStandardData(tableId, data, startLine, endLine, rawMarkdown);
+}
 let tablePlugin = function (md) {
     // 核心拦截器：移除所有表格相关的 token，防止 Markdown-it 解析表格
     md.core.ruler.after('block', 'table_to_div', (state) => {
+        // 重置文档解析状态（每次解析开始时）
+        resetDocumentParsing();
+        // 重置注册表（每次解析开始时）
+        tableRegistry.clear();
+        standardTableDataManager.clearAll();
         const tokens = state.tokens;
+        let tableIndex = 0; // 当前文档中的表格索引
         for (let i = 0; i < tokens.length; i++) {
             const token = tokens[i];
             // 1. Intercept Markdown table tokens.
             if (token.type === 'table_open') {
-                // Find the index of the matching table_close token.
-                for (let j = i + 1; j < tokens.length; j++) {
+                // 检查是否被<center>或<right>等标签包裹
+                let align = 'left';
+                // 检查前面的token
+                if (i > 0 && tokens[i - 1].type === 'html_block') {
+                    const prevHtml = tokens[i - 1].content.trim().toLowerCase();
+                    if (prevHtml === '<center>')
+                        align = 'center';
+                    if (prevHtml === '<right>')
+                        align = 'right';
+                }
+                // 检查后面的token
+                // 先找到table_close
+                let tableCloseIndex = -1;
+                for (let j = i; j < tokens.length; j++) {
                     if (tokens[j].type === 'table_close') {
-                        // Remove the entire table token sequence and replace with a placeholder token.
-                        const placeholderToken = new state.Token('html_block', '', 0);
-                        placeholderToken.content = `<div data-line="${tokens[i].map[0]}" data-react-table class="react-table"></div>`;
-                        tokens.splice(i, j - i + 1, placeholderToken);
+                        tableCloseIndex = j;
                         break;
                     }
+                }
+                if (tableCloseIndex !== -1 && tableCloseIndex + 1 < tokens.length && tokens[tableCloseIndex + 1].type === 'html_block') {
+                    const nextHtml = tokens[tableCloseIndex + 1].content.trim().toLowerCase();
+                    if (nextHtml === '</center>')
+                        align = 'center';
+                    if (nextHtml === '</right>')
+                        align = 'right';
+                }
+                // 提取表格数据
+                let tableTokens = [];
+                // 收集所有表格相关的token
+                for (let j = i; j < tokens.length; j++) {
+                    tableTokens.push(tokens[j]);
+                    if (tokens[j].type === 'table_close') {
+                        tableCloseIndex = j;
+                        break;
+                    }
+                }
+                if (tableCloseIndex !== -1) {
+                    // 获取表格行号范围
+                    let startLine = 0;
+                    let endLine = 0;
+                    // 安全地获取开始行号
+                    const startToken = tokens[i];
+                    if (startToken && startToken.map && startToken.map.length > 0) {
+                        startLine = startToken.map[0];
+                    }
+                    // 🚀 修复：更准确的结束行号计算
+                    const endToken = tokens[tableCloseIndex];
+                    if (endToken && endToken.map && endToken.map.length > 1) {
+                        endLine = endToken.map[1]; // 不减1，因为map[1]已经是下一行的开始
+                    }
+                    else {
+                        // 回退计算：基于开始行号和预估的表格行数
+                        endLine = startLine + 3; // 默认估算：表头 + 分隔符 + 至少一行数据
+                    }
+                    // 使用基于位置的ID生成机制
+                    const tableId = getTableIdByPosition(startLine, endLine, tableIndex);
+                    tableIndex++; // 递增表格索引
+                    // 解析表格数据
+                    const tableData = parseTableTokens(tableTokens);
+                    // console.log("解析的tableData: \n", tableData);
+                    // 🚀 修复：更准确的结束行计算，基于实际数据
+                    const actualDataLines = 2 + tableData.rows.length; // 表头行 + 分隔符行 + 数据行数
+                    if (endLine <= startLine || endLine - startLine < actualDataLines) {
+                        endLine = startLine + actualDataLines;
+                        console.log(`修正endLine: ${startLine} -> ${endLine} (${actualDataLines}行)`);
+                    }
+                    // 计算原始Markdown（用于回写）
+                    const rawMarkdown = tableDataToMarkdown(tableData);
+                    // ===== 🚀 新增：生成标准化JSON数据 =====
+                    const standardData = standardTableDataManager.createStandardData(tableId, tableData, startLine, endLine, rawMarkdown);
+                    // 注册标准化数据
+                    standardTableDataManager.registerStandardData(standardData);
+                    // ===== 保持向后兼容：注册传统表格元数据 =====
+                    const metadata = {
+                        tableId,
+                        tableHash: standardData.metadata.tableHash,
+                        startLine,
+                        endLine,
+                        rawMarkdown,
+                        data: tableData
+                    };
+                    tableRegistry.set(tableId, metadata);
+                    // 创建占位符token，包含标准化数据信息
+                    const placeholderToken = new state.Token('html_block', '', 0);
+                    placeholderToken.content = `<div data-react-table data-table-id="${tableId}" data-table-hash="${standardData.metadata.tableHash}" data-start-line="${startLine}" data-end-line="${endLine}" data-align="${align}" class="react-table-placeholder" style="min-height: 100px; margin: 16px 0;"></div>`;
+                    // 替换整个表格token序列
+                    tokens.splice(i, tableCloseIndex - i + 1, placeholderToken);
                 }
             }
         }
     });
+    // 备份默认的html_block渲染规则
+    const fallbackHtmlBlock = md.renderer.rules.html_block;
+    // ⭐️ 核心修复：覆写html_block规则，返回IncrementalDOM指令函数而不是字符串
+    // @ts-ignore - 在IncrementalDOM模式下，渲染规则可以返回函数
+    md.renderer.rules.html_block = function (tokens, idx, options, env, renderer) {
+        const html = tokens[idx].content;
+        // 如果不是React表格占位符，使用默认规则
+        if (!/data-react-table/.test(html)) {
+            return fallbackHtmlBlock ? fallbackHtmlBlock(tokens, idx, options, env, renderer) : html;
+        }
+        // 解析表格属性
+        const id = html.match(/data-table-id="([^"]+)"/)?.[1] ?? '';
+        const hash = html.match(/data-table-hash="([^"]+)"/)?.[1] ?? '';
+        const startLine = html.match(/data-start-line="([^"]+)"/)?.[1] ?? '';
+        const endLine = html.match(/data-end-line="([^"]+)"/)?.[1] ?? '';
+        const align = html.match(/data-align="([^"]+)"/)?.[1] ?? 'left';
+        // ⭐️ 关键：返回IncrementalDOM指令函数，而不是字符串！
+        return function () {
+            // 使用tableId作为key，IncrementalDOM会复用现有节点
+            window.IncrementalDOM.elementOpen('div', id, [
+                'class', 'react-table-placeholder',
+                'data-react-table', 'true',
+                'data-table-id', id,
+                'data-table-hash', hash,
+                'data-start-line', startLine,
+                'data-end-line', endLine,
+                'data-align', align,
+                'style', 'min-height: 100px; margin: 16px 0;'
+            ]);
+            // 直接跳过子树diff，React DOM内容不会被清空
+            window.IncrementalDOM.skip();
+            window.IncrementalDOM.elementClose('div');
+        };
+    };
 };
 export { tablePlugin };
-// // 2. Intercept raw HTML tables in the content.
-// if ((token.type === 'html_block' || token.type === 'html_inline') && /<table\b/i.test(token.content)) {
-//     // If a raw HTML <table> is detected, replace its content with the placeholder.
-//     // (This covers cases where an HTML table might appear in the markdown source.)
-//     const placeholderToken = new state.Token('html_block', '', 0);
-//     placeholderToken.content = `<div class="react-table">test</div>`;
-//     tokens.splice(i, 1, placeholderToken);
-//     // Note: We replaced the current token with the placeholder. If the HTML table spanned
-//     // multiple tokens, this simple approach covers the common case where the entire table
-//     // is in one token. For multi-token HTML tables (split by blank lines), you could extend
-//     // this to remove tokens until a closing </table> is found.
+// 在markdown-it-incremental-dom插件注册后添加的后置处理钩子
+// 这个函数需要在allInit.ts中tablePlugin注册后调用
+// export function addIncrementalDOMTableSupport(md: MarkdownIt) {
+//     // 检查是否有IncrementalDOM和相关方法
+//     if (typeof window === 'undefined' || !window.IncrementalDOM) {
+//         return;
+//     }
+//     // 扩展类型定义
+//     interface ExtendedMarkdownIt extends MarkdownIt {
+//         renderToIncrementalDOM?: (src: string, env?: any) => () => void;
+//     }
+//     const extendedMd = md as ExtendedMarkdownIt;
+//     if (!extendedMd.renderToIncrementalDOM) {
+//         return;
+//     }
+//     // 保存原始的renderToIncrementalDOM方法
+//     const originalRenderToIncrementalDOM = extendedMd.renderToIncrementalDOM;
+//     // 覆盖renderToIncrementalDOM方法
+//     extendedMd.renderToIncrementalDOM = function (src: string, env?: any) {
+//         const originalRenderFunc = originalRenderToIncrementalDOM.call(this, src, env);
+//         return function () {
+//             // 保存原始的IncrementalDOM.raw方法
+//             const originalRaw = window.IncrementalDOM.raw;
+//             // 临时覆盖raw方法来拦截React表格占位符
+//             window.IncrementalDOM.raw = function (html: string) {
+//                 // 检查是否是React表格占位符
+//                 if (/data-react-table/.test(html)) {
+//                     // 解析表格属性
+//                     const idMatch = html.match(/data-table-id="([^"]+)"/);
+//                     const hashMatch = html.match(/data-table-hash="([^"]+)"/);
+//                     const alignMatch = html.match(/data-align="([^"]+)"/);
+//                     if (idMatch && hashMatch) {
+//                         const tableId = idMatch[1];
+//                         const tableHash = hashMatch[1];
+//                         const align = alignMatch ? alignMatch[1] : 'left';
+//                         // ⭐️ 核心：使用IncrementalDOM.skip()避免子树diff
+//                         window.IncrementalDOM.elementOpen('div', tableId, [
+//                             'data-react-table', 'true',
+//                             'data-table-id', tableId,
+//                             'data-table-hash', tableHash,
+//                             'data-align', align,
+//                             'data-skip-dom', 'true',
+//                             'class', 'react-table-placeholder',
+//                             'style', 'min-height: 100px; margin: 16px 0;'
+//                         ]);
+//                         // 跳过子树diff，让React完全控制内部内容
+//                         window.IncrementalDOM.skip();
+//                         window.IncrementalDOM.elementClose('div');
+//                         return;
+//                     }
+//                 }
+//                 // 对于非React表格的HTML，使用原始的raw方法
+//                 originalRaw.call(this, html);
+//             };
+//             try {
+//                 // 执行原始的渲染函数
+//                 originalRenderFunc();
+//             } finally {
+//                 // 恢复原始的raw方法
+//                 window.IncrementalDOM.raw = originalRaw;
+//             }
+//         };
+//     };
 // }
+// ===== 标准化数据API（供外部使用） =====
+export const StandardTableAPI = {
+    // 获取标准化数据
+    getStandardData: (tableId) => standardTableDataManager.getStandardData(tableId),
+    // 更新标准化数据
+    updateStandardData: (tableId, data, source = 'react') => standardTableDataManager.updateStandardData(tableId, data, source),
+    // 🚀 直接注册标准化数据（用于元数据更新）
+    registerStandardData: (standardData) => standardTableDataManager.registerStandardData(standardData),
+    // 监听数据变化
+    onDataChange: (tableId, callback) => standardTableDataManager.addDataChangeListener(tableId, callback),
+    // 取消监听
+    offDataChange: (tableId, callback) => standardTableDataManager.removeDataChangeListener(tableId, callback),
+    // 获取所有标准化数据
+    getAllStandardData: () => standardTableDataManager.getAllStandardData(),
+    // 数据转换工具
+    standardToTable: standardDataToTableData,
+    tableToStandard: tableDataToStandardData
+};

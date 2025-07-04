@@ -447,6 +447,25 @@ const FileDrawer = observer(function FileDrawer() {
     }, [watcherHealthy, folderManager, intelligentWatchCallback, watchInterval]);
     const onClickOpenSingleFile = async () => {
         try {
+            // 清理之前文件夹的监听器和相关状态
+            folderManager.stopWatching();
+            // 清理所有定时器
+            if (systemRefreshRef.current) {
+                clearTimeout(systemRefreshRef.current);
+                systemRefreshRef.current = undefined;
+            }
+            if (userOperationRef.current) {
+                clearTimeout(userOperationRef.current);
+                userOperationRef.current = undefined;
+            }
+            // 重置文件夹相关状态
+            folderManager.topDirectoryArray = [];
+            setExpandedFolders(new Set());
+            setIsProcessingUserOperation(false);
+            setLastUserOperationTime(0);
+            setOperationQueue([]);
+            setWatcherHealthy(true);
+            setIsLazyLoading(false);
             const fileHandle = await fileManager.openSingleFile();
             if (!fileHandle) {
                 alertUseArco(t("t-no-file-selected"), 2500, {

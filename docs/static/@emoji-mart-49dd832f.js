@@ -1,0 +1,1 @@
+import{r,R as c}from"./react-2c2ad9dc.js";import{$ as f}from"./emoji-mart-029374f1.js";function o(t){const n=r.useRef(null),e=r.useRef(null);return e.current&&e.current.update(t),r.useEffect(()=>(e.current=new f({...t,ref:n}),()=>{e.current=null}),[]),c.createElement("div",{ref:n})}export{o as $};

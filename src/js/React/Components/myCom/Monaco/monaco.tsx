@@ -277,8 +277,8 @@ const MonacoEditor = observer(function MonacoEditor({
       "markdownitIncrementalDOM",
       "katex",
       "IncrementalDOM",
-      "React",
-      "ReactDOM",
+      // "React",
+      // "ReactDOM",
     ]).then(() => {
       allInit(editor, monaco)
       monacoInit(editor, monaco)

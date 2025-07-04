@@ -23,6 +23,7 @@ export default observer(function Body() {
                                 padding: getStates().unmemorable.previewMode
                                     ? "0px 5px"
                                     : "26px 38px",
-                            }, className: "markdown-body " +
+                            }, className: "uniform-scroller " +
+                                "markdown-body " +
                                 `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}` })] }), getStatesMemorable().memorable.welcomeAnimationState ? _jsx(WelcomeAnimation, {}) : _jsx(_Fragment, {}), _jsx(Suspense, { fallback: _jsx(_Fragment, {}), children: _jsx(LazyEmojiPicker, { open: getEmojiPickerState() === "on" ? true : false }) }), _jsx(Suspense, { children: _jsx(LazyPromptAIPanel, { open: getStates().unmemorable.aiPanelState }) }), _jsx(Suspense, { children: _jsx(LazyVoiceTrans, { open: getStates().unmemorable.voicePanelState }) })] }) }));
 });

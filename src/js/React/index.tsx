@@ -8,8 +8,8 @@ pollVariables([
   "markdownitIncrementalDOM",
   "katex",
   "IncrementalDOM",
-  "React",
-  "ReactDOM",
+  // "React",
+  // "ReactDOM",
 ]).then(() => {
   ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <Suspense fallback={<div>Loading...</div>}>

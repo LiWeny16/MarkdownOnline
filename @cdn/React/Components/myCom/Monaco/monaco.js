@@ -1,4 +1,5 @@
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+// src/js/React/Components/myCom/Monaco/monaco.tsx
 import React, { useState } from "react";
 import Editor, { loader } from "@monaco-editor/react";
 import allInit from "@Func/Init/allInit";
@@ -20,7 +21,8 @@ import { pollVariables } from "@App/basic/basic";
 import monacoDragEvent from "@Func/Events/drag/drag";
 import "monaco-editor/esm/vs/basic-languages/markdown/markdown.contribution";
 import "monaco-editor/esm/vs/basic-languages/javascript/javascript.contribution";
-import { Backdrop } from "@mui/material";
+import { Backdrop, debounce } from "@mui/material";
+import { isCurrentlyWritingToMonaco, handleMonacoContentChange } from "@App/text/tableEditor";
 const version = "0.45.0";
 loader.config({
     paths: {
@@ -107,7 +109,7 @@ const MonacoEditor = observer(function MonacoEditor({ setMarkdownViewerWidth, })
         document.body.style.cursor = "default"; // 恢复光标样式
     };
     const handleOnChange = (e) => {
-        triggerConverterEvent(4);
+        // triggerConverterEvent(4) // 注释掉，避免与onDidChangeModelContent重复触发
     };
     const handleResizeStart = () => {
         setOpenBackdrop(true); // 开始拖拽时显示遮罩
@@ -223,6 +225,21 @@ const MonacoEditor = observer(function MonacoEditor({ setMarkdownViewerWidth, })
         // 暴露出去
         window.editor = editor;
         window.monaco = monaco;
+        // 添加内容变化监听器，用于左右同步 - 使用新的同步机制
+        editor.onDidChangeModelContent((event) => {
+            // 检查是否正在写入Monaco，避免循环触发
+            if (isCurrentlyWritingToMonaco()) {
+                console.log('跳过变化事件 - 正在写入Monaco');
+                return;
+            }
+            // 防抖处理，避免过于频繁的更新
+            const debounceSync = debounce(() => {
+                console.log('执行Monaco内容变化同步');
+                handleMonacoContentChange();
+                triggerConverterEvent(2);
+            }, 150);
+            debounceSync();
+        });
         /**
          * @description allInit
          */
@@ -230,8 +247,8 @@ const MonacoEditor = observer(function MonacoEditor({ setMarkdownViewerWidth, })
             "markdownitIncrementalDOM",
             "katex",
             "IncrementalDOM",
-            "React",
-            "ReactDOM",
+            // "React",
+            // "ReactDOM",
         ]).then(() => {
             allInit(editor, monaco);
             monacoInit(editor, monaco);

@@ -71,10 +71,10 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   const [isEditMode, setIsEditMode] = useState(false);
   // 🚀 新增：标准化数据状态
   const [standardData, setStandardData] = useState<StandardTableData | null>(null);
-  
+
   // 🚀 新增：排序状态
   const [sortConfig, setSortConfig] = useState<SortConfig>({ order: 'asc', orderBy: '' });
-  
+
   // 🚀 新增：多选状态
   const [selectedCells, setSelectedCells] = useState<SelectedCell[]>([]);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
@@ -83,18 +83,18 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   const descendingComparator = useCallback((a: string[], b: string[], orderBy: string) => {
     const colIndex = data.headers.indexOf(orderBy);
     if (colIndex === -1) return 0;
-    
+
     const aVal = a[colIndex] || '';
     const bVal = b[colIndex] || '';
-    
+
     // 尝试数字比较
     const aNum = parseFloat(aVal);
     const bNum = parseFloat(bVal);
-    
+
     if (!isNaN(aNum) && !isNaN(bNum)) {
       return bNum - aNum;
     }
-    
+
     // 字符串比较
     if (bVal < aVal) return -1;
     if (bVal > aVal) return 1;
@@ -155,7 +155,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       const start = Math.min(lastSelectedIndex, rowIndex);
       const end = Math.max(lastSelectedIndex, rowIndex);
       const rangeSelected = Array.from({ length: end - start + 1 }, (_, i) => start + i);
-      
+
       // 🚀 修复：合并现有选择和范围选择，确保没有重复
       const newSelected = Array.from(new Set([...selectedRows, ...rangeSelected])).sort((a, b) => a - b);
       setSelectedRows(newSelected);
@@ -208,6 +208,8 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     }
   }, [tableId, updateStandardDataAndSync]);
 
+
+  
   // 🚀 标准化数据监听器（Monaco → React）
   useEffect(() => {
     if (!tableId) return;
@@ -466,9 +468,9 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     // 🚀 新增：方向键选择（支持Shift扩展选择）
     if (['ArrowUp', 'ArrowDown'].includes(event.key)) {
       event.preventDefault();
-      
+
       let targetIndex: number;
-      
+
       if (selectedRows.length === 0) {
         // 没有选择时，选择第一行或最后一行
         targetIndex = event.key === 'ArrowDown' ? 0 : data.rows.length - 1;
@@ -478,7 +480,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       }
 
       const currentIndex = lastSelectedIndex !== null ? lastSelectedIndex : selectedRows[selectedRows.length - 1];
-      
+
       if (event.key === 'ArrowDown') {
         targetIndex = Math.min(currentIndex + 1, data.rows.length - 1);
       } else {
@@ -504,33 +506,33 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   const handleRequestSort = useCallback((property: string) => {
     const isAsc = sortConfig.orderBy === property && sortConfig.order === 'asc';
     const newOrder = isAsc ? 'desc' : 'asc';
-    
+
     console.log(`排序请求: ${property}, 方向: ${newOrder}`);
-    
+
     // 🚀 立即对数据进行排序并更新
     const sortedRows = [...data.rows].sort(getComparator(newOrder, property));
     const newData = {
       headers: [...data.headers],
       rows: sortedRows
     };
-    
+
     console.log('排序前数据:', data.rows);
     console.log('排序后数据:', sortedRows);
-    
+
     // 🚀 更新排序状态
     setSortConfig({
       order: newOrder,
       orderBy: property
     });
-    
+
     // 🚀 关键修复：排序后清空选中状态，因为行索引已经改变
     setSelectedRows([]);
     setSelectedCells([]);
     setLastSelectedIndex(null);
-    
+
     // 🚀 更新底层数据并同步到Monaco
     updateDataAndSync(newData);
-    
+
   }, [sortConfig, data, getComparator, updateDataAndSync]);
 
   // 渲染编辑器 - 完全匹配单元格大小，不改变任何尺寸
@@ -645,18 +647,18 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   }
 
   return (
-    <Paper 
-      elevation={0} 
-      sx={{ width: '100%', overflow: 'hidden' }} 
+    <Paper
+      elevation={0}
+      sx={{ width: '100%', overflow: 'hidden' }}
       className="academic-table"
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
       {/* 工具栏 */}
-      <Box sx={{ 
-        p: 1, 
-        display: 'flex', 
-        gap: 1, 
+      <Box sx={{
+        p: 1,
+        display: 'flex',
+        gap: 1,
         borderBottom: '1px solid #e0e0e0',
         backgroundColor: 'transparent'
       }} className="react-table-toolbar">
@@ -751,11 +753,24 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       </Box>
 
       {/* 表格 */}
-      <TableContainer 
-        sx={{ maxHeight: 440 }} 
+      <TableContainer
+        sx={{
+          width: '100%',
+          overflowX: 'auto', // 横向滚动
+          overflowY: 'visible', // 纵向不限制
+          maxWidth: '100%' // 确保容器不会超出父元素
+        }}
         className="uniform-scroller"
       >
-        <Table size="small" stickyHeader sx={{ minWidth: 650 }}>
+        <Table
+          size="small"
+          stickyHeader
+          sx={{
+            minWidth: 'max-content',
+            width: 'auto', // 让表格宽度自适应内容
+            tableLayout: 'fix' // 自动表格布局
+          }}
+        >
           <TableHead>
             <TableRow sx={{
               backgroundColor: '#f5f5f5',
@@ -783,9 +798,12 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
                   />
                 </TableCell>
               )}
-              
+
               {data.headers.map((header, colIndex) => (
-                <TableCell key={colIndex} sx={{ minWidth: 120 }}>
+                <TableCell key={colIndex} sx={{
+                  minWidth: 120,
+                  whiteSpace: 'nowrap' // 防止表头换行
+                }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     {/* 🚀 表头排序功能 - 只在编辑模式下启用 */}
                     <TableSortLabel
@@ -797,7 +815,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
                         }
                       }}
                       disabled={!isEditMode}
-                      sx={{ 
+                      sx={{
                         flex: 1,
                         '& .MuiTableSortLabel-root': {
                           flexDirection: 'row'
@@ -839,7 +857,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
                         </Box>
                       ) : null}
                     </TableSortLabel>
-                    
+
                     {isEditMode && data.headers.length > 1 && (
                       <Tooltip title="Delete Column">
                         <IconButton
@@ -865,7 +883,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
             {sortedRows.map((row, rowIndex) => {
               // 🚀 修复：排序后直接使用rowIndex，因为数据已经真正排序
               const isRowSelectedValue = isRowSelected(rowIndex);
-              
+
               return (
                 <TableRow
                   key={`row-${rowIndex}-${JSON.stringify(row).slice(0, 20)}`} // 使用行内容作为key的一部分
@@ -923,13 +941,14 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
                       />
                     </TableCell>
                   )}
-                  
+
                   {row.map((cell, colIndex) => (
-                    <TableCell 
-                      key={colIndex} 
-                      sx={{ 
+                    <TableCell
+                      key={colIndex}
+                      sx={{
                         minWidth: 120,
                         padding: 0,
+                        whiteSpace: 'nowrap', // 防止单元格内容换行
                         '&:hover': {
                           backgroundColor: isEditMode ? alpha('#1976d2', 0.04) : 'transparent'
                         }
@@ -1000,6 +1019,7 @@ class TableManager {
     // 处理每个占位符
     placeholders.forEach((placeholder, index) => {
       const tableId = placeholder.getAttribute('data-table-id');
+      const align = placeholder.getAttribute('data-align');
       const domTableHash = placeholder.getAttribute('data-table-hash'); // DOM中的哈希
 
       if (!tableId) {

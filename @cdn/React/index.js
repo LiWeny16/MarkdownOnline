@@ -9,8 +9,8 @@ pollVariables([
     "markdownitIncrementalDOM",
     "katex",
     "IncrementalDOM",
-    "React",
-    "ReactDOM",
+    // "React",
+    // "ReactDOM",
 ]).then(() => {
     ReactDOM.createRoot(document.getElementById("root")).render(_jsx(Suspense, { fallback: _jsx("div", { children: "Loading..." }), children: _jsx(App, {}) }));
 });

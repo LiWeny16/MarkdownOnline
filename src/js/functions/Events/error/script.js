@@ -1,6 +1,7 @@
 "use strict";
 function scriptErrorEvent() {
     const cdnDomains = [
+        "cdn.jsdmirror.com",
         "jsd.onmicrosoft.cn",
         "fastly.jsdelivr.net",
         "cdn.jsdelivr.net",
