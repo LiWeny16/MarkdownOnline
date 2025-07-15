@@ -99,7 +99,7 @@ export default defineConfig({
         "https://cdn.jsdelivr.net/npm/react-photo-view-cdn@0.0.4/esm/db.min.js",
       "@cdn-latex-map":
         "https://cdn.jsdelivr.net/npm/react-photo-view-cdn@0.0.4/esm/latex.map.min.js",
-      "markdown-it": "https://cdn.jsdmirror.com/npm/markdown-it@8.4.2/+esm",
+      // "markdown-it": "https://cdn.jsdmirror.com/npm/markdown-it@8.4.2/+esm",
       "markdown-it-emoji":
         "https://cdn.jsdmirror.com/npm/markdown-it-emoji@3.0.0/+esm",
       "markdown-it-footnote":
@@ -113,7 +113,6 @@ export default defineConfig({
       "@emoji-mart/data":
         "https://cdn.jsdmirror.com/npm/@emoji-mart/data@1.1.2/+esm",
       "emoji-mart": "https://cdn.jsdmirror.com/npm/emoji-mart@5.6.0/+esm",
-      "@cdn-emojilib": "https://cdn.jsdmirror.com/npm/emojilib@3.0.11/+esm",
       "@cdn-prettier": "https://cdn.jsdmirror.com/npm/prettier@3.2.4/+esm",
       "@cdn-prettier-plugins-markdown":
         "https://cdn.jsdmirror.com/npm/prettier@3.2.4/plugins/markdown.js/+esm",

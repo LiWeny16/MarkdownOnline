@@ -46,17 +46,6 @@ export default observer(function Body() {
             }
           ></article>
         </div>
-        {/* <div id="aboutBox">
-          <div id="markdownParser">
-            <div
-              id="aboutMd"
-              className={
-                "aboutViewArea markdown-body " +
-                `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}`
-              }
-            ></div>
-          </div>
-        </div> */}
         {getStatesMemorable().memorable.welcomeAnimationState ? <WelcomeAnimation /> : <></>}
         <Suspense fallback={<></>}>
           <LazyEmojiPicker

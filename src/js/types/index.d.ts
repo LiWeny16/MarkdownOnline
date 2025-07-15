@@ -62,10 +62,7 @@ declare module "dom-to-image" {
   const domtoimg: any
   export default domtoimg
 }
-declare module "@cdn-emojilib" {
-  const emojilib: any
-  export default emojilib
-}
+
 
 declare module "@cdn-axios" {
   const axios: any
