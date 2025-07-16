@@ -89,8 +89,9 @@ export default defineConfig({
       // gsap: "https://cdn.jsdmirror.com/npm/gsap@3.12/+esm",
       "react-photo-view":
         "https://cdn.jsdmirror.com/npm/react-photo-view-cdn@0.0.1/esm/react-photo-view.module.js",
-      // "@arco-design/web-react":
-      //   "https://cdn.jsdmirror.com/npm/@arco-design/web-react@2.62.0/+esm",
+      // cannot remove
+      "@arco-design/web-react":
+        "https://cdn.jsdmirror.com/npm/@arco-design/web-react@2.62.0/+esm",
       "@cdn-emoji-data":
         "https://cdn.jsdmirror.com/npm/@emoji-mart/data@1.2.1/+esm",
       "@cdn-Readme":
@@ -116,8 +117,8 @@ export default defineConfig({
       "@cdn-prettier": "https://cdn.jsdmirror.com/npm/prettier@3.2.4/+esm",
       "@cdn-prettier-plugins-markdown":
         "https://cdn.jsdmirror.com/npm/prettier@3.2.4/plugins/markdown.js/+esm",
-      "string-replace-async":
-        "https://cdn.jsdmirror.com/npm/string-replace-async@3.0.2/index.min.js",
+      // "string-replace-async":
+      //   "https://cdn.jsdmirror.com/npm/string-replace-async@3.0.2/index.min.js",
       // html2canvas: "https://cdn.jsdmirror.com/npm/html2canvas@1.4.1/+esm",
       // mobx: "https://cdn.jsdmirror.com/npm/mobx@6.12.0/+esm",
       // axios: "https://cdn.jsdmirror.com/npm/axios@1.6.5/+esm",
