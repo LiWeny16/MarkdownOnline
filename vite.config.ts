@@ -86,11 +86,11 @@ export default defineConfig({
     // dynamicImport(/* options */),
     retryImportPlugin({
       // "@monaco-editor/react"
-      gsap: "https://cdn.jsdmirror.com/npm/gsap@3.12/+esm",
+      // gsap: "https://cdn.jsdmirror.com/npm/gsap@3.12/+esm",
       "react-photo-view":
         "https://cdn.jsdmirror.com/npm/react-photo-view-cdn@0.0.1/esm/react-photo-view.module.js",
-      "@arco-design/web-react":
-        "https://cdn.jsdmirror.com/npm/@arco-design/web-react@2.62.0/+esm",
+      // "@arco-design/web-react":
+      //   "https://cdn.jsdmirror.com/npm/@arco-design/web-react@2.62.0/+esm",
       "@cdn-emoji-data":
         "https://cdn.jsdmirror.com/npm/@emoji-mart/data@1.2.1/+esm",
       "@cdn-Readme":
@@ -100,16 +100,16 @@ export default defineConfig({
       "@cdn-latex-map":
         "https://cdn.jsdelivr.net/npm/react-photo-view-cdn@0.0.4/esm/latex.map.min.js",
       // "markdown-it": "https://cdn.jsdmirror.com/npm/markdown-it@8.4.2/+esm",
-      "markdown-it-emoji":
-        "https://cdn.jsdmirror.com/npm/markdown-it-emoji@3.0.0/+esm",
-      "markdown-it-footnote":
-        "https://cdn.jsdmirror.com/npm/markdown-it-footnote@4.0.0/+esm",
-      "markdown-it-multimd-table":
-        "https://cdn.jsdmirror.com/npm/markdown-it-multimd-table@4.2.3/+esm",
-      "markdown-it-task-lists":
-        "https://cdn.jsdmirror.com/npm/@hackmd/markdown-it-task-lists@2.1.4/+esm",
-      "markdown-it-github-toc":
-        "https://cdn.jsdmirror.com/npm/markdown-it-github-toc@3.2.4/src/index.js/+esm",
+      // "markdown-it-emoji":
+      //   "https://cdn.jsdmirror.com/npm/markdown-it-emoji@3.0.0/+esm",
+      // "markdown-it-footnote":
+      //   "https://cdn.jsdmirror.com/npm/markdown-it-footnote@4.0.0/+esm",
+      // "markdown-it-multimd-table":
+      //   "https://cdn.jsdmirror.com/npm/markdown-it-multimd-table@4.2.3/+esm",
+      // "markdown-it-task-lists":
+      //   "https://cdn.jsdmirror.com/npm/@hackmd/markdown-it-task-lists@2.1.4/+esm",
+      // "markdown-it-github-toc":
+      //   "https://cdn.jsdmirror.com/npm/markdown-it-github-toc@3.2.4/src/index.js/+esm",
       "@emoji-mart/data":
         "https://cdn.jsdmirror.com/npm/@emoji-mart/data@1.1.2/+esm",
       "emoji-mart": "https://cdn.jsdmirror.com/npm/emoji-mart@5.6.0/+esm",
@@ -118,14 +118,12 @@ export default defineConfig({
         "https://cdn.jsdmirror.com/npm/prettier@3.2.4/plugins/markdown.js/+esm",
       "string-replace-async":
         "https://cdn.jsdmirror.com/npm/string-replace-async@3.0.2/index.min.js",
-      html2canvas: "https://cdn.jsdmirror.com/npm/html2canvas@1.4.1/+esm",
-      mobx: "https://cdn.jsdmirror.com/npm/mobx@6.12.0/+esm",
-      axios: "https://cdn.jsdmirror.com/npm/axios@1.6.5/+esm",
+      // html2canvas: "https://cdn.jsdmirror.com/npm/html2canvas@1.4.1/+esm",
+      // mobx: "https://cdn.jsdmirror.com/npm/mobx@6.12.0/+esm",
+      // axios: "https://cdn.jsdmirror.com/npm/axios@1.6.5/+esm",
       "@cdn-node-emoji": "https://cdn.jsdmirror.com/npm/node-emoji@2.1.3/+esm",
-      mermaid:
-        "https://cdn.jsdmirror.com/npm/mermaid@10/dist/mermaid.esm.min.mjs",
-      "@cdn-mermaid":
-        "https://cdn.jsdmirror.com/npm/mermaid@10/dist/mermaid.esm.min.mjs",
+      // mermaid:
+      //   "https://cdn.jsdmirror.com/npm/mermaid@10/dist/mermaid.esm.min.mjs",
       "@cdn-kit":
         "https://cdn.jsdmirror.com/npm/bigonion-kit@0.12.6/esm/kit.min.js",
       "bigonion-kit":

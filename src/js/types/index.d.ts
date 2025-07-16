@@ -91,10 +91,7 @@ declare module "@cdn-marked" {
   const marked: any
   export { marked }
 }
-declare module "@cdn-mermaid" {
-  const mermaid: any
-  export default mermaid
-}
+
 declare module "@cdn-kit" {
   const kit: any
   export default kit
