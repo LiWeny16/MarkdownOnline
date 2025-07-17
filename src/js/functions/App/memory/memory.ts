@@ -3,7 +3,7 @@ import {
   cursorGetDataByIndex,
   cursorGetData,
   updateDB,
-} from "@cdn-indexedDb-lib"
+} from "@App/db"
 // import getMdText from "@App/text/getMdText"
 
 export function fillInMemoryText(md: MD) {

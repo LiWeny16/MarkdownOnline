@@ -1,5 +1,5 @@
 import { getTheme } from "@App/config/change";
-import hljs from "@cdn-hljs";
+import hljs from "highlight.js";
 let codePlugin = function (md) {
     const oldRender = md.renderer.rules.code_block;
     md.renderer.rules.fence = function (tokens, idx, options, env, self) {

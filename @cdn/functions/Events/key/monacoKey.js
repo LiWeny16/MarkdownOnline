@@ -2,7 +2,7 @@ import save, { isSaved } from "@App/save";
 import exeTableAction from "./actions/table";
 import myPrint from "@App/export/myPrint";
 import exportAsImage from "@App/export/domToImg";
-import kit from "@cdn-kit";
+import kit from "bigonion-kit";
 import exeInsertPageBreakerAction from "./actions/pageBreaker";
 import exeLatexBlockAction from "./actions/latexBlock";
 import exeEmojiPickerAction from "./actions/emojiPicker";

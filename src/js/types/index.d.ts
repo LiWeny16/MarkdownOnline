@@ -82,98 +82,91 @@ declare module "@cdn-prettier-plugins-markdown" {
   export default parseMd
 }
 
-declare module "@cdn-node-emoji" {
-  const emoji: any
-  export default emoji
-  export { emojify, has }
-}
+// declare module "@cdn-node-emoji" {
+//   const emoji: any
+//   export default emoji
+//   export { emojify, has }
+// }
 declare module "@cdn-marked" {
   const marked: any
   export { marked }
 }
 
-declare module "@cdn-kit" {
-  const kit: any
-  export default kit
-}
 
-declare module "@cdn-hljs" {
-  const hljs: any
-  export default hljs
-}
+
 
 declare module "@cdn-katex" {
   const hljs: any
   export default hljs
 }
 
-declare module "@cdn-latex-map" {
-  const cdnLatexMap: any
-  export default cdnLatexMap
-  export {
-    accents1,
-    delimiters0,
-    delimeterSizing0,
-    greekLetters0,
-    otherLetters0,
-    annotation1,
-    verticalLayout0,
-    verticalLayout1,
-    verticalLayout2,
-    overlap1,
-    spacing0,
-    spacing1,
-    logicAndSetTheory0,
-    logicAndSetTheory1,
-    macros0,
-    bigOperators0,
-    binaryOperators0,
-    fractions0,
-    fractions2,
-    binomialCoefficients0,
-    binomialCoefficients2,
-    mathOperators0,
-    mathOperators1,
-    sqrt1,
-    relations0,
-    negatedRelations0,
-    arrows0,
-    extensibleArrows1,
-    braketNotation1,
-    classAssignment1,
-    color2,
-    font0,
-    font1,
-    size0,
-    style0,
-    symbolsAndPunctuation0,
-    debugging0,
-    envs,
-  }
-}
+// declare module "@cdn-latex-map" {
+//   const cdnLatexMap: any
+//   export default cdnLatexMap
+//   export {
+//     accents1,
+//     delimiters0,
+//     delimeterSizing0,
+//     greekLetters0,
+//     otherLetters0,
+//     annotation1,
+//     verticalLayout0,
+//     verticalLayout1,
+//     verticalLayout2,
+//     overlap1,
+//     spacing0,
+//     spacing1,
+//     logicAndSetTheory0,
+//     logicAndSetTheory1,
+//     macros0,
+//     bigOperators0,
+//     binaryOperators0,
+//     fractions0,
+//     fractions2,
+//     binomialCoefficients0,
+//     binomialCoefficients2,
+//     mathOperators0,
+//     mathOperators1,
+//     sqrt1,
+//     relations0,
+//     negatedRelations0,
+//     arrows0,
+//     extensibleArrows1,
+//     braketNotation1,
+//     classAssignment1,
+//     color2,
+//     font0,
+//     font1,
+//     size0,
+//     style0,
+//     symbolsAndPunctuation0,
+//     debugging0,
+//     envs,
+//   }
+// }
 // declare module "@Root/js/functions/aboutBox" {
 //   const aboutBox: any
 //   export default aboutBox
 // }
 
-declare module "@cdn-indexedDb-lib" {
-  const aboutBox: any
-  export default aboutBox
-  export {
-    openDB,
-    getDataByIndex,
-    cursorGetDataByIndex,
-    addData,
-    getDataByKey,
-    cursorGetData,
-    updateDB,
-  }
-}
+// declare module "@cdn-indexedDb-lib" {
+//   const aboutBox: any
+//   export default aboutBox
+//   export {
+//     openDB,
+//     getDataByIndex,
+//     cursorGetDataByIndex,
+//     addData,
+//     getDataByKey,
+//     cursorGetData,
+//     updateDB,
+//   }
+// }
 
-declare module "@cdn-emoji-data" {
-  const e: any
-  export default e
-}
+// declare module "@cdn-emoji-data" {
+//   const e: any
+//   export default e
+// }
 declare module "@Root/js/functions/fastKey" {
   const aboutBox: any
   export default aboutBox

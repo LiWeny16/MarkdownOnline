@@ -1,5 +1,5 @@
 // src/js/index.ts
-import hljs from "@cdn-hljs"
+import hljs from "highlight.js"
 import { getMdTextFromMonaco } from "@App/text/getMdText"
 import pageBreaker from "@Func/Parser/pageBreaker"
 import "../css/index.less"

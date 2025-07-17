@@ -9,6 +9,7 @@ import { green, blue } from "@mui/material/colors";
 import { changeStates, getStates, getTheme } from "@App/config/change";
 import { Backdrop, Box, CircularProgress } from "@mui/material";
 import { aheadInit } from "@Func/Init/aheadInit";
+// import ServiceWorkerDevTools from "./Components/DevTools/ServiceWorkerDevTools"
 const bothStyle = {
     zIndex: { drawer: 1300, modal: 1200, appBar: 1200 },
 };
@@ -52,6 +53,7 @@ const App = observer(() => {
     React.useEffect(() => {
         aheadInit();
     }, []);
+    const isDevelopment = process.env.NODE_ENV === 'development';
     return (_jsx(_Fragment, { children: _jsxs(ThemeProvider, { theme: getTheme() === "light" ? lightTheme : darkTheme, children: [_jsx(CssBaseline, {}), _jsxs(Box, { className: "FLEX COL App-top", children: [_jsx(Header, {}), _jsx(Body, {}), _jsx(Backdrop, { sx: { color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }, open: getStates().unmemorable.loading, onClick: () => {
                                 changeStates({ unmemorable: { loading: false } });
                             }, children: _jsx(CircularProgress, { color: "inherit" }) })] })] }) }));

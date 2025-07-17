@@ -1,6 +1,6 @@
 // import { kit } from "@Root/js/index"
 import { getTheme } from "@App/config/change";
-import kit from "@cdn-kit";
+import kit from "bigonion-kit";
 export default function myPrint() {
     let printString = document.getElementById("view-area").innerHTML;
     // console.log(printString)

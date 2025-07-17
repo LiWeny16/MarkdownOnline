@@ -26,24 +26,24 @@ import { isCurrentlyWritingToMonaco, handleMonacoContentChange } from "@App/text
 const version = "0.45.0";
 loader.config({
     paths: {
-        vs: `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs`,
+        vs: `https://cdn.jsdmirror.com/npm/monaco-editor@0.45.0/min/vs`,
     },
     // @ts-ignore
-    'vs/editor/editor.main': `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs/editor/editor.main.js`,
+    // 'vs/editor/editor.main': `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs/editor/editor.main.js`,
 });
-loader.init().then((monaco) => {
-    self.MonacoEnvironment = {
-        getWorkerUrl: function (moduleId, label) {
-            if (label === "html") {
-                return `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs/language/html/html.worker.js`;
-            }
-            if (label === "typescript" || label === "javascript") {
-                return `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs/language/typescript/ts.worker.js`;
-            }
-            return `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs/editor/editor.worker.js`;
-        },
-    };
-});
+// loader.init().then((monaco) => {
+//   self.MonacoEnvironment = {
+//     getWorkerUrl: function (moduleId, label) {
+//       if (label === "html") {
+//         return `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs/language/html/html.worker.js`;
+//       }
+//       if (label === "typescript" || label === "javascript") {
+//         return `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs/language/typescript/ts.worker.js`;
+//       }
+//       return `https://${window._cdn.cdn[0]}/npm/monaco-editor@0.45.0/min/vs/editor/editor.worker.js`;
+//     },
+//   };
+// });
 const files = {
     "index.py": {
         name: "index.py",
@@ -234,7 +234,6 @@ const MonacoEditor = observer(function MonacoEditor({ setMarkdownViewerWidth, })
             }
             // 防抖处理，避免过于频繁的更新
             const debounceSync = debounce(() => {
-                console.log('执行Monaco内容变化同步');
                 handleMonacoContentChange();
                 triggerConverterEvent(2);
             }, 150);

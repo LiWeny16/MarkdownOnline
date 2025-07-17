@@ -100,7 +100,7 @@ declare let tablePlugin: (md: MarkdownIt) => void;
 export { tablePlugin };
 export declare const StandardTableAPI: {
     getStandardData: (tableId: string) => StandardTableData | null;
-    updateStandardData: (tableId: string, data: TableData, source?: 'react' | 'monaco') => boolean;
+    updateStandardData: (tableId: string, data: TableData, source?: "react" | "monaco") => boolean;
     registerStandardData: (standardData: StandardTableData) => void;
     onDataChange: (tableId: string, callback: (data: StandardTableData) => void) => void;
     offDataChange: (tableId: string, callback: (data: StandardTableData) => void) => void;

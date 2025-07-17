@@ -1,6 +1,6 @@
 // import { kit } from "@Root/js/index"
 import { getTheme } from "@App/config/change"
-import kit from "@cdn-kit"
+import kit from "bigonion-kit"
 
 import html2canvas from "html2canvas"
 

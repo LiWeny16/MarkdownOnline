@@ -1,4 +1,4 @@
-import hljs from "@cdn-hljs";
+import hljs from "highlight.js";
 import mermaid from "mermaid";
 import blankTextInit from "./blankTextInit";
 import { mdConverter } from "@Root/js";
@@ -10,7 +10,7 @@ import markdownItGithubToc from "markdown-it-github-toc";
 import markdownItTaskLists from "markdown-it-task-lists";
 // @ts-ignore
 import { full as markdownItEmoji } from "markdown-it-emoji";
-import kit from "@cdn-kit";
+import kit from "bigonion-kit";
 import OperateLocalStorage from "@App/localStorage/localStorage";
 import { ConfigStore, } from "@Root/js/React/Mobx/Config";
 import { markdownitLineNumber } from "@Func/Parser/mdItPlugin/lineNumber";
@@ -60,6 +60,7 @@ export function markdownParser() {
     })
         .use(codePlugin)
         .use(cluePlugin)
+        // @ts-ignore
         .use(markdownitFootNote)
         .use(customAlignPlugin)
         .use(customAlignPluginHeading)

@@ -9,6 +9,7 @@ import { green, blue } from "@mui/material/colors"
 import { changeStates, getStates, getTheme } from "@App/config/change"
 import { Backdrop, Box, CircularProgress } from "@mui/material"
 import { aheadInit } from "@Func/Init/aheadInit"
+// import ServiceWorkerDevTools from "./Components/DevTools/ServiceWorkerDevTools"
 const bothStyle: ThemeOptions = {
   zIndex: { drawer: 1300, modal: 1200, appBar: 1200 },
 }
@@ -55,6 +56,8 @@ const App: any = observer(() => {
     aheadInit()
   }, [])
 
+  const isDevelopment = process.env.NODE_ENV === 'development';
+
   return (
     <>
       <ThemeProvider theme={getTheme() === "light" ? lightTheme : darkTheme}>
@@ -72,6 +75,8 @@ const App: any = observer(() => {
             <CircularProgress color="inherit" />
           </Backdrop>
         </Box>
+        {/* Service Worker 开发者工具 - 开发环境显示，生产环境可通过快捷键开启 */}
+        {/* <ServiceWorkerDevTools visible={isDevelopment} /> */}
       </ThemeProvider>
     </>
   )

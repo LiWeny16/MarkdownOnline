@@ -5,7 +5,7 @@ import { Backdrop, Button, Typography, Box } from "@mui/material";
 import { gsap } from "gsap";
 import { changeStatesMemorable, getStatesMemorable } from "@App/config/change";
 import { useTranslation } from "react-i18next";
-import kit from "@cdn-kit";
+import kit from "bigonion-kit";
 const WelcomeAnimation = () => {
     const { t } = useTranslation();
     const featuresList = [

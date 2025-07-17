@@ -394,14 +394,6 @@ export function handleStandardMonacoContentChange(): void {
         console.warn('Monaco编辑器内容为空');
         return;
     }
-
-    // 🚀 简化逻辑：右边回写左边时，会触发 mdConverter 重新解析
-    // mdConverter 会使用正确的 parseTableTokens 来获取真实的表格数据
-    // 我们不需要在这里做额外的解析，直接让 mdConverter 处理即可
-    console.log('Monaco内容发生变化，将通过 mdConverter 重新解析所有表格数据');
-    
-    // 注意：这个函数主要用于检测内容变化，实际的表格数据更新
-    // 会通过 mdConverter -> tablePlugin -> parseTableTokens 的正确流程进行
 }
 
 // Monaco内容变化时触发表格同步的函数（保持向后兼容）

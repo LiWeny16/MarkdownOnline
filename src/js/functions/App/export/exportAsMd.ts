@@ -1,4 +1,4 @@
-import kit from "@cdn-kit";
+import kit from "bigonion-kit";
 import {getMdTextFromMonaco} from "@App/text/getMdText";
 
 export default function exportAsMd() {

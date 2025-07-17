@@ -1,5 +1,5 @@
 import { getTheme } from "@App/config/change"
-import hljs from "@cdn-hljs"
+import hljs from "highlight.js"
 import MarkdownIt from "markdown-it/lib"
 
 

@@ -1,7 +1,7 @@
 import { FileFolderManager } from "@App/fileSystem/file";
 import { readMemoryImg } from "@App/memory/memory";
 import { markdownParser } from "@Func/Init/allInit";
-import kit from "@cdn-kit";
+import kit from "bigonion-kit";
 import mermaid from "mermaid";
 /**
  * @description 预解析，来处理异步信息，因为markdown-it天然不支持异步

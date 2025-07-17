@@ -8,9 +8,9 @@ import { Suspense } from "react"
 import WelcomeAnimation from "../Components/myCom/Prompt/WelcomeAni"
 
 // 使用 React.lazy 懒加载组件
-const LazyEmojiPicker = React.lazy(
-  () => import("@Root/js/React/Components/myCom/EmojiPicker")
-)
+// const LazyEmojiPicker = React.lazy(
+//   () => import("@Root/js/React/Components/myCom/EmojiPicker")
+// )
 // const LazyPromptPanel = React.lazy(() => import("@Com/myCom/Prompt/Prompt"))
 const LazyPromptAIPanel = React.lazy(() => import("@Com/myCom/Prompt/AIPanel"))
 const LazyVoiceTrans = React.lazy(() => import("@Com/myCom/Prompt/VoiceTrans"))
@@ -47,11 +47,11 @@ export default observer(function Body() {
           ></article>
         </div>
         {getStatesMemorable().memorable.welcomeAnimationState ? <WelcomeAnimation /> : <></>}
-        <Suspense fallback={<></>}>
+        {/* <Suspense fallback={<></>}>
           <LazyEmojiPicker
             open={getEmojiPickerState() === "on" ? true : false}
           />
-        </Suspense>
+        </Suspense> */}
         {/* <Suspense fallback={<></>}>
           <LazyPromptPanel open={getStates().unmemorable.promptPanelState} />
         </Suspense> */}

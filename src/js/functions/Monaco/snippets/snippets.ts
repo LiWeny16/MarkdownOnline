@@ -1,7 +1,5 @@
 import { Monaco } from "@monaco-editor/react"
 import { editor } from "monaco-editor"
-// import words from "an-array-of-english-words";
-
 import {
   accents1,
   delimiters0,
@@ -41,7 +39,7 @@ import {
   symbolsAndPunctuation0,
   debugging0,
   envs,
-} from "@cdn-latex-map"
+} from "./latexRules"
 import { type Position } from "monaco-editor/esm/vs/editor/editor.api"
 import { FileFolderManager } from "@App/fileSystem/file"
 import { getSettings } from "@App/config/change"
@@ -68,7 +66,7 @@ export async function monacoSnippets(
         endLineNumber: position.lineNumber,
         endColumn: position.column,
       })
-      
+
       // 获取当前行光标前的文本
       const currentLineText = model.getValueInRange({
         startLineNumber: position.lineNumber,
@@ -76,14 +74,14 @@ export async function monacoSnippets(
         endLineNumber: position.lineNumber,
         endColumn: position.column,
       })
-      
+
       const rangeWithFirstLetter = {
         startLineNumber: position.lineNumber,
         startColumn: position.column - 1, // 包括"/"字符
         endLineNumber: position.lineNumber,
         endColumn: position.column,
       }
-      
+
       // 检查是否是动态表格模式 (支持多种输入状态)
       const tablePatterns = [
         { pattern: /\/table(\d+)x(\d+)$/i, type: 'complete' },  // /table5x8
@@ -91,7 +89,7 @@ export async function monacoSnippets(
         { pattern: /\/table(\d+)$/i, type: 'square' },          // /table5 (默认正方形)
         { pattern: /\/table$/i, type: 'basic' }                 // /table
       ]
-      
+
       for (const tablePattern of tablePatterns) {
         const match = currentLineText.match(tablePattern.pattern)
         if (match && !isInLatexBlock(textUntilPosition)) {
@@ -101,9 +99,9 @@ export async function monacoSnippets(
             endLineNumber: position.lineNumber,
             endColumn: position.column,
           }
-          
+
           let suggestions: any[] = []
-          
+
           if (tablePattern.type === 'complete') {
             // /table5x8 - 完整格式
             const rows = parseInt(match[1])
@@ -170,13 +168,13 @@ export async function monacoSnippets(
               range: dynamicRange,
             })
           }
-          
+
           if (suggestions.length > 0) {
             return { suggestions }
           }
         }
       }
-      
+
       if (!isInLatexBlock(textUntilPosition) && position.column === 2) {
         let _suggestions = [
           {
@@ -548,7 +546,7 @@ sequenceDiagram
           insertText: word,
           detail: `Suggested word: ${word}`
         }));
-        
+
       } else {
         suggestions = []
       }
@@ -970,23 +968,23 @@ export function isNeedToUseCodeIntellisense(textUntilPosition: string) {
  */
 export function generateDynamicTable(rows: number, cols: number): string {
   if (rows <= 0 || cols <= 0) return ""
-  
+
   let tableText = "\n"
-  
+
   // 生成表头
   let headerRow = "|"
   for (let col = 0; col < cols; col++) {
     headerRow += `\${${col + 1}:}    |`
   }
   tableText += headerRow + "\n"
-  
+
   // 生成分隔行
   let separatorRow = "|"
   for (let col = 0; col < cols; col++) {
     separatorRow += "--- |"
   }
   tableText += separatorRow + "\n"
-  
+
   // 生成数据行
   for (let row = 1; row < rows; row++) {
     let dataRow = "|"
@@ -995,6 +993,6 @@ export function generateDynamicTable(rows: number, cols: number): string {
     }
     tableText += dataRow + "\n"
   }
-  
+
   return tableText
 }

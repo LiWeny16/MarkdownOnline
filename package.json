@@ -6,6 +6,7 @@
   "scripts": {
     "d": "yarn vite --open --force",
     "b": "tsc && yarn vite build",
+    "maxb": "node --max-old-space-size=8192 ./node_modules/vite/bin/vite.js build",
     "dev": " yarn vite --open ",
     "build": "tsc && yarn vite build"
   },
@@ -38,6 +39,7 @@
     "emoji-mart": "^5.5.2",
     "fast-diff": "^1.3.0",
     "gsap": "^3.12.5",
+    "highlight.js": "^11.11.1",
     "html2canvas": "^1.4.1",
     "i18next": "^23.16.4",
     "i18next-browser-languagedetector": "^8.0.0",
@@ -54,6 +56,7 @@
     "mobx": "^6.10.2",
     "mobx-react": "^9.1.0",
     "monaco-editor": "^0.45.0",
+    "prettier": "^3.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-i18next": "^15.1.0",
@@ -82,6 +85,7 @@
     "vite-plugin-cdn-import": "^1.0.1",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-dynamic-import": "^1.5.0",
-    "vite-plugin-externals": "^0.6.2"
+    "vite-plugin-externals": "^0.6.2",
+    "vite-plugin-pwa": "^1.0.1"
   }
 }

@@ -1,10 +1,10 @@
 import { getDataByKey, openDB, updateDB } from "@App/db"
 
 export const cdnDomains = [
+  "cdn.jsdmirror.com",
   "cdn.jsdelivr.net",
   "fastly.jsdelivr.net",
   // "jsd.onmicrosoft.cn",
-  "cdn.jsdmirror.com",
 ]
 export const cdnDomainsNpm = ["npm.elemecdn.com"]
 export default async function cdnInit() {
@@ -186,10 +186,10 @@ export async function loadScripts(): Promise<void> {
       id: "clue-parser",
       cdnUrl: `https://${usefulDomain}/npm/clue-parser@1.0.4/index.min.css`,
     },
-    {
-      id: "arco-design",
-      cdnUrl: `https://${usefulDomain}/npm/@arco-design/web-react@2.58.3/dist/css/arco.min.css`,
-    },
+    // {
+    //   id: "arco-design",
+    //   cdnUrl: `https://${usefulDomain}/npm/@arco-design/web-react@2.58.3/dist/css/arco.min.css`,
+    // },
 
   ]
   async function loadOrFetchResource(

@@ -26,7 +26,7 @@ import { speechLanguageMap } from "@App/voice/speech"
 import { normalMermaidTheme, normalMermaidThemeMap } from "@Func/Init/allInit"
 import mermaid from "mermaid"
 import { mdConverter } from "@Root/js"
-import kit from "@cdn-kit"
+import kit from "bigonion-kit"
 import { useTranslation } from "react-i18next"
 export const settingsBodyContentBoxStyle = {
   transition: "background-color 0.4s ease, box-shadow 0.4s ease",
@@ -155,7 +155,7 @@ export default observer(function SettingsBody() {
       basic: { fontSize: e.target.value },
     })
     if (document.getElementsByClassName("fontSizeStyle")) {
-      kit.removeAddedStyle("fontSizeStyle")
+      kit.removeAddedStyle()
       kit.addStyle(
         `
       .markdown-body p,

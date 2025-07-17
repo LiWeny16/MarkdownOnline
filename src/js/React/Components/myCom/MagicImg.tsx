@@ -1,4 +1,3 @@
-import { PhotoProvider, PhotoView } from "react-photo-view"
 import React from "react"
 import Zoom from "@mui/material/Zoom"
 import Tooltip from "@mui/material/Tooltip"

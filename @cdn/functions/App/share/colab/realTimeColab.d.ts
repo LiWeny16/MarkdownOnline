@@ -1,4 +1,3 @@
-/// <reference types="react" />
 declare class RealTimeColab {
     private static instance;
     private static userId;
