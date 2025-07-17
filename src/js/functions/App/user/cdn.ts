@@ -1,4 +1,4 @@
-import { getDataByKey, openDB, updateDB } from "@App/db"
+import { getDataByKey, openDB, updateDB } from "@App/memory/db"
 
 export const cdnDomains = [
   "cdn.jsdmirror.com",

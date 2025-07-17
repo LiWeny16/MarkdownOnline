@@ -3,11 +3,13 @@ import React from "react";
 import fastKeyEvent from "@Func/Events/key/fastKey";
 import MdArea from "./SubBody/MdArea";
 import { observer } from "mobx-react";
-import { getEmojiPickerState, getSettings, getStates, getStatesMemorable, getTheme } from "@App/config/change";
+import { getSettings, getStates, getStatesMemorable, getTheme } from "@App/config/change";
 import { Suspense } from "react";
 import WelcomeAnimation from "../Components/myCom/Prompt/WelcomeAni";
 // 使用 React.lazy 懒加载组件
-const LazyEmojiPicker = React.lazy(() => import("@Root/js/React/Components/myCom/EmojiPicker"));
+// const LazyEmojiPicker = React.lazy(
+//   () => import("@Root/js/React/Components/myCom/EmojiPicker")
+// )
 // const LazyPromptPanel = React.lazy(() => import("@Com/myCom/Prompt/Prompt"))
 const LazyPromptAIPanel = React.lazy(() => import("@Com/myCom/Prompt/AIPanel"));
 const LazyVoiceTrans = React.lazy(() => import("@Com/myCom/Prompt/VoiceTrans"));
@@ -25,5 +27,5 @@ export default observer(function Body() {
                                     : "26px 38px",
                             }, className: "uniform-scroller " +
                                 "markdown-body " +
-                                `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}` })] }), getStatesMemorable().memorable.welcomeAnimationState ? _jsx(WelcomeAnimation, {}) : _jsx(_Fragment, {}), _jsx(Suspense, { fallback: _jsx(_Fragment, {}), children: _jsx(LazyEmojiPicker, { open: getEmojiPickerState() === "on" ? true : false }) }), _jsx(Suspense, { children: _jsx(LazyPromptAIPanel, { open: getStates().unmemorable.aiPanelState }) }), _jsx(Suspense, { children: _jsx(LazyVoiceTrans, { open: getStates().unmemorable.voicePanelState }) })] }) }));
+                                `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}` })] }), getStatesMemorable().memorable.welcomeAnimationState ? _jsx(WelcomeAnimation, {}) : _jsx(_Fragment, {}), _jsx(Suspense, { children: _jsx(LazyPromptAIPanel, { open: getStates().unmemorable.aiPanelState }) }), _jsx(Suspense, { children: _jsx(LazyVoiceTrans, { open: getStates().unmemorable.voicePanelState }) })] }) }));
 });

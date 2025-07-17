@@ -19,7 +19,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { deleteDBAll, openDB, cursorDelete } from "@App/db.js";
+import { deleteDBAll, openDB, cursorDelete } from "@App/memory/db.js";
 import { getTheme } from "@App/config/change";
 import { useTranslation } from "react-i18next";
 // THEME

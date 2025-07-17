@@ -1,17 +1,21 @@
-export declare function fillInMemoryText(md: MD): void;
-export declare function readMemoryText(): Promise<any>;
+declare function checkIndexedDBSupport(): boolean;
+export declare function fillInMemoryText(md: MD): Promise<void>;
+export declare function readMemoryText(): Promise<any[]>;
+export declare function fillInMemoryImg(base64: string, timeStamp: number): Promise<void>;
+export declare function fillInMemoryImgs(base64Arr: string[], timeStamp: number): Promise<void>;
+export declare function readMemoryImg(indexName: string, indexValue: any): Promise<any[]>;
+export declare function readAllMemoryImg(): Promise<any[]>;
 /**
- * @description 单次存储图片
+ * @description 数据库初始化函数 - 在应用启动时调用
+ * 执行一次健康检查和自动修复
  */
-export declare function fillInMemoryImg(base64: string, timeStamp: number): void;
+export declare function initMemoryDB(): Promise<void>;
 /**
- * @description 批量存储图片
+ * @description 手动触发数据库健康检查和修复
  */
-export declare function fillInMemoryImgs(base64Arr: Array<string>, timeStamp: number): void;
-/**
- * @description 读取image base64
- * @param indexName 索引名
- * @param indexValue 索引值
- */
-export declare function readMemoryImg(indexName: any, indexValue: any): Promise<any>;
-export declare function readAllMemoryImg(): Promise<any>;
+export declare function checkAndRepairDatabase(): Promise<{
+    isHealthy: boolean;
+    issues: string[];
+    repaired: boolean;
+}>;
+export { checkIndexedDBSupport };

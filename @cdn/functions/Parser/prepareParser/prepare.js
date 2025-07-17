@@ -60,7 +60,7 @@ export default async function prepareParser(originalMd) {
                 return undefined;
             }
             return await readMemoryImg("uuid", parseInt(imgId)).then((e) => {
-                if (e && e[0] && e[0].imgBase64) {
+                if (e && e.length > 0 && e[0] && e[0].imgBase64) {
                     return e[0].imgBase64;
                 }
                 else {

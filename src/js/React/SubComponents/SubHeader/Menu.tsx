@@ -22,7 +22,7 @@ import {
   DialogTitle,
   Typography,
 } from "@mui/material"
-import { deleteDBAll } from "@App/db.js"
+import { deleteDBAll } from "@App/memory/db.js"
 import myPrint from "@App/export/myPrint"
 import FolderOpenOutlinedIcon from "@mui/icons-material/Folder"
 import { changeFileManagerState, getFileManagerState } from "@App/config/change"

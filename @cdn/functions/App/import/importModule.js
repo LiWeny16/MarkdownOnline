@@ -1,6 +1,5 @@
 // import { cdnDomains, cdnDomainsNpm } from "@App/user/cdn"
 const cdnImportArr = [
-// "/npm/@emoji-mart/data@1.2.1/+esm",
 // "/npm/gsap@3.12/+esm",
 ];
 export default async function importModule(url) {

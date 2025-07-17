@@ -26,6 +26,7 @@ import noteUseArco from "@App/message/note";
 import { mergeObjects } from "@App/basic/basic";
 import importFilePlugin from "@Func/Parser/mdItPlugin/file";
 import i18n from "i18next";
+import { initMemoryDB } from "@App/memory/memory";
 // import markdownItTOCPlugin from "@Func/Parser/mdItPlugin/TOC"
 // import tocPlugin from "@Func/Parser/mdItPlugin/TOC"
 import latexFix from "@Func/Parser/mdItPlugin/latexFix";
@@ -135,6 +136,10 @@ export default function allInit(editor = window.editor, monaco = window.monaco) 
     /**@description Third Party Settings Init*/
     const settings = new settingsClass();
     settings.settingsAllInit();
+    /**
+     * @description 数据库初始化
+     */
+    initMemoryDB();
     /**
      * @description Style init
      */

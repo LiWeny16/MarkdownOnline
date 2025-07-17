@@ -42,7 +42,7 @@ export default async function save(editor = null, message = true) {
 
 export async function isSaved() {
   return await readMemoryText().then((list) => {
-    if (list) {
+    if (list && list.length > 0) {
       if (list[0]?.contentText === getMdTextFromMonaco()) {
         // 已保存
         return true
@@ -51,6 +51,7 @@ export async function isSaved() {
         return false
       }
     } else {
+      // 没有数据，认为未保存
       return false
     }
   })

@@ -19,7 +19,7 @@ export default function virtualFileSystem(md: any): any {
         let imgId = src.match(reg2) ? src.match(reg2)![0] : "1"
         // console.log({ src: src, title: title, imgId: imgId })
         let temp2 = readMemoryImg("uuid", parseInt(imgId)).then((e) => {
-          if (e[0]) {
+          if (e && e.length > 0 && e[0]) {
             return `![${title}](${e[0].imgBase64})`
           } else {
             return `<div class="ERR">Err_VFS_ID</div>`

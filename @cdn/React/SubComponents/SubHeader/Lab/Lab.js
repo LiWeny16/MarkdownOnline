@@ -5,7 +5,7 @@ import { Box, Typography, Card, Button, Divider, CircularProgress } from "@mui/m
 import { useTranslation } from "react-i18next";
 import { getTheme } from "@App/config/change";
 import ScienceIcon from "@mui/icons-material/Science";
-import { deleteDB, fetchAndStoreJSON, openDB, fetchStoredJSON } from "@App/db";
+import { deleteDB, fetchAndStoreJSON, openDB, fetchStoredJSON } from "@App/memory/db";
 import alertUseArco from "@App/message/alert";
 export default function Lab(props) {
     const { t } = useTranslation();

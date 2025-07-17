@@ -44,7 +44,7 @@ import { type Position } from "monaco-editor/esm/vs/editor/editor.api"
 import { FileFolderManager } from "@App/fileSystem/file"
 import { getSettings } from "@App/config/change"
 import { getFormattedDate } from "@App/user/date"
-import { fetchStoredJSON, getDataByKey } from "@App/db";
+import { fetchStoredJSON, getDataByKey } from "@App/memory/db";
 
 // let words: any[] = []
 export async function monacoSnippets(

@@ -1,9 +1,8 @@
-// import words from "an-array-of-english-words";
 import { accents1, delimiters0, delimeterSizing0, greekLetters0, otherLetters0, annotation1, verticalLayout0, verticalLayout1, verticalLayout2, overlap1, spacing0, spacing1, logicAndSetTheory0, logicAndSetTheory1, macros0, bigOperators0, binaryOperators0, fractions0, fractions2, binomialCoefficients0, binomialCoefficients2, mathOperators0, mathOperators1, sqrt1, relations0, negatedRelations0, arrows0, extensibleArrows1, braketNotation1, classAssignment1, color2, font0, font1, size0, style0, symbolsAndPunctuation0, debugging0, envs, } from "./latexRules";
 import { FileFolderManager } from "@App/fileSystem/file";
 import { getSettings } from "@App/config/change";
 import { getFormattedDate } from "@App/user/date";
-import { fetchStoredJSON } from "@App/db";
+import { fetchStoredJSON } from "@App/memory/db";
 // let words: any[] = []
 export async function monacoSnippets(editor, monaco) {
     /**

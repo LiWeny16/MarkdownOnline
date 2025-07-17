@@ -1,9 +1,9 @@
-import { getDataByKey, openDB, updateDB } from "@App/db";
+import { getDataByKey, openDB, updateDB } from "@App/memory/db";
 export const cdnDomains = [
+    "cdn.jsdmirror.com",
     "cdn.jsdelivr.net",
     "fastly.jsdelivr.net",
     // "jsd.onmicrosoft.cn",
-    "cdn.jsdmirror.com",
 ];
 export const cdnDomainsNpm = ["npm.elemecdn.com"];
 export default async function cdnInit() {
@@ -145,10 +145,10 @@ export async function loadScripts() {
             id: "clue-parser",
             cdnUrl: `https://${usefulDomain}/npm/clue-parser@1.0.4/index.min.css`,
         },
-        {
-            id: "arco-design",
-            cdnUrl: `https://${usefulDomain}/npm/@arco-design/web-react@2.58.3/dist/css/arco.min.css`,
-        },
+        // {
+        //   id: "arco-design",
+        //   cdnUrl: `https://${usefulDomain}/npm/@arco-design/web-react@2.58.3/dist/css/arco.min.css`,
+        // },
     ];
     async function loadOrFetchResource(resource, loadFunction, type) {
         try {

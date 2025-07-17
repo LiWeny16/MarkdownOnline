@@ -5,7 +5,6 @@ import exportAsImage from "@App/export/domToImg";
 import kit from "bigonion-kit";
 import exeInsertPageBreakerAction from "./actions/pageBreaker";
 import exeLatexBlockAction from "./actions/latexBlock";
-import exeEmojiPickerAction from "./actions/emojiPicker";
 import exeSpeechPanelAction from "./actions/speechPanel";
 import exeSyncScrollAction from "./actions/syncScroll";
 import exeFileManagerAction from "./actions/fileManager";
@@ -59,16 +58,19 @@ export default function monacoKeyEvent(editor, monaco) {
     //     insertQuotationInMonaco()
     //   },
     // })
-    editor.addAction({
-        id: "show.emojiPicker",
-        label: "打开表情包超市 🤪",
-        keybindings: [],
-        contextMenuGroupId: "navigation",
-        contextMenuOrder: 1,
-        run: () => {
-            exeEmojiPickerAction(editor, monaco);
-        },
-    });
+    /**
+     * @description emojiPicker
+    */
+    // editor.addAction({
+    //   id: "show.emojiPicker",
+    //   label: "打开表情包超市 🤪",
+    //   keybindings: [],
+    //   contextMenuGroupId: "navigation",
+    //   contextMenuOrder: 1,
+    //   run: () => {
+    //     exeEmojiPickerAction(editor, monaco)
+    //   },
+    // })
     editor.addAction({
         id: "insert.tableAny",
         label: "插入任意行和列,格式: table#x#x",

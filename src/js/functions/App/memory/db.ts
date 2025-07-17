@@ -84,7 +84,8 @@ export function updateDB(
     }
 
     request.onerror = function (event) {
-      // console.log("数据更新失败")
+      console.error("数据更新失败:", event)
+      reject(event)
     }
   })
 }

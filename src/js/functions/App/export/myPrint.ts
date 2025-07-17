@@ -7,7 +7,7 @@ export default function myPrint() {
   // console.log(printString)
   window.document.body.style.background =
     getTheme() === "light" ? "" : "#0D1117"
-  window.document.body.innerHTML = `<div class="markdown-body markdown-body-${getTheme() === "light" ? "light" : "dark"}">${printString}</div>`
+  // window.document.body.innerHTML = `<div class="markdown-body markdown-body-${getTheme() === "light" ? "light" : "dark"}">${printString}</div>`
   kit.sleep(500).then(() => {
     window.print()
   })
