@@ -66,14 +66,15 @@ const createAlertStyles = (severity: AlertColor) => {
   const currentTheme = themeColors.currentColors
   
   const baseStyles = {
-    minWidth: '280px',
-    maxWidth: '400px',
+    minWidth: '160px',  // 优化最小宽度，保证短文字有合适的容器大小
+    maxWidth: '400px',  // 调整最大宽度，保持合理的长度限制
+    width: 'fit-content', // 根据内容自适应宽度
     border: '1px solid',
     borderRadius: '6px',
     boxShadow: `0 3px 6px -4px ${currentTheme.shadowColor}, 0 6px 16px 0 ${currentTheme.shadowColor}, 0 9px 28px 8px ${currentTheme.shadowColor}`,
     fontSize: '14px',
     fontWeight: 400,
-    padding: '12px 16px',
+    padding: '10px 16px',  // 稍微减少垂直内边距，让整体更紧凑
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
@@ -109,7 +110,7 @@ const createIcon = (severity: AlertColor) => {
     justify-content: center;
     width: 16px;
     height: 16px;
-    margin-right: 8px;
+    margin-right: 6px;
     flex-shrink: 0;
   `
   
@@ -220,7 +221,11 @@ const alertUseMui = (
   messageSpan.textContent = msg
   messageSpan.style.cssText = `
     flex: 1;
-    word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    text-align: left;
   `
 
   // 添加关闭按钮

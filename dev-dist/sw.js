@@ -67,7 +67,7 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-3d1c42bc'], (function (workbox) { 'use strict';
+define(['./workbox-6c6c3b19'], (function (workbox) { 'use strict';
 
   self.skipWaiting();
   workbox.clientsClaim();
@@ -82,34 +82,63 @@ define(['./workbox-3d1c42bc'], (function (workbox) { 'use strict';
     "revision": "3ca0b8505b4bec776b69afdba2768812"
   }, {
     "url": "index.html",
-    "revision": "0.u7dkr0ftupo"
+    "revision": "0.hkmvc8fegug"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
     allowlist: [/^\/$/]
   }));
   workbox.registerRoute(/(cdn\.jsdelivr\.net|cdn\.jsdmirror\.com|unpkg\.com).*\/monaco-editor\//, new workbox.CacheFirst({
-    "cacheName": "monaco-editor-cache-v1",
+    "cacheName": "monaco-editor-cache-v2",
     plugins: [new workbox.ExpirationPlugin({
-      maxAgeSeconds: 432000,
-      maxEntries: 20
+      maxAgeSeconds: 7776000,
+      maxEntries: 100
     }), new workbox.CacheableResponsePlugin({
       statuses: [0, 200]
     })]
   }), 'GET');
-  workbox.registerRoute(/(cdn\.jsdelivr\.net|cdn\.jsdmirror\.com)/, new workbox.StaleWhileRevalidate({
-    "cacheName": "cdn-libraries-cache-v1",
+  workbox.registerRoute(/(cdn\.jsdelivr\.net|cdn\.jsdmirror\.com|fastly\.jsdelivr\.net|npm\.elemecdn\.com)/, new workbox.StaleWhileRevalidate({
+    "cacheName": "cdn-libraries-cache-v2",
     plugins: [new workbox.ExpirationPlugin({
-      maxAgeSeconds: 432000
+      maxAgeSeconds: 5184000,
+      maxEntries: 500
     }), new workbox.CacheableResponsePlugin({
       statuses: [0, 200]
     })]
   }), 'GET');
-  workbox.registerRoute(/\.(?:png|gif|jpg|jpeg|svg|webp)$/, new workbox.CacheFirst({
-    "cacheName": "image-cache-v1",
+  workbox.registerRoute(/\.(?:png|gif|jpg|jpeg|svg|webp|avif|ico)$/, new workbox.CacheFirst({
+    "cacheName": "image-cache-v2",
     plugins: [new workbox.ExpirationPlugin({
-      maxEntries: 60,
-      maxAgeSeconds: 432000
+      maxEntries: 200,
+      maxAgeSeconds: 7776000
+    })]
+  }), 'GET');
+  workbox.registerRoute(/\.(?:woff|woff2|ttf|eot|otf)$/, new workbox.CacheFirst({
+    "cacheName": "fonts-cache-v1",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 50,
+      maxAgeSeconds: 31536000
+    }), new workbox.CacheableResponsePlugin({
+      statuses: [0, 200]
+    })]
+  }), 'GET');
+  workbox.registerRoute(/\/api\/|\.json$/, new workbox.NetworkFirst({
+    "cacheName": "api-cache-v1",
+    "networkTimeoutSeconds": 3,
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 100,
+      maxAgeSeconds: 604800
+    }), new workbox.CacheableResponsePlugin({
+      statuses: [0, 200]
+    })]
+  }), 'GET');
+  workbox.registerRoute(/\.(?:css|js|mjs|esm)$/, new workbox.StaleWhileRevalidate({
+    "cacheName": "static-resources-cache-v1",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 300,
+      maxAgeSeconds: 2592000
+    }), new workbox.CacheableResponsePlugin({
+      statuses: [0, 200]
     })]
   }), 'GET');
 

@@ -142,9 +142,9 @@ export default defineConfig({
       // 1. 注册策略与开发选项
       // --------------------------
       registerType: 'autoUpdate', // 自动更新 Service Worker，无需用户手动刷新。这能解决您之前遇到的开发死循环问题。
-      devOptions: {
-        enabled: true, // 在开发模式 (`npm run dev`) 中也启用 Service Worker，方便调试。
-      },
+      // devOptions: {
+      //   enabled: true, // 在开发模式 (`npm run dev`) 中也启用 Service Worker，方便调试。
+      // },
 
       // 2. PWA Manifest 配置 (应用清单)
       // --------------------------------
@@ -177,7 +177,7 @@ export default defineConfig({
         clientsClaim: true,
         // 🚀 增加最大预缓存大小限制
         maximumFileSizeToCacheInBytes: 50 * 1024 * 1024, // 50MB (默认2MB)
-        
+
         // a. 预缓存 (Precaching)：处理您的本地文件
         // ------------------------------------------
         // globPatterns 会匹配您 `build.outDir` (即 'docs') 下的所有相应文件
@@ -188,8 +188,10 @@ export default defineConfig({
           '**/*.{md,txt,xml}', // 添加文档文件
           '**/*.{webp,avif,gif,jpg,jpeg}', // 添加更多图片格式
         ],
-        // globIgnores: ['**/monaco-editor-*.js'],
-        
+        globIgnores: [
+          '**/LICENSES/*.md' // 或者更精确地忽略这个特定文件
+        ],
+
         // b. 运行时缓存 (Runtime Caching)：处理您的 CDN 和其他外部资源
         // -----------------------------------------------------------------
         // 规则顺序很重要，Workbox 会使用第一个匹配的规则。
