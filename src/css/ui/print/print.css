@@ -59,6 +59,13 @@
     break-inside: avoid;
   }
 
+  .mui-notification-item,
+  .prompt-panel-content,
+  .mui-alert-item {
+    display: none !important;
+  }
+
+
   /* s */
   /* .App-top{
       flex-direction: column;

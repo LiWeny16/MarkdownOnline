@@ -52,20 +52,21 @@ class StandardTableSyncManager {
             return;
         }
         this.isInternalUpdate = true;
-        console.log(`标准化数据同步: ${tableId}, source: ${source}`);
+        console.log(`🚀 标准化数据同步开始: ${tableId}, source: ${source}`);
         try {
             if (source === 'react') {
-                // React → Monaco: 通过标准化数据更新Monaco编辑器
+                // React → Monaco: 更新标准化数据后立即回写Monaco
                 const success = StandardTableAPI.updateStandardData(tableId, newData, source);
                 if (success) {
-                    console.log(`准备写入Monaco: ${tableId}`);
-                    // 🚀 确保写入操作在下一个事件循环中执行，避免同步冲突
-                    setTimeout(() => {
-                        writeStandardTableToMonaco(tableId, newData);
-                    }, 50); // 减少延迟到50ms
+                    console.log(`✅ 标准化数据更新成功，准备写入Monaco: ${tableId}`);
+                    // 🚀 直接同步执行，避免延迟导致的状态不一致
+                    const writeSuccess = writeStandardTableToMonaco(tableId, newData);
+                    if (!writeSuccess) {
+                        console.error(`❌ Monaco写入失败: ${tableId}`);
+                    }
                 }
                 else {
-                    console.warn(`更新标准化数据失败: ${tableId}`);
+                    console.warn(`❌ 更新标准化数据失败: ${tableId}`);
                 }
             }
             else {
@@ -74,11 +75,11 @@ class StandardTableSyncManager {
             }
         }
         finally {
-            // 🚀 减少重置延迟，提高响应速度
+            // 🚀 快速重置状态，提高响应性
             setTimeout(() => {
                 this.isInternalUpdate = false;
-                console.log(`同步更新完成: ${tableId}`);
-            }, 200); // 从300ms减少到200ms
+                console.log(`✅ 同步更新完成: ${tableId}`);
+            }, 100); // 减少到100ms
         }
     }
     // 检查是否正在进行内部更新
@@ -189,9 +190,10 @@ export function writeStandardTableToMonaco(tableId, newData) {
         return false;
     }
     try {
-        /* 1️⃣ 生成 markdown */
-        const newMarkdown = tableDataToMarkdown(newData); // 不做 trim
-        /* 2️⃣ editor / model */
+        /* 1️⃣ 生成新的markdown */
+        const newMarkdown = tableDataToMarkdown(newData);
+        console.log(`生成新markdown，行数: ${newMarkdown.split('\n').length}`);
+        /* 2️⃣ 获取editor和model */
         const editor = window.editor;
         const model = editor.getModel();
         if (!model) {
@@ -199,38 +201,58 @@ export function writeStandardTableToMonaco(tableId, newData) {
             isWritingToMonaco = false;
             return false;
         }
-        /* 3️⃣ 计算范围：只替换表格本身的内容 */
+        /* 3️⃣ 精确的范围计算：只替换表格本身的内容 */
         const startLine = standardData.metadata.startLine; // 0‑based
-        const originalEndLine = standardData.metadata.endLine; // 0‑based
+        const originalEndLine = standardData.metadata.endLine; // 0‑based，已经是表格后一行的行号
         const modelLineCount = model.getLineCount();
-        const safeEndLine = Math.min(originalEndLine, modelLineCount - 1);
-        const monacoStartLine = startLine + 1; // 1‑based
-        const monacoEndLine = safeEndLine + 1; // 1‑based
-        // 🚀 关键修复：只替换表格本身的内容，不包含下一行
-        // 获取表格最后一行的实际内容长度
-        const tableEndLineContent = model.getLineContent(monacoEndLine);
-        const endCol = tableEndLineContent.length + 1; // +1 to include the entire line
+        // 🚀 修复：endLine已经是表格后一行，表格最后一行应该是endLine-1
+        const tableLastLine = originalEndLine - 1; // 0‑based，表格实际最后一行
+        const safeEndLine = Math.min(tableLastLine, modelLineCount - 1);
+        const monacoStartLine = startLine + 1; // 转换为1‑based
+        const monacoEndLine = safeEndLine + 1; // 转换为1‑based，表格实际最后一行
+        // 🚀 修复：精确计算范围，只选择表格行，不影响下一行
         const range = new window.monaco.Range(monacoStartLine, // 开始行
-        1, // 开始列
-        monacoEndLine, // 结束行：表格的最后一行
-        endCol // 结束列：表格最后一行的末尾
+        1, // 开始列（行首）
+        monacoEndLine, // 结束行（表格最后一行）
+        model.getLineMaxColumn(monacoEndLine) // 结束列（表格最后一行的行尾，不包含换行符）
         );
-        /* 4️⃣ 写入 */
+        console.log(`替换范围: [${monacoStartLine}:1] 到 [${monacoEndLine}:${model.getLineMaxColumn(monacoEndLine)}]`);
+        /* 4️⃣ 准备替换文本 - 检查是否需要空行分隔 */
+        let finalText = newMarkdown.trimEnd();
+        // 🚀 修复：正确检查表格下一行内容
+        const nextLineNumber = originalEndLine + 1; // 表格下一行（1-based）
+        if (nextLineNumber <= modelLineCount) {
+            const nextLineContent = model.getLineContent(nextLineNumber);
+            console.log(`检查下一行 ${nextLineNumber}: "${nextLineContent}"`);
+            // 如果下一行不是空行且有内容，则在表格后添加空行
+            if (nextLineContent && nextLineContent.trim() !== '') {
+                finalText += '\n'; // 添加空行分隔
+                console.log(`添加空行分隔，因为下一行有内容: "${nextLineContent}"`);
+            }
+        }
+        /* 执行替换 */
         editor.executeEdits(`table-edit-${tableId}`, [
             {
                 range,
-                text: newMarkdown.trim(), // 确保没有多余的换行符
+                text: finalText,
                 forceMoveMarkers: true,
             },
         ]);
-        /* 5️⃣ 更新 endLine (基于新内容) */
-        const newLines = (newMarkdown.endsWith("\n") ? newMarkdown.slice(0, -1) : newMarkdown).split("\n").length;
-        const newEndLine = startLine + newLines - 1;
-        updateStandardTableEndLine(tableId, newEndLine);
+        /* 5️⃣ 重新计算和更新endLine */
+        // 等待DOM更新后重新计算
         setTimeout(() => {
+            const updatedModel = editor.getModel();
+            if (updatedModel) {
+                // 重新计算行数，考虑可能添加的空行
+                const finalTextLines = finalText.split('\n');
+                const newTableLastLine = startLine + finalTextLines.length - 1; // 0-based，表格实际最后一行
+                const newEndLine = newTableLastLine + 1; // 0-based，表格后一行
+                console.log(`更新endLine: ${originalEndLine} -> ${newEndLine} (表格行数: ${finalTextLines.length})`);
+                updateStandardTableEndLine(tableId, newEndLine);
+            }
             isWritingToMonaco = false;
             console.log(`Monaco写入完成: ${tableId}`);
-        }, 50);
+        }, 10); // 减少到10ms，快速完成
         return true;
     }
     catch (e) {

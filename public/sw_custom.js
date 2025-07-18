@@ -121,7 +121,7 @@ const config = {
 // 开发环境专用日志函数
 function devLog(message, ...args) {
     if (isDevelopment && config.development.enableDetailedLogging) {
-        console.log(`[SW-DEV] ${message}`, ...args);
+        // console.log(`[SW-DEV] ${message}`, ...args);
     }
 }
 
@@ -349,9 +349,9 @@ async function cacheFirstWithIndexedDB(request, resourceType) {
         }
         const response = await fetch(fetchRequest);
         // --- 在这里添加诊断日志 ---
-        console.log('[SW-DEBUG] Fetched Response Status:', response.status);
-        console.log('[SW-DEBUG] Fetched Response OK:', response.ok);
-        console.log('[SW-DEBUG] Fetched Response Type:', response.type);
+        // console.log('[SW-DEBUG] Fetched Response Status:', response.status);
+        // console.log('[SW-DEBUG] Fetched Response OK:', response.ok);
+        // console.log('[SW-DEBUG] Fetched Response Type:', response.type);
         // -------------------------
 
         devLog(`网络请求时间: ${networkTime}ms`);

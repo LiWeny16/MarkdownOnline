@@ -596,6 +596,38 @@ let tablePlugin = function (md: MarkdownIt) {
 
 export { tablePlugin };
 
+
+
+// ===== 标准化数据API（供外部使用） =====
+export const StandardTableAPI = {
+    // 获取标准化数据
+    getStandardData: (tableId: string) => standardTableDataManager.getStandardData(tableId),
+
+    // 更新标准化数据
+    updateStandardData: (tableId: string, data: TableData, source: 'react' | 'monaco' = 'react') =>
+        standardTableDataManager.updateStandardData(tableId, data, source),
+
+    // 🚀 直接注册标准化数据（用于元数据更新）
+    registerStandardData: (standardData: StandardTableData) =>
+        standardTableDataManager.registerStandardData(standardData),
+
+    // 监听数据变化
+    onDataChange: (tableId: string, callback: (data: StandardTableData) => void) =>
+        standardTableDataManager.addDataChangeListener(tableId, callback),
+
+    // 取消监听
+    offDataChange: (tableId: string, callback: (data: StandardTableData) => void) =>
+        standardTableDataManager.removeDataChangeListener(tableId, callback),
+
+    // 获取所有标准化数据
+    getAllStandardData: () => standardTableDataManager.getAllStandardData(),
+
+    // 数据转换工具
+    standardToTable: standardDataToTableData,
+    tableToStandard: tableDataToStandardData
+};
+
+
 // 在markdown-it-incremental-dom插件注册后添加的后置处理钩子
 // 这个函数需要在allInit.ts中tablePlugin注册后调用
 // export function addIncrementalDOMTableSupport(md: MarkdownIt) {
@@ -670,33 +702,3 @@ export { tablePlugin };
 //         };
 //     };
 // }
-
-// ===== 标准化数据API（供外部使用） =====
-export const StandardTableAPI = {
-    // 获取标准化数据
-    getStandardData: (tableId: string) => standardTableDataManager.getStandardData(tableId),
-
-    // 更新标准化数据
-    updateStandardData: (tableId: string, data: TableData, source: 'react' | 'monaco' = 'react') =>
-        standardTableDataManager.updateStandardData(tableId, data, source),
-
-    // 🚀 直接注册标准化数据（用于元数据更新）
-    registerStandardData: (standardData: StandardTableData) =>
-        standardTableDataManager.registerStandardData(standardData),
-
-    // 监听数据变化
-    onDataChange: (tableId: string, callback: (data: StandardTableData) => void) =>
-        standardTableDataManager.addDataChangeListener(tableId, callback),
-
-    // 取消监听
-    offDataChange: (tableId: string, callback: (data: StandardTableData) => void) =>
-        standardTableDataManager.removeDataChangeListener(tableId, callback),
-
-    // 获取所有标准化数据
-    getAllStandardData: () => standardTableDataManager.getAllStandardData(),
-
-    // 数据转换工具
-    standardToTable: standardDataToTableData,
-    tableToStandard: tableDataToStandardData
-};
-

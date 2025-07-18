@@ -1,5 +1,5 @@
 // src/js/React/SubComponents/SubBody/SuperComs/ReactTable.tsx/index.tsx
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import {
   Table,
   TableBody,
@@ -23,8 +23,26 @@ import {
   Add as AddIcon,
   Delete as DeleteIcon,
   FilterList as FilterListIcon,
-  HelpOutline as HelpIcon
+  HelpOutline as HelpIcon,
+  DragIndicator as DragIndicatorIcon
 } from '@mui/icons-material';
+import MarkdownIt from 'markdown-it';
+import {
+  DndContext,
+  DragEndEvent,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  closestCenter
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+  arrayMove
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { visuallyHidden } from '@mui/utils';
 import {
   TableData,
@@ -38,6 +56,48 @@ import {
   standardTableSyncManager
 } from '@App/text/tableEditor';
 import { getTableMetadata } from '@App/text/tableEditor';
+import { getTheme } from '@App/config/change';
+
+// 🚀 主题样式函数
+const getTableThemeStyles = () => {
+  const isDark = getTheme() === 'dark';
+  
+  return {
+    // 表格容器样式
+    paperBackground: isDark ? '#2d2d30' : '#ffffff',
+    paperBorder: isDark ? '1px solid #3c3c3c' : '1px solid #e0e0e0',
+    
+    // 表格单元格样式
+    cellBackground: isDark ? '#2d2d30' : '#ffffff',
+    cellHoverBackground: isDark ? '#3c3c3c' : '#f5f5f5',
+    cellSelectedBackground: isDark ? alpha('#1976d2', 0.15) : alpha('#1976d2', 0.12),
+    cellActiveBackground: isDark ? alpha('#1976d2', 0.12) : alpha('#1976d2', 0.08),
+    cellBorder: isDark ? '#3c3c3c' : '#e0e0e0',
+    cellText: isDark ? '#ffffff' : '#000000',
+    
+    // 表头样式
+    headerBackground: isDark ? '#383838' : '#f5f5f5',
+    headerText: isDark ? '#ffffff' : '#000000',
+    headerHoverBackground: isDark ? '#4a4a4a' : '#eeeeee',
+    
+    // 工具栏样式
+    toolbarBackground: isDark ? '#2d2d30' : 'transparent',
+    toolbarBorder: isDark ? '#3c3c3c' : '#e0e0e0',
+    
+    // 按钮样式
+    buttonColor: isDark ? '#ffffff' : '#1976d2',
+    buttonHoverBackground: isDark ? '#3c3c3c' : alpha('#1976d2', 0.04),
+    
+    // 编辑器样式
+    editorBackground: isDark ? '#2d2d30' : 'transparent',
+    editorBorder: isDark ? '1px solid #1976d2' : '1px solid #1976d2',
+    editorFocusBorder: isDark ? '2px solid #1976d2' : '2px solid #1976d2',
+    
+    // 选中行样式
+    selectedRowBackground: isDark ? alpha('#1976d2', 0.15) : alpha('#1976d2', 0.08),
+    selectedRowHoverBackground: isDark ? alpha('#1976d2', 0.2) : alpha('#1976d2', 0.12),
+  };
+};
 
 interface ReactTableProps {
   tableId?: string;
@@ -64,7 +124,175 @@ interface SelectedCell {
   colIndex: number;
 }
 
+// 活动单元格 (用于粘贴操作的起始点)
+interface ActiveCell {
+  rowIndex: number;
+  colIndex: number;
+}
+
+// 🚀 Part 3: 可拖拽的表格行组件
+interface DraggableTableRowProps {
+  rowId: string;
+  rowIndex: number;
+  row: string[];
+  isEditMode: boolean;
+  isSelected: boolean;
+  lastSelectedIndex: number | null;
+  editingCell: EditingCell | null;
+  onRowClick: (event: React.MouseEvent<unknown>, rowIndex: number) => void;
+  onDeleteRow: (rowIndex: number) => void;
+  renderCellContent: (value: string, rowIndex: number, colIndex: number) => React.ReactNode;
+  setSelectedRows: React.Dispatch<React.SetStateAction<number[]>>;
+  setLastSelectedIndex: React.Dispatch<React.SetStateAction<number | null>>;
+}
+
+const DraggableTableRow: React.FC<DraggableTableRowProps> = ({
+  rowId,
+  rowIndex,
+  row,
+  isEditMode,
+  isSelected,
+  lastSelectedIndex,
+  editingCell,
+  onRowClick,
+  onDeleteRow,
+  renderCellContent,
+  setSelectedRows,
+  setLastSelectedIndex
+}) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: rowId });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 1000 : 'auto',
+    opacity: isDragging ? 0.8 : 1,
+  };
+
+  return (
+    <TableRow
+      ref={setNodeRef}
+      style={style}
+      key={rowId}
+      hover
+      role={isEditMode ? "checkbox" : undefined}
+      aria-checked={isEditMode ? isSelected : undefined}
+      tabIndex={-1}
+      selected={isEditMode ? isSelected : false}
+      sx={{
+        '&:nth-of-type(even)': {
+          backgroundColor: isDragging ? '#f5f5f5' : '#fafafa'
+        },
+        '&:hover': {
+          backgroundColor: isEditMode ? alpha('#1976d2', 0.08) : '#f0f0f0'
+        },
+        cursor: isEditMode ? 'pointer' : 'default'
+      }}
+      onClick={(event) => {
+        if (isEditMode) {
+          onRowClick(event, rowIndex);
+        }
+      }}
+    >
+      {/* 🚀 拖拽手柄列 */}
+      {isEditMode && (
+        <TableCell padding="checkbox">
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Checkbox
+              color="primary"
+              checked={isSelected}
+              onChange={(event) => {
+                event.stopPropagation();
+                if (isSelected) {
+                  setSelectedRows(prev => prev.filter(index => index !== rowIndex));
+                  if (lastSelectedIndex === rowIndex) {
+                    setLastSelectedIndex(null);
+                  }
+                } else {
+                  setSelectedRows(prev => {
+                    if (prev.includes(rowIndex)) {
+                      return prev;
+                    }
+                    return [...prev, rowIndex];
+                  });
+                  setLastSelectedIndex(rowIndex);
+                }
+              }}
+              inputProps={{
+                'aria-labelledby': `enhanced-table-checkbox-${rowIndex}`,
+              }}
+            />
+            <IconButton
+              size="small"
+              {...attributes}
+              {...listeners}
+              sx={{ 
+                cursor: 'grab',
+                opacity: 0.6,
+                '&:hover': { opacity: 1 },
+                '&:active': { cursor: 'grabbing' }
+              }}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <DragIndicatorIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        </TableCell>
+      )}
+
+      {row.map((cell, colIndex) => (
+        <TableCell
+          key={colIndex}
+          sx={{
+            minWidth: 120,
+            padding: 0,
+            whiteSpace: 'nowrap',
+            '&:hover': {
+              backgroundColor: isEditMode ? alpha('#1976d2', 0.04) : 'transparent'
+            }
+          }}
+          onClick={(event) => {
+            if (isEditMode) {
+              event.stopPropagation();
+            }
+          }}
+        >
+          {renderCellContent(cell, rowIndex, colIndex)}
+        </TableCell>
+      ))}
+
+      {isEditMode && (
+        <TableCell>
+          <Tooltip title="Delete Row">
+            <IconButton
+              size="small"
+              onClick={(event) => {
+                event.stopPropagation();
+                onDeleteRow(rowIndex);
+              }}
+              color="error"
+              sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}
+            >
+              <DeleteIcon fontSize="inherit" />
+            </IconButton>
+          </Tooltip>
+        </TableCell>
+      )}
+    </TableRow>
+  );
+};
+
 const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: propTableData }) => {
+  // 🚀 主题样式
+  const themeStyles = useMemo(() => getTableThemeStyles(), []);
+  
   // 状态管理
   const [data, setData] = useState<TableData>({ headers: [], rows: [] });
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
@@ -78,6 +306,36 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   // 🚀 新增：多选状态
   const [selectedCells, setSelectedCells] = useState<SelectedCell[]>([]);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  
+  // 🚀 新增：活动单元格状态
+  const [activeCell, setActiveCell] = useState<ActiveCell | null>(null);
+
+  // 🚀 新增：表格容器引用
+  const tableContainerRef = useRef<HTMLDivElement>(null);
+
+  // 🚀 Part 1: 创建 markdown-it 实例
+  const md = useMemo(() => {
+    return new MarkdownIt({
+      html: false,
+      linkify: true,
+      typographer: false
+    });
+  }, []);
+
+  // 🚀 Part 3: 配置拖拽传感器
+  const sensors = useSensors(
+    useSensor(MouseSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
+      },
+    })
+  );
 
   // 🚀 排序比较函数
   const descendingComparator = useCallback((a: string[], b: string[], orderBy: string) => {
@@ -173,6 +431,52 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   const isRowSelected = useCallback((rowIndex: number) => {
     return selectedRows.includes(rowIndex);
   }, [selectedRows]);
+
+  // 🚀 Part 2: 单元格点击处理（支持多选）
+  const handleCellClick = useCallback((event: React.MouseEvent<unknown>, rowIndex: number, colIndex: number) => {
+    event.stopPropagation(); // 防止触发行选择
+
+    const cellKey = `${rowIndex}-${colIndex}`;
+    
+    if (event.ctrlKey || event.metaKey) {
+      // Ctrl/Cmd点击：切换单元格选择
+      const isCurrentlySelected = selectedCells.some(cell => 
+        cell.rowIndex === rowIndex && cell.colIndex === colIndex
+      );
+      
+      if (isCurrentlySelected) {
+        setSelectedCells(prev => prev.filter(cell => 
+          !(cell.rowIndex === rowIndex && cell.colIndex === colIndex)
+        ));
+      } else {
+        setSelectedCells(prev => [...prev, { rowIndex, colIndex }]);
+      }
+    } else if (event.shiftKey && selectedCells.length > 0) {
+      // Shift点击：矩形区域选择
+      const lastCell = selectedCells[selectedCells.length - 1];
+      const minRow = Math.min(lastCell.rowIndex, rowIndex);
+      const maxRow = Math.max(lastCell.rowIndex, rowIndex);
+      const minCol = Math.min(lastCell.colIndex, colIndex);
+      const maxCol = Math.max(lastCell.colIndex, colIndex);
+
+      const rectangularSelection: SelectedCell[] = [];
+      for (let r = minRow; r <= maxRow; r++) {
+        for (let c = minCol; c <= maxCol; c++) {
+          rectangularSelection.push({ rowIndex: r, colIndex: c });
+        }
+      }
+      
+      // 合并现有选择和矩形选择，去重
+      const allSelected = [...selectedCells, ...rectangularSelection];
+      const uniqueSelected = allSelected.filter((cell, index, arr) => 
+        arr.findIndex(c => c.rowIndex === cell.rowIndex && c.colIndex === cell.colIndex) === index
+      );
+      setSelectedCells(uniqueSelected);
+    } else {
+      // 普通点击：单选
+      setSelectedCells([{ rowIndex, colIndex }]);
+    }
+  }, [selectedCells]);
 
   // 默认示例数据（用于后备）
   const defaultTableData: TableData = useMemo(() => ({
@@ -418,9 +722,94 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     updateDataAndSync(newData);
   }, [data, updateDataAndSync]);
 
+  // 🚀 Part 2: 格式化助手函数
+  const toggleMarkdownFormat = useCallback((text: string, format: 'bold' | 'italic' | 'strikethrough' | 'code') => {
+    const formatMap = {
+      bold: { start: '**', end: '**' },
+      italic: { start: '*', end: '*' },
+      strikethrough: { start: '~~', end: '~~' },
+      code: { start: '`', end: '`' }
+    };
+
+    const { start, end } = formatMap[format];
+    
+    // 检查是否已经有格式
+    if (text.startsWith(start) && text.endsWith(end)) {
+      // 移除格式
+      return text.slice(start.length, -end.length);
+    } else {
+      // 添加格式
+      return `${start}${text}${end}`;
+    }
+  }, []);
+
   // 🚀 增强键盘快捷键处理
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
     if (!isEditMode || editingCell) return;
+
+    // 🚀 Part 2: Ctrl+B - 切换加粗格式
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'b') {
+      event.preventDefault();
+      
+      if (selectedCells.length === 0) return;
+
+      // 创建数据副本
+      const newData = JSON.parse(JSON.stringify(data)) as TableData;
+      
+      // 对所有选中的单元格应用/移除加粗格式
+      selectedCells.forEach(({ rowIndex, colIndex }) => {
+        if (rowIndex === -1) {
+          // 表头
+          if (colIndex < newData.headers.length) {
+            newData.headers[colIndex] = toggleMarkdownFormat(
+              newData.headers[colIndex] || '', 
+              'bold'
+            );
+          }
+        } else {
+          // 数据行
+          if (rowIndex < newData.rows.length && colIndex < newData.rows[rowIndex].length) {
+            newData.rows[rowIndex][colIndex] = toggleMarkdownFormat(
+              newData.rows[rowIndex][colIndex] || '', 
+              'bold'
+            );
+          }
+        }
+      });
+
+      updateDataAndSync(newData);
+      return;
+    }
+
+    // 🚀 Part 2: Ctrl+I - 切换斜体格式
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'i') {
+      event.preventDefault();
+      
+      if (selectedCells.length === 0) return;
+
+      const newData = JSON.parse(JSON.stringify(data)) as TableData;
+      
+      selectedCells.forEach(({ rowIndex, colIndex }) => {
+        if (rowIndex === -1) {
+          if (colIndex < newData.headers.length) {
+            newData.headers[colIndex] = toggleMarkdownFormat(
+              newData.headers[colIndex] || '', 
+              'italic'
+            );
+          }
+        } else {
+          if (rowIndex < newData.rows.length && colIndex < newData.rows[rowIndex].length) {
+            newData.rows[rowIndex][colIndex] = toggleMarkdownFormat(
+              newData.rows[rowIndex][colIndex] || '', 
+              'italic'
+            );
+          }
+        }
+      });
+
+      updateDataAndSync(newData);
+      return;
+    }
 
     // Ctrl+A: 全选
     if ((event.ctrlKey || event.metaKey) && event.key === 'a') {
@@ -436,6 +825,180 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       setSelectedRows([]);
       setSelectedCells([]);
       setLastSelectedIndex(null);
+      return;
+    }
+
+    // 🚀 Part 4: Ctrl+C - 复制选中的单元格
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'c') {
+      event.preventDefault();
+      if (selectedCells.length === 0) return;
+
+      // 找出选中区域的边界
+      const minRow = Math.min(...selectedCells.map(cell => cell.rowIndex));
+      const maxRow = Math.max(...selectedCells.map(cell => cell.rowIndex));
+      const minCol = Math.min(...selectedCells.map(cell => cell.colIndex));
+      const maxCol = Math.max(...selectedCells.map(cell => cell.colIndex));
+
+      // 构建 TSV 字符串
+      const tsvRows: string[] = [];
+      for (let r = minRow; r <= maxRow; r++) {
+        const tsvCols: string[] = [];
+        for (let c = minCol; c <= maxCol; c++) {
+          const isSelected = selectedCells.some(cell => 
+            cell.rowIndex === r && cell.colIndex === c
+          );
+          
+          let cellValue = '';
+          if (isSelected) {
+            if (r === -1) {
+              // 表头
+              cellValue = data.headers[c] || '';
+            } else {
+              // 数据行
+              cellValue = data.rows[r]?.[c] || '';
+            }
+          }
+          tsvCols.push(cellValue);
+        }
+        tsvRows.push(tsvCols.join('\t'));
+      }
+
+      const tsvString = tsvRows.join('\n');
+      navigator.clipboard.writeText(tsvString).catch(err => {
+        console.warn('复制到剪贴板失败:', err);
+      });
+      return;
+    }
+
+    // 🚀 Part 4: Ctrl+X - 剪切选中的单元格
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'x') {
+      event.preventDefault();
+      if (selectedCells.length === 0) return;
+
+      // 先执行复制逻辑
+      const minRow = Math.min(...selectedCells.map(cell => cell.rowIndex));
+      const maxRow = Math.max(...selectedCells.map(cell => cell.rowIndex));
+      const minCol = Math.min(...selectedCells.map(cell => cell.colIndex));
+      const maxCol = Math.max(...selectedCells.map(cell => cell.colIndex));
+
+      const tsvRows: string[] = [];
+      for (let r = minRow; r <= maxRow; r++) {
+        const tsvCols: string[] = [];
+        for (let c = minCol; c <= maxCol; c++) {
+          const isSelected = selectedCells.some(cell => 
+            cell.rowIndex === r && cell.colIndex === c
+          );
+          
+          let cellValue = '';
+          if (isSelected) {
+            if (r === -1) {
+              cellValue = data.headers[c] || '';
+            } else {
+              cellValue = data.rows[r]?.[c] || '';
+            }
+          }
+          tsvCols.push(cellValue);
+        }
+        tsvRows.push(tsvCols.join('\t'));
+      }
+
+      const tsvString = tsvRows.join('\n');
+      navigator.clipboard.writeText(tsvString).then(() => {
+        // 复制成功后，清空选中的单元格
+        const newData = JSON.parse(JSON.stringify(data)) as TableData;
+        
+        selectedCells.forEach(({ rowIndex, colIndex }) => {
+          if (rowIndex === -1) {
+            // 表头
+            if (colIndex < newData.headers.length) {
+              newData.headers[colIndex] = '';
+            }
+          } else {
+            // 数据行
+            if (rowIndex < newData.rows.length && colIndex < newData.rows[rowIndex].length) {
+              newData.rows[rowIndex][colIndex] = '';
+            }
+          }
+        });
+
+        updateDataAndSync(newData);
+      }).catch(err => {
+        console.warn('剪切失败:', err);
+      });
+      return;
+    }
+
+    // 🚀 Part 4: Ctrl+V - 粘贴到活动单元格
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'v') {
+      event.preventDefault();
+      if (!activeCell) return;
+
+      navigator.clipboard.readText().then(clipboardText => {
+        if (!clipboardText.trim()) return;
+
+        // 解析 TSV 数据
+        const rows = clipboardText.split('\n').map(row => row.split('\t'));
+        const pasteRowCount = rows.length;
+        const pasteColCount = Math.max(...rows.map(row => row.length));
+
+        // 计算需要的总行数和列数
+        const needRowCount = Math.max(data.rows.length, activeCell.rowIndex + pasteRowCount);
+        const needColCount = Math.max(data.headers.length, activeCell.colIndex + pasteColCount);
+
+        // 创建扩展后的数据副本
+        const newData: TableData = {
+          headers: [...data.headers],
+          rows: data.rows.map(row => [...row])
+        };
+
+        // 扩展表头
+        while (newData.headers.length < needColCount) {
+          newData.headers.push(`Col ${newData.headers.length + 1}`);
+        }
+
+        // 扩展行
+        while (newData.rows.length < needRowCount) {
+          const newRow = new Array(needColCount).fill('');
+          newData.rows.push(newRow);
+        }
+
+        // 确保所有现有行都有足够的列
+        newData.rows.forEach(row => {
+          while (row.length < needColCount) {
+            row.push('');
+          }
+        });
+
+        // 粘贴数据
+        for (let r = 0; r < pasteRowCount; r++) {
+          const targetRowIndex = activeCell.rowIndex + r;
+          if (targetRowIndex >= 0 && targetRowIndex < newData.rows.length) {
+            for (let c = 0; c < rows[r].length; c++) {
+              const targetColIndex = activeCell.colIndex + c;
+              if (targetColIndex >= 0 && targetColIndex < newData.rows[targetRowIndex].length) {
+                newData.rows[targetRowIndex][targetColIndex] = rows[r][c] || '';
+              }
+            }
+          }
+        }
+
+        updateDataAndSync(newData);
+        
+        // 更新选择区域到粘贴的范围
+        const newSelectedCells: SelectedCell[] = [];
+        for (let r = 0; r < pasteRowCount; r++) {
+          for (let c = 0; c < pasteColCount; c++) {
+            const rowIndex = activeCell.rowIndex + r;
+            const colIndex = activeCell.colIndex + c;
+            if (rowIndex >= 0 && rowIndex < needRowCount && colIndex >= 0 && colIndex < needColCount) {
+              newSelectedCells.push({ rowIndex, colIndex });
+            }
+          }
+        }
+        setSelectedCells(newSelectedCells);
+      }).catch(err => {
+        console.warn('从剪贴板读取失败:', err);
+      });
       return;
     }
 
@@ -501,6 +1064,62 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
       return;
     }
   }, [isEditMode, editingCell, data, selectedRows, lastSelectedIndex, updateDataAndSync]);
+
+  // 🚀 Part 3: 拖拽结束处理函数
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    // 解析拖拽的行索引
+    const activeIndex = parseInt(String(active.id).replace('row-', ''));
+    const overIndex = parseInt(String(over.id).replace('row-', ''));
+
+    if (isNaN(activeIndex) || isNaN(overIndex)) {
+      console.warn('无法解析拖拽索引');
+      return;
+    }
+
+    // 使用 arrayMove 重新排列数据
+    const newRows = arrayMove(data.rows, activeIndex, overIndex);
+    const newData = {
+      headers: [...data.headers],
+      rows: newRows
+    };
+
+    // 清空选择状态，因为行索引已经改变
+    setSelectedRows([]);
+    setSelectedCells([]);
+    setLastSelectedIndex(null);
+
+    // 更新数据并同步
+    updateDataAndSync(newData);
+  }, [data, updateDataAndSync]);
+
+  // 🚀 Part 1: Markdown 渲染助手函数（移到组件顶层）
+  const renderMarkdownContent = useCallback((value: string) => {
+    if (value === '' || value === '\u00A0') {
+      return <span>{'\u00A0'}</span>;
+    }
+    
+    try {
+      // 使用 renderInline 只渲染行内元素，避免包裹 <p> 标签
+      const htmlContent = md.renderInline(value);
+      return (
+        <span 
+          dangerouslySetInnerHTML={{ __html: htmlContent }}
+          style={{ wordBreak: 'break-word' }}
+        />
+      );
+    } catch (error) {
+      console.warn('Markdown 渲染失败:', error);
+      // 降级到纯文本显示
+      const displayValue = value === '' ? '\u00A0' : value;
+      return <span>{displayValue}</span>;
+    }
+  }, [md]);
 
   // 🚀 排序处理 - 修改为真正影响底层数据，并清空选中状态
   const handleRequestSort = useCallback((property: string) => {
@@ -591,7 +1210,7 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     />
   ), [editingCell, commitEdit, cancelEdit]);
 
-  // 渲染单元格内容，空字符串显示为不间断空格，单击编辑
+  // 🚀 Part 1: 渲染单元格内容，支持 Markdown 渲染
   const renderCellContent = useCallback((
     value: string,
     rowIndex: number,
@@ -599,6 +1218,8 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
     isHeader: boolean = false
   ) => {
     const isEditing = editingCell?.rowIndex === rowIndex && editingCell?.colIndex === colIndex;
+    const isCellSelectedState = isCellSelected(rowIndex, colIndex);
+    const isActive = activeCell?.rowIndex === rowIndex && activeCell?.colIndex === colIndex;
 
     // 空字符串显示为不间断空格
     const displayValue = value === '' ? '\u00A0' : value;
@@ -609,16 +1230,27 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
           display: 'flex',
           alignItems: 'center',
           minHeight: '32px',
-          height: '32px', // 🚀 固定高度，避免编辑时高度变化
+          height: '32px',
           cursor: isEditMode ? 'text' : 'default',
-          padding: isEditing ? 0 : '6px 8px', // 🚀 编辑时取消padding，让编辑器填满整个单元格
+          padding: isEditing ? 0 : '6px 8px',
           position: 'relative',
+          backgroundColor: isCellSelectedState 
+            ? alpha('#1976d2', 0.12) 
+            : isActive 
+              ? alpha('#1976d2', 0.08)
+              : 'transparent',
+          border: isActive ? '1px solid #1976d2' : 'none',
           '&:hover': {
-            backgroundColor: isEditMode && !isHeader ? 'rgba(25, 118, 210, 0.08)' : 'transparent'
+            backgroundColor: isEditMode && !isHeader 
+              ? (isCellSelectedState ? alpha('#1976d2', 0.16) : alpha('#1976d2', 0.08))
+              : 'transparent'
           }
         }}
-        onClick={() => {
+        onClick={(event) => {
           if (isEditMode && !isHeader) {
+            // 🚀 Part 2: 处理单元格点击选择
+            handleCellClick(event, rowIndex, colIndex);
+            setActiveCell({ rowIndex, colIndex });
             startEdit(rowIndex, colIndex);
           }
         }}
@@ -626,11 +1258,18 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
         {isEditing ? (
           renderEditor(value)
         ) : (
-          <span>{displayValue || (isHeader ? `Header ${colIndex + 1}` : '')}</span>
+          // 🚀 Part 1: 根据是否为表头选择渲染方式
+          isHeader ? (
+            <span style={{ fontWeight: 'bold' }}>
+              {displayValue || `Header ${colIndex + 1}`}
+            </span>
+          ) : (
+            renderMarkdownContent(value)
+          )
         )}
       </Box>
     );
-  }, [editingCell, renderEditor, startEdit, isEditMode]);
+  }, [editingCell, renderEditor, startEdit, isEditMode, isCellSelected, activeCell, renderMarkdownContent, handleCellClick]);
 
   if (!data || (!data.headers.length && !data.rows.length)) {
     return (
@@ -647,13 +1286,19 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   }
 
   return (
-    <Paper
-      elevation={0}
-      sx={{ width: '100%', overflow: 'hidden' }}
-      className="academic-table"
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
     >
+      <Paper
+        elevation={0}
+        sx={{ width: '100%', overflow: 'hidden' }}
+        className="academic-table"
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        ref={tableContainerRef}
+      >
       {/* 工具栏 */}
       <Box sx={{
         p: 1,
@@ -706,9 +1351,22 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
                   <IconButton
                     size="small"
                     onClick={() => {
+                      // 🚀 修复：一次性构建最终数据，避免多次状态更新
+                      const newData = {
+                        headers: [...data.headers],
+                        rows: data.rows.map(row => [...row])
+                      };
+                      
                       // 从大到小删除，避免索引变化问题
                       const sortedIndices = [...selectedRows].sort((a, b) => b - a);
-                      sortedIndices.forEach(index => deleteRow(index));
+                      sortedIndices.forEach(index => {
+                        newData.rows.splice(index, 1);
+                      });
+                      
+                      // 用最终结果进行唯一一次的状态更新和同步
+                      updateDataAndSync(newData);
+                      
+                      // 清空选择状态
                       setSelectedRows([]);
                       setLastSelectedIndex(null);
                     }}
@@ -726,11 +1384,17 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
                 <div>快捷键:</div>
                 <div>• Ctrl+A: 全选</div>
                 <div>• Ctrl+D: 取消选择</div>
+                <div>• Ctrl+B: 加粗选中单元格</div>
+                <div>• Ctrl+I: 斜体选中单元格</div>
+                <div>• Ctrl+C: 复制选中单元格</div>
+                <div>• Ctrl+X: 剪切选中单元格</div>
+                <div>• Ctrl+V: 粘贴到活动单元格</div>
                 <div>• Delete: 删除选中行</div>
                 <div>• Ctrl+点击: 多选</div>
                 <div>• Shift+点击: 范围选择</div>
                 <div>• 方向键: 移动选择</div>
                 <div>• Shift+方向键: 扩展选择</div>
+                <div>• 拖拽行首图标: 重新排序</div>
               </Box>
             }>
               <IconButton size="small" sx={{ ml: 'auto' }}>
@@ -784,18 +1448,24 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
                 zIndex: 10
               }
             }}>
-              {/* 🚀 新增：多选复选框列 */}
+              {/* 🚀 新增：拖拽手柄和复选框列 */}
               {isEditMode && (
-                <TableCell padding="checkbox" sx={{ width: 48 }}>
-                  <Checkbox
-                    color="primary"
-                    indeterminate={selectedRows.length > 0 && selectedRows.length < data.rows.length}
-                    checked={data.rows.length > 0 && selectedRows.length === data.rows.length}
-                    onChange={handleSelectAllClick}
-                    inputProps={{
-                      'aria-label': 'select all rows',
-                    }}
-                  />
+                <TableCell padding="checkbox" sx={{ width: 80 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Checkbox
+                      color="primary"
+                      indeterminate={selectedRows.length > 0 && selectedRows.length < data.rows.length}
+                      checked={data.rows.length > 0 && selectedRows.length === data.rows.length}
+                      onChange={handleSelectAllClick}
+                      inputProps={{
+                        'aria-label': 'select all rows',
+                      }}
+                    />
+                    <DragIndicatorIcon 
+                      fontSize="small" 
+                      sx={{ opacity: 0.5, cursor: 'default' }}
+                    />
+                  </Box>
                 </TableCell>
               )}
 
@@ -880,113 +1550,71 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
           </TableHead>
 
           <TableBody>
-            {sortedRows.map((row, rowIndex) => {
-              // 🚀 修复：排序后直接使用rowIndex，因为数据已经真正排序
-              const isRowSelectedValue = isRowSelected(rowIndex);
+            <SortableContext
+              items={sortedRows.map((_, index) => `row-${index}`)}
+              strategy={verticalListSortingStrategy}
+            >
+              {sortedRows.map((row, rowIndex) => {
+                // 🚀 修复：排序后直接使用rowIndex，因为数据已经真正排序
+                const isRowSelectedValue = isRowSelected(rowIndex);
+                const rowId = `row-${rowIndex}`;
 
-              return (
-                <TableRow
-                  key={`row-${rowIndex}-${JSON.stringify(row).slice(0, 20)}`} // 使用行内容作为key的一部分
-                  hover
-                  role={isEditMode ? "checkbox" : undefined}
-                  aria-checked={isEditMode ? isRowSelectedValue : undefined}
-                  tabIndex={-1}
-                  selected={isEditMode ? isRowSelectedValue : false}
-                  sx={{
-                    '&:nth-of-type(even)': {
-                      backgroundColor: '#fafafa'
-                    },
-                    '&:hover': {
-                      backgroundColor: isEditMode ? alpha('#1976d2', 0.08) : '#f0f0f0'
-                    },
-                    cursor: isEditMode ? 'pointer' : 'default'
-                  }}
-                  onClick={(event) => {
-                    if (isEditMode) {
-                      // 🚀 确保传递完整的事件对象，包含键盘修饰键信息
-                      handleRowClick(event, rowIndex);
-                    }
-                  }}
-                >
-                  {/* 🚀 新增：多选复选框列 */}
-                  {isEditMode && (
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isRowSelectedValue}
-                        onChange={(event) => {
-                          event.stopPropagation();
-                          // 🚀 修复：复选框点击应该支持多选逻辑
-                          if (isRowSelectedValue) {
-                            // 取消选择：从选中列表中移除
-                            setSelectedRows(prev => prev.filter(index => index !== rowIndex));
-                            // 如果取消选择的是最后选择的行，重置lastSelectedIndex
-                            if (lastSelectedIndex === rowIndex) {
-                              setLastSelectedIndex(null);
-                            }
-                          } else {
-                            // 添加选择：添加到选中列表，避免重复
-                            setSelectedRows(prev => {
-                              if (prev.includes(rowIndex)) {
-                                return prev; // 如果已经存在，不重复添加
-                              }
-                              return [...prev, rowIndex];
-                            });
-                            setLastSelectedIndex(rowIndex);
-                          }
-                        }}
-                        inputProps={{
-                          'aria-labelledby': `enhanced-table-checkbox-${rowIndex}`,
-                        }}
-                      />
-                    </TableCell>
-                  )}
-
-                  {row.map((cell, colIndex) => (
-                    <TableCell
-                      key={colIndex}
+                // 🚀 Part 3: 在编辑模式下使用可拖拽行，否则使用普通行
+                if (isEditMode) {
+                  return (
+                    <DraggableTableRow
+                      key={rowId}
+                      rowId={rowId}
+                      rowIndex={rowIndex}
+                      row={row}
+                      isEditMode={isEditMode}
+                      isSelected={isRowSelectedValue}
+                      lastSelectedIndex={lastSelectedIndex}
+                      editingCell={editingCell}
+                      onRowClick={handleRowClick}
+                      onDeleteRow={deleteRow}
+                      renderCellContent={renderCellContent}
+                      setSelectedRows={setSelectedRows}
+                      setLastSelectedIndex={setLastSelectedIndex}
+                    />
+                  );
+                } else {
+                  // 普通模式下的静态行
+                  return (
+                    <TableRow
+                      key={rowId}
+                      hover
                       sx={{
-                        minWidth: 120,
-                        padding: 0,
-                        whiteSpace: 'nowrap', // 防止单元格内容换行
+                        '&:nth-of-type(even)': {
+                          backgroundColor: '#fafafa'
+                        },
                         '&:hover': {
-                          backgroundColor: isEditMode ? alpha('#1976d2', 0.04) : 'transparent'
-                        }
-                      }}
-                      onClick={(event) => {
-                        if (isEditMode) {
-                          event.stopPropagation(); // 阻止行选择
+                          backgroundColor: '#f0f0f0'
                         }
                       }}
                     >
-                      {renderCellContent(cell, rowIndex, colIndex)}
-                    </TableCell>
-                  ))}
-
-                  {isEditMode && (
-                    <TableCell>
-                      <Tooltip title="Delete Row">
-                        <IconButton
-                          size="small"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            deleteRow(rowIndex);
+                      {row.map((cell, colIndex) => (
+                        <TableCell
+                          key={colIndex}
+                          sx={{
+                            minWidth: 120,
+                            padding: 0,
+                            whiteSpace: 'nowrap'
                           }}
-                          color="error"
-                          sx={{ opacity: 0.6, '&:hover': { opacity: 1 } }}
                         >
-                          <DeleteIcon fontSize="inherit" />
-                        </IconButton>
-                      </Tooltip>
-                    </TableCell>
-                  )}
-                </TableRow>
-              );
-            })}
+                          {renderCellContent(cell, rowIndex, colIndex)}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                }
+              })}
+            </SortableContext>
           </TableBody>
         </Table>
       </TableContainer>
     </Paper>
+    </DndContext>
   );
 }, (prevProps, nextProps) => {
   // 自定义比较函数，优化性能
