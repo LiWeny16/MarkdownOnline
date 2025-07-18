@@ -11,6 +11,7 @@ import { styled, alpha } from "@mui/material/styles";
 import { Box } from "@mui/material";
 import ImageIcon from "@mui/icons-material/Image";
 import GTranslateIcon from "@mui/icons-material/GTranslate";
+import RestoreIcon from "@mui/icons-material/Restore";
 import { useTranslation } from "react-i18next";
 function TransitionComponent(props) {
     return (
@@ -93,5 +94,9 @@ export default function SettingsRoute() {
                                     endIcon: ImageIcon,
                                 }, onClick: () => {
                                     linkToView("settings_2_3");
-                                }, itemId: "2_3", label: t("t-image-settings") })] })] }) }) }));
+                                }, itemId: "2_3", label: t("t-image-settings") }), _jsx(CustomTreeItem, { slots: {
+                                    endIcon: RestoreIcon,
+                                }, onClick: () => {
+                                    linkToView("settings_2_7");
+                                }, itemId: "2_7", label: t("t-reset-initialization") })] })] }) }) }));
 }

@@ -3,9 +3,9 @@ import React from "react";
 import fastKeyEvent from "@Func/Events/key/fastKey";
 import MdArea from "./SubBody/MdArea";
 import { observer } from "mobx-react";
-import { getSettings, getStates, getStatesMemorable, getTheme } from "@App/config/change";
+import { getSettings, getStates, getTheme } from "@App/config/change";
 import { Suspense } from "react";
-import WelcomeAnimation from "../Components/myCom/Prompt/WelcomeAni";
+// import WelcomeAnimation from "../Components/myCom/Prompt/WelcomeAni"
 // 使用 React.lazy 懒加载组件
 // const LazyEmojiPicker = React.lazy(
 //   () => import("@Root/js/React/Components/myCom/EmojiPicker")
@@ -27,5 +27,5 @@ export default observer(function Body() {
                                     : "26px 38px",
                             }, className: "uniform-scroller " +
                                 "markdown-body " +
-                                `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}` })] }), getStatesMemorable().memorable.welcomeAnimationState ? _jsx(WelcomeAnimation, {}) : _jsx(_Fragment, {}), _jsx(Suspense, { children: _jsx(LazyPromptAIPanel, { open: getStates().unmemorable.aiPanelState }) }), _jsx(Suspense, { children: _jsx(LazyVoiceTrans, { open: getStates().unmemorable.voicePanelState }) })] }) }));
+                                `${getTheme() === "light" ? "markdown-body-light" : "markdown-body-dark"}` })] }), _jsx(Suspense, { children: _jsx(LazyPromptAIPanel, { open: getStates().unmemorable.aiPanelState }) }), _jsx(Suspense, { children: _jsx(LazyVoiceTrans, { open: getStates().unmemorable.voicePanelState }) })] }) }));
 });

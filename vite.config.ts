@@ -129,8 +129,8 @@ export default defineConfig({
       //   "https://cdn.jsdmirror.com/npm/bigonion-kit@0.12.6/esm/kit.min.js",
       "bigonion-kit":
         "https://cdn.jsdmirror.com/npm/bigonion-kit@0.12.6/esm/kit.min.js",
-      // "@cdn-hljs":
-      //   "https://cdn.jsdmirror.com/npm/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js",
+      "highlight.js":
+        "https://cdn.jsdmirror.com/npm/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js",
       // "@cdn-katex":
       //   "https://cdn.jsdmirror.com/npm/katex@0.16.7/dist/katex.min.js",
     }),
@@ -198,86 +198,86 @@ export default defineConfig({
         // b. 运行时缓存 (Runtime Caching)：处理您的 CDN 和其他外部资源
         // -----------------------------------------------------------------
         // 规则顺序很重要，Workbox 会使用第一个匹配的规则。
-        runtimeCaching: [
-          {
-            // 规则一: 【高优先级】缓存 Monaco Editor，增加缓存容量和时间
-            handler: 'CacheFirst',
-            urlPattern: /(cdn\.jsdelivr\.net|cdn\.jsdmirror\.com|unpkg\.com).*\/monaco-editor\//,
-            options: {
-              cacheName: 'monaco-editor-cache-v2',
-              expiration: {
-                maxAgeSeconds: 60 * 60 * 24 * 90, // 缓存 90 天 (之前5天)
-                maxEntries: 100, // 增加到100个条目 (之前20个)
-              },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-          {
-            // 规则二: 缓存所有CDN JS/CSS库，大幅增加容量
-            handler: 'StaleWhileRevalidate',
-            urlPattern: /(cdn\.jsdelivr\.net|cdn\.jsdmirror\.com|fastly\.jsdelivr\.net|npm\.elemecdn\.com)/,
-            options: {
-              cacheName: 'cdn-libraries-cache-v2',
-              expiration: {
-                maxAgeSeconds: 60 * 60 * 24 * 60, // 缓存 60 天 (之前5天)
-                maxEntries: 500, // 添加最大条目限制，防止缓存无限增长
-              },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-          {
-            // 规则三: 缓存图片资源，增加容量
-            handler: 'CacheFirst',
-            urlPattern: /\.(?:png|gif|jpg|jpeg|svg|webp|avif|ico)$/,
-            options: {
-              cacheName: 'image-cache-v2',
-              expiration: {
-                maxEntries: 200, // 增加到200个条目 (之前60个)
-                maxAgeSeconds: 60 * 60 * 24 * 90, // 缓存 90 天 (之前5天)
-              },
-            },
-          },
-          {
-            // 规则四: 新增 - 缓存字体文件
-            handler: 'CacheFirst',
-            urlPattern: /\.(?:woff|woff2|ttf|eot|otf)$/,
-            options: {
-              cacheName: 'fonts-cache-v1',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 365, // 字体文件缓存1年
-              },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-          {
-            // 规则五: 新增 - 缓存API和数据请求
-            handler: 'NetworkFirst',
-            urlPattern: /\/api\/|\.json$/,
-            options: {
-              cacheName: 'api-cache-v1',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 7, // API缓存7天
-              },
-              cacheableResponse: { statuses: [0, 200] },
-              networkTimeoutSeconds: 3, // 3秒超时后使用缓存
-            },
-          },
-          {
-            // 规则六: 新增 - 缓存其他静态资源
-            handler: 'StaleWhileRevalidate',
-            urlPattern: /\.(?:css|js|mjs|esm)$/,
-            options: {
-              cacheName: 'static-resources-cache-v1',
-              expiration: {
-                maxEntries: 300,
-                maxAgeSeconds: 60 * 60 * 24 * 30, // 缓存30天
-              },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-        ],
+        // runtimeCaching: [
+        //   {
+        //     // 规则一: 【高优先级】缓存 Monaco Editor，增加缓存容量和时间
+        //     handler: 'CacheFirst',
+        //     urlPattern: /(cdn\.jsdelivr\.net|cdn\.jsdmirror\.com|unpkg\.com).*\/monaco-editor\//,
+        //     options: {
+        //       cacheName: 'monaco-editor-cache-v2',
+        //       expiration: {
+        //         maxAgeSeconds: 60 * 60 * 24 * 90, // 缓存 90 天 (之前5天)
+        //         maxEntries: 100, // 增加到100个条目 (之前20个)
+        //       },
+        //       cacheableResponse: { statuses: [0, 200] },
+        //     },
+        //   },
+        //   {
+        //     // 规则二: 缓存所有CDN JS/CSS库，大幅增加容量
+        //     handler: 'StaleWhileRevalidate',
+        //     urlPattern: /(cdn\.jsdelivr\.net|cdn\.jsdmirror\.com|fastly\.jsdelivr\.net|npm\.elemecdn\.com)/,
+        //     options: {
+        //       cacheName: 'cdn-libraries-cache-v2',
+        //       expiration: {
+        //         maxAgeSeconds: 60 * 60 * 24 * 60, // 缓存 60 天 (之前5天)
+        //         maxEntries: 500, // 添加最大条目限制，防止缓存无限增长
+        //       },
+        //       cacheableResponse: { statuses: [0, 200] },
+        //     },
+        //   },
+        //   {
+        //     // 规则三: 缓存图片资源，增加容量
+        //     handler: 'CacheFirst',
+        //     urlPattern: /\.(?:png|gif|jpg|jpeg|svg|webp|avif|ico)$/,
+        //     options: {
+        //       cacheName: 'image-cache-v2',
+        //       expiration: {
+        //         maxEntries: 200, // 增加到200个条目 (之前60个)
+        //         maxAgeSeconds: 60 * 60 * 24 * 90, // 缓存 90 天 (之前5天)
+        //       },
+        //     },
+        //   },
+        //   {
+        //     // 规则四: 新增 - 缓存字体文件
+        //     handler: 'CacheFirst',
+        //     urlPattern: /\.(?:woff|woff2|ttf|eot|otf)$/,
+        //     options: {
+        //       cacheName: 'fonts-cache-v1',
+        //       expiration: {
+        //         maxEntries: 50,
+        //         maxAgeSeconds: 60 * 60 * 24 * 365, // 字体文件缓存1年
+        //       },
+        //       cacheableResponse: { statuses: [0, 200] },
+        //     },
+        //   },
+        //   {
+        //     // 规则五: 新增 - 缓存API和数据请求
+        //     handler: 'NetworkFirst',
+        //     urlPattern: /\/api\/|\.json$/,
+        //     options: {
+        //       cacheName: 'api-cache-v1',
+        //       expiration: {
+        //         maxEntries: 100,
+        //         maxAgeSeconds: 60 * 60 * 24 * 7, // API缓存7天
+        //       },
+        //       cacheableResponse: { statuses: [0, 200] },
+        //       networkTimeoutSeconds: 3, // 3秒超时后使用缓存
+        //     },
+        //   },
+        //   {
+        //     // 规则六: 新增 - 缓存其他静态资源
+        //     handler: 'StaleWhileRevalidate',
+        //     urlPattern: /\.(?:css|js|mjs|esm)$/,
+        //     options: {
+        //       cacheName: 'static-resources-cache-v1',
+        //       expiration: {
+        //         maxEntries: 300,
+        //         maxAgeSeconds: 60 * 60 * 24 * 30, // 缓存30天
+        //       },
+        //       cacheableResponse: { statuses: [0, 200] },
+        //     },
+        //   },
+        // ],
       },
     }),
   ],

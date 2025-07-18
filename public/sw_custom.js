@@ -19,7 +19,11 @@ const config = {
 
     // 缓存策略配置
     cacheName: `markdownol-v1${isDevelopment ? '-dev' : ''}`,
-    maxCacheAge: isDevelopment ? 40 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000, // 开发环境30分钟，生产环境7天
+    maxCacheAge: isDevelopment ? 40 * 60 * 1000 : 365 * 24 * 60 * 60 * 1000, // 开发环境40分钟，生产环境1年
+
+    // Cache API 缓存配置（用于非特定配置的资源）
+    cacheApiName: `markdownol-cache-v1${isDevelopment ? '-dev' : ''}`,
+    cacheApiMaxAge: isDevelopment ? 30 * 60 * 1000 : 30 * 24 * 60 * 60 * 1000, // 开发环境30分钟，生产环境1个月
 
     // 开发环境配置
     development: {
@@ -28,43 +32,91 @@ const config = {
         shortCacheAge: 5 * 60 * 1000, // 5分钟短缓存
     },
 
-    // 需要缓存的资源模式
+    // 需要缓存的资源模式（这些将存储在IndexedDB中，长期缓存1年）
+    // 主要是核心工具库、编辑器等稳定组件
     cachePatterns: {
-        // Monaco Editor 相关资源
+        // Monaco Editor 相关资源 - 代码编辑器核心，非常稳定
         monaco: [
-            /cdn\.jsdmirror\.com.*monaco-editor/,
-            /cdn\.jsdelivr\.net.*monaco-editor/,
-            /unpkg\.com.*monaco-editor/,
+            /monaco-editor/i,
         ],
-        // CSS 资源
-        styles: [
-            /\.css$/,
-            /cdn\.jsdmirror\.com.*\.css/,
-            /cdn\.jsdelivr\.net.*\.css/,
+
+        // 核心 Markdown 处理库 - 这些是项目的核心依赖，变动较少
+        markdown: [
+            /markdown-it/i, // markdown-it 核心库
+            /markdown-it-footnote/i, // 脚注插件
+            /markdown-it-emoji/i, // 表情插件
+            /markdown-it-task-lists/i, // 任务列表
+            /markdown-it-multimd-table/i, // 表格增强
+            /markdown-it-github-toc/i, // 目录生成
+            /markdown-it-incremental-dom/i, // DOM 渲染
         ],
-        // JavaScript 库
-        scripts: [
-            /cdn\.jsdmirror\.com.*markdown-it/,
-            /cdn\.jsdmirror\.com.*prettier/,
-            /cdn\.jsdmirror\.com.*markdown-it-footnote/,
-            /cdn\.jsdmirror\.com.*bigonion-kit/,
-            /cdn\.jsdmirror\.com.*mermaid/,
-            /cdn\.jsdmirror\.com.*katex/,
-            /cdn\.jsdmirror\.com.*incremental-dom/,
-            /cdn\.jsdmirror\.com.*markdown-it/,
-            /cdn\.jsdmirror\.com.*highlight\.js/,
-            /cdn\.jsdelivr\.net.*katex/,
+
+        // 代码高亮库 - 相对稳定
+        highlighting: [
+            /highlight\.js/i,
+            /highlightjs/i,
         ],
-        // 字体文件
+
+        // 图表和数学公式库 - 功能相对独立稳定
+        visualization: [
+            /mermaid/i, // 图表库
+            /katex/i,   // 数学公式渲染
+        ],
+
+        // 核心工具库 - 这些是基础工具，变动很少
+        utilities: [
+            /prettier/i, // 代码格式化
+            /incremental-dom/i, // DOM 操作库
+            /bigonion-kit/i, // 你们的工具包
+        ],
+        html2canvas: [
+            /html2canvas/i,
+        ],
+        // 字体文件 - 最稳定的资源
         fonts: [
             /\.(woff|woff2|ttf|eot)$/,
+            /katex.*\.(woff|woff2|ttf|eot)/i,
         ],
-        // 其他静态资源
+        gsap: [
+            /gsap/i,
+        ],
+        // 核心静态资源
         assets: [
             /\.(png|jpg|jpeg|gif|svg|ico)$/,
         ]
     }
 };
+
+// ====================================================================
+// 📝 缓存策略说明
+// ====================================================================
+// 
+// 🔥 IndexedDB 长期缓存（1年）- 稳定的核心库：
+//    ✅ Monaco Editor - 代码编辑器，版本稳定
+//    ✅ Markdown-it 系列 - 核心渲染引擎，API稳定
+//    ✅ Highlight.js - 代码高亮，功能成熟
+//    ✅ Mermaid - 图表库，独立功能
+//    ✅ KaTeX - 数学公式，渲染稳定
+//    ✅ Prettier - 代码格式化，核心功能
+//    ✅ Incremental-DOM - DOM操作库
+//    ✅ Bigonion-kit - 你们的工具包
+//    ✅ 所有字体文件
+//    ✅ GSAP - 动画库，效果可能需要调整
+
+//    ✅ HTML2Canvas - 截图功能
+
+// 
+// 🚀 Cache API 短期缓存（1个月）- 易变的UI和框架库：
+//    📦 React & React-DOM - 框架库，版本更新频繁
+//    📦 MUI (@mui/material, @mui/icons-material) - UI组件库，样式经常调整
+//    📦 Emotion (@emotion/react, @emotion/styled) - CSS-in-JS，样式动态
+//    📦 Mobx & Mobx-React - 状态管理，可能需要频繁调试
+//    📦 Axios - HTTP库，配置可能变化
+//    📦 React-Photo-View - 图片查看器，UI相关
+//    📦 DND-Kit 系列 - 拖拽功能，交互逻辑可能变化
+//    📦 i18next 系列 - 国际化，文本内容经常更新
+//    📦 所有 CSS 文件（除了字体相关）
+// ====================================================================
 
 // 开发环境专用日志函数
 function devLog(message, ...args) {
@@ -78,7 +130,9 @@ if (isDevelopment) {
     console.log('[SW] 开发环境配置:', {
         cacheName: config.cacheName,
         maxCacheAge: config.maxCacheAge,
-        shortCacheAge: config.development.shortCacheAge
+        shortCacheAge: config.development.shortCacheAge,
+        cacheApiName: config.cacheApiName,
+        cacheApiMaxAge: config.cacheApiMaxAge
     });
 }
 
@@ -293,7 +347,7 @@ async function cacheFirstWithIndexedDB(request, resourceType) {
                 credentials: 'omit' // 对于CDN资源，通常建议设置为 'omit'，不发送 cookies 等凭证
             });
         }
-        const response = await fetch(fetchRequest); 
+        const response = await fetch(fetchRequest);
         // --- 在这里添加诊断日志 ---
         console.log('[SW-DEBUG] Fetched Response Status:', response.status);
         console.log('[SW-DEBUG] Fetched Response OK:', response.ok);
@@ -398,12 +452,159 @@ async function networkFirst(request) {
     }
 }
 
+/**
+ * 缓存优先策略 - 使用 Cache API 进行通用资源缓存（1个月过期）
+ * @param {Request} request - 网络请求对象
+ * @returns {Promise<Response>}
+ */
+async function cacheFirstWithCacheAPI(request) {
+    const url = request.url;
+    const startTime = Date.now();
+
+    try {
+        // 首先尝试从 Cache API 获取缓存
+        const cache = await caches.open(config.cacheApiName);
+        const cachedResponse = await cache.match(request);
+
+        if (cachedResponse) {
+            // 检查缓存是否过期
+            const cacheTime = cachedResponse.headers.get('X-Cache-Timestamp');
+            if (cacheTime) {
+                const age = Date.now() - parseInt(cacheTime);
+                const maxAge = isDevelopment ? config.development.shortCacheAge : config.cacheApiMaxAge;
+
+                if (age < maxAge) {
+                    devLog(`Cache API 缓存命中, 年龄: ${Math.round(age / 1000)}s:`, url);
+
+                    // 添加缓存命中标识
+                    const modifiedResponse = new Response(cachedResponse.body, {
+                        status: cachedResponse.status,
+                        statusText: cachedResponse.statusText,
+                        headers: new Headers({
+                            ...Object.fromEntries(cachedResponse.headers.entries()),
+                            'X-SW-Cache': 'HIT-CACHEAPI',
+                            'X-SW-Cache-Age': Math.round(age / 1000).toString()
+                        })
+                    });
+
+                    if (isDevelopment) {
+                        const responseTime = Date.now() - startTime;
+                        devLog(`Cache API 响应时间: ${responseTime}ms`);
+                    }
+
+                    return modifiedResponse;
+                } else {
+                    devLog(`Cache API 缓存过期, 年龄: ${Math.round(age / 1000)}s:`, url);
+                    // 删除过期缓存
+                    await cache.delete(request);
+                }
+            }
+        }
+
+        devLog(`Cache API 缓存未命中:`, url);
+
+        // 从网络获取资源
+        const networkStart = Date.now();
+        const response = await fetch(request);
+        const networkTime = Date.now() - networkStart;
+
+        devLog(`Cache API 网络请求时间: ${networkTime}ms`);
+
+        if (response && response.ok) {
+            // 克隆响应用于缓存
+            const responseToCache = response.clone();
+
+            // 只缓存成功的响应
+            if (response.status === 200) {
+                try {
+                    // 添加缓存时间戳
+                    const modifiedResponseToCache = new Response(responseToCache.body, {
+                        status: responseToCache.status,
+                        statusText: responseToCache.statusText,
+                        headers: new Headers({
+                            ...Object.fromEntries(responseToCache.headers.entries()),
+                            'X-Cache-Timestamp': Date.now().toString()
+                        })
+                    });
+
+                    // 异步存储到 Cache API（不阻塞响应）
+                    cache.put(request, modifiedResponseToCache).then(() => {
+                        devLog(`已缓存新资源到 Cache API:`, url);
+                    }).catch(error => {
+                        console.warn('[SW] Cache API 存储失败:', error);
+                    });
+                } catch (cacheError) {
+                    console.warn('[SW] 处理 Cache API 缓存数据时出错:', cacheError);
+                }
+            }
+
+            // 添加响应头标识
+            const modifiedResponse = new Response(response.body, {
+                status: response.status,
+                statusText: response.statusText,
+                headers: new Headers({
+                    ...Object.fromEntries(response.headers.entries()),
+                    'X-SW-Cache': 'MISS-CACHEAPI',
+                    'X-SW-Network-Time': networkTime.toString()
+                })
+            });
+
+            return modifiedResponse;
+        }
+
+        return response;
+
+    } catch (error) {
+        console.error(`[SW] Cache API 网络请求失败: ${url}`, error);
+
+        // 如果网络失败，尝试返回缓存（即使过期）
+        try {
+            const cache = await caches.open(config.cacheApiName);
+            const staleResponse = await cache.match(request);
+            if (staleResponse) {
+                devLog('返回过期的 Cache API 缓存:', url);
+                return new Response(staleResponse.body, {
+                    status: staleResponse.status,
+                    statusText: staleResponse.statusText,
+                    headers: new Headers({
+                        ...Object.fromEntries(staleResponse.headers.entries()),
+                        'X-SW-Cache': 'STALE-CACHEAPI',
+                        'X-Offline': 'true'
+                    })
+                });
+            }
+        } catch (cacheError) {
+            console.warn('[SW] 获取过期缓存失败:', cacheError);
+        }
+
+        // 最后的错误响应
+        return new Response(
+            JSON.stringify({
+                error: '网络请求失败，且无可用缓存',
+                url: url,
+                message: '请检查网络连接',
+                timestamp: new Date().toISOString(),
+                environment: isDevelopment ? 'development' : 'production'
+            }),
+            {
+                status: 408,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Offline': 'true',
+                    'X-SW-Error': 'network-failed-cacheapi'
+                }
+            }
+        );
+    }
+}
+
 // --- 5. 缓存清理函数 ---
 /**
  * 清理过期缓存
  */
 async function cleanExpiredCache() {
     try {
+        // 清理 IndexedDB 中的过期缓存
         const db = await getDB();
         const transaction = db.transaction([config.objectStoreName], 'readwrite');
         const store = transaction.objectStore(config.objectStoreName);
@@ -421,12 +622,42 @@ async function cleanExpiredCache() {
                 cursor.continue();
             } else {
                 if (deletedCount > 0) {
-                    devLog(`已清理 ${deletedCount} 个过期缓存项`);
+                    devLog(`已清理 ${deletedCount} 个过期的 IndexedDB 缓存项`);
                 }
             }
         };
     } catch (error) {
-        console.warn('[SW] 清理缓存时出错:', error);
+        console.warn('[SW] 清理 IndexedDB 缓存时出错:', error);
+    }
+
+    try {
+        // 清理 Cache API 中的过期缓存
+        const cache = await caches.open(config.cacheApiName);
+        const keys = await cache.keys();
+        const cutoffTime = Date.now() - config.cacheApiMaxAge;
+
+        let deletedCacheApiCount = 0;
+
+        for (const request of keys) {
+            try {
+                const response = await cache.match(request);
+                if (response) {
+                    const cacheTime = response.headers.get('X-Cache-Timestamp');
+                    if (cacheTime && parseInt(cacheTime) < cutoffTime) {
+                        await cache.delete(request);
+                        deletedCacheApiCount++;
+                    }
+                }
+            } catch (error) {
+                console.warn('[SW] 清理单个 Cache API 项时出错:', error);
+            }
+        }
+
+        if (deletedCacheApiCount > 0) {
+            devLog(`已清理 ${deletedCacheApiCount} 个过期的 Cache API 缓存项`);
+        }
+    } catch (error) {
+        console.warn('[SW] 清理 Cache API 缓存时出错:', error);
     }
 }
 
@@ -440,9 +671,9 @@ self.addEventListener('install', (event) => {
         Promise.all([
             self.skipWaiting(), // 强制激活新的 SW
             // 预缓存关键资源（可选）
-            caches.open(config.cacheName).then(cache => {
-                devLog('缓存已初始化');
-            })
+            // caches.open(config.cacheName).then(cache => {
+            //     devLog('缓存已初始化');
+            // })
         ])
     );
 });
@@ -455,11 +686,11 @@ self.addEventListener('activate', (event) => {
         Promise.all([
             self.clients.claim(), // 立即控制所有页面
             cleanExpiredCache(), // 清理过期缓存
-            // 清理旧版本缓存
+            // 清理旧版本缓存（包括 Cache API 和传统 caches）
             caches.keys().then(cacheNames => {
                 return Promise.all(
                     cacheNames.map(cacheName => {
-                        if (cacheName !== config.cacheName) {
+                        if (cacheName !== config.cacheName && cacheName !== config.cacheApiName) {
                             devLog('删除旧缓存:', cacheName);
                             return caches.delete(cacheName);
                         }
@@ -501,20 +732,17 @@ self.addEventListener('fetch', (event) => {
     const resourceType = getResourceType(url.href);
 
     if (resourceType) {
-        devLog(`拦截资源请求 (${resourceType}):`, url.pathname);
-
-        // 根据资源类型应用不同策略
-        if (resourceType === 'monaco' || resourceType === 'scripts' || resourceType === 'styles' || resourceType === 'fonts') {
-            // Monaco Editor 和静态资源使用缓存优先策略
-            event.respondWith(cacheFirstWithIndexedDB(request, resourceType));
-        } else {
-            // 其他资源也使用缓存优先
-            event.respondWith(cacheFirstWithIndexedDB(request, resourceType));
-        }
+        // 匹配特定模式的资源使用 IndexedDB 缓存策略（长期缓存1年）
+        devLog(`拦截资源请求 (${resourceType}) - 使用 IndexedDB:`, url.pathname);
+        event.respondWith(cacheFirstWithIndexedDB(request, resourceType));
     } else if (url.pathname.startsWith('/api/')) {
         // API 请求使用网络优先策略
         devLog('API请求使用网络优先:', url.pathname);
         event.respondWith(networkFirst(request));
+    } else {
+        // 其他资源使用 Cache API 缓存策略（1个月过期）
+        devLog('其他资源使用 Cache API 缓存策略:', url.pathname);
+        event.respondWith(cacheFirstWithCacheAPI(request));
     }
 
     // 其他请求不做处理，正常通过
@@ -537,38 +765,59 @@ self.addEventListener('message', (event) => {
     switch (type) {
         case 'CACHE_STATUS':
             // 返回缓存状态
-            getDB().then(db => {
-                const transaction = db.transaction([config.objectStoreName], 'readonly');
-                const store = transaction.objectStore(config.objectStoreName);
-                const countRequest = store.count();
-
-                countRequest.onsuccess = () => {
-                    event.ports[0].postMessage({
-                        type: 'CACHE_STATUS_RESPONSE',
-                        data: {
-                            cacheCount: countRequest.result,
-                            dbName: config.dbName,
-                            environment: isDevelopment ? 'development' : 'production',
-                            cacheName: config.cacheName,
-                            maxCacheAge: config.maxCacheAge
-                        }
+            Promise.all([
+                getDB().then(db => {
+                    const transaction = db.transaction([config.objectStoreName], 'readonly');
+                    const store = transaction.objectStore(config.objectStoreName);
+                    return new Promise(resolve => {
+                        const countRequest = store.count();
+                        countRequest.onsuccess = () => resolve(countRequest.result);
+                        countRequest.onerror = () => resolve(0);
                     });
-                };
+                }).catch(() => 0),
+                caches.open(config.cacheApiName).then(cache => {
+                    return cache.keys().then(keys => keys.length);
+                }).catch(() => 0)
+            ]).then(([indexedDBCount, cacheApiCount]) => {
+                event.ports[0].postMessage({
+                    type: 'CACHE_STATUS_RESPONSE',
+                    data: {
+                        indexedDBCount: indexedDBCount,
+                        cacheApiCount: cacheApiCount,
+                        totalCacheCount: indexedDBCount + cacheApiCount,
+                        dbName: config.dbName,
+                        environment: isDevelopment ? 'development' : 'production',
+                        cacheName: config.cacheName,
+                        cacheApiName: config.cacheApiName,
+                        maxCacheAge: config.maxCacheAge,
+                        cacheApiMaxAge: config.cacheApiMaxAge
+                    }
+                });
             });
             break;
 
         case 'CLEAR_CACHE':
-            // 清空缓存
-            getDB().then(db => {
-                const transaction = db.transaction([config.objectStoreName], 'readwrite');
-                const store = transaction.objectStore(config.objectStoreName);
-                store.clear().onsuccess = () => {
-                    devLog('缓存已清空');
-                    event.ports[0].postMessage({
-                        type: 'CLEAR_CACHE_RESPONSE',
-                        data: { success: true }
+            // 清空所有缓存
+            Promise.all([
+                getDB().then(db => {
+                    const transaction = db.transaction([config.objectStoreName], 'readwrite');
+                    const store = transaction.objectStore(config.objectStoreName);
+                    return new Promise(resolve => {
+                        store.clear().onsuccess = () => resolve();
+                        store.clear().onerror = () => resolve();
                     });
-                };
+                }).catch(() => { }),
+                caches.open(config.cacheApiName).then(cache => {
+                    return cache.keys().then(keys => {
+                        return Promise.all(keys.map(key => cache.delete(key)));
+                    });
+                }).catch(() => { })
+            ]).then(() => {
+                devLog('所有缓存已清空');
+                event.ports[0].postMessage({
+                    type: 'CLEAR_CACHE_RESPONSE',
+                    data: { success: true }
+                });
             });
             break;
 
