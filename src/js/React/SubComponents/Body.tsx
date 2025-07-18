@@ -5,7 +5,7 @@ import MdArea from "./SubBody/MdArea"
 import { observer } from "mobx-react"
 import { getEmojiPickerState, getSettings, getStates, getStatesMemorable, getTheme } from "@App/config/change"
 import { Suspense } from "react"
-import WelcomeAnimation from "../Components/myCom/Prompt/WelcomeAni"
+// import WelcomeAnimation from "../Components/myCom/Prompt/WelcomeAni"
 
 // 使用 React.lazy 懒加载组件
 // const LazyEmojiPicker = React.lazy(
@@ -46,7 +46,7 @@ export default observer(function Body() {
             }
           ></article>
         </div>
-        {getStatesMemorable().memorable.welcomeAnimationState ? <WelcomeAnimation /> : <></>}
+        {/* {getStatesMemorable().memorable.welcomeAnimationState ? <WelcomeAnimation /> : <></>} */}
         {/* <Suspense fallback={<></>}>
           <LazyEmojiPicker
             open={getEmojiPickerState() === "on" ? true : false}

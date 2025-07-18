@@ -3,46 +3,51 @@ import ReactDOM from "react-dom/client"
 import App from "./App"
 import { pollVariables } from "@App/basic/basic"
 import initI18N from "@Func/I18N/i18n"
-// import { initServiceWorker } from "@Func/ServiceWorker/swManager"
 
 initI18N()
 
-// 初始化 Service Worker - 开发和生产环境都启用
-// const isProduction = process.env.NODE_ENV === 'production';
-
-// initServiceWorker({
-//   scriptUrl: './sw.js', // 相对于public目录
-//   scope: './',
-//   updateViaCache: isProduction ? 'none' : 'imports' // 开发环境允许更新缓存
-// }).then(manager => {
-//   console.log(`[App] Service Worker 初始化完成 (${isProduction ? '生产' : '开发'}环境)`);
-  
-//   // 开发环境下提供更多调试信息
-//   if (!isProduction) {
-//     console.log('[App] 开发环境下 Service Worker 已启用');
-//     console.log('[App] 使用 Ctrl+Shift+S 打开调试工具');
-//     console.log('[App] 可在开发者工具的 Application -> Service Workers 查看详细信息');
-//   }
-// }).catch(error => {
-//   console.warn('[App] Service Worker 初始化失败:', error);
-//   if (!isProduction) {
-//     console.warn('[App] 开发环境调试提示:');
-//     console.warn('1. 确保使用 HTTPS 或 localhost');
-//     console.warn('2. 检查 public/sw.js 文件是否存在');
-//     console.warn('3. 检查浏览器控制台是否有 SW 相关错误');
-//   }
-// });
-
+// 使用 pollVariables 函数等待核心依赖加载完成
 pollVariables([
   "markdownitIncrementalDOM",
   "katex",
   "IncrementalDOM",
-  // "React",
-  // "ReactDOM",
 ]).then(() => {
-  ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+  // 获取关键元素
+  const rootElement = document.getElementById("root") as HTMLElement;
+  const loadingElement = document.getElementById('app-loading');
+  if (!rootElement || !loadingElement) {
+    console.error("Fatal Error: #root or #app-loading element not found.");
+    return;
+  }
+
+  const root = ReactDOM.createRoot(rootElement);
+
+  // 1. 渲染 React 应用。此时 #root 的 opacity 为 0，所以用户看不到它。
+  root.render(
     <Suspense fallback={<div>Loading...</div>}>
       <App />
     </Suspense>
-  )
-})
+  );
+
+  // 2. 使用一个微小的延迟来确保React完成了首次绘制。
+  //    这可以保证动画的流畅性。
+  setTimeout(() => {
+    // 3. 开始让 React 应用渐变出现
+    rootElement.style.opacity = '1';
+
+    // 4. 同时让骨架屏渐变消失
+    loadingElement.classList.add('hidden');
+
+    // 5. [优化] 在骨架屏的CSS过渡动画结束后，再将其从DOM中彻底移除，
+    //    这样更干净，性能也更好。
+    loadingElement.addEventListener('transitionend', () => {
+      // 清理进度文本的定时器
+      const windowWithInterval = window as any;
+      if (typeof windowWithInterval.clearLoadingInterval === 'function') {
+        windowWithInterval.clearLoadingInterval();
+      }
+      loadingElement.remove(); // 使用 .remove() 更现代
+    }, { once: true }); // { once: true } 保证事件只触发一次
+
+  }, 150); // 稍微增加延迟，确保布局稳定
+});

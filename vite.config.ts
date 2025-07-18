@@ -88,9 +88,8 @@ export default defineConfig({
     retryImportPlugin({
       // "@monaco-editor/react"
       // gsap: "https://cdn.jsdmirror.com/npm/gsap@3.12/+esm",
-      "react-photo-view":
-        "https://cdn.jsdmirror.com/npm/react-photo-view-cdn@0.0.1/esm/react-photo-view.module.js",
-      // cannot remove
+      // "react-photo-view":
+      //   "https://cdn.jsdmirror.com/npm/react-photo-view-cdn@0.0.1/esm/react-photo-view.module.js",
       // "@arco-design/web-react":
       //   "https://cdn.jsdmirror.com/npm/@arco-design/web-react@2.62.0/+esm",
       // "@cdn-emoji-data":
@@ -101,11 +100,11 @@ export default defineConfig({
       //   "https://cdn.jsdelivr.net/npm/react-photo-view-cdn@0.0.4/esm/db.min.js",
       // "@cdn-latex-map":
       //   "https://cdn.jsdelivr.net/npm/react-photo-view-cdn@0.0.4/esm/latex.map.min.js",
-      // "markdown-it": "https://cdn.jsdmirror.com/npm/markdown-it@8.4.2/+esm",
+      "markdown-it": "https://cdn.jsdmirror.com/npm/markdown-it@8.4.2/+esm",
       // "markdown-it-emoji":
       //   "https://cdn.jsdmirror.com/npm/markdown-it-emoji@3.0.0/+esm",
-      // "markdown-it-footnote":
-      //   "https://cdn.jsdmirror.com/npm/markdown-it-footnote@4.0.0/+esm",
+      "markdown-it-footnote":
+        "https://cdn.jsdmirror.com/npm/markdown-it-footnote@4.0.0/+esm",
       // "markdown-it-multimd-table":
       //   "https://cdn.jsdmirror.com/npm/markdown-it-multimd-table@4.2.3/+esm",
       // "markdown-it-task-lists":
@@ -115,7 +114,7 @@ export default defineConfig({
       // "@emoji-mart/data":
       //   "https://cdn.jsdmirror.com/npm/@emoji-mart/data@1.1.2/+esm",
       // "emoji-mart": "https://cdn.jsdmirror.com/npm/emoji-mart@5.6.0/+esm",
-      // "@cdn-prettier": "https://cdn.jsdmirror.com/npm/prettier@3.2.4/+esm",
+      "prettier": "https://cdn.jsdmirror.com/npm/prettier@3.2.4/+esm",
       // "@cdn-prettier-plugins-markdown":
       //   "https://cdn.jsdmirror.com/npm/prettier@3.2.4/plugins/markdown.js/+esm",
       // "string-replace-async":
@@ -124,12 +123,12 @@ export default defineConfig({
       // mobx: "https://cdn.jsdmirror.com/npm/mobx@6.12.0/+esm",
       // axios: "https://cdn.jsdmirror.com/npm/axios@1.6.5/+esm",
       // "@cdn-node-emoji": "https://cdn.jsdmirror.com/npm/node-emoji@2.1.3/+esm",
-      // mermaid:
-      //   "https://cdn.jsdmirror.com/npm/mermaid@10/dist/mermaid.esm.min.mjs",
+      mermaid:
+        "https://cdn.jsdmirror.com/npm/mermaid@10/dist/mermaid.esm.min.mjs",
       // "@cdn-kit":
       //   "https://cdn.jsdmirror.com/npm/bigonion-kit@0.12.6/esm/kit.min.js",
-      // "bigonion-kit":
-      //   "https://cdn.jsdmirror.com/npm/bigonion-kit@0.12.6/esm/kit.min.js",
+      "bigonion-kit":
+        "https://cdn.jsdmirror.com/npm/bigonion-kit@0.12.6/esm/kit.min.js",
       // "@cdn-hljs":
       //   "https://cdn.jsdmirror.com/npm/@highlightjs/cdn-assets@11.6.0/es/highlight.min.js",
       // "@cdn-katex":
@@ -139,12 +138,13 @@ export default defineConfig({
     // ✨ 全新且合理的 VitePWA 配置 ✨
     // ========================================================================
     VitePWA({
+
       // 1. 注册策略与开发选项
       // --------------------------
       registerType: 'autoUpdate', // 自动更新 Service Worker，无需用户手动刷新。这能解决您之前遇到的开发死循环问题。
-      // devOptions: {
-      //   enabled: true, // 在开发模式 (`npm run dev`) 中也启用 Service Worker，方便调试。
-      // },
+      devOptions: {
+        enabled: true, // 在开发模式 (`npm run dev`) 中也启用 Service Worker，方便调试。
+      },
 
       // 2. PWA Manifest 配置 (应用清单)
       // --------------------------------
@@ -174,6 +174,9 @@ export default defineConfig({
       // 3. Workbox 配置 (核心)
       // -------------------------
       workbox: {
+        importScripts: [
+          'sw_custom.js',
+        ],
         clientsClaim: true,
         // 🚀 增加最大预缓存大小限制
         maximumFileSizeToCacheInBytes: 50 * 1024 * 1024, // 50MB (默认2MB)

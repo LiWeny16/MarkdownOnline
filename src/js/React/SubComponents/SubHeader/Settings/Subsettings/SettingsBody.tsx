@@ -19,6 +19,11 @@ import {
   TextField,
   Typography,
   useTheme,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material"
 import React from "react"
 import { observer } from "mobx-react"
@@ -28,6 +33,7 @@ import mermaid from "mermaid"
 import { mdConverter } from "@Root/js"
 import kit from "bigonion-kit"
 import { useTranslation } from "react-i18next"
+import alertUseArco from "@App/message/alert"
 export const settingsBodyContentBoxStyle = {
   transition: "background-color 0.4s ease, box-shadow 0.4s ease",
   position: "relative",
@@ -82,6 +88,7 @@ export default observer(function SettingsBody() {
     mb: "5px",
   }
   const [themeState, setThemeState] = React.useState<boolean>(false)
+  const [confirmDialogOpen, setConfirmDialogOpen] = React.useState<boolean>(false)
 
   const handleOnChangeImagePrefer = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -205,6 +212,158 @@ export default observer(function SettingsBody() {
   React.useEffect(() => {
     setThemeState(getTheme() === "dark" ? true : false)
   }, [getTheme()])
+
+  /**
+   * @description 重置所有数据 - 清除localStorage、cookies、indexedDB和service worker缓存
+   */
+  const handleResetAllData = async () => {
+    try {
+      // 清除localStorage
+      localStorage.clear()
+      
+      // 清除sessionStorage
+      sessionStorage.clear()
+      
+      // 清除所有cookies
+      document.cookie.split(";").forEach((c) => {
+        const eqPos = c.indexOf("=")
+        const name = eqPos > -1 ? c.substr(0, eqPos).trim() : c.trim()
+        if (name) {
+          // 尝试多种路径和域名清除
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`
+          document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=.${window.location.hostname}`
+        }
+      })
+      
+      // 清除indexedDB - 使用更安全的方法
+      if ('indexedDB' in window) {
+        try {
+          const databases = await indexedDB.databases()
+          
+          // 首先尝试关闭所有数据库连接
+          for (const dbInfo of databases) {
+            if (dbInfo.name) {
+              try {
+                // 先尝试打开然后立即关闭，强制断开连接
+                const openReq = indexedDB.open(dbInfo.name)
+                openReq.onsuccess = () => {
+                  openReq.result.close()
+                }
+              } catch (e) {
+                console.log(`无法关闭数据库 ${dbInfo.name}:`, e)
+              }
+            }
+          }
+          
+          // 等待一下让连接关闭
+          await new Promise(resolve => setTimeout(resolve, 100))
+          
+          // 然后删除数据库
+          for (const dbInfo of databases) {
+            if (dbInfo.name) {
+              try {
+                await new Promise<void>((resolve, reject) => {
+                  const deleteReq = indexedDB.deleteDatabase(dbInfo.name!)
+                  let resolved = false
+                  
+                  const timeout = setTimeout(() => {
+                    if (!resolved) {
+                      resolved = true
+                      console.warn(`删除数据库 ${dbInfo.name} 超时，但继续处理`)
+                      resolve()
+                    }
+                  }, 3000) // 3秒超时
+                  
+                  deleteReq.onsuccess = () => {
+                    if (!resolved) {
+                      resolved = true
+                      clearTimeout(timeout)
+                      console.log(`成功删除数据库: ${dbInfo.name}`)
+                      resolve()
+                    }
+                  }
+                  
+                  deleteReq.onerror = () => {
+                    if (!resolved) {
+                      resolved = true
+                      clearTimeout(timeout)
+                      console.warn(`删除数据库 ${dbInfo.name} 失败，但继续处理:`, deleteReq.error)
+                      resolve() // 继续而不是失败
+                    }
+                  }
+                  
+                  deleteReq.onblocked = () => {
+                    console.warn(`数据库 ${dbInfo.name} 删除被阻塞，将在页面刷新后清除`)
+                    if (!resolved) {
+                      resolved = true
+                      clearTimeout(timeout)
+                      resolve() // 继续而不是失败
+                    }
+                  }
+                })
+              } catch (e) {
+                console.warn(`删除数据库 ${dbInfo.name} 时出错:`, e)
+                // 继续处理其他数据库
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('清除IndexedDB时出错，但继续处理其他数据:', e)
+        }
+      }
+      
+      // 清除service worker缓存
+      if ('serviceWorker' in navigator && 'caches' in window) {
+        try {
+          const cacheNames = await caches.keys()
+          await Promise.allSettled(
+            cacheNames.map(cacheName => caches.delete(cacheName))
+          )
+          
+          // 注销所有service workers
+          const registrations = await navigator.serviceWorker.getRegistrations()
+          await Promise.allSettled(
+            registrations.map(registration => registration.unregister())
+          )
+        } catch (e) {
+          console.warn('清除Service Worker缓存时出错:', e)
+        }
+      }
+      
+      alertUseArco(t("t-reset-success"), 3000, { kind: "success" })
+      
+      // 3秒后强制刷新页面
+      setTimeout(() => {
+        // 使用更强力的刷新方式
+        window.location.href = window.location.href
+      }, 3000)
+      
+    } catch (error) {
+      console.error('重置数据时出错:', error)
+      alertUseArco(t("t-reset-warning"), 3000, { kind: "warning" })
+      
+      // 即使出错也刷新页面
+      setTimeout(() => {
+        window.location.href = window.location.href
+      }, 3000)
+    }
+  }
+
+  /**
+   * @description 显示重置确认对话框
+   */
+  const showResetConfirmDialog = () => {
+    setConfirmDialogOpen(true)
+  }
+
+  /**
+   * @description 确认重置操作
+   */
+  const handleConfirmReset = () => {
+    setConfirmDialogOpen(false)
+    handleResetAllData()
+  }
   return (
     <>
       <Box
@@ -224,7 +383,7 @@ export default observer(function SettingsBody() {
           id="settings_1_x"
           sx={{ fontSize: "30px", fontWeight: "700" }}
         >
-          基础设置
+          {t("t-basic-settings-title")}
         </Typography>
 
         <Divider></Divider>
@@ -241,7 +400,7 @@ export default observer(function SettingsBody() {
             Theme
           </Typography>
           <Typography sx={ContentDescriptionTextStyle}>
-            更改编辑器的主题
+            {t("t-theme-description")}
           </Typography>
           <SwitchTheme
             checked={themeState}
@@ -262,7 +421,7 @@ export default observer(function SettingsBody() {
             Language
           </Typography>
           <Typography sx={ContentDescriptionTextStyle}>
-            更改编辑器的语言
+            {t("t-language-description")}
           </Typography>
           <Select
             value={getSettings().basic.language ?? "zh"}
@@ -271,13 +430,13 @@ export default observer(function SettingsBody() {
             color="primary"
             onChange={handleOnChangeLanguage}
           >
-            <MenuItem value="zh">中文</MenuItem>
-            <MenuItem value="en">English</MenuItem>
+            <MenuItem value="zh">{t("t-chinese")}</MenuItem>
+            <MenuItem value="en">{t("t-english")}</MenuItem>
           </Select>
         </Box>
         <SecondaryHeading
           id="settings_1_3"
-          content="编辑器设置"
+          content={t("t-editor-settings-title")}
         ></SecondaryHeading>
         <Box sx={{
           ...settingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme())
@@ -294,7 +453,7 @@ export default observer(function SettingsBody() {
               </Typography>
             </Box>
             <Typography sx={ContentDescriptionTextStyle}>
-              更改渲染后文字字体大小
+              {t("t-font-size-description")}
             </Typography>
             <Select
               value={getSettings().basic.fontSize}
@@ -325,7 +484,7 @@ export default observer(function SettingsBody() {
               </Typography>
             </Box>
             <Typography sx={ContentDescriptionTextStyle}>
-              更改渲染后文字字体
+              {t("t-font-family-description")}
             </Typography>
             <Select
               value={getSettings().basic.fontFamily === "Times New Roman" ? 1 : 0}
@@ -334,7 +493,7 @@ export default observer(function SettingsBody() {
               size="small"
               onChange={handleOnChangeFontFamily}
             >
-              <MenuItem value={0}>Defualt</MenuItem>
+              <MenuItem value={0}>{t("t-default")}</MenuItem>
               <MenuItem value={1}>Times New Roman</MenuItem>
             </Select>
           </Box>
@@ -352,7 +511,7 @@ export default observer(function SettingsBody() {
               </Typography>
             </Box>
             <Typography sx={ContentDescriptionTextStyle}>
-              同步滚动左边编辑区和预览区域。
+              {t("t-sync-scroll-description")}
             </Typography>
             <SwitchIOS
               checked={getSettings().basic.syncScroll}
@@ -375,7 +534,7 @@ export default observer(function SettingsBody() {
               </Typography>
             </Box>
             <Typography sx={ContentDescriptionTextStyle}>
-              是否开启编辑器自动换行
+              {t("t-auto-wrap-description")}
             </Typography>
             <Select
               value={getSettings().basic.editorAutoWrap ? 1 : 0}
@@ -384,8 +543,8 @@ export default observer(function SettingsBody() {
               size="small"
               onChange={handleOnChangeEditorAutoWrap}
             >
-              <MenuItem value={1}>On</MenuItem>
-              <MenuItem value={0}>OFF</MenuItem>
+              <MenuItem value={1}>{t("t-on")}</MenuItem>
+              <MenuItem value={0}>{t("t-off")}</MenuItem>
             </Select>
           </Box>
         </Box>
@@ -401,7 +560,7 @@ export default observer(function SettingsBody() {
             Speech To Text
           </Typography>
           <Typography sx={ContentDescriptionTextStyle}>
-            选择语音转文字的识别语言
+            {t("t-speech-language-description")}
           </Typography>
           <Select
             // label={"语言"}
@@ -426,7 +585,7 @@ export default observer(function SettingsBody() {
           id="settings_2_x"
           sx={{ mt: "20px", fontSize: "30px", fontWeight: "700" }}
         >
-          高级设置（施工中）
+          {t("t-advanced-settings-title")}
         </Typography>
         <Divider></Divider>
 
@@ -442,7 +601,7 @@ export default observer(function SettingsBody() {
             Export Settings
           </Typography>
           <Typography sx={ContentDescriptionTextStyle}>
-            更改导出设置(施工中)
+            {t("t-export-settings-description")}
           </Typography>
           <SwitchIOS
             disabled
@@ -464,7 +623,7 @@ export default observer(function SettingsBody() {
             Mermaid Theme Configs
           </Typography>
           <Typography sx={ContentDescriptionTextStyle}>
-            Mermaid流程图主题
+            {t("t-mermaid-theme-description")}
           </Typography>
           <Select
             value={getSettings().advanced.mermaidTheme ?? "default"}
@@ -484,7 +643,7 @@ export default observer(function SettingsBody() {
         </Box>
         <SecondaryHeading
           id="settings_2_3"
-          content="图片设置"
+          content={t("t-image-settings-title")}
         ></SecondaryHeading>
         <Box sx={{
           ...settingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme())
@@ -497,10 +656,10 @@ export default observer(function SettingsBody() {
                 fontWeight: 500,
               }}
             >
-              Image Storage Mode Preference (Pasting)
+              {t("t-image-storage-preference")}
             </Typography>
             <Typography sx={ContentDescriptionTextStyle}>
-              选择粘贴图片优先存储在浏览器/文件夹
+              {t("t-image-storage-description")}
             </Typography>
             <FormControl sx={{ transition: "inherit" }}>
               <RadioGroup
@@ -519,7 +678,7 @@ export default observer(function SettingsBody() {
                       }}
                     />
                   }
-                  label="本地文件夹 (Prefer In Local Folder)"
+                  label={t("t-image-storage-folder")}
                 />
                 <FormControlLabel
                   value="vf"
@@ -533,7 +692,7 @@ export default observer(function SettingsBody() {
                       }}
                     />
                   }
-                  label="浏览器 (Prefer In Browser)"
+                  label={t("t-image-storage-browser")}
                 />
               </RadioGroup>
             </FormControl>
@@ -546,17 +705,16 @@ export default observer(function SettingsBody() {
                 fontWeight: 500,
               }}
             >
-              Default Image Style
+              {t("t-default-image-style")}
             </Typography>
             <Typography sx={ContentDescriptionTextStyle}>
-              默认填充的图片样式，大小，位置等,w表示大小, c表示center,
-              s表示shadow
+              {t("t-default-image-style-description")}
             </Typography>
             <TextField
               fullWidth
               margin="normal"
               name="basicStyle"
-              label="基本样式"
+              label={t("t-basic-style")}
               value={getSettings().advanced.imageSettings.basicStyle}
               onChange={handleOnChangeImageStyle}
             />
@@ -569,10 +727,10 @@ export default observer(function SettingsBody() {
                 fontWeight: 500,
               }}
             >
-              Default Stored Path
+              {t("t-default-stored-path")}
             </Typography>
             <Typography sx={ContentDescriptionTextStyle}>
-              默认粘贴图片上传的路径，如设置为"images"，则图片会上传到名根目录的一个为"images"的文件夹下，如该项为空，则保持默认的"images"文件夹
+              {t("t-default-stored-path-description")}
             </Typography>
             <TextField
               disabled={
@@ -583,13 +741,80 @@ export default observer(function SettingsBody() {
               fullWidth
               margin="none"
               name="imgStorePath"
-              label="图片存储路径"
+              label={t("t-image-store-path")}
               value={getSettings().advanced.imageSettings.imgStorePath}
               onChange={handleOnChangeImageStorePath}
             />
           </Box>
         </Box>
+        
+        {/* 数据管理设置 */}
+        <SecondaryHeading
+          id="settings_2_7"
+          content={t("t-reset-settings-title")}
+        ></SecondaryHeading>
+        <Box id="settings_2_8" sx={{
+          ...settingsBodyContentBoxStyle, ...settingsBodyContentBoxStyleFromTheme(getTheme())
+        }}>
+          <Typography
+            sx={{
+              fontSize: "0.89rem",
+              fontWeight: 500,
+            }}
+          >
+            Reset All Data
+          </Typography>
+          <Typography sx={ContentDescriptionTextStyle}>
+            {t("t-reset-data-description")}
+          </Typography>
+          <Button
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={showResetConfirmDialog}
+            sx={{
+              mt: 1,
+              backgroundColor: "#d32f2f",
+              "&:hover": {
+                backgroundColor: "#b71c1c",
+              },
+            }}
+          >
+            {t("t-reset-button")}
+          </Button>
+        </Box>
       </Box>
+      
+      {/* 确认重置对话框 */}
+      <Dialog
+        open={confirmDialogOpen}
+        onClose={() => setConfirmDialogOpen(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle id="alert-dialog-title">
+          {t("t-reset-confirm-title")}
+        </DialogTitle>
+        <DialogContent>
+          <Typography id="alert-dialog-description" sx={{ mb: 2 }} dangerouslySetInnerHTML={{ __html: t("t-reset-confirm-description") }}>
+          </Typography>
+          <Typography component="div" sx={{ ml: 2, mb: 2 }} dangerouslySetInnerHTML={{ __html: t("t-reset-confirm-list") }}>
+          </Typography>
+          <Typography color="error" sx={{ fontWeight: 500 }}>
+            {t("t-reset-confirm-warning")}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDialogOpen(false)} color="primary">
+            {t("t-cancel")}
+          </Button>
+          <Button onClick={handleConfirmReset} color="error" variant="contained">
+            {t("t-confirm-reset")}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 })
