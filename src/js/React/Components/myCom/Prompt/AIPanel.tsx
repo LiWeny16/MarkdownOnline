@@ -15,6 +15,7 @@ import ChatIcon from "@mui/icons-material/Chat"
 import WrapTextIcon from "@mui/icons-material/WrapText"
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera"
 import CloseIcon from "@mui/icons-material/Close"
+import StopIcon from "@mui/icons-material/Stop"
 import ScrollableBox from "../Layout/ScrollBox"
 import bigModel from "@App/ai/ai"
 import { insertTextMonacoAtCursor } from "@App/text/insertTextAtCursor"
@@ -37,15 +38,20 @@ const IconButtonSq = React.memo(
       borderColor: "#0062cc",
       transition: "background-color 0.4s ease-in-out, opacity 0.4s ease-in-out",
     },
+    "&:disabled": {
+      opacity: 0.5,
+      cursor: "not-allowed",
+    },
     transition: "background-color 0.4s ease-in-out, opacity 0.4s ease-in-out",
     color: getTheme() === "light" ? "black" : "white",
     height: "6svh",
+    minWidth: "60px", // 添加最小宽度以防止布局跳动
     fontSize: "0.83rem",
     borderRadius: "55px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    // 内部的图标与文字会继ite样式
+    // 内部的图标与文字会继承样式
   }))
 )
 
@@ -63,6 +69,7 @@ export default observer(function AIPromptPanel(props: any) {
   const [aiResponse, setAiResponse] = useState("")
   const [isEnd, setIsEnd] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [isStreaming, setIsStreaming] = useState(false) // 新增：跟踪是否正在流式回答
   // 存储上传或粘贴的图片 Base64 数据
   const [imageBase64, setImageBase64] = useState<string>("")
   // 隐藏的文件上传控件引用（现将其渲染在 Backdrop 外部）
@@ -118,6 +125,9 @@ export default observer(function AIPromptPanel(props: any) {
   }
 
   const handleInputKeyDown = (event: any) => {
+    // 如果正在流式回答，禁用发送
+    if (isStreaming) return
+    
     if (event.ctrlKey && event.key === "Enter") {
       handleSend()
       inputQsRef.current!.value = ""
@@ -165,11 +175,14 @@ export default observer(function AIPromptPanel(props: any) {
 
   const handleSend = () => {
     const inputValue = inputQsRef.current!.value
-    if (!inputValue) return
+    if (!inputValue || isStreaming) return // 如果正在流式回答，禁用发送
+    
     setAnswerBoxState(true)
     setAiResponse("")
     setIsLoading(true)
     setIsEnd(false)
+    setIsStreaming(true) // 开始流式回答
+    
     bigModel.askAI(
       inputValue,
       getSelectionText(),
@@ -183,17 +196,27 @@ export default observer(function AIPromptPanel(props: any) {
       (finalMessage) => {
         setAiResponse(finalMessage)
         setIsEnd(true)
+        setIsStreaming(false) // 结束流式回答
       },
       (error) => {
         console.error("AI 请求错误:", error)
         setAiResponse("抱歉，发生了错误，可能是宿主没充钱，请联系他olderonion@gmail.com :(")
         setIsLoading(false)
+        setIsStreaming(false) // 结束流式回答
       },
       imageBase64 // 传递图片 Base64 数据
     )
     inputQsRef.current!.value = ""
     handleClearImgRestore()
   }
+  
+  const handleAbort = () => {
+    bigModel.abortCurrentRequest()
+    setIsStreaming(false)
+    setIsLoading(false)
+    setIsEnd(true)
+  }
+  
   const handleClearImgRestore = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = ''; // 清空文件选择
@@ -265,19 +288,51 @@ export default observer(function AIPromptPanel(props: any) {
               <InputBase
                 autoFocus
                 multiline
+                disabled={isStreaming} // 流式回答时禁用输入
                 className="transparent-scrollbar"
                 onKeyDown={handleInputKeyDown}
                 onPaste={handlePaste}
                 fullWidth
                 inputRef={inputQsRef}
                 maxRows={5}
-                placeholder="Search in GLM-4 AI Model"
+                placeholder={isStreaming ? "AI正在回答中，请稍候..." : "Search in GLM-4 AI Model"}
                 inputProps={{ "aria-label": "search google maps" }}
               /></Box>
-            <Box>
-              <IconButtonSq style={{ padding: "0px 20px", fontWeight: "700" }} onClick={handleSend} aria-label="发送">
-                <SearchIcon />
-              </IconButtonSq>
+            <Box sx={{ position: "relative", display: "inline-block" }}>
+              {isStreaming ? (
+                <Tooltip title="中断回答">
+                  <IconButtonSq 
+                    style={{ 
+                      padding: "0px 20px", 
+                      fontWeight: "700",
+                      backgroundColor: "#f44336",
+                      color: "white",
+                      minWidth: "60px", // 固定最小宽度
+                      height: "6svh", // 确保高度一致
+                      transform: "scale(1)", // 确保没有缩放差异
+                    }} 
+                    onClick={handleAbort} 
+                    aria-label="中断"
+                  >
+                    <StopIcon style={{ fontSize: "1.2rem" }} />
+                  </IconButtonSq>
+                </Tooltip>
+              ) : (
+                <IconButtonSq 
+                  style={{ 
+                    padding: "0px 20px", 
+                    fontWeight: "700",
+                    minWidth: "60px", // 固定最小宽度，与中断按钮保持一致
+                    height: "6svh", // 确保高度一致
+                    transform: "scale(1)", // 确保没有缩放差异
+                  }} 
+                  onClick={handleSend} 
+                  aria-label="发送"
+                  disabled={isStreaming}
+                >
+                  <SearchIcon style={{ fontSize: "1.2rem" }} />
+                </IconButtonSq>
+              )}
             </Box>
           </Box>
           <Box className="FLEX COW">
@@ -285,7 +340,7 @@ export default observer(function AIPromptPanel(props: any) {
               <IconButtonSq
                 style={{ padding: "0px 20px", fontWeight: "700" }}
               >
-                <ChatIcon /> Ask AI
+                <ChatIcon style={{ fontSize: "1.2rem", marginRight: "4px" }} /> Ask AI
               </IconButtonSq>
             </Tooltip>
             {/* 图片选择按钮 */}
@@ -295,7 +350,7 @@ export default observer(function AIPromptPanel(props: any) {
                 aria-label="选择图片"
                 style={{ padding: "0px 20px", fontWeight: "700" }}
               >
-                <PhotoCameraIcon />
+                <PhotoCameraIcon style={{ fontSize: "1.2rem" }} />
               </IconButtonSq>
             </Tooltip>
             <InputBase
@@ -346,7 +401,7 @@ export default observer(function AIPromptPanel(props: any) {
                 disabled={!isEnd}
                 style={{ padding: "0px 20px", fontWeight: "700" }}
               >
-                <WrapTextIcon />
+                <WrapTextIcon style={{ fontSize: "1.2rem" }} />
               </IconButtonSq>
             </Tooltip>
           </Box>

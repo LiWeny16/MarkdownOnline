@@ -8,6 +8,7 @@ import ChatIcon from "@mui/icons-material/Chat";
 import WrapTextIcon from "@mui/icons-material/WrapText";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import CloseIcon from "@mui/icons-material/Close";
+import StopIcon from "@mui/icons-material/Stop";
 import ScrollableBox from "../Layout/ScrollBox";
 import bigModel from "@App/ai/ai";
 import { insertTextMonacoAtCursor } from "@App/text/insertTextAtCursor";
@@ -27,15 +28,20 @@ const IconButtonSq = React.memo(styled("button")(({ theme }) => ({
         borderColor: "#0062cc",
         transition: "background-color 0.4s ease-in-out, opacity 0.4s ease-in-out",
     },
+    "&:disabled": {
+        opacity: 0.5,
+        cursor: "not-allowed",
+    },
     transition: "background-color 0.4s ease-in-out, opacity 0.4s ease-in-out",
     color: getTheme() === "light" ? "black" : "white",
     height: "6svh",
+    minWidth: "60px", // 添加最小宽度以防止布局跳动
     fontSize: "0.83rem",
     borderRadius: "55px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    // 内部的图标与文字会继ite样式
+    // 内部的图标与文字会继承样式
 })));
 export default observer(function AIPromptPanel(props) {
     const pickerHeight = 64;
@@ -51,6 +57,7 @@ export default observer(function AIPromptPanel(props) {
     const [aiResponse, setAiResponse] = useState("");
     const [isEnd, setIsEnd] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isStreaming, setIsStreaming] = useState(false); // 新增：跟踪是否正在流式回答
     // 存储上传或粘贴的图片 Base64 数据
     const [imageBase64, setImageBase64] = useState("");
     // 隐藏的文件上传控件引用（现将其渲染在 Backdrop 外部）
@@ -98,6 +105,9 @@ export default observer(function AIPromptPanel(props) {
         }
     };
     const handleInputKeyDown = (event) => {
+        // 如果正在流式回答，禁用发送
+        if (isStreaming)
+            return;
         if (event.ctrlKey && event.key === "Enter") {
             handleSend();
             inputQsRef.current.value = "";
@@ -141,12 +151,13 @@ export default observer(function AIPromptPanel(props) {
     };
     const handleSend = () => {
         const inputValue = inputQsRef.current.value;
-        if (!inputValue)
-            return;
+        if (!inputValue || isStreaming)
+            return; // 如果正在流式回答，禁用发送
         setAnswerBoxState(true);
         setAiResponse("");
         setIsLoading(true);
         setIsEnd(false);
+        setIsStreaming(true); // 开始流式回答
         bigModel.askAI(inputValue, getSelectionText(), (messageChunk) => {
             if (aiResponseRef.current) {
                 aiResponseRef.current.scrollTo(0, 10000);
@@ -156,14 +167,22 @@ export default observer(function AIPromptPanel(props) {
         }, (finalMessage) => {
             setAiResponse(finalMessage);
             setIsEnd(true);
+            setIsStreaming(false); // 结束流式回答
         }, (error) => {
             console.error("AI 请求错误:", error);
             setAiResponse("抱歉，发生了错误，可能是宿主没充钱，请联系他olderonion@gmail.com :(");
             setIsLoading(false);
+            setIsStreaming(false); // 结束流式回答
         }, imageBase64 // 传递图片 Base64 数据
         );
         inputQsRef.current.value = "";
         handleClearImgRestore();
+    };
+    const handleAbort = () => {
+        bigModel.abortCurrentRequest();
+        setIsStreaming(false);
+        setIsLoading(false);
+        setIsEnd(true);
     };
     const handleClearImgRestore = () => {
         if (fileInputRef.current) {
@@ -195,7 +214,21 @@ export default observer(function AIPromptPanel(props) {
                                         padding: "21px 6px 4px 16px",
                                         ml: 1,
                                         flex: "0 0 89%",
-                                    }, children: _jsx(InputBase, { autoFocus: true, multiline: true, className: "transparent-scrollbar", onKeyDown: handleInputKeyDown, onPaste: handlePaste, fullWidth: true, inputRef: inputQsRef, maxRows: 5, placeholder: "Search in GLM-4 AI Model", inputProps: { "aria-label": "search google maps" } }) }), _jsx(Box, { children: _jsx(IconButtonSq, { style: { padding: "0px 20px", fontWeight: "700" }, onClick: handleSend, "aria-label": "\u53D1\u9001", children: _jsx(SearchIcon, {}) }) })] }), _jsxs(Box, { className: "FLEX COW", children: [_jsx(Tooltip, { title: "Ctrl+J", children: _jsxs(IconButtonSq, { style: { padding: "0px 20px", fontWeight: "700" }, children: [_jsx(ChatIcon, {}), " Ask AI"] }) }), _jsx(Tooltip, { title: "\u9009\u62E9\u56FE\u7247", children: _jsx(IconButtonSq, { onClick: handleImageUploadClick, "aria-label": "\u9009\u62E9\u56FE\u7247", style: { padding: "0px 20px", fontWeight: "700" }, children: _jsx(PhotoCameraIcon, {}) }) }), _jsx(InputBase, { multiline: true, disabled: true, fullWidth: true, sx: { ml: 1, flex: 1 }, maxRows: 5, placeholder: "Press Ctrl + Enter To Send", inputProps: { "aria-label": "search google maps" } }), imageBase64 && (_jsxs(Box, { sx: { ml: 1, position: "relative", display: "inline-block" }, children: [_jsx("img", { src: imageBase64, alt: "\u56FE\u7247\u9884\u89C8", style: {
+                                    }, children: _jsx(InputBase, { autoFocus: true, multiline: true, disabled: isStreaming, className: "transparent-scrollbar", onKeyDown: handleInputKeyDown, onPaste: handlePaste, fullWidth: true, inputRef: inputQsRef, maxRows: 5, placeholder: isStreaming ? "AI正在回答中，请稍候..." : "Search in GLM-4 AI Model", inputProps: { "aria-label": "search google maps" } }) }), _jsx(Box, { sx: { position: "relative", display: "inline-block" }, children: isStreaming ? (_jsx(Tooltip, { title: "\u4E2D\u65AD\u56DE\u7B54", children: _jsx(IconButtonSq, { style: {
+                                                padding: "0px 20px",
+                                                fontWeight: "700",
+                                                backgroundColor: "#f44336",
+                                                color: "white",
+                                                minWidth: "60px", // 固定最小宽度
+                                                height: "6svh", // 确保高度一致
+                                                transform: "scale(1)", // 确保没有缩放差异
+                                            }, onClick: handleAbort, "aria-label": "\u4E2D\u65AD", children: _jsx(StopIcon, { style: { fontSize: "1.2rem" } }) }) })) : (_jsx(IconButtonSq, { style: {
+                                            padding: "0px 20px",
+                                            fontWeight: "700",
+                                            minWidth: "60px", // 固定最小宽度，与中断按钮保持一致
+                                            height: "6svh", // 确保高度一致
+                                            transform: "scale(1)", // 确保没有缩放差异
+                                        }, onClick: handleSend, "aria-label": "\u53D1\u9001", disabled: isStreaming, children: _jsx(SearchIcon, { style: { fontSize: "1.2rem" } }) })) })] }), _jsxs(Box, { className: "FLEX COW", children: [_jsx(Tooltip, { title: "Ctrl+J", children: _jsxs(IconButtonSq, { style: { padding: "0px 20px", fontWeight: "700" }, children: [_jsx(ChatIcon, { style: { fontSize: "1.2rem", marginRight: "4px" } }), " Ask AI"] }) }), _jsx(Tooltip, { title: "\u9009\u62E9\u56FE\u7247", children: _jsx(IconButtonSq, { onClick: handleImageUploadClick, "aria-label": "\u9009\u62E9\u56FE\u7247", style: { padding: "0px 20px", fontWeight: "700" }, children: _jsx(PhotoCameraIcon, { style: { fontSize: "1.2rem" } }) }) }), _jsx(InputBase, { multiline: true, disabled: true, fullWidth: true, sx: { ml: 1, flex: 1 }, maxRows: 5, placeholder: "Press Ctrl + Enter To Send", inputProps: { "aria-label": "search google maps" } }), imageBase64 && (_jsxs(Box, { sx: { ml: 1, position: "relative", display: "inline-block" }, children: [_jsx("img", { src: imageBase64, alt: "\u56FE\u7247\u9884\u89C8", style: {
                                                 width: 35,
                                                 height: 35,
                                                 borderRadius: "1px",
@@ -210,5 +243,5 @@ export default observer(function AIPromptPanel(props) {
                                                 height: 20,
                                                 padding: 0,
                                                 zIndex: 1,
-                                            }, children: _jsx(CloseIcon, { style: { fontSize: 16 } }) })] })), _jsx(Tooltip, { title: "\u63A5\u53D7AI\u5E76\u63D2\u5165\u7F16\u8F91\u5668", children: _jsx(IconButtonSq, { onClick: handleInsertAIResponse, "aria-label": "\u63D2\u5165", disabled: !isEnd, style: { padding: "0px 20px", fontWeight: "700" }, children: _jsx(WrapTextIcon, {}) }) })] })] }) }), _jsx("input", { type: "file", accept: "image/*", ref: fileInputRef, style: { display: "none" }, onChange: handleFileUpload })] }));
+                                            }, children: _jsx(CloseIcon, { style: { fontSize: 16 } }) })] })), _jsx(Tooltip, { title: "\u63A5\u53D7AI\u5E76\u63D2\u5165\u7F16\u8F91\u5668", children: _jsx(IconButtonSq, { onClick: handleInsertAIResponse, "aria-label": "\u63D2\u5165", disabled: !isEnd, style: { padding: "0px 20px", fontWeight: "700" }, children: _jsx(WrapTextIcon, { style: { fontSize: "1.2rem" } }) }) })] })] }) }), _jsx("input", { type: "file", accept: "image/*", ref: fileInputRef, style: { display: "none" }, onChange: handleFileUpload })] }));
 });

@@ -1,5 +1,10 @@
 declare class BigModel {
     protected static token: string;
+    private abortController;
+    /**
+     * 中断当前的AI请求
+     */
+    abortCurrentRequest(): void;
     /**
      * 流式询问 AI，并通过回调实时接收数据
      * @param content 用户输入的内容

@@ -2,6 +2,23 @@
 const token = "409f1e38b0d8586919166aa6117243f7.AVQTIQqUbGI1g8B5";
 const url = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
 class BigModel {
+    constructor() {
+        Object.defineProperty(this, "abortController", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: null
+        });
+    }
+    /**
+     * 中断当前的AI请求
+     */
+    abortCurrentRequest() {
+        if (this.abortController) {
+            this.abortController.abort();
+            this.abortController = null;
+        }
+    }
     /**
      * 流式询问 AI，并通过回调实时接收数据
      * @param content 用户输入的内容
@@ -30,29 +47,23 @@ class BigModel {
             }
         };
         const data = {
-            model: base64 ? "glm-4v-plus-0111" : "glm-4-plus",
+            model: base64 ? "GLM-4V-Plus-0111" : "GLM-4-flash",
             tool: "web-search-pro",
             stream: true, // 启用流式响应
             messages: [
                 {
                     role: "system",
-                    content: "你是一个专门为markdown写作输出内容的AI助手，严禁废话，若用户问换行符号怎么写，你的回答只需要：<br>"
+                    content: "你是专业的Markdown写作助手，提供简洁准确的内容，直接输出可用的Markdown格式文本，不用代码块包裹。"
                 },
                 {
                     role: "system",
-                    content: "你作为一个markdownAI助手，只需要回答markdown格式纯文本即可，不要用markdown代码包裹回答，除非用户主动要求"
+                    content: "格式规范：数学公式用$包裹（行内）或$$包裹（块级）；图表用正确的mermaid语法；保持层次清晰。"
                 },
                 {
                     role: "system",
-                    content: "所有数学/公式/定律/方程必须遵循:行内公式用单$包裹，公式块用两个$$包裹！严谨直接打印出来"
-                },
-                {
-                    role: "system",
-                    content: "用户问你思维导图/饼图等mermaid的语法图怎么写，你需要回答正确语法的mermaid内容，如```mermaid \n graph TD;\nA[人工智能学习思维导图] --> B[基础知识];\nB --> B1[数学基础];```"
-                },
-                {
-                    role: "system",
-                    content: promptText ?? `用户鼠标选中了这一段文本：${promptText}可能需要修改，扩写等对这段文本操作，你只需要回答修改后的文本即可`
+                    content: promptText ?
+                        `用户选中文本："${promptText}"，请根据要求处理此文本（修改/扩写/优化等），未指明则默认优化。`
+                        : "根据用户问题提供相应的Markdown内容。"
                 },
                 {
                     role: "user",
@@ -61,6 +72,8 @@ class BigModel {
             ],
         };
         try {
+            // 创建新的 AbortController
+            this.abortController = new AbortController();
             const response = await fetch(url, {
                 method: "POST",
                 headers: {
@@ -68,6 +81,7 @@ class BigModel {
                     Authorization: `${token}`,
                 },
                 body: JSON.stringify(data),
+                signal: this.abortController.signal, // 添加信号以支持中断
             });
             if (!response.body) {
                 throw new Error("ReadableStream not supported in this browser.");
@@ -77,6 +91,11 @@ class BigModel {
             let done = false;
             let finalMessage = "";
             while (!done) {
+                // 检查是否被中断
+                if (this.abortController.signal.aborted) {
+                    onComplete(finalMessage);
+                    return;
+                }
                 const { value, done: readerDone } = await reader.read();
                 done = readerDone;
                 if (value) {
@@ -88,6 +107,7 @@ class BigModel {
                             const jsonStr = line.replace("data:", "").trim();
                             if (jsonStr === "[DONE]") {
                                 onComplete(finalMessage);
+                                this.abortController = null; // 清理控制器
                                 return;
                             }
                             try {
@@ -107,8 +127,15 @@ class BigModel {
                     }
                 }
             }
+            this.abortController = null; // 清理控制器
         }
         catch (error) {
+            this.abortController = null; // 清理控制器
+            if (error.name === 'AbortError') {
+                // 请求被中断，这是正常情况
+                onComplete("回答已中断");
+                return;
+            }
             console.error("Error:", error);
             onError(error);
         }
