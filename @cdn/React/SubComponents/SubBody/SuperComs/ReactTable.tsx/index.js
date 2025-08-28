@@ -2,7 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 // src/js/React/SubComponents/SubBody/SuperComs/ReactTable.tsx/index.tsx
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TextField, IconButton, Tooltip, Box, TableSortLabel, Checkbox, alpha } from '@mui/material';
-import { Edit as EditIcon, Add as AddIcon, Delete as DeleteIcon, HelpOutline as HelpIcon, DragIndicator as DragIndicatorIcon } from '@mui/icons-material';
+import { Edit as EditIcon, Close as CloseIcon, Add as AddIcon, Delete as DeleteIcon, HelpOutline as HelpIcon, DragIndicator as DragIndicatorIcon } from '@mui/icons-material';
 import MarkdownIt from 'markdown-it';
 import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors, closestCenter } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
@@ -45,7 +45,7 @@ const getTableThemeStyles = () => {
         selectedRowHoverBackground: isDark ? alpha('#1976d2', 0.2) : alpha('#1976d2', 0.12),
     };
 };
-const DraggableTableRow = ({ rowId, rowIndex, row, isEditMode, isSelected, lastSelectedIndex, editingCell, onRowClick, onDeleteRow, renderCellContent, setSelectedRows, setLastSelectedIndex }) => {
+const DraggableTableRow = ({ rowId, rowIndex, row, isEditMode, isSelected, lastSelectedIndex, editingCell, onRowClick, renderCellContent, setSelectedRows, setLastSelectedIndex, totalColumns }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging, } = useSortable({ id: rowId });
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -90,20 +90,19 @@ const DraggableTableRow = ({ rowId, rowIndex, row, isEditMode, isSelected, lastS
                                 '&:hover': { opacity: 1 },
                                 '&:active': { cursor: 'grabbing' }
                             }, onMouseDown: (e) => e.stopPropagation(), children: _jsx(DragIndicatorIcon, { fontSize: "small" }) })] }) })), row.map((cell, colIndex) => (_jsx(TableCell, { sx: {
-                    minWidth: 120,
+                    width: `${100 / (totalColumns + (isEditMode ? 1 : 0))}%`, // 只考虑拖拽列，没有Actions列
+                    minWidth: 0, // 允许缩小
+                    maxWidth: `${100 / (totalColumns + (isEditMode ? 1 : 0))}%`, // 限制最大宽度
                     padding: 0,
-                    whiteSpace: 'nowrap',
-                    '&:hover': {
-                        backgroundColor: isEditMode ? alpha('#1976d2', 0.04) : 'transparent'
+                    '& > *': {
+                        width: '100%',
+                        maxWidth: '100%'
                     }
                 }, onClick: (event) => {
                     if (isEditMode) {
                         event.stopPropagation();
                     }
-                }, children: renderCellContent(cell, rowIndex, colIndex) }, colIndex))), isEditMode && (_jsx(TableCell, { children: _jsx(Tooltip, { title: "Delete Row", children: _jsx(IconButton, { size: "small", onClick: (event) => {
-                            event.stopPropagation();
-                            onDeleteRow(rowIndex);
-                        }, color: "error", sx: { opacity: 0.6, '&:hover': { opacity: 1 } }, children: _jsx(DeleteIcon, { fontSize: "inherit" }) }) }) }))] }, rowId));
+                }, children: renderCellContent(cell, rowIndex, colIndex) }, colIndex)))] }, rowId));
 };
 const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
     // 🚀 主题样式
@@ -800,13 +799,23 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
         try {
             // 使用 renderInline 只渲染行内元素，避免包裹 <p> 标签
             const htmlContent = md.renderInline(value);
-            return (_jsx("span", { dangerouslySetInnerHTML: { __html: htmlContent }, style: { wordBreak: 'break-word' } }));
+            return (_jsx("span", { dangerouslySetInnerHTML: { __html: htmlContent }, style: {
+                    wordBreak: 'break-word',
+                    whiteSpace: 'normal',
+                    display: 'inline-block',
+                    width: '100%'
+                } }));
         }
         catch (error) {
             console.warn('Markdown 渲染失败:', error);
             // 降级到纯文本显示
             const displayValue = value === '' ? '\u00A0' : value;
-            return _jsx("span", { children: displayValue });
+            return (_jsx("span", { style: {
+                    wordBreak: 'break-word',
+                    whiteSpace: 'normal',
+                    display: 'inline-block',
+                    width: '100%'
+                }, children: displayValue }));
         }
     }, [md]);
     // 🚀 排序处理 - 修改为真正影响底层数据，并清空选中状态
@@ -886,9 +895,9 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
         const displayValue = value === '' ? '\u00A0' : value;
         return (_jsx(Box, { sx: {
                 display: 'flex',
-                alignItems: 'center',
+                alignItems: 'flex-start', // 改为顶部对齐
                 minHeight: '32px',
-                height: '32px',
+                width: '100%',
                 cursor: isEditMode ? 'text' : 'default',
                 padding: isEditing ? 0 : '6px 8px',
                 position: 'relative',
@@ -898,6 +907,9 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
                         ? alpha('#1976d2', 0.08)
                         : 'transparent',
                 border: isActive ? '1px solid #1976d2' : 'none',
+                wordBreak: 'break-word', // 允许换行
+                whiteSpace: 'normal', // 允许正常换行
+                overflowWrap: 'break-word', // 确保长单词能够换行
                 '&:hover': {
                     backgroundColor: isEditMode && !isHeader
                         ? (isCellSelectedState ? alpha('#1976d2', 0.16) : alpha('#1976d2', 0.08))
@@ -912,26 +924,58 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
                 }
             }, children: isEditing ? (renderEditor(value)) : (
             // 🚀 Part 1: 根据是否为表头选择渲染方式
-            isHeader ? (_jsx("span", { style: { fontWeight: 'bold' }, children: displayValue || `Header ${colIndex + 1}` })) : (renderMarkdownContent(value))) }));
+            isHeader ? (_jsx("span", { style: {
+                    fontWeight: 'bold',
+                    wordBreak: 'break-word',
+                    whiteSpace: 'normal',
+                    display: 'block',
+                    width: '100%'
+                }, children: displayValue || `Header ${colIndex + 1}` })) : (_jsx("div", { style: {
+                    wordBreak: 'break-word',
+                    whiteSpace: 'normal',
+                    width: '100%'
+                }, children: renderMarkdownContent(value) }))) }));
     }, [editingCell, renderEditor, startEdit, isEditMode, isCellSelected, activeCell, renderMarkdownContent, handleCellClick]);
     if (!data || (!data.headers.length && !data.rows.length)) {
         return (_jsxs(Paper, { sx: { p: 2, textAlign: 'center', color: 'text.secondary' }, children: ["Empty table - ", tableId ? `Table ID: ${tableId}` : 'No data', standardData && (_jsxs("div", { style: { fontSize: '0.75rem', marginTop: '4px', color: '#666' }, children: ["Columns: ", standardData.schema.columnCount, " | Rows: ", standardData.schema.rowCount] }))] }));
     }
     return (_jsx(DndContext, { sensors: sensors, collisionDetection: closestCenter, onDragEnd: handleDragEnd, children: _jsxs(Paper, { elevation: 0, sx: { width: '100%', overflow: 'hidden' }, className: "academic-table", tabIndex: 0, onKeyDown: handleKeyDown, ref: tableContainerRef, children: [_jsxs(Box, { sx: {
-                        p: 1,
                         display: 'flex',
-                        gap: 1,
+                        flexDirection: 'column',
                         borderBottom: '1px solid #e0e0e0',
                         backgroundColor: 'transparent'
-                    }, className: "react-table-toolbar", children: [_jsx(Tooltip, { title: isEditMode ? "Exit Edit Mode (多选：Ctrl+点击, Shift+点击范围选择)" : "Enter Edit Mode", children: _jsx(IconButton, { size: "small", onClick: () => {
-                                    setIsEditMode(!isEditMode);
-                                    // 🚀 退出编辑模式时清除选择
-                                    if (isEditMode) {
-                                        setSelectedRows([]);
-                                        setSelectedCells([]);
-                                        setLastSelectedIndex(null);
-                                    }
-                                }, color: isEditMode ? "primary" : "default", children: _jsx(EditIcon, {}) }) }), isEditMode && (_jsxs(_Fragment, { children: [_jsx(Tooltip, { title: "Add Row", children: _jsx(IconButton, { size: "small", onClick: addRow, children: _jsx(AddIcon, {}) }) }), _jsx(Tooltip, { title: "Add Column", children: _jsx(IconButton, { size: "small", onClick: addColumn, children: _jsx(AddIcon, { sx: { transform: 'rotate(90deg)' } }) }) }), selectedRows.length > 0 && (_jsxs(_Fragment, { children: [_jsx(Box, { sx: { display: 'flex', alignItems: 'center', ml: 1, mr: 1 }, children: _jsxs("span", { style: { fontWeight: 500, color: '#1976d2', fontSize: '0.875rem' }, children: [selectedRows.length, " row", selectedRows.length > 1 ? 's' : '', " selected"] }) }), _jsx(Tooltip, { title: "Delete Selected Rows", children: _jsx(IconButton, { size: "small", onClick: () => {
+                    }, className: "react-table-toolbar", children: [_jsxs(Box, { sx: {
+                                p: 1,
+                                display: 'flex',
+                                gap: 1,
+                                alignItems: 'center'
+                            }, children: [_jsx(Tooltip, { title: isEditMode ? "Exit Edit Mode" : "Enter Edit Mode", children: _jsx(IconButton, { size: "small", onClick: () => {
+                                            setIsEditMode(!isEditMode);
+                                            // 🚀 退出编辑模式时清除选择
+                                            if (isEditMode) {
+                                                setSelectedRows([]);
+                                                setSelectedCells([]);
+                                                setLastSelectedIndex(null);
+                                            }
+                                        }, color: isEditMode ? "primary" : "default", children: _jsx(EditIcon, {}) }) }), isEditMode && (_jsxs(_Fragment, { children: [_jsxs(Box, { sx: { display: 'flex', gap: 0.5, ml: 1 }, children: [_jsx(Tooltip, { title: "Add Row", children: _jsx(IconButton, { size: "small", onClick: addRow, children: _jsx(AddIcon, {}) }) }), _jsx(Tooltip, { title: "Add Column", children: _jsx(IconButton, { size: "small", onClick: addColumn, children: _jsx(AddIcon, { sx: { transform: 'rotate(90deg)' } }) }) })] }), _jsx(Box, { sx: { width: '1px', height: '20px', backgroundColor: '#e0e0e0', mx: 1 } }), _jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [_jsx("span", { style: { fontSize: '0.75rem', color: '#666' }, children: "\u5217:" }), _jsx(Box, { sx: { display: 'flex', gap: 0.5 }, children: data.headers.map((header, colIndex) => (_jsx(Tooltip, { title: `Delete "${header}" column`, children: _jsx(IconButton, { size: "small", onClick: () => deleteColumn(colIndex), disabled: data.headers.length <= 1, sx: {
+                                                                p: 0.25,
+                                                                fontSize: '0.75rem',
+                                                                minWidth: 'auto',
+                                                                color: data.headers.length <= 1 ? '#ccc' : '#d32f2f',
+                                                                '&:hover': {
+                                                                    backgroundColor: data.headers.length <= 1 ? 'transparent' : alpha('#d32f2f', 0.08)
+                                                                }
+                                                            }, children: _jsx(DeleteIcon, { fontSize: "inherit" }) }) }, colIndex))) })] }), _jsx(Box, { sx: { width: '1px', height: '20px', backgroundColor: '#e0e0e0', mx: 1 } }), _jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [_jsx("span", { style: { fontSize: '0.75rem', color: '#666' }, children: "\u6392\u5E8F:" }), sortConfig.orderBy && (_jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 0.5 }, children: [_jsx("span", { style: { fontSize: '0.75rem', fontWeight: 500 }, children: sortConfig.orderBy }), _jsx("span", { style: { fontSize: '0.75rem', color: '#1976d2' }, children: sortConfig.order === 'asc' ? '↑' : '↓' }), _jsx(Tooltip, { title: "Clear Sort", children: _jsx(IconButton, { size: "small", onClick: () => {
+                                                                    setSortConfig({ order: 'asc', orderBy: '' });
+                                                                }, sx: { p: 0.25 }, children: _jsx(CloseIcon, { fontSize: "inherit" }) }) })] })), !sortConfig.orderBy && (_jsx("span", { style: { fontSize: '0.75rem', color: '#999', fontStyle: 'italic' }, children: "\u70B9\u51FB\u8868\u5934\u6392\u5E8F" }))] })] })), _jsxs(Box, { sx: { ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }, children: [isEditMode && (_jsx(Tooltip, { title: _jsxs(Box, { sx: { fontSize: '0.75rem', lineHeight: 1.2 }, children: [_jsx("div", { children: "\u5FEB\u6377\u952E:" }), _jsx("div", { children: "\u2022 Ctrl+A: \u5168\u9009" }), _jsx("div", { children: "\u2022 Ctrl+D: \u53D6\u6D88\u9009\u62E9" }), _jsx("div", { children: "\u2022 Ctrl+B: \u52A0\u7C97\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+I: \u659C\u4F53\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+C: \u590D\u5236\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+X: \u526A\u5207\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+V: \u7C98\u8D34\u5230\u6D3B\u52A8\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Delete: \u5220\u9664\u9009\u4E2D\u884C" }), _jsx("div", { children: "\u2022 Ctrl+\u70B9\u51FB: \u591A\u9009" }), _jsx("div", { children: "\u2022 Shift+\u70B9\u51FB: \u8303\u56F4\u9009\u62E9" }), _jsx("div", { children: "\u2022 \u65B9\u5411\u952E: \u79FB\u52A8\u9009\u62E9" }), _jsx("div", { children: "\u2022 Shift+\u65B9\u5411\u952E: \u6269\u5C55\u9009\u62E9" }), _jsx("div", { children: "\u2022 \u62D6\u62FD\u884C\u9996\u56FE\u6807: \u91CD\u65B0\u6392\u5E8F" })] }), children: _jsx(IconButton, { size: "small", children: _jsx(HelpIcon, { fontSize: "small" }) }) })), tableId && (_jsxs(Box, { sx: { fontSize: '0.75rem', color: 'text.secondary', display: 'flex', alignItems: 'center' }, children: ["Table ID: ", tableId, standardData && (_jsxs("span", { style: { marginLeft: '8px' }, children: [standardData.schema.columnCount, "\u00D7", standardData.schema.rowCount] }))] }))] })] }), isEditMode && selectedRows.length > 0 && (_jsxs(Box, { sx: {
+                                px: 1,
+                                py: 0.5,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                backgroundColor: alpha('#1976d2', 0.04),
+                                borderTop: '1px solid #e0e0e0'
+                            }, children: [_jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [_jsx(Checkbox, { size: "small", indeterminate: selectedRows.length > 0 && selectedRows.length < data.rows.length, checked: data.rows.length > 0 && selectedRows.length === data.rows.length, onChange: handleSelectAllClick }), _jsxs("span", { style: { fontWeight: 500, color: '#1976d2', fontSize: '0.875rem' }, children: [selectedRows.length, " row", selectedRows.length > 1 ? 's' : '', " selected"] })] }), _jsxs(Box, { sx: { display: 'flex', gap: 0.5, ml: 2 }, children: [_jsx(Tooltip, { title: "Delete Selected Rows", children: _jsx(IconButton, { size: "small", onClick: () => {
                                                     // 🚀 修复：一次性构建最终数据，避免多次状态更新
                                                     const newData = {
                                                         headers: [...data.headers],
@@ -947,15 +991,26 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
                                                     // 清空选择状态
                                                     setSelectedRows([]);
                                                     setLastSelectedIndex(null);
-                                                }, color: "error", children: _jsx(DeleteIcon, {}) }) })] })), _jsx(Tooltip, { title: _jsxs(Box, { sx: { fontSize: '0.75rem', lineHeight: 1.2 }, children: [_jsx("div", { children: "\u5FEB\u6377\u952E:" }), _jsx("div", { children: "\u2022 Ctrl+A: \u5168\u9009" }), _jsx("div", { children: "\u2022 Ctrl+D: \u53D6\u6D88\u9009\u62E9" }), _jsx("div", { children: "\u2022 Ctrl+B: \u52A0\u7C97\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+I: \u659C\u4F53\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+C: \u590D\u5236\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+X: \u526A\u5207\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+V: \u7C98\u8D34\u5230\u6D3B\u52A8\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Delete: \u5220\u9664\u9009\u4E2D\u884C" }), _jsx("div", { children: "\u2022 Ctrl+\u70B9\u51FB: \u591A\u9009" }), _jsx("div", { children: "\u2022 Shift+\u70B9\u51FB: \u8303\u56F4\u9009\u62E9" }), _jsx("div", { children: "\u2022 \u65B9\u5411\u952E: \u79FB\u52A8\u9009\u62E9" }), _jsx("div", { children: "\u2022 Shift+\u65B9\u5411\u952E: \u6269\u5C55\u9009\u62E9" }), _jsx("div", { children: "\u2022 \u62D6\u62FD\u884C\u9996\u56FE\u6807: \u91CD\u65B0\u6392\u5E8F" })] }), children: _jsx(IconButton, { size: "small", sx: { ml: 'auto' }, children: _jsx(HelpIcon, { fontSize: "small" }) }) })] })), tableId && (_jsxs(Box, { sx: { ml: isEditMode ? 1 : 'auto', fontSize: '0.75rem', color: 'text.secondary', display: 'flex', alignItems: 'center' }, children: ["Table ID: ", tableId, standardData && (_jsxs("span", { style: { marginLeft: '8px' }, children: [standardData.schema.columnCount, "\u00D7", standardData.schema.rowCount] }))] }))] }), _jsx(TableContainer, { sx: {
+                                                }, color: "error", children: _jsx(DeleteIcon, {}) }) }), _jsx(Tooltip, { title: "Clear Selection", children: _jsx(IconButton, { size: "small", onClick: () => {
+                                                    setSelectedRows([]);
+                                                    setSelectedCells([]);
+                                                    setLastSelectedIndex(null);
+                                                }, children: _jsx(CloseIcon, {}) }) })] })] }))] }), _jsx(TableContainer, { sx: {
                         width: '100%',
-                        overflowX: 'auto', // 横向滚动
+                        overflowX: 'hidden', // 不允许横向溢出
                         overflowY: 'visible', // 纵向不限制
-                        maxWidth: '100%' // 确保容器不会超出父元素
+                        maxWidth: '100%', // 确保容器不会超出父元素
+                        display: 'block' // 确保是块级元素
                     }, className: "uniform-scroller", children: _jsxs(Table, { size: "small", stickyHeader: true, sx: {
-                            minWidth: 'max-content',
-                            width: 'auto', // 让表格宽度自适应内容
-                            tableLayout: 'fix' // 自动表格布局
+                            width: '100%', // 表格占满容器宽度
+                            tableLayout: 'fixed', // 固定表格布局，允许单元格换行
+                            '& .MuiTableCell-root': {
+                                wordWrap: 'break-word', // 允许单词断行
+                                wordBreak: 'break-word', // 在必要时断开单词
+                                overflowWrap: 'break-word', // 确保长单词能够换行
+                                whiteSpace: 'normal', // 允许正常换行
+                                verticalAlign: 'top' // 垂直对齐到顶部
+                            }
                         }, children: [_jsx(TableHead, { children: _jsxs(TableRow, { sx: {
                                         backgroundColor: '#f5f5f5',
                                         '& .MuiTableCell-head': {
@@ -970,43 +1025,56 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
                                     }, children: [isEditMode && (_jsx(TableCell, { padding: "checkbox", sx: { width: 80 }, children: _jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [_jsx(Checkbox, { color: "primary", indeterminate: selectedRows.length > 0 && selectedRows.length < data.rows.length, checked: data.rows.length > 0 && selectedRows.length === data.rows.length, onChange: handleSelectAllClick, inputProps: {
                                                             'aria-label': 'select all rows',
                                                         } }), _jsx(DragIndicatorIcon, { fontSize: "small", sx: { opacity: 0.5, cursor: 'default' } })] }) })), data.headers.map((header, colIndex) => (_jsx(TableCell, { sx: {
-                                                minWidth: 120,
-                                                whiteSpace: 'nowrap' // 防止表头换行
-                                            }, children: _jsxs(Box, { sx: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' }, children: [_jsxs(TableSortLabel, { active: isEditMode && sortConfig.orderBy === header, direction: sortConfig.orderBy === header ? sortConfig.order : 'asc', onClick: () => {
+                                                width: `${100 / data.headers.length}%`, // 平均分配列宽
+                                                minWidth: 0, // 允许缩小到内容大小
+                                                maxWidth: `${100 / data.headers.length}%`, // 限制最大宽度
+                                                padding: '4px 8px',
+                                                '& > *': {
+                                                    width: '100%',
+                                                    maxWidth: '100%'
+                                                }
+                                            }, children: _jsxs(TableSortLabel, { active: isEditMode && sortConfig.orderBy === header, direction: sortConfig.orderBy === header ? sortConfig.order : 'asc', onClick: () => {
+                                                    if (isEditMode) {
+                                                        handleRequestSort(header);
+                                                    }
+                                                }, disabled: !isEditMode, sx: {
+                                                    width: '100%',
+                                                    '& .MuiTableSortLabel-root': {
+                                                        flexDirection: 'row'
+                                                    },
+                                                    '&.Mui-disabled': {
+                                                        opacity: 1,
+                                                        color: 'inherit'
+                                                    }
+                                                }, children: [_jsx(Box, { sx: {
+                                                            display: 'flex',
+                                                            alignItems: 'flex-start', // 顶部对齐
+                                                            minHeight: '32px',
+                                                            cursor: isEditMode ? 'text' : 'default',
+                                                            padding: '6px 8px',
+                                                            width: '100%',
+                                                            wordBreak: 'break-word', // 允许换行
+                                                            whiteSpace: 'normal', // 允许正常换行
+                                                            '&:hover': {
+                                                                backgroundColor: isEditMode ? 'rgba(25, 118, 210, 0.08)' : 'transparent'
+                                                            }
+                                                        }, onClick: (e) => {
                                                             if (isEditMode) {
-                                                                handleRequestSort(header);
+                                                                e.stopPropagation(); // 阻止排序
+                                                                startEdit(-1, colIndex);
                                                             }
-                                                        }, disabled: !isEditMode, sx: {
-                                                            flex: 1,
-                                                            '& .MuiTableSortLabel-root': {
-                                                                flexDirection: 'row'
-                                                            },
-                                                            '&.Mui-disabled': {
-                                                                opacity: 1,
-                                                                color: 'inherit'
-                                                            }
-                                                        }, children: [_jsx(Box, { sx: {
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    minHeight: '32px',
-                                                                    cursor: isEditMode ? 'text' : 'default',
-                                                                    padding: '6px 8px',
-                                                                    width: '100%',
-                                                                    '&:hover': {
-                                                                        backgroundColor: isEditMode ? 'rgba(25, 118, 210, 0.08)' : 'transparent'
-                                                                    }
-                                                                }, onClick: (e) => {
-                                                                    if (isEditMode) {
-                                                                        e.stopPropagation(); // 阻止排序
-                                                                        startEdit(-1, colIndex);
-                                                                    }
-                                                                }, children: editingCell?.rowIndex === -1 && editingCell?.colIndex === colIndex ? (renderEditor(header)) : (_jsx("span", { children: header || `Header ${colIndex + 1}` })) }), isEditMode && sortConfig.orderBy === header ? (_jsx(Box, { component: "span", sx: visuallyHidden, children: sortConfig.order === 'desc' ? 'sorted descending' : 'sorted ascending' })) : null] }), isEditMode && data.headers.length > 1 && (_jsx(Tooltip, { title: "Delete Column", children: _jsx(IconButton, { size: "small", onClick: () => deleteColumn(colIndex), color: "error", sx: { opacity: 0.6, '&:hover': { opacity: 1 }, ml: 1 }, children: _jsx(DeleteIcon, { fontSize: "inherit" }) }) }))] }) }, colIndex))), isEditMode && (_jsx(TableCell, { sx: { width: 80 }, children: "Actions" }))] }) }), _jsx(TableBody, { children: _jsx(SortableContext, { items: sortedRows.map((_, index) => `row-${index}`), strategy: verticalListSortingStrategy, children: sortedRows.map((row, rowIndex) => {
+                                                        }, children: editingCell?.rowIndex === -1 && editingCell?.colIndex === colIndex ? (renderEditor(header)) : (_jsx("span", { style: {
+                                                                wordBreak: 'break-word',
+                                                                whiteSpace: 'normal',
+                                                                display: 'block',
+                                                                width: '100%'
+                                                            }, children: header || `Header ${colIndex + 1}` })) }), isEditMode && sortConfig.orderBy === header ? (_jsx(Box, { component: "span", sx: visuallyHidden, children: sortConfig.order === 'desc' ? 'sorted descending' : 'sorted ascending' })) : null] }) }, colIndex)))] }) }), _jsx(TableBody, { children: _jsx(SortableContext, { items: sortedRows.map((_, index) => `row-${index}`), strategy: verticalListSortingStrategy, children: sortedRows.map((row, rowIndex) => {
                                         // 🚀 修复：排序后直接使用rowIndex，因为数据已经真正排序
                                         const isRowSelectedValue = isRowSelected(rowIndex);
                                         const rowId = `row-${rowIndex}`;
                                         // 🚀 Part 3: 在编辑模式下使用可拖拽行，否则使用普通行
                                         if (isEditMode) {
-                                            return (_jsx(DraggableTableRow, { rowId: rowId, rowIndex: rowIndex, row: row, isEditMode: isEditMode, isSelected: isRowSelectedValue, lastSelectedIndex: lastSelectedIndex, editingCell: editingCell, onRowClick: handleRowClick, onDeleteRow: deleteRow, renderCellContent: renderCellContent, setSelectedRows: setSelectedRows, setLastSelectedIndex: setLastSelectedIndex }, rowId));
+                                            return (_jsx(DraggableTableRow, { rowId: rowId, rowIndex: rowIndex, row: row, isEditMode: isEditMode, isSelected: isRowSelectedValue, lastSelectedIndex: lastSelectedIndex, editingCell: editingCell, onRowClick: handleRowClick, renderCellContent: renderCellContent, setSelectedRows: setSelectedRows, setLastSelectedIndex: setLastSelectedIndex, totalColumns: data.headers.length }, rowId));
                                         }
                                         else {
                                             // 普通模式下的静态行
@@ -1018,9 +1086,14 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
                                                         backgroundColor: '#f0f0f0'
                                                     }
                                                 }, children: row.map((cell, colIndex) => (_jsx(TableCell, { sx: {
-                                                        minWidth: 120,
+                                                        width: `${100 / data.headers.length}%`, // 平均分配列宽
+                                                        minWidth: 0, // 允许缩小
+                                                        maxWidth: `${100 / data.headers.length}%`, // 限制最大宽度
                                                         padding: 0,
-                                                        whiteSpace: 'nowrap'
+                                                        '& > *': {
+                                                            width: '100%',
+                                                            maxWidth: '100%'
+                                                        }
                                                     }, children: renderCellContent(cell, rowIndex, colIndex) }, colIndex))) }, rowId));
                                         }
                                     }) }) })] }) })] }) }));

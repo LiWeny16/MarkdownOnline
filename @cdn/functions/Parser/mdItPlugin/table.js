@@ -1,3 +1,4 @@
+// src/js/functions/Parser/mdItPlugin/table.ts
 // ===== ID 管理器：基于位置的稳定ID生成 =====
 let currentDocumentId = 0; // 当前文档的唯一标识
 let documentTableCount = 0; // 当前文档中的表格计数
