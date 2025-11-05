@@ -8,6 +8,13 @@ import { DndContext, MouseSensor, TouchSensor, useSensor, useSensors, closestCen
 import { SortableContext, useSortable, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { visuallyHidden } from '@mui/utils';
+// 🚀 自定义拖拽修饰器：限制垂直拖拽
+const restrictToVerticalAxis = ({ transform }) => {
+    return {
+        ...transform,
+        x: 0, // 禁止水平移动
+    };
+};
 import { StandardTableAPI } from '@Func/Parser/mdItPlugin/table';
 import { getTableData, tableSyncManager, getStandardTableData, standardTableSyncManager } from '@App/text/tableEditor';
 import { getTableMetadata } from '@App/text/tableEditor';
@@ -17,35 +24,35 @@ const getTableThemeStyles = () => {
     const isDark = getTheme() === 'dark';
     return {
         // 表格容器样式
-        paperBackground: isDark ? '#2d2d30' : '#ffffff',
-        paperBorder: isDark ? '1px solid #3c3c3c' : '1px solid #e0e0e0',
+        paperBackground: isDark ? '#1e1e1e' : '#ffffff',
+        paperBorder: isDark ? '1px solid #808080' : 'none',
         // 表格单元格样式
-        cellBackground: isDark ? '#2d2d30' : '#ffffff',
-        cellHoverBackground: isDark ? '#3c3c3c' : '#f5f5f5',
-        cellSelectedBackground: isDark ? alpha('#1976d2', 0.15) : alpha('#1976d2', 0.12),
-        cellActiveBackground: isDark ? alpha('#1976d2', 0.12) : alpha('#1976d2', 0.08),
-        cellBorder: isDark ? '#3c3c3c' : '#e0e0e0',
-        cellText: isDark ? '#ffffff' : '#000000',
+        cellBackground: isDark ? '#1e1e1e' : '#ffffff',
+        cellHoverBackground: isDark ? '#2d2d30' : '#f5f5f5',
+        cellSelectedBackground: isDark ? alpha('#569cd6', 0.2) : alpha('#1976d2', 0.12),
+        cellActiveBackground: isDark ? alpha('#569cd6', 0.15) : alpha('#1976d2', 0.08),
+        cellBorder: isDark ? '#3e3e42' : '#e0e0e0',
+        cellText: isDark ? '#d8d8d8ff' : '#000000',
         // 表头样式
-        headerBackground: isDark ? '#383838' : '#f5f5f5',
-        headerText: isDark ? '#ffffff' : '#000000',
-        headerHoverBackground: isDark ? '#4a4a4a' : '#eeeeee',
+        headerBackground: isDark ? '#1e1e1e' : '#f5f5f5',
+        headerText: isDark ? '#cdcdcdff' : '#000000',
+        headerHoverBackground: isDark ? '#2d2d30' : '#eeeeee',
         // 工具栏样式
-        toolbarBackground: isDark ? '#2d2d30' : 'transparent',
-        toolbarBorder: isDark ? '#3c3c3c' : '#e0e0e0',
+        toolbarBackground: isDark ? '#1e1e1e' : 'transparent',
+        toolbarBorder: isDark ? '#808080' : '#e0e0e0',
         // 按钮样式
-        buttonColor: isDark ? '#ffffff' : '#1976d2',
-        buttonHoverBackground: isDark ? '#3c3c3c' : alpha('#1976d2', 0.04),
+        buttonColor: isDark ? '#cccccc' : '#1976d2',
+        buttonHoverBackground: isDark ? '#2d2d30' : alpha('#1976d2', 0.04),
         // 编辑器样式
-        editorBackground: isDark ? '#2d2d30' : 'transparent',
-        editorBorder: isDark ? '1px solid #1976d2' : '1px solid #1976d2',
-        editorFocusBorder: isDark ? '2px solid #1976d2' : '2px solid #1976d2',
+        editorBackground: isDark ? '#1e1e1e' : '#ffffff',
+        editorBorder: isDark ? '1px solid #569cd6' : '1px solid #1976d2',
+        editorFocusBorder: isDark ? '2px solid #569cd6' : '2px solid #1976d2',
         // 选中行样式
-        selectedRowBackground: isDark ? alpha('#1976d2', 0.15) : alpha('#1976d2', 0.08),
-        selectedRowHoverBackground: isDark ? alpha('#1976d2', 0.2) : alpha('#1976d2', 0.12),
+        selectedRowBackground: isDark ? alpha('#569cd6', 0.2) : alpha('#1976d2', 0.08),
+        selectedRowHoverBackground: isDark ? alpha('#569cd6', 0.25) : alpha('#1976d2', 0.12),
     };
 };
-const DraggableTableRow = ({ rowId, rowIndex, row, isEditMode, isSelected, lastSelectedIndex, editingCell, onRowClick, renderCellContent, setSelectedRows, setLastSelectedIndex, totalColumns }) => {
+const DraggableTableRow = ({ rowId, rowIndex, row, isEditMode, isSelected, lastSelectedIndex, editingCell, onRowClick, renderCellContent, setSelectedRows, setLastSelectedIndex, totalColumns, themeStyles }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging, } = useSortable({ id: rowId });
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -55,10 +62,10 @@ const DraggableTableRow = ({ rowId, rowIndex, row, isEditMode, isSelected, lastS
     };
     return (_jsxs(TableRow, { ref: setNodeRef, style: style, hover: true, role: isEditMode ? "checkbox" : undefined, "aria-checked": isEditMode ? isSelected : undefined, tabIndex: -1, selected: isEditMode ? isSelected : false, sx: {
             '&:nth-of-type(even)': {
-                backgroundColor: isDragging ? '#f5f5f5' : '#fafafa'
+                backgroundColor: isDragging ? themeStyles.cellHoverBackground : themeStyles.cellBackground
             },
             '&:hover': {
-                backgroundColor: isEditMode ? alpha('#1976d2', 0.08) : '#f0f0f0'
+                backgroundColor: isEditMode ? alpha('#1976d2', 0.08) : themeStyles.cellHoverBackground
             },
             cursor: isEditMode ? 'pointer' : 'default'
         }, onClick: (event) => {
@@ -88,8 +95,9 @@ const DraggableTableRow = ({ rowId, rowIndex, row, isEditMode, isSelected, lastS
                                 cursor: 'grab',
                                 opacity: 0.6,
                                 '&:hover': { opacity: 1 },
-                                '&:active': { cursor: 'grabbing' }
-                            }, onMouseDown: (e) => e.stopPropagation(), children: _jsx(DragIndicatorIcon, { fontSize: "small" }) })] }) })), row.map((cell, colIndex) => (_jsx(TableCell, { sx: {
+                                '&:active': { cursor: 'grabbing' },
+                                touchAction: 'none' // 🚀 确保触摸设备也能拖拽
+                            }, children: _jsx(DragIndicatorIcon, { fontSize: "small" }) })] }) })), row.map((cell, colIndex) => (_jsx(TableCell, { sx: {
                     width: `${100 / (totalColumns + (isEditMode ? 1 : 0))}%`, // 只考虑拖拽列，没有Actions列
                     minWidth: 0, // 允许缩小
                     maxWidth: `${100 / (totalColumns + (isEditMode ? 1 : 0))}%`, // 限制最大宽度
@@ -105,8 +113,21 @@ const DraggableTableRow = ({ rowId, rowIndex, row, isEditMode, isSelected, lastS
                 }, children: renderCellContent(cell, rowIndex, colIndex) }, colIndex)))] }, rowId));
 };
 const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
-    // 🚀 主题样式
-    const themeStyles = useMemo(() => getTableThemeStyles(), []);
+    // 🚀 主题样式 - 使用 state 来跟踪主题变化
+    const [currentTheme, setCurrentTheme] = useState(getTheme());
+    const themeStyles = useMemo(() => getTableThemeStyles(), [currentTheme]);
+    // 🚀 监听主题变化
+    useEffect(() => {
+        const checkTheme = () => {
+            const newTheme = getTheme();
+            if (newTheme !== currentTheme) {
+                setCurrentTheme(newTheme);
+            }
+        };
+        // 定期检查主题变化（可以优化为事件监听）
+        const interval = setInterval(checkTheme, 100);
+        return () => clearInterval(interval);
+    }, [currentTheme]);
     // 状态管理
     const [data, setData] = useState({ headers: [], rows: [] });
     const [editingCell, setEditingCell] = useState(null);
@@ -122,13 +143,27 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
     const [activeCell, setActiveCell] = useState(null);
     // 🚀 新增：表格容器引用
     const tableContainerRef = useRef(null);
-    // 🚀 Part 1: 创建 markdown-it 实例
+    // 🚀 Part 1: 创建 markdown-it 实例，支持行内markdown语法
     const md = useMemo(() => {
-        return new MarkdownIt({
+        const mdInstance = new MarkdownIt({
             html: false,
             linkify: true,
-            typographer: false
+            typographer: false,
+            breaks: true // 启用换行转换
         });
+        // 🚀 添加自定义渲染规则以支持strikethrough
+        // markdown-it默认支持 **bold**, *italic*, `code`
+        // 这里添加简单的~~strikethrough~~支持
+        const defaultRender = mdInstance.renderer.rules.text || function (tokens, idx, options, env, self) {
+            return tokens[idx].content;
+        };
+        mdInstance.renderer.rules.text = function (tokens, idx, options, env, self) {
+            let content = tokens[idx].content;
+            // 手动处理 ~~删除线~~ 语法
+            content = content.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+            return content;
+        };
+        return mdInstance;
     }, []);
     // 🚀 Part 3: 配置拖拽传感器
     const sensors = useSensors(useSensor(MouseSensor, {
@@ -306,7 +341,9 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
         const handleStandardDataChange = (newStandardData) => {
             const newTableData = StandardTableAPI.standardToTable(newStandardData);
             const dataChanged = JSON.stringify(data) !== JSON.stringify(newTableData);
-            if (dataChanged) {
+            const standardDataChanged = JSON.stringify(standardData) !== JSON.stringify(newStandardData);
+            // 🚀 修复：即使数据内容相同，对齐信息可能也会改变，所以要检查standardData
+            if (dataChanged || standardDataChanged) {
                 setStandardData(newStandardData);
                 setData(newTableData);
             }
@@ -317,7 +354,7 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
             // 清理监听器
             standardTableSyncManager.removeStandardDataListener(tableId, handleStandardDataChange);
         };
-    }, [tableId, data]);
+    }, [tableId]); // 🚀 修复：只依赖tableId，避免循环依赖
     // 传统数据监听器（保持向后兼容）
     useEffect(() => {
         if (!tableId)
@@ -373,7 +410,16 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
         const value = isHeader
             ? data.headers[colIndex] || ''
             : data.rows[rowIndex]?.[colIndex] || '';
-        setEditingCell({ rowIndex, colIndex, value });
+        const cellKey = `${rowIndex}-${colIndex}`;
+        const cellElement = cellRefs.current.get(cellKey);
+        const rect = cellElement?.getBoundingClientRect();
+        setEditingCell({
+            rowIndex,
+            colIndex,
+            value,
+            width: rect?.width,
+            height: rect?.height
+        });
     }, [data]);
     // 提交编辑
     const commitEdit = useCallback(() => {
@@ -406,10 +452,16 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
             return newData;
         });
         setEditingCell(null);
+        // 🚀 清除选中状态，避免高亮残留
+        setSelectedCells([]);
+        setActiveCell(null);
     }, [editingCell, tableId, updateDataAndSync]);
     // 取消编辑
     const cancelEdit = useCallback(() => {
         setEditingCell(null);
+        // 🚀 清除选中状态，避免高亮残留
+        setSelectedCells([]);
+        setActiveCell(null);
     }, []);
     // 添加行
     const addRow = useCallback(() => {
@@ -822,15 +874,12 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
     const handleRequestSort = useCallback((property) => {
         const isAsc = sortConfig.orderBy === property && sortConfig.order === 'asc';
         const newOrder = isAsc ? 'desc' : 'asc';
-        console.log(`排序请求: ${property}, 方向: ${newOrder}`);
         // 🚀 立即对数据进行排序并更新
         const sortedRows = [...data.rows].sort(getComparator(newOrder, property));
         const newData = {
             headers: [...data.headers],
             rows: sortedRows
         };
-        console.log('排序前数据:', data.rows);
-        console.log('排序后数据:', sortedRows);
         // 🚀 更新排序状态
         setSortConfig({
             order: newOrder,
@@ -843,73 +892,102 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
         // 🚀 更新底层数据并同步到Monaco
         updateDataAndSync(newData);
     }, [sortConfig, data, getComparator, updateDataAndSync]);
-    // 渲染编辑器 - 完全匹配单元格大小，不改变任何尺寸
-    const renderEditor = useCallback((currentValue) => (_jsx(TextField, { value: editingCell?.value || '', onChange: (e) => setEditingCell(prev => prev ? { ...prev, value: e.target.value } : null), onKeyDown: (e) => {
-            if (e.key === 'Enter') {
-                commitEdit();
-            }
-            else if (e.key === 'Escape') {
-                cancelEdit();
-            }
-        }, onBlur: commitEdit, autoFocus: true, size: "small", variant: "outlined", sx: {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: '100%',
-            height: '100%',
-            '& .MuiOutlinedInput-root': {
-                fontSize: '0.875rem',
-                height: '100%',
-                padding: 0,
-                border: 'none',
-                borderRadius: 0,
-                backgroundColor: 'transparent',
-                '& fieldset': {
-                    border: '1px solid #1976d2',
-                    borderRadius: 0,
-                    margin: 0,
-                    padding: 0
-                },
-                '&:hover fieldset': {
-                    border: '1px solid #1976d2'
-                },
-                '&.Mui-focused fieldset': {
-                    border: '2px solid #1976d2',
-                    borderRadius: 0
+    // 🚀 新增：单元格尺寸引用
+    const cellRefs = useRef(new Map());
+    // 🚀 渲染编辑器 - 精确匹配单元格尺寸
+    const renderEditor = useCallback((currentValue, rowIndex, colIndex) => {
+        // 获取当前单元格的实际尺寸
+        const cellKey = `${rowIndex}-${colIndex}`;
+        const cellElement = cellRefs.current.get(cellKey);
+        return (_jsx(TextField, { value: editingCell?.value || '', onChange: (e) => setEditingCell(prev => prev ? { ...prev, value: e.target.value } : null), onKeyDown: (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    commitEdit();
                 }
-            },
-            '& .MuiOutlinedInput-input': {
-                padding: '6px 8px',
-                height: 'calc(100% - 12px)',
-                boxSizing: 'border-box'
-            }
-        } })), [editingCell, commitEdit, cancelEdit]);
-    // 🚀 Part 1: 渲染单元格内容，支持 Markdown 渲染
+                else if (e.key === 'Escape') {
+                    cancelEdit();
+                }
+            }, onBlur: commitEdit, autoFocus: true, multiline: true, size: "small", variant: "standard", sx: {
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                width: '100%',
+                height: '100%',
+                margin: 0,
+                '& .MuiInputBase-root': {
+                    fontSize: '0.875rem',
+                    height: '100%',
+                    width: '100%',
+                    padding: '6px 8px',
+                    margin: 0,
+                    backgroundColor: themeStyles.cellBackground,
+                    color: themeStyles.cellText,
+                    border: themeStyles.editorFocusBorder,
+                    borderRadius: 0,
+                    boxSizing: 'border-box',
+                    '&:before, &:after': {
+                        display: 'none'
+                    },
+                    '&:hover': {
+                        backgroundColor: themeStyles.cellBackground
+                    }
+                },
+                '& .MuiInputBase-input': {
+                    padding: 0,
+                    height: '100%',
+                    boxSizing: 'border-box',
+                    overflow: 'auto',
+                    wordBreak: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    color: themeStyles.cellText
+                }
+            } }));
+    }, [editingCell, commitEdit, cancelEdit, themeStyles]);
+    // 🚀 获取列对齐方式
+    const getColumnAlign = useCallback((colIndex) => {
+        return standardData?.schema.headers[colIndex]?.align || 'left';
+    }, [standardData]);
+    // 🚀 Part 1: 渲染单元格内容，支持 Markdown 渲染和列对齐
     const renderCellContent = useCallback((value, rowIndex, colIndex, isHeader = false) => {
         const isEditing = editingCell?.rowIndex === rowIndex && editingCell?.colIndex === colIndex;
         const isCellSelectedState = isCellSelected(rowIndex, colIndex);
         const isActive = activeCell?.rowIndex === rowIndex && activeCell?.colIndex === colIndex;
+        // 🚀 获取列对齐方式
+        const textAlign = getColumnAlign(colIndex);
         // 空字符串显示为不间断空格
         const displayValue = value === '' ? '\u00A0' : value;
-        return (_jsx(Box, { sx: {
+        // 🚀 单元格ref key
+        const cellKey = `${rowIndex}-${colIndex}`;
+        return (_jsx(Box, { ref: (el) => {
+                if (el && el instanceof HTMLDivElement) {
+                    cellRefs.current.set(cellKey, el);
+                }
+                else {
+                    cellRefs.current.delete(cellKey);
+                }
+            }, sx: {
                 display: 'flex',
-                alignItems: 'flex-start', // 改为顶部对齐
-                minHeight: '32px',
-                width: '100%',
+                alignItems: 'flex-start',
+                justifyContent: textAlign === 'center' ? 'center' : textAlign === 'right' ? 'flex-end' : 'flex-start',
+                minHeight: isEditing && editingCell.height ? `${editingCell.height}px` : '32px',
+                height: isEditing && editingCell.height ? `${editingCell.height}px` : 'auto',
+                width: isEditing && editingCell.width ? `${editingCell.width}px` : '100%',
                 cursor: isEditMode ? 'text' : 'default',
-                padding: isEditing ? 0 : '6px 8px',
+                padding: isEditing ? 0 : '6px 8px', // 🚀 编辑时去除padding，让编辑框填满
                 position: 'relative',
                 backgroundColor: isCellSelectedState
                     ? alpha('#1976d2', 0.12)
                     : isActive
                         ? alpha('#1976d2', 0.08)
                         : 'transparent',
-                border: isActive ? '1px solid #1976d2' : 'none',
-                wordBreak: 'break-word', // 允许换行
-                whiteSpace: 'normal', // 允许正常换行
-                overflowWrap: 'break-word', // 确保长单词能够换行
+                border: isActive && !isEditing ? '1px solid #1976d2' : '1px solid transparent', // 🚀 非编辑状态显示选中边框
+                boxSizing: 'border-box',
+                wordBreak: 'break-word',
+                whiteSpace: 'normal',
+                overflowWrap: 'break-word',
+                overflow: isEditing ? 'hidden' : 'visible', // 🚀 编辑时隐藏溢出
                 '&:hover': {
                     backgroundColor: isEditMode && !isHeader
                         ? (isCellSelectedState ? alpha('#1976d2', 0.16) : alpha('#1976d2', 0.08))
@@ -917,33 +995,41 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
                 }
             }, onClick: (event) => {
                 if (isEditMode && !isHeader) {
-                    // 🚀 Part 2: 处理单元格点击选择
                     handleCellClick(event, rowIndex, colIndex);
                     setActiveCell({ rowIndex, colIndex });
                     startEdit(rowIndex, colIndex);
                 }
-            }, children: isEditing ? (renderEditor(value)) : (
+            }, children: isEditing ? (renderEditor(value, rowIndex, colIndex)) : (
             // 🚀 Part 1: 根据是否为表头选择渲染方式
             isHeader ? (_jsx("span", { style: {
                     fontWeight: 'bold',
                     wordBreak: 'break-word',
                     whiteSpace: 'normal',
                     display: 'block',
-                    width: '100%'
+                    width: '100%',
+                    textAlign, // 🚀 应用对齐
+                    color: themeStyles.headerText // 🚀 使用主题表头文字颜色
                 }, children: displayValue || `Header ${colIndex + 1}` })) : (_jsx("div", { style: {
                     wordBreak: 'break-word',
                     whiteSpace: 'normal',
-                    width: '100%'
+                    width: '100%',
+                    textAlign, // 🚀 应用对齐
+                    color: themeStyles.cellText // 🚀 使用主题单元格文字颜色
                 }, children: renderMarkdownContent(value) }))) }));
-    }, [editingCell, renderEditor, startEdit, isEditMode, isCellSelected, activeCell, renderMarkdownContent, handleCellClick]);
+    }, [editingCell, renderEditor, startEdit, isEditMode, isCellSelected, activeCell, renderMarkdownContent, handleCellClick, getColumnAlign]);
     if (!data || (!data.headers.length && !data.rows.length)) {
         return (_jsxs(Paper, { sx: { p: 2, textAlign: 'center', color: 'text.secondary' }, children: ["Empty table - ", tableId ? `Table ID: ${tableId}` : 'No data', standardData && (_jsxs("div", { style: { fontSize: '0.75rem', marginTop: '4px', color: '#666' }, children: ["Columns: ", standardData.schema.columnCount, " | Rows: ", standardData.schema.rowCount] }))] }));
     }
-    return (_jsx(DndContext, { sensors: sensors, collisionDetection: closestCenter, onDragEnd: handleDragEnd, children: _jsxs(Paper, { elevation: 0, sx: { width: '100%', overflow: 'hidden' }, className: "academic-table", tabIndex: 0, onKeyDown: handleKeyDown, ref: tableContainerRef, children: [_jsxs(Box, { sx: {
+    return (_jsx(DndContext, { sensors: sensors, collisionDetection: closestCenter, onDragEnd: handleDragEnd, modifiers: [restrictToVerticalAxis], children: _jsxs(Paper, { elevation: 0, sx: {
+                width: '100%',
+                overflow: 'hidden',
+                backgroundColor: themeStyles.paperBackground,
+                border: themeStyles.paperBorder
+            }, className: "academic-table", tabIndex: 0, onKeyDown: handleKeyDown, ref: tableContainerRef, children: [_jsxs(Box, { sx: {
                         display: 'flex',
                         flexDirection: 'column',
-                        borderBottom: '1px solid #e0e0e0',
-                        backgroundColor: 'transparent'
+                        borderBottom: `1px solid ${themeStyles.toolbarBorder}`,
+                        backgroundColor: themeStyles.toolbarBackground
                     }, className: "react-table-toolbar", children: [_jsxs(Box, { sx: {
                                 p: 1,
                                 display: 'flex',
@@ -951,13 +1037,15 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
                                 alignItems: 'center'
                             }, children: [_jsx(Tooltip, { title: isEditMode ? "Exit Edit Mode" : "Enter Edit Mode", children: _jsx(IconButton, { size: "small", onClick: () => {
                                             setIsEditMode(!isEditMode);
-                                            // 🚀 退出编辑模式时清除选择
+                                            // 🚀 退出编辑模式时清除选择和编辑状态
                                             if (isEditMode) {
                                                 setSelectedRows([]);
                                                 setSelectedCells([]);
                                                 setLastSelectedIndex(null);
+                                                setActiveCell(null);
+                                                setEditingCell(null);
                                             }
-                                        }, color: isEditMode ? "primary" : "default", children: _jsx(EditIcon, {}) }) }), isEditMode && (_jsxs(_Fragment, { children: [_jsxs(Box, { sx: { display: 'flex', gap: 0.5, ml: 1 }, children: [_jsx(Tooltip, { title: "Add Row", children: _jsx(IconButton, { size: "small", onClick: addRow, children: _jsx(AddIcon, {}) }) }), _jsx(Tooltip, { title: "Add Column", children: _jsx(IconButton, { size: "small", onClick: addColumn, children: _jsx(AddIcon, { sx: { transform: 'rotate(90deg)' } }) }) })] }), _jsx(Box, { sx: { width: '1px', height: '20px', backgroundColor: '#e0e0e0', mx: 1 } }), _jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [_jsx("span", { style: { fontSize: '0.75rem', color: '#666' }, children: "\u5217:" }), _jsx(Box, { sx: { display: 'flex', gap: 0.5 }, children: data.headers.map((header, colIndex) => (_jsx(Tooltip, { title: `Delete "${header}" column`, children: _jsx(IconButton, { size: "small", onClick: () => deleteColumn(colIndex), disabled: data.headers.length <= 1, sx: {
+                                        }, color: isEditMode ? "primary" : "default", children: _jsx(EditIcon, {}) }) }), isEditMode && (_jsxs(_Fragment, { children: [_jsxs(Box, { sx: { display: 'flex', gap: 0.5, ml: 1 }, children: [_jsx(Tooltip, { title: "Add Row", children: _jsx(IconButton, { size: "small", onClick: addRow, children: _jsx(AddIcon, {}) }) }), _jsx(Tooltip, { title: "Add Column", children: _jsx(IconButton, { size: "small", onClick: addColumn, children: _jsx(AddIcon, { sx: { transform: 'rotate(90deg)' } }) }) })] }), _jsx(Box, { sx: { width: '1px', height: '20px', backgroundColor: themeStyles.toolbarBorder, mx: 1 } }), _jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [_jsx("span", { style: { fontSize: '0.75rem', color: themeStyles.cellText, opacity: 0.7 }, children: "\u5217:" }), _jsx(Box, { sx: { display: 'flex', gap: 0.5 }, children: data.headers.map((header, colIndex) => (_jsx(Tooltip, { title: `Delete "${header}" column`, children: _jsx(IconButton, { size: "small", onClick: () => deleteColumn(colIndex), disabled: data.headers.length <= 1, sx: {
                                                                 p: 0.25,
                                                                 fontSize: '0.75rem',
                                                                 minWidth: 'auto',
@@ -965,16 +1053,16 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
                                                                 '&:hover': {
                                                                     backgroundColor: data.headers.length <= 1 ? 'transparent' : alpha('#d32f2f', 0.08)
                                                                 }
-                                                            }, children: _jsx(DeleteIcon, { fontSize: "inherit" }) }) }, colIndex))) })] }), _jsx(Box, { sx: { width: '1px', height: '20px', backgroundColor: '#e0e0e0', mx: 1 } }), _jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [_jsx("span", { style: { fontSize: '0.75rem', color: '#666' }, children: "\u6392\u5E8F:" }), sortConfig.orderBy && (_jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 0.5 }, children: [_jsx("span", { style: { fontSize: '0.75rem', fontWeight: 500 }, children: sortConfig.orderBy }), _jsx("span", { style: { fontSize: '0.75rem', color: '#1976d2' }, children: sortConfig.order === 'asc' ? '↑' : '↓' }), _jsx(Tooltip, { title: "Clear Sort", children: _jsx(IconButton, { size: "small", onClick: () => {
+                                                            }, children: _jsx(DeleteIcon, { fontSize: "inherit" }) }) }, colIndex))) })] }), _jsx(Box, { sx: { width: '1px', height: '20px', backgroundColor: themeStyles.toolbarBorder, mx: 1 } }), _jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [_jsx("span", { style: { fontSize: '0.75rem', color: themeStyles.cellText, opacity: 0.7 }, children: "\u6392\u5E8F:" }), sortConfig.orderBy && (_jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 0.5 }, children: [_jsx("span", { style: { fontSize: '0.75rem', fontWeight: 500, color: themeStyles.cellText }, children: sortConfig.orderBy }), _jsx("span", { style: { fontSize: '0.75rem', color: '#1976d2' }, children: sortConfig.order === 'asc' ? '↑' : '↓' }), _jsx(Tooltip, { title: "Clear Sort", children: _jsx(IconButton, { size: "small", onClick: () => {
                                                                     setSortConfig({ order: 'asc', orderBy: '' });
-                                                                }, sx: { p: 0.25 }, children: _jsx(CloseIcon, { fontSize: "inherit" }) }) })] })), !sortConfig.orderBy && (_jsx("span", { style: { fontSize: '0.75rem', color: '#999', fontStyle: 'italic' }, children: "\u70B9\u51FB\u8868\u5934\u6392\u5E8F" }))] })] })), _jsxs(Box, { sx: { ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }, children: [isEditMode && (_jsx(Tooltip, { title: _jsxs(Box, { sx: { fontSize: '0.75rem', lineHeight: 1.2 }, children: [_jsx("div", { children: "\u5FEB\u6377\u952E:" }), _jsx("div", { children: "\u2022 Ctrl+A: \u5168\u9009" }), _jsx("div", { children: "\u2022 Ctrl+D: \u53D6\u6D88\u9009\u62E9" }), _jsx("div", { children: "\u2022 Ctrl+B: \u52A0\u7C97\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+I: \u659C\u4F53\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+C: \u590D\u5236\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+X: \u526A\u5207\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+V: \u7C98\u8D34\u5230\u6D3B\u52A8\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Delete: \u5220\u9664\u9009\u4E2D\u884C" }), _jsx("div", { children: "\u2022 Ctrl+\u70B9\u51FB: \u591A\u9009" }), _jsx("div", { children: "\u2022 Shift+\u70B9\u51FB: \u8303\u56F4\u9009\u62E9" }), _jsx("div", { children: "\u2022 \u65B9\u5411\u952E: \u79FB\u52A8\u9009\u62E9" }), _jsx("div", { children: "\u2022 Shift+\u65B9\u5411\u952E: \u6269\u5C55\u9009\u62E9" }), _jsx("div", { children: "\u2022 \u62D6\u62FD\u884C\u9996\u56FE\u6807: \u91CD\u65B0\u6392\u5E8F" })] }), children: _jsx(IconButton, { size: "small", children: _jsx(HelpIcon, { fontSize: "small" }) }) })), tableId && (_jsxs(Box, { sx: { fontSize: '0.75rem', color: 'text.secondary', display: 'flex', alignItems: 'center' }, children: ["Table ID: ", tableId, standardData && (_jsxs("span", { style: { marginLeft: '8px' }, children: [standardData.schema.columnCount, "\u00D7", standardData.schema.rowCount] }))] }))] })] }), isEditMode && selectedRows.length > 0 && (_jsxs(Box, { sx: {
+                                                                }, sx: { p: 0.25 }, children: _jsx(CloseIcon, { fontSize: "inherit" }) }) })] })), !sortConfig.orderBy && (_jsx("span", { style: { fontSize: '0.75rem', color: themeStyles.cellText, opacity: 0.5, fontStyle: 'italic' }, children: "\u70B9\u51FB\u8868\u5934\u6392\u5E8F" }))] })] })), _jsxs(Box, { sx: { ml: 'auto', display: 'flex', alignItems: 'center', gap: 1 }, children: [isEditMode && (_jsx(Tooltip, { title: _jsxs(Box, { sx: { fontSize: '0.75rem', lineHeight: 1.2 }, children: [_jsx("div", { children: "\u5FEB\u6377\u952E:" }), _jsx("div", { children: "\u2022 Ctrl+A: \u5168\u9009" }), _jsx("div", { children: "\u2022 Ctrl+D: \u53D6\u6D88\u9009\u62E9" }), _jsx("div", { children: "\u2022 Ctrl+B: \u52A0\u7C97\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+I: \u659C\u4F53\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+C: \u590D\u5236\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+X: \u526A\u5207\u9009\u4E2D\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Ctrl+V: \u7C98\u8D34\u5230\u6D3B\u52A8\u5355\u5143\u683C" }), _jsx("div", { children: "\u2022 Delete: \u5220\u9664\u9009\u4E2D\u884C" }), _jsx("div", { children: "\u2022 Ctrl+\u70B9\u51FB: \u591A\u9009" }), _jsx("div", { children: "\u2022 Shift+\u70B9\u51FB: \u8303\u56F4\u9009\u62E9" }), _jsx("div", { children: "\u2022 \u65B9\u5411\u952E: \u79FB\u52A8\u9009\u62E9" }), _jsx("div", { children: "\u2022 Shift+\u65B9\u5411\u952E: \u6269\u5C55\u9009\u62E9" }), _jsx("div", { children: "\u2022 \u62D6\u62FD\u884C\u9996\u56FE\u6807: \u91CD\u65B0\u6392\u5E8F" })] }), children: _jsx(IconButton, { size: "small", children: _jsx(HelpIcon, { fontSize: "small" }) }) })), tableId && (_jsxs(Box, { sx: { fontSize: '0.75rem', color: 'text.secondary', display: 'flex', alignItems: 'center' }, children: ["Table ID: ", tableId, standardData && (_jsxs("span", { style: { marginLeft: '8px' }, children: [standardData.schema.columnCount, "\u00D7", standardData.schema.rowCount] }))] }))] })] }), isEditMode && selectedRows.length > 0 && (_jsxs(Box, { sx: {
                                 px: 1,
                                 py: 0.5,
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 1,
                                 backgroundColor: alpha('#1976d2', 0.04),
-                                borderTop: '1px solid #e0e0e0'
+                                borderTop: `1px solid ${themeStyles.toolbarBorder}`
                             }, children: [_jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [_jsx(Checkbox, { size: "small", indeterminate: selectedRows.length > 0 && selectedRows.length < data.rows.length, checked: data.rows.length > 0 && selectedRows.length === data.rows.length, onChange: handleSelectAllClick }), _jsxs("span", { style: { fontWeight: 500, color: '#1976d2', fontSize: '0.875rem' }, children: [selectedRows.length, " row", selectedRows.length > 1 ? 's' : '', " selected"] })] }), _jsxs(Box, { sx: { display: 'flex', gap: 0.5, ml: 2 }, children: [_jsx(Tooltip, { title: "Delete Selected Rows", children: _jsx(IconButton, { size: "small", onClick: () => {
                                                     // 🚀 修复：一次性构建最终数据，避免多次状态更新
                                                     const newData = {
@@ -1004,22 +1092,27 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
                     }, className: "uniform-scroller", children: _jsxs(Table, { size: "small", stickyHeader: true, sx: {
                             width: '100%', // 表格占满容器宽度
                             tableLayout: 'fixed', // 固定表格布局，允许单元格换行
+                            borderCollapse: 'collapse',
                             '& .MuiTableCell-root': {
                                 wordWrap: 'break-word', // 允许单词断行
                                 wordBreak: 'break-word', // 在必要时断开单词
                                 overflowWrap: 'break-word', // 确保长单词能够换行
                                 whiteSpace: 'normal', // 允许正常换行
-                                verticalAlign: 'top' // 垂直对齐到顶部
+                                verticalAlign: 'top', // 垂直对齐到顶部
+                                borderLeft: 'none',
+                                borderRight: 'none',
+                                borderBottom: `1px solid ${themeStyles.cellBorder}`,
+                                color: themeStyles.cellText
                             }
                         }, children: [_jsx(TableHead, { children: _jsxs(TableRow, { sx: {
-                                        backgroundColor: '#f5f5f5',
+                                        backgroundColor: themeStyles.headerBackground,
                                         '& .MuiTableCell-head': {
                                             fontWeight: 600,
-                                            borderBottom: '2px solid #e0e0e0',
-                                            color: '#333',
+                                            borderBottom: `2px solid ${themeStyles.cellBorder}`,
+                                            color: themeStyles.headerText,
                                             position: 'sticky',
                                             top: 0,
-                                            backgroundColor: '#f5f5f5',
+                                            backgroundColor: themeStyles.headerBackground,
                                             zIndex: 10
                                         }
                                     }, children: [isEditMode && (_jsx(TableCell, { padding: "checkbox", sx: { width: 80 }, children: _jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [_jsx(Checkbox, { color: "primary", indeterminate: selectedRows.length > 0 && selectedRows.length < data.rows.length, checked: data.rows.length > 0 && selectedRows.length === data.rows.length, onChange: handleSelectAllClick, inputProps: {
@@ -1056,17 +1149,18 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
                                                             wordBreak: 'break-word', // 允许换行
                                                             whiteSpace: 'normal', // 允许正常换行
                                                             '&:hover': {
-                                                                backgroundColor: isEditMode ? 'rgba(25, 118, 210, 0.08)' : 'transparent'
+                                                                backgroundColor: isEditMode ? themeStyles.headerHoverBackground : 'transparent'
                                                             }
                                                         }, onClick: (e) => {
                                                             if (isEditMode) {
                                                                 e.stopPropagation(); // 阻止排序
                                                                 startEdit(-1, colIndex);
                                                             }
-                                                        }, children: editingCell?.rowIndex === -1 && editingCell?.colIndex === colIndex ? (renderEditor(header)) : (_jsx("span", { style: {
+                                                        }, children: editingCell?.rowIndex === -1 && editingCell?.colIndex === colIndex ? (renderEditor(header, -1, colIndex)) : (_jsx("span", { style: {
                                                                 wordBreak: 'break-word',
                                                                 whiteSpace: 'normal',
                                                                 display: 'block',
+                                                                color: themeStyles.headerText,
                                                                 width: '100%'
                                                             }, children: header || `Header ${colIndex + 1}` })) }), isEditMode && sortConfig.orderBy === header ? (_jsx(Box, { component: "span", sx: visuallyHidden, children: sortConfig.order === 'desc' ? 'sorted descending' : 'sorted ascending' })) : null] }) }, colIndex)))] }) }), _jsx(TableBody, { children: _jsx(SortableContext, { items: sortedRows.map((_, index) => `row-${index}`), strategy: verticalListSortingStrategy, children: sortedRows.map((row, rowIndex) => {
                                         // 🚀 修复：排序后直接使用rowIndex，因为数据已经真正排序
@@ -1074,16 +1168,16 @@ const ReactTable = React.memo(({ tableId, tableData: propTableData }) => {
                                         const rowId = `row-${rowIndex}`;
                                         // 🚀 Part 3: 在编辑模式下使用可拖拽行，否则使用普通行
                                         if (isEditMode) {
-                                            return (_jsx(DraggableTableRow, { rowId: rowId, rowIndex: rowIndex, row: row, isEditMode: isEditMode, isSelected: isRowSelectedValue, lastSelectedIndex: lastSelectedIndex, editingCell: editingCell, onRowClick: handleRowClick, renderCellContent: renderCellContent, setSelectedRows: setSelectedRows, setLastSelectedIndex: setLastSelectedIndex, totalColumns: data.headers.length }, rowId));
+                                            return (_jsx(DraggableTableRow, { rowId: rowId, rowIndex: rowIndex, row: row, isEditMode: isEditMode, isSelected: isRowSelectedValue, lastSelectedIndex: lastSelectedIndex, editingCell: editingCell, onRowClick: handleRowClick, renderCellContent: renderCellContent, setSelectedRows: setSelectedRows, setLastSelectedIndex: setLastSelectedIndex, totalColumns: data.headers.length, themeStyles: themeStyles }, rowId));
                                         }
                                         else {
                                             // 普通模式下的静态行
                                             return (_jsx(TableRow, { hover: true, sx: {
                                                     '&:nth-of-type(even)': {
-                                                        backgroundColor: '#fafafa'
+                                                        backgroundColor: themeStyles.cellBackground
                                                     },
                                                     '&:hover': {
-                                                        backgroundColor: '#f0f0f0'
+                                                        backgroundColor: themeStyles.cellHoverBackground
                                                     }
                                                 }, children: row.map((cell, colIndex) => (_jsx(TableCell, { sx: {
                                                         width: `${100 / data.headers.length}%`, // 平均分配列宽

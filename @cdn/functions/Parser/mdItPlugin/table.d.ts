@@ -52,6 +52,7 @@ export interface StandardTableData {
             title: string;
             type: 'text' | 'number' | 'date' | 'boolean';
             index: number;
+            align?: 'left' | 'center' | 'right';
         }>;
         columnCount: number;
         rowCount: number;
@@ -81,7 +82,7 @@ declare class StandardTableDataManager {
     private standardDataRegistry;
     private dataChangeListeners;
     static getInstance(): StandardTableDataManager;
-    createStandardData(tableId: string, data: TableData, startLine: number, endLine: number, rawMarkdown: string): StandardTableData;
+    createStandardData(tableId: string, data: TableData | TableDataWithAlign, startLine: number, endLine: number, rawMarkdown: string): StandardTableData;
     registerStandardData(standardData: StandardTableData): void;
     getStandardData(tableId: string): StandardTableData | null;
     updateStandardData(tableId: string, newData: TableData, source?: 'react' | 'monaco'): boolean;
@@ -93,7 +94,10 @@ declare class StandardTableDataManager {
 }
 export declare const standardTableDataManager: StandardTableDataManager;
 export declare const tableRegistry: Map<string, TableMetadata>;
-export declare function tableDataToMarkdown(data: TableData): string;
+interface TableDataWithAlign extends TableData {
+    alignments?: Array<'left' | 'center' | 'right'>;
+}
+export declare function tableDataToMarkdown(data: TableData | TableDataWithAlign): string;
 export declare function standardDataToTableData(standardData: StandardTableData): TableData;
 export declare function tableDataToStandardData(tableId: string, data: TableData, startLine: number, endLine: number, rawMarkdown: string): StandardTableData;
 declare let tablePlugin: (md: MarkdownIt) => void;

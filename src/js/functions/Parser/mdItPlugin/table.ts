@@ -70,6 +70,7 @@ export interface StandardTableData {
             title: string;
             type: 'text' | 'number' | 'date' | 'boolean';
             index: number;
+            align?: 'left' | 'center' | 'right'; // 🚀 新增：列对齐方式
         }>;
         columnCount: number;
         rowCount: number;
@@ -171,7 +172,7 @@ class StandardTableDataManager {
     // 将TableData转换为StandardTableData
     createStandardData(
         tableId: string,
-        data: TableData,
+        data: TableData | TableDataWithAlign,
         startLine: number,
         endLine: number,
         rawMarkdown: string
@@ -179,12 +180,16 @@ class StandardTableDataManager {
         const now = Date.now();
         const existing = this.standardDataRegistry.get(tableId);
 
+        // 🚀 检查是否有对齐信息
+        const alignments = 'alignments' in data ? data.alignments : undefined;
+
         // 生成列schema
         const headers = data.headers.map((title, index) => ({
             id: `col_${index}`,
             title: title || `Column ${index + 1}`,
             type: 'text' as const,
-            index
+            index,
+            align: alignments?.[index] || 'left' // 🚀 新增：添加对齐信息
         }));
 
         const standardData: StandardTableData = {
@@ -232,12 +237,18 @@ class StandardTableDataManager {
             return false;
         }
 
-        // 🚀 修复：生成新的rawMarkdown
-        const newRawMarkdown = tableDataToMarkdown(newData);
+        // 🚀 修复：保留现有的对齐信息
+        const dataWithAlign: TableDataWithAlign = {
+            ...newData,
+            alignments: existing.schema.headers.map(h => h.align || 'left')
+        };
+
+        // 🚀 修复：生成新的rawMarkdown，包含对齐信息
+        const newRawMarkdown = tableDataToMarkdown(dataWithAlign);
 
         const updatedStandardData = this.createStandardData(
             tableId,
-            newData,
+            dataWithAlign,
             existing.metadata.startLine,
             existing.metadata.endLine,
             newRawMarkdown  // 使用新生成的markdown
@@ -245,10 +256,6 @@ class StandardTableDataManager {
 
         // 🚀 修复：确保rawMarkdown使用最新的数据
         updatedStandardData.metadata.rawMarkdown = newRawMarkdown;
-
-        console.log(`更新标准化数据 ${tableId} (source: ${source})`);
-        console.log('新的表格数据:', newData);
-        console.log('生成的Markdown:', newRawMarkdown);
 
         this.registerStandardData(updatedStandardData);
         return true;
@@ -305,10 +312,16 @@ export const standardTableDataManager = StandardTableDataManager.getInstance();
 // 全局表格索引表（保持向后兼容）
 export const tableRegistry = new Map<string, TableMetadata>();
 
+// 🚀 扩展接口以支持对齐信息
+interface TableDataWithAlign extends TableData {
+    alignments?: Array<'left' | 'center' | 'right'>;
+}
+
 // 解析表格token为数据结构，增强空行空列兼容性
-function parseTableTokens(tableTokens: any[]): TableData {
+function parseTableTokens(tableTokens: any[]): TableDataWithAlign {
     const headers: string[] = [];
     const rows: string[][] = [];
+    const alignments: Array<'left' | 'center' | 'right'> = []; // 🚀 新增：存储列对齐信息
 
     let currentRow: string[] = [];
     let inHeader = false;
@@ -344,7 +357,17 @@ function parseTableTokens(tableTokens: any[]): TableData {
                 break;
             case 'th_open':
             case 'td_open':
-                // 准备收集单元格内容
+                // 🚀 提取对齐信息（markdown-it会将对齐信息存储在style属性中）
+                if (inHeader && token.type === 'th_open') {
+                    const style = token.attrGet && token.attrGet('style');
+                    if (style && style.includes('text-align:center')) {
+                        alignments.push('center');
+                    } else if (style && style.includes('text-align:right')) {
+                        alignments.push('right');
+                    } else {
+                        alignments.push('left');
+                    }
+                }
                 break;
             case 'th_close':
             case 'td_close':
@@ -369,6 +392,11 @@ function parseTableTokens(tableTokens: any[]): TableData {
         headers.push('');
     }
 
+    // 🚀 补全alignments（如果没有提取到对齐信息，默认为left）
+    while (alignments.length < maxCols) {
+        alignments.push('left');
+    }
+
     // 补全rows中的每一行
     rows.forEach(row => {
         while (row.length < maxCols) {
@@ -376,24 +404,39 @@ function parseTableTokens(tableTokens: any[]): TableData {
         }
     });
 
-    const result = { headers, rows };
+    const result: TableDataWithAlign = { headers, rows, alignments };
     // console.log('最终解析结果:', result);
     return result;
 }
 
 // 将表格数据转换为Markdown格式，空字符串用空格表示
-export function tableDataToMarkdown(data: TableData): string {
+// 🚀 支持对齐信息
+export function tableDataToMarkdown(data: TableData | TableDataWithAlign): string {
     // console.log("tableDataToMarkdown输入: \n", data);
     if (!data.headers.length && !data.rows.length) return '';
 
     let markdown = '';
+    
+    // 🚀 检查是否有对齐信息
+    const alignments = 'alignments' in data ? data.alignments : undefined;
 
     // 生成表头
     if (data.headers.length > 0) {
         const headerRow = data.headers.map(h => h === '' ? ' ' : h);
         markdown += '| ' + headerRow.join(' | ') + ' |\n';
-        // 生成分隔行
-        markdown += '| ' + data.headers.map(() => '---').join(' | ') + ' |\n';
+        
+        // 🚀 生成分隔行，考虑对齐信息
+        const separators = data.headers.map((_, index) => {
+            const align = alignments?.[index] || 'left';
+            if (align === 'center') {
+                return ':---:';
+            } else if (align === 'right') {
+                return '---:';
+            } else {
+                return '---';
+            }
+        });
+        markdown += '| ' + separators.join(' | ') + ' |\n';
     }
 
     // 生成数据行
@@ -515,7 +558,6 @@ let tablePlugin = function (md: MarkdownIt) {
                     const actualDataLines = 2 + tableData.rows.length; // 表头行 + 分隔符行 + 数据行数
                     if (endLine <= startLine || endLine - startLine < actualDataLines) {
                         endLine = startLine + actualDataLines;
-                        console.log(`修正endLine: ${startLine} -> ${endLine} (${actualDataLines}行)`);
                     }
                     
                     // 计算原始Markdown（用于回写）
