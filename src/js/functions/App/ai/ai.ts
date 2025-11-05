@@ -1,7 +1,7 @@
 import getSelectionText from "@App/text/getSelection";
 
 // BigModel.ts
-const token = "4f0f9e54e52e43faadbf24c9a7754b00"+"."+"Xon9PmRyJShYVVJ7"
+const token = "4f0f9e54e52e43faadbf24c9a7754b00" + "." + "Xon9PmRyJShYVVJ7"
 const url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
 
 class BigModel {
@@ -52,7 +52,7 @@ class BigModel {
       }
     }
     const data = {
-      model: base64 ? "GLM-4V-Plus-0111" : "GLM-4.5",
+      model: base64 ? "GLM-4V-Plus-0111" : "GLM-4-flash",
       tool: "web-search-pro",
       stream: true, // 启用流式响应
       messages: [
@@ -80,7 +80,7 @@ class BigModel {
     try {
       // 创建新的 AbortController
       this.abortController = new AbortController()
-      
+
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -106,7 +106,7 @@ class BigModel {
           onComplete(finalMessage)
           return
         }
-        
+
         const { value, done: readerDone } = await reader.read()
         done = readerDone
         if (value) {

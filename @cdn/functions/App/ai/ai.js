@@ -47,7 +47,7 @@ class BigModel {
             }
         };
         const data = {
-            model: base64 ? "GLM-4V-Plus-0111" : "GLM-4.5",
+            model: base64 ? "GLM-4V-Plus-0111" : "GLM-4-flash",
             tool: "web-search-pro",
             stream: true, // 启用流式响应
             messages: [
