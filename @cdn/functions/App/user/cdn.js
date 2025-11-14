@@ -17,7 +17,7 @@ export async function testCdns() {
             const signal = controller.signal;
             let url = `https://${domain}/npm/bigonion-kit@0.12.6/.vscode/settings.json`;
             if (domain === "cdn.jsdmirror.com") {
-                url = `https://${domain}/npm/bigonion-kit@0.12.6/.vscode/settings.jso`;
+                url = `https://${domain}/npm/bigonion-kit@0.12.6/.vscode/settings.json`;
             }
             // 设置一个定时器在指定的超时时间后中止请求
             const timeoutId = setTimeout(() => {
