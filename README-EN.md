@@ -1,119 +1,289 @@
-# Markdown Online View+
+<div align="center">
 
-## Origin
+# 🚀 Markdown Online Editor
 
-<a><img src="https://img.shields.io/badge/Github-v3.0.0-c.svg" alt="example"></a> <a><img src="https://img.shields.io/badge/LICENSE-MIT-pink.svg" alt="example"></a>
+**Professional Online Markdown Editor | Powered by VSCode Editor Core**
 
-This project originated from a joke with my roommate three years ago, triggered when Typora started charging fees.
+[![Version](https://img.shields.io/badge/version-v3.0.0-blue.svg)](https://github.com/LiWeny16/MarkdownOnline)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE-MIT)
+[![React](https://img.shields.io/badge/React-18+-61dafb.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178c6.svg)](https://www.typescriptlang.org/)
+[![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-Latest-0066cc.svg)](https://microsoft.github.io/monaco-editor/)
 
-I said, "What's so hard about this project? Let's do it." He replied, "Go ahead and try; I bet you can't make anything worthwhile!" (Just joking)
+[🌐 Live Demo](https://md.bigonion.cn) | [📖 中文文档](./README.md) | [🐛 Report Issues](https://github.com/LiWeny16/MarkdownOnline/issues)
 
-Since then, I've been continuously improving and refining it, migrating from native JS to React, from JS to a pure TS project, and finally incorporating VSCode's front-end editor—gradually implementing my ideas and creativity.
+</div>
 
-Moreover, since it's really hard to find a decent, free, online Markdown editor on the web, I decided to make one!
+---
 
-## What is Markdown?
+## ✨ Introduction
 
-Unlike Word, Markdown is a text markup language that displays all operations in text form. 
+**Markdown Online Editor** is a powerful online Markdown editor integrated with VSCode Monaco Editor core, providing a professional-grade editing experience. No installation required - enjoy a desktop-like smooth experience right in your browser.
 
-For example, if you want to write a heading, in Word you might click on the heading option, but in Markdown, you indicate a heading by writing "#" before the text.  
-Example:
+### 🎯 Key Features
 
+- 🎨 **Monaco Editor** - Powered by VSCode editor core with complete syntax highlighting and IntelliSense
+- 📁 **File Management** - Support for folders, multi-file management, and local storage persistence
+- 🎭 **Real-time Preview** - Dual-pane synchronized scrolling with WYSIWYG experience
+- 🧮 **LaTeX Formulas** - Complete mathematical formula rendering support (KaTeX)
+- 📊 **Mermaid Diagrams** - Flowcharts, sequence diagrams, Gantt charts, and more
+- 🎨 **Code Highlighting** - Syntax highlighting for 100+ programming languages
+- 🖼️ **Image Management** - Local image upload, management, and preview
+- 🌓 **Theme Switching** - Light and dark themes to protect your eyes
+- 💾 **Export Features** - Support for PDF, HTML, and other formats
+- ⚡ **AI Assistant** - Integrated AI writing assistant
+- 📱 **Responsive Design** - Perfect adaptation for mobile and desktop
 
+## 🚀 Quick Start
 
-```md
-# I am a heading
+### 📦 Installation
+
+```bash
+# Using npm
+npm install
+
+# Or using yarn
+yarn install
+
+# Or using pnpm
+pnpm install
 ```
 
- If you want to write a code block, it's relatively difficult in Word, but in Markdown, you just need to wrap your code with triple backticks.
+### 💻 Local Development
 
-````js
-```js
-    alert("welcome to markdown")
+```bash
+# Start development server
+npm run dev
+
+# Visit http://localhost:5173
+```
+
+### 🏗️ Build for Production
+
+```bash
+# Build the project
+npm run build
+
+# Preview the build
+npm run preview
+```
+
+### 🌐 Deployment
+
+#### Vercel Deployment (Recommended)
+
+1. Fork this project to your GitHub account
+2. Import the project on [Vercel](https://vercel.com)
+3. One-click deployment with automatic configuration
+
+#### Netlify Deployment
+
+1. Connect your GitHub repository
+2. Build command: `npm run build`
+3. Publish directory: `docs`
+
+#### Self-hosted Deployment
+
+```bash
+# Build the project
+npm run build
+
+# Deploy the docs directory to your server
+# Host static files with Nginx, Apache, or other web servers
+```
+
+**Nginx Configuration Example:**
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    root /path/to/docs;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+## 📚 Tech Stack
+
+| Technology | Description |
+|------------|-------------|
+| **React 18** | Modern component-based UI framework |
+| **TypeScript** | Type-safe JavaScript superset |
+| **Vite** | Next-generation frontend build tool |
+| **Monaco Editor** | VSCode editor core for professional coding |
+| **MobX** | Simple and scalable state management |
+| **Material-UI** | React UI component library |
+| **markdown-it** | Powerful Markdown parser |
+| **KaTeX** | Fast math typesetting library |
+| **Mermaid** | Text-based diagram generation |
+| **Vite PWA** | Progressive Web App support |
+
+## 📖 Usage Guide
+
+### LaTeX Mathematical Formulas
+
+Use `$$` for block formulas and `$` for inline formulas:
+
+```latex
+Block formula:
+$$
+E = mc^2
+$$
+
+Inline formula: The mass-energy equation $E = mc^2$ is important
+```
+
+### Mermaid Flowcharts
+
+Use code blocks with `mermaid` language:
+
+````markdown
+```mermaid
+graph TD
+    A[Start] --> B{Condition}
+    B -->|Option 1| C[Execute Plan A]
+    B -->|Option 2| D[Execute Plan B]
+    C --> E[End]
+    D --> E
 ```
 ````
 
-If you still don't understand what Markdown syntax is, please click [here](https://markdown.com.cn/intro.html) to learn about Markdown syntax
+### Emoji
 
-## Why use Markdown?
+Use emoji codes directly:
 
-- Fast and convenient, suitable for writing blogs
-- Word formatting can easily become messy; - Markdown sacrifices some complex functions in exchange for convenience
-- Inputting code is easy and supports syntax highlighting
-- Supports embedding LaTeX (Word actually can too)
-- Based on HTML syntax, do what you think, achieve what you want
-- ~~Of course, it's also the favorite of those who love aestheticsヾ(•ω•`)o~~
-## Todo
+```markdown
+:heart: :smile: :rocket: :star:
+```
 
-- ~~Add PDF export~~
-- ~~Add code highlighting~~
-- ~~LaTeX formula support~~
-- ~~Add keyboard shortcuts Ctrl+B for bold and Ctrl+Alt+C for center alignment~~
-- ~~Image support~~
-- ~~Replace with VSCode front-end editor, add full keyboard shortcut hint support~~
-- Support running JS/Python scripts line by line like [Jupyter](https://jupyter.org/) (based on [WASM](https://developer.mozilla.org/en-US/docs/WebAssembly))
-- ~~Add settings button to configure script injection and line break rules, etc.~~
-- ~~[TOC] support~~
+### Code Highlighting
 
-## Tutorial
+Support for 100+ programming languages:
 
-- Please write LaTeX inside `$$` symbols.  
-  For example, $\lambda$. For more details, see: [LaTeX Syntax Guide](https://hub.fgit.cf/KaTeX/KaTeX/blob/main/docs/supported.md)
-- For Mermaid, see the official website: [Mermaid Docs](https://mermaid.nodejs.cn/syntax/flowchart.html)
-- Emoji code reference: [Emoji I :hearts: You!](https://gist.github.com/rxaviers/7360908)
-- Features of this editor: [Documentation not written yet haha](#)
+````markdown
+```python
+def hello_world():
+    print("Hello, Markdown!")
+```
 
-## New Features
+```javascript
+const greeting = () => {
+    console.log("Hello, Markdown!");
+};
+```
+````
 
-- Right alignment can be done using `>>`
-- Mermaid flowchart support!
-- Emoji support!!!
+### Enhanced Tables
 
-## Update Log
+Support for multi-line tables (multimd-table):
 
-- v0.1.x Fixed numerous bugs, added image manager
-- v0.x.x Too lazy to write, already updated multiple features
-- v1.x Lazy
-- v2.x ...
-- v3.0.0 Updated full version of file manager, support for folders!
+```markdown
+|             |          Grouping           ||
+| First Header  | Second Header | Third Header |
+| ------------- | :-----------: | -----------: |
+| Content       |          *Long Cell*        ||
+| Content       |   **Cell**    |         Cell |
+```
 
-## Open Source License
+### Task Lists
 
-/_
-\* @Author Bigonion  
-\* @Copyright 2022© Present  
-_/
+```markdown
+- [x] Completed task
+- [ ] Pending task
+- [ ] Another todo item
+```
 
-<center>
+For more syntax, see the [Complete Markdown Guide](https://www.markdownguide.org/)
 
-**MIT**
+## 🗺️ Roadmap
+
+### ✅ Completed
+
+- ✅ VSCode Monaco Editor integration
+- ✅ Complete file management system (with folder support)
+- ✅ LaTeX mathematical formula rendering
+- ✅ Mermaid diagram support
+- ✅ AI writing assistant integration
+- ✅ PDF/HTML export functionality
+- ✅ Image manager
+- ✅ Table of contents (TOC) auto-generation
+- ✅ Multi-theme support
+- ✅ PWA support
+
+### 🚧 In Progress
+
+- 🚧 WebAssembly script runtime environment
+- 🚧 Jupyter-style code cell execution
+
+### 📋 Planned
+
+- 📋 Real-time collaborative editing
+- 📋 Cloud synchronization
+- 📋 Enhanced AI features
+- 📋 Plugin system
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome!
+
+1. Fork this project
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the [MIT](./LICENSE-MIT) License
+
+```
+Copyright (c) 2022-present Bigonion
+```
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline?ref=badge_large&issueType=license)
 
-</center>
+## 🔗 Links
 
-## Namespace
+- **Live Demo**: [md.bigonion.cn](https://md.bigonion.cn)
+- **GitHub**: [github.com/LiWeny16/MarkdownOnline](https://github.com/LiWeny16/MarkdownOnline)
+- **Author**: [bigonion.cn](https://bigonion.cn)
+- **Issues**: [GitHub Issues](https://github.com/LiWeny16/MarkdownOnline/issues)
 
-- [GitHub](https://github.com/LiWeny16/MarkdownOnline)
-- [Namespace](https://bigonion.cn)
+## 👨‍💻 About the Author
 
-## Online Address
+**Bigonion**
+- 📧 Email: bigonion@bigonion.cn
+- 🌐 Website: [bigonion.cn](https://bigonion.cn)
 
-[md.bigonion.cn](https://md.bigonion.cn)
+## 🙏 Acknowledgments
 
-## About
-
-Author: Bigonion  
-Email: bigonion@bigonion.cn
-
-## Acknowledgments
-
-Thanks to the following developers for their contributions to this project:
+Thanks to all contributors who have helped make this project better:
 
 <a href="https://github.com/LiWeny16/MarkdownOnline/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=LiWeny16/MarkdownOnline&max=1000" />
 </a>
 
-Thanks to the following open-source projects for their contributions to this project:
+Special thanks to these amazing open-source projects:
 
-[Reliance Report](/public/LICENSES/report.md)
+- [React](https://reactjs.org/) - JavaScript library for building user interfaces
+- [Monaco Editor](https://microsoft.github.io/monaco-editor/) - VSCode editor core
+- [Vite](https://vitejs.dev/) - Next-generation frontend build tool
+- [markdown-it](https://github.com/markdown-it/markdown-it) - Markdown parser
+- [KaTeX](https://katex.org/) - Math typesetting library
+- [Mermaid](https://mermaid.js.org/) - Diagram generation tool
+
+For a complete list of dependencies, see the [Dependency Report](/public/LICENSES/report.md)
+
+---
+
+<div align="center">
+
+**If this project helps you, please give it a ⭐️**
+
+Made with ❤️ by [Bigonion](https://github.com/LiWeny16)
+
+</div>

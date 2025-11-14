@@ -1,118 +1,260 @@
-# Markdown Online View+
+<div align="center">
 
-[English Version](./README-EN.md)
+# 🚀 Markdown Online Editor
 
-## 起源
-<a><img src="https://img.shields.io/badge/Github-v3.0.0-c.svg" alt="example"></a> <a><img src="https://img.shields.io/badge/LICENSE-MIT-pink.svg" alt="example"></a>
-本项目起源于三年前和舍友的一次调侃，导火索是Typora正式收费那会，
+**专业级在线 Markdown 编辑器 | 基于 VSCode 编辑器内核**
 
-我说，“这b项目有什么难的，做呗。”他说，“你就做吧，谅你也做不出个什么破玩意！”（纯属玩笑）
+[![Version](https://img.shields.io/badge/version-v3.0.0-blue.svg)](https://github.com/LiWeny16/MarkdownOnline)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE-MIT)
+[![React](https://img.shields.io/badge/React-18+-61dafb.svg)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178c6.svg)](https://www.typescriptlang.org/)
+[![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-Latest-0066cc.svg)](https://microsoft.github.io/monaco-editor/)
 
-然后就一直断断续续在改进和完善，从原生JS迁移到了React，从JS变成纯TS项目，最后上了Vscode的前端编辑器，一点点的在把自己的灵感和创意尝试给落地。
+[🌐 在线体验](https://md.bigonion.cn) | [📖 English](./README-EN.md) | [🐛 问题反馈](https://github.com/LiWeny16/MarkdownOnline/issues)
 
-再加上，现在确实全网找不到一个像样的Markdown在线且免费好用的编辑器，那我来做呗！
+</div>
 
-## 什么是markdown?
+---
 
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;和word不同，markdown是文本标记语言，它会把所有操作都以文本的形式展现出来  
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;例如你想写一个标题，你在word里可能得点击一下右上角的标题，但是在markdown里则是通过写在“#”后来表示这是一个标题文本  
-例如：
+## ✨ 项目简介
 
-```md
-# 我是标题
+**Markdown Online Editor** 是一款功能强大的在线 Markdown 编辑器，集成了 VSCode Monaco 编辑器内核，提供专业级的编辑体验。无需安装，打开浏览器即可享受媲美桌面应用的流畅体验。
+
+### 🎯 核心特性
+
+- 🎨 **Monaco 编辑器** - 基于 VSCode 的强大编辑器内核，完整的语法高亮和智能提示
+- 📁 **文件管理系统** - 支持文件夹、多文件管理，本地存储持久化
+- 🎭 **实时预览** - 双栏同步滚动，所见即所得
+- 🧮 **LaTeX 公式** - 完整的数学公式渲染支持（KaTeX）
+- 📊 **Mermaid 图表** - 流程图、时序图、甘特图等多种图表
+- 🎨 **代码高亮** - 支持 100+ 编程语言语法高亮
+- 🖼️ **图片管理** - 本地图片上传、管理和预览
+- 🌓 **主题切换** - 支持明暗主题，保护您的眼睛
+- 💾 **导出功能** - 支持 PDF、HTML 等多种格式导出
+- ⚡ **AI 辅助** - 集成 AI 助手，智能写作辅助
+- 📱 **响应式设计** - 完美适配移动端和桌面端
+
+## 🚀 快速开始
+
+### 📦 安装依赖
+
+```bash
+# 使用 npm
+npm install
+
+# 或使用 yarn
+yarn install
+
+# 或使用 pnpm
+pnpm install
 ```
 
-&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;如果你想写一段代码区，在word里会比较难实现，但是在markdown里，你只需要用两个```包裹住代码即可
+### 💻 本地开发
 
-````js
- ```js
-    alert("welcome to markdown")
- ```
+```bash
+# 启动开发服务器
+npm run dev
+
+# 访问 http://localhost:5173
+```
+
+### 🏗️ 构建生产版本
+
+```bash
+# 构建项目
+npm run build
+
+# 预览构建结果
+npm run preview
+```
+
+### 🌐 部署
+
+#### Vercel 部署（推荐）
+
+1. Fork 本项目到您的 GitHub 账号
+2. 在 [Vercel](https://vercel.com) 导入项目
+3. 一键部署，自动配置
+
+
+
+## 📚 技术栈
+
+| 技术 | 说明 |
+|------|------|
+| **React 18** | 前端框架，提供现代化的组件开发体验 |
+| **TypeScript** | 类型安全的 JavaScript 超集 |
+| **Vite** | 下一代前端构建工具，极速开发体验 |
+| **Monaco Editor** | VSCode 编辑器内核，专业级代码编辑 |
+| **MobX** | 简单、可扩展的状态管理 |
+| **Material-UI** | React UI 组件库 |
+| **markdown-it** | 强大的 Markdown 解析器 |
+| **KaTeX** | 快速的数学公式渲染引擎 |
+| **Mermaid** | 文本驱动的图表生成工具 |
+| **Vite PWA** | 渐进式 Web 应用支持 |
+
+## 📖 使用指南
+
+### LaTeX 数学公式
+
+使用 `$$` 包裹块级公式，`$` 包裹行内公式：
+
+```latex
+块级公式：
+$$
+E = mc^2
+$$
+
+行内公式：质能方程 $E = mc^2$ 很重要
+```
+
+### Mermaid 流程图
+
+使用代码块并指定 `mermaid` 语言：
+
+````markdown
+```mermaid
+graph TD
+    A[开始] --> B{判断条件}
+    B -->|条件1| C[执行方案A]
+    B -->|条件2| D[执行方案B]
+    C --> E[结束]
+    D --> E
+```
 ````
 
-如果你还不了解什么是markdown语法，那请[点我了解markdown语法](https://markdown.com.cn/intro.html)
+### Emoji 表情
 
-## 为什么要使用markdown?
+直接使用 emoji 代码：
 
-- 足够快捷，方便，适合写博客
-- word排版容易乱， markdown舍弃了一些复杂的功能，  
-  换来了一定程度的快捷
-- 输入代码足够容易，并支持高亮
-- 支持嵌入LATEX(word其实也可以)
-- 背靠HTML语法，想你所想，做你所做
-- ~~当然啦是颜狗最爱ヾ(•ω•`)o~~
+```markdown
+:heart: :smile: :rocket: :star:
+```
 
-## Todo
+### 代码高亮
 
-- <s>增加PDF导出</s>
-- <s>增加代码高亮</s>
-- <s>LATEX公式支持</s>
-- <s>增加快捷键Ctrl+B加粗和Ctrl+Alt+C居中</s>
-- <s>Img图片支持</s>
-- <s>替换成Vscode前端编辑器，加入完整的快捷键提示支持</s>
-- 像[jupyter](https://jupyter.org/)那样支持一行一行的运行JS/Python脚本(基于[WASM](https://developer.mozilla.org/zh-CN/docs/WebAssembly))
-- <s>增加设置按钮以配置脚本注入和换行等规则</s>
-- <s>[TOC] 支持</s>
+支持 100+ 编程语言：
 
-## 教程
+````markdown
+```python
+def hello_world():
+    print("Hello, Markdown!")
+```
 
-- LATEX请写在用$$中间  
-例如 $\lambda$ 详情请见:[LaTex语法大全](https://hub.fgit.cf/KaTeX/KaTeX/blob/main/docs/supported.md)
-- mermaid请见官网: [mermaid docs](https://mermaid.nodejs.cn/syntax/flowchart.html)
-- emoji标签码表见: [emoji I :hearts: You!](https://gist.github.com/rxaviers/7360908)
-- 本编辑器特性请见: [还没写文档嘻嘻](#)
+```javascript
+const greeting = () => {
+    console.log("Hello, Markdown!");
+};
+```
+````
 
-## 新增特性
+### 表格增强
 
-- 右对齐可以用 >>
-- mermaid 流程图支持！
-- 小表情支持！！！
+支持多行表格（multimd-table）：
 
-## 更新日志
+```markdown
+|             |          Grouping           ||
+| First Header  | Second Header | Third Header |
+| ------------- | :-----------: | -----------: |
+| Content       |          *Long Cell*        ||
+| Content       |   **Cell**    |         Cell |
+```
 
-- v0.1.x 修复大量bug，新增图片管理器
-- v0.x.x 懒得写，更新N个特性了已经
-- v1.x 懒
-- v2.x 。。。
-- v3.0.0 更新完整版文件管理器，支持文件夹！
+### 任务列表
 
-## 开源协议
+```markdown
+- [x] 已完成的任务
+- [ ] 待完成的任务
+- [ ] 另一个待办事项
+```
 
-/_  
-\* @Author Bigonion  
-\* @Copyright 2022© 至今  
-_/
+更多语法请参考 [Markdown 完整指南](https://markdown.com.cn/intro.html)
 
-<center>
+## 🗺️ 开发路线图
 
-**MIT**
+### ✅ 已完成
+
+- ✅ VSCode Monaco 编辑器集成
+- ✅ 完整的文件管理系统（支持文件夹）
+- ✅ LaTeX 数学公式渲染
+- ✅ Mermaid 图表支持
+- ✅ AI 写作助手集成
+- ✅ PDF/HTML 导出功能
+- ✅ 图片管理器
+- ✅ 目录（TOC）自动生成
+- ✅ 多主题支持
+- ✅ PWA 支持
+
+### 🚧 开发中
+
+- 🚧 WebAssembly 脚本运行环境
+- 🚧 Jupyter 风格的代码单元格执行
+
+### 📋 计划中
+
+- 📋 实时协同编辑
+- 📋 云端同步
+- 📋 更多 AI 功能增强
+- 📋 插件系统
+
+## 🤝 贡献指南
+
+欢迎贡献代码、报告问题或提出建议！
+
+1. Fork 本项目
+2. 创建您的特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交您的更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 打开一个 Pull Request
+
+## 📄 开源协议
+
+本项目采用 [MIT](./LICENSE-MIT) 协议开源
+
+```
+Copyright (c) 2022-present Bigonion
+```
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline?ref=badge_large&issueType=license)
 
-</center>
+## 🔗 相关链接
 
-## Namespace
+- **在线体验**: [md.bigonion.cn](https://md.bigonion.cn)
+- **GitHub**: [github.com/LiWeny16/MarkdownOnline](https://github.com/LiWeny16/MarkdownOnline)
+- **作者主页**: [bigonion.cn](https://bigonion.cn)
+- **问题反馈**: [Issues](https://github.com/LiWeny16/MarkdownOnline/issues)
 
-- [github](https://github.com/LiWeny16/MarkdownOnline)
-- [namespace](https://bigonion.cn)
+## 👨‍💻 关于作者
 
-## 在线地址
+**Bigonion**
+- 📧 Email: bigonion@bigonion.cn
+- 🌐 Website: [bigonion.cn](https://bigonion.cn)
 
-[md.bigonion.cn](https://md.bigonion.cn)
+## 🙏 致谢
 
-## 关于
-
-作者：Bigonion  
-邮箱：bigonion@bigonion.cn
-
-## 致谢
-
-感谢以下开发者对本项目做出的贡献：
+感谢所有为本项目做出贡献的开发者：
 
 <a href="https://github.com/LiWeny16/MarkdownOnline/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=LiWeny16/MarkdownOnline&max=1000" />
 </a>
 
-感谢以下开源项目对本项目做出的贡献：
+感谢以下开源项目的支持：
 
-[Reliance Report](/public/LICENSES/report.md)
+- [React](https://reactjs.org/) - 用于构建用户界面的 JavaScript 库
+- [Monaco Editor](https://microsoft.github.io/monaco-editor/) - VSCode 编辑器内核
+- [Vite](https://vitejs.dev/) - 下一代前端构建工具
+- [markdown-it](https://github.com/markdown-it/markdown-it) - Markdown 解析器
+- [KaTeX](https://katex.org/) - 数学公式渲染
+- [Mermaid](https://mermaid.js.org/) - 图表生成工具
+
+完整的依赖列表请查看 [依赖报告](/public/LICENSES/report.md)
+
+---
+
+<div align="center">
+
+**如果这个项目对您有帮助，请给它一个 ⭐️**
+
+Made with ❤️ by [Bigonion](https://github.com/LiWeny16)
+
+</div>
