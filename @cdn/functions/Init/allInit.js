@@ -174,6 +174,7 @@ export default function allInit(editor = window.editor, monaco = window.monaco) 
         processing: false,
         speechResult: "",
         speech: null,
+        isFinal: false,
     };
     /**
      * @description 全局事件初始化

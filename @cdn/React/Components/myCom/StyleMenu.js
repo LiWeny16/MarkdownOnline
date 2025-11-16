@@ -1,5 +1,5 @@
 import { jsx as _jsx } from "react/jsx-runtime";
-import { styled } from "@mui/material/styles";
+import { styled, alpha } from "@mui/material/styles";
 import Menu from "@mui/material/Menu";
 // import { StyledComponent } from "@mui/system";
 // @ts-ignore
@@ -23,6 +23,11 @@ const StyledMenu = styled((props) => (_jsx(Menu, { elevation: 0, anchorOrigin: {
             padding: "4px 0",
         },
         "& .MuiMenuItem-root": {
+            "&:hover": {
+                backgroundColor: theme.palette.mode === "light"
+                    ? alpha(theme.palette.primary.main, 0.08)
+                    : alpha(theme.palette.primary.main, 0.15),
+            },
             "& .MuiSvgIcon-root": {
                 fontSize: 20,
                 color: theme.palette.mode === "light"

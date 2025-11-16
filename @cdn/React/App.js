@@ -2,6 +2,8 @@ import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-run
 import React from "react";
 import Header from "./SubComponents/Header";
 import Body from "./SubComponents/Body";
+import AIMeetingDialog from "./SubComponents/AIMeeting/AIMeetingDialog";
+import MeetingHistory from "./SubComponents/AIMeeting/MeetingHistory";
 import { observer } from "mobx-react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -56,6 +58,6 @@ const App = observer(() => {
     const isDevelopment = process.env.NODE_ENV === 'development';
     return (_jsx(_Fragment, { children: _jsxs(ThemeProvider, { theme: getTheme() === "light" ? lightTheme : darkTheme, children: [_jsx(CssBaseline, {}), _jsxs(Box, { className: "FLEX COL App-top", children: [_jsx(Header, {}), _jsx(Body, {}), _jsx(Backdrop, { sx: { color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }, open: getStates().unmemorable.loading, onClick: () => {
                                 changeStates({ unmemorable: { loading: false } });
-                            }, children: _jsx(CircularProgress, { color: "inherit" }) })] })] }) }));
+                            }, children: _jsx(CircularProgress, { color: "inherit" }) })] }), _jsx(AIMeetingDialog, {}), _jsx(MeetingHistory, {})] }) }));
 });
 export default App;

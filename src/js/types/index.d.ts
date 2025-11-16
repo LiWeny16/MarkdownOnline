@@ -205,6 +205,7 @@ declare interface Window {
   _speechData: {
     processing: Boolean
     speechResult: string
+    isFinal: boolean
     speech: any
   }
   _cdn: { failed: Array; index: number; cdn: string[] }
@@ -219,7 +220,7 @@ declare interface Window {
   _directoryHandle: FileSystemDirectoryHandle
   _temp: any
 }
-interface a extends ShowSaveFilePicker {}
+interface a extends ShowSaveFilePicker { }
 interface HandleDBListFun {
   (List: string): void
 }

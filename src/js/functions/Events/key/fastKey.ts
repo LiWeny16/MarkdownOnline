@@ -5,7 +5,6 @@ import exeSyncScrollAction from "./actions/syncScroll"
 import exeFileManagerAction from "./actions/fileManager"
 import exeAskAI from "./actions/askAI"
 import exeSpeechPanelAction from "./actions/speechPanel"
-// import voice from "@App/voice/sound"
 // import qiniuFileAPI from "@App/qiniu/index"
 // import insertTextAtCursor from "@App/text/insertTextAtCursor"
 /**

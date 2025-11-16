@@ -1,0 +1,209 @@
+import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
+import * as React from "react";
+import { observer } from "mobx-react";
+import { useAIMeeting } from "@Mobx/AIMeeting";
+import { Dialog, Box, IconButton, Typography, Divider, } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import CropFreeIcon from "@mui/icons-material/CropFree";
+import GroupsIcon from '@mui/icons-material/Groups';
+import MeetingTranscript from "./MeetingTranscript";
+import MeetingSummary from "./MeetingSummary";
+import MeetingControls from "./MeetingControls";
+import { getTheme } from "@App/config/change";
+const AIMeetingDialog = observer(() => {
+    const aiMeeting = useAIMeeting();
+    const [windowSize, setWindowSize] = React.useState({
+        width: window.innerWidth * 0.8,
+        height: window.innerHeight * 0.9
+    });
+    const [windowPosition, setWindowPosition] = React.useState({
+        x: window.innerWidth * 0.1,
+        y: window.innerHeight * 0.05 // 居中：(1 - 0.9) / 2 = 0.05
+    });
+    const [isMaximized, setIsMaximized] = React.useState(false);
+    const [isDragging, setIsDragging] = React.useState(false);
+    const [isResizing, setIsResizing] = React.useState(false);
+    const dragRef = React.useRef({ offsetX: 0, offsetY: 0 });
+    const isDark = getTheme() === "dark";
+    // 主题样式
+    const themeStyles = {
+        background: isDark ? "#1e1e1e" : "#ffffff",
+        color: isDark ? "#d8d8d8" : "#000000",
+        border: isDark ? "1px solid #404040" : "1px solid #e0e0e0",
+        headerBg: isDark ? "#2d2d30" : "#f5f5f5",
+        divider: isDark ? "#404040" : "#e0e0e0",
+    };
+    const handleClose = () => {
+        aiMeeting.hidden();
+    };
+    const handleMouseDown = (e) => {
+        if (isMaximized)
+            return;
+        setIsDragging(true);
+        dragRef.current = {
+            offsetX: e.clientX - windowPosition.x,
+            offsetY: e.clientY - windowPosition.y,
+        };
+    };
+    const handleMouseMove = (e) => {
+        if (!isDragging)
+            return;
+        const maxX = window.innerWidth - windowSize.width;
+        const maxY = window.innerHeight - windowSize.height;
+        const newX = Math.max(0, Math.min(maxX, e.clientX - dragRef.current.offsetX));
+        const newY = Math.max(0, Math.min(maxY, e.clientY - dragRef.current.offsetY));
+        setWindowPosition({ x: newX, y: newY });
+    };
+    const handleMouseUp = () => {
+        setIsDragging(false);
+    };
+    React.useEffect(() => {
+        if (isDragging) {
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+            return () => {
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+            };
+        }
+    }, [isDragging, windowSize]);
+    const toggleMaximize = () => {
+        setIsMaximized(!isMaximized);
+    };
+    return (_jsx(Dialog, { hideBackdrop: false, fullScreen: false, maxWidth: false, open: aiMeeting.displayState, onClose: handleClose, PaperProps: {
+            style: {
+                position: 'fixed',
+                left: isMaximized ? 0 : windowPosition.x,
+                top: isMaximized ? 0 : windowPosition.y,
+                width: isMaximized ? '100vw' : windowSize.width,
+                height: isMaximized ? '100vh' : windowSize.height,
+                margin: 0,
+                maxWidth: 'none',
+                maxHeight: 'none',
+                background: themeStyles.background,
+                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)',
+                overflow: 'hidden',
+                transition: (isDragging || isResizing) ? 'none' : 'all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)',
+            }
+        }, children: _jsxs(Box, { sx: {
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                position: 'relative',
+            }, children: [_jsxs(Box, { onMouseDown: handleMouseDown, sx: {
+                        p: 2,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        background: themeStyles.headerBg,
+                        borderBottom: `1px solid ${themeStyles.divider}`,
+                        cursor: isDragging ? 'grabbing' : (isMaximized ? 'default' : 'grab'),
+                        userSelect: 'none',
+                    }, children: [_jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [_jsx(GroupsIcon, { sx: { fontSize: 28 } }), _jsx(Typography, { variant: "h6", sx: { fontWeight: "bold" }, children: "AI \u4F1A\u8BAE - \u5B9E\u65F6\u8F6C\u5F55 & \u7FFB\u8BD1 & \u4F1A\u8BAE\u7EAA\u8981" })] }), _jsxs(Box, { sx: { display: 'flex', gap: 0.5, position: 'relative', zIndex: 1000 }, children: [_jsx(IconButton, { onClick: toggleMaximize, size: "small", children: _jsx(CropFreeIcon, { fontSize: "small" }) }), _jsx(IconButton, { onClick: handleClose, size: "small", children: _jsx(CloseIcon, { fontSize: "small" }) })] })] }), _jsx(MeetingControls, { themeStyles: themeStyles }), _jsx(Divider, { sx: { bgcolor: themeStyles.divider } }), _jsxs(Box, { sx: {
+                        flex: 1,
+                        display: "flex",
+                        overflow: "hidden",
+                        gap: 1,
+                        p: 2,
+                    }, children: [_jsx(Box, { sx: {
+                                flex: 1,
+                                display: "flex",
+                                flexDirection: "column",
+                                overflow: "hidden",
+                                border: `1px solid ${themeStyles.divider}`,
+                                borderRadius: 1,
+                            }, children: _jsx(MeetingTranscript, { themeStyles: themeStyles }) }), _jsx(Box, { sx: {
+                                flex: 1,
+                                display: "flex",
+                                flexDirection: "column",
+                                overflow: "hidden",
+                                border: `1px solid ${themeStyles.divider}`,
+                                borderRadius: 1,
+                            }, children: _jsx(MeetingSummary, { themeStyles: themeStyles }) })] }), (isDragging || isResizing) && (_jsx(Box, { sx: {
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        zIndex: 999,
+                        cursor: isDragging ? 'grabbing' : 'default',
+                        background: 'transparent',
+                    } })), !isMaximized && (_jsxs(_Fragment, { children: [_jsx(Box, { sx: {
+                                position: 'absolute',
+                                right: -8,
+                                top: 0,
+                                width: 16,
+                                height: '100%',
+                                cursor: 'ew-resize',
+                                zIndex: 1000,
+                            }, onMouseDown: (e) => {
+                                e.preventDefault();
+                                setIsResizing(true);
+                                const startX = e.clientX;
+                                const startWidth = windowSize.width;
+                                const handleResize = (e) => {
+                                    const newWidth = Math.max(600, Math.min(window.innerWidth, startWidth + (e.clientX - startX)));
+                                    setWindowSize(prev => ({ ...prev, width: newWidth }));
+                                };
+                                const handleStop = () => {
+                                    setIsResizing(false);
+                                    document.removeEventListener('mousemove', handleResize);
+                                    document.removeEventListener('mouseup', handleStop);
+                                };
+                                document.addEventListener('mousemove', handleResize);
+                                document.addEventListener('mouseup', handleStop);
+                            } }), _jsx(Box, { sx: {
+                                position: 'absolute',
+                                bottom: -8,
+                                left: 0,
+                                width: '100%',
+                                height: 16,
+                                cursor: 'ns-resize',
+                                zIndex: 1000,
+                            }, onMouseDown: (e) => {
+                                e.preventDefault();
+                                setIsResizing(true);
+                                const startY = e.clientY;
+                                const startHeight = windowSize.height;
+                                const handleResize = (e) => {
+                                    const newHeight = Math.max(400, Math.min(window.innerHeight, startHeight + (e.clientY - startY)));
+                                    setWindowSize(prev => ({ ...prev, height: newHeight }));
+                                };
+                                const handleStop = () => {
+                                    setIsResizing(false);
+                                    document.removeEventListener('mousemove', handleResize);
+                                    document.removeEventListener('mouseup', handleStop);
+                                };
+                                document.addEventListener('mousemove', handleResize);
+                                document.addEventListener('mouseup', handleStop);
+                            } }), _jsx(Box, { sx: {
+                                position: 'absolute',
+                                bottom: -8,
+                                right: -8,
+                                width: 20,
+                                height: 20,
+                                cursor: 'nwse-resize',
+                                zIndex: 1001,
+                            }, onMouseDown: (e) => {
+                                e.preventDefault();
+                                setIsResizing(true);
+                                const startX = e.clientX;
+                                const startY = e.clientY;
+                                const startWidth = windowSize.width;
+                                const startHeight = windowSize.height;
+                                const handleResize = (e) => {
+                                    const newWidth = Math.max(600, Math.min(window.innerWidth, startWidth + (e.clientX - startX)));
+                                    const newHeight = Math.max(400, Math.min(window.innerHeight, startHeight + (e.clientY - startY)));
+                                    setWindowSize({ width: newWidth, height: newHeight });
+                                };
+                                const handleStop = () => {
+                                    setIsResizing(false);
+                                    document.removeEventListener('mousemove', handleResize);
+                                    document.removeEventListener('mouseup', handleStop);
+                                };
+                                document.addEventListener('mousemove', handleResize);
+                                document.addEventListener('mouseup', handleStop);
+                            } })] }))] }) }));
+});
+export default AIMeetingDialog;
