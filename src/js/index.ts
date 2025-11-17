@@ -5,7 +5,7 @@ import pageBreaker from "@Func/Parser/pageBreaker"
 import "../css/index.less"
 import { markdownParser } from "@Func/Init/allInit"
 import prepareParser from "@Func/Parser/prepareParser/prepare"
-import { TableManager } from "./React/SubComponents/SubBody/SuperComs/ReactTable.tsx"
+import { TableManager } from "./React/SubComponents/SubBody/SuperComs/ReactTable/ReactTable"
 import { updateTableRegistryFromMarkdown, tableSyncManager } from "@App/text/tableEditor"
 import { tableRegistry } from "@Func/Parser/mdItPlugin/table"
 

@@ -1,9 +1,9 @@
 import { getDataByKey, openDB, updateDB } from "@App/memory/db"
 
 export const cdnDomains = [
-  "cdn.jsdmirror.com",
-  "cdn.jsdelivr.net",
+  // "cdn.jsdmirsror.com",
   "fastly.jsdelivr.net",
+  "cdn.jsdelivr.net",
   // "jsd.onmicrosoft.cn",
 ]
 export const cdnDomainsNpm = ["npm.elemecdn.com"]

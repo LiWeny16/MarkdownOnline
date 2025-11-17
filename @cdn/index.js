@@ -5,7 +5,7 @@ import pageBreaker from "@Func/Parser/pageBreaker";
 import "../css/index.less";
 import { markdownParser } from "@Func/Init/allInit";
 import prepareParser from "@Func/Parser/prepareParser/prepare";
-import { TableManager } from "./React/SubComponents/SubBody/SuperComs/ReactTable.tsx";
+import { TableManager } from "./React/SubComponents/SubBody/SuperComs/ReactTable/ReactTable";
 /**
  * @description 循环执行触发主解析事件流
  */
