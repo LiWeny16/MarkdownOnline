@@ -13,12 +13,14 @@ import CloseIcon from "@mui/icons-material/Close"
 import CropFreeIcon from "@mui/icons-material/CropFree"
 import GroupsIcon from '@mui/icons-material/Groups'
 import MeetingTranscript from "./MeetingTranscript"
-import MeetingSummary from "./MeetingSummary"
+import MeetingAssistant from "./MeetingAssistant"
 import MeetingControls from "./MeetingControls"
 import { getTheme } from "@App/config/change"
+import { useTranslation } from "react-i18next"
 
 const AIMeetingDialog = observer(() => {
     const aiMeeting = useAIMeeting()
+    const { t } = useTranslation()
     const [windowSize, setWindowSize] = React.useState({
         width: window.innerWidth * 0.8,
         height: window.innerHeight * 0.9
@@ -137,7 +139,7 @@ const AIMeetingDialog = observer(() => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <GroupsIcon sx={{ fontSize: 28 }} />
                         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                            AI 会议 - 实时转录 & 翻译 & 会议纪要
+                            {t("t-ai-meeting-title")}
                         </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 0.5, position: 'relative', zIndex: 1000 }}>
@@ -190,7 +192,7 @@ const AIMeetingDialog = observer(() => {
                             borderRadius: 1,
                         }}
                     >
-                        <MeetingSummary themeStyles={themeStyles} />
+                        <MeetingAssistant themeStyles={themeStyles} />
                     </Box>
                 </Box>
 

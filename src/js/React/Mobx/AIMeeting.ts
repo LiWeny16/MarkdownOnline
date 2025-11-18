@@ -38,6 +38,7 @@ class AIMeetingStore {
   // 语言设置
   sourceLanguage = "zh-CN" // 源语言
   targetLanguage = "en" // 目标翻译语言
+  enableRealtimeTranslation = true // 是否启用实时翻译
   
   // AI提示（暂时保留接口）
   aiSuggestions: string[] = []
@@ -53,6 +54,7 @@ class AIMeetingStore {
       tempTranscript: observable,
       sourceLanguage: observable,
       targetLanguage: observable,
+      enableRealtimeTranslation: observable,
       aiSuggestions: observable,
     })
   }
@@ -260,6 +262,13 @@ class AIMeetingStore {
 
   setTargetLanguage(lang: string) {
     this.targetLanguage = lang
+  }
+
+  // 切换实时翻译开关
+  toggleRealtimeTranslation() {
+    runInAction(() => {
+      this.enableRealtimeTranslation = !this.enableRealtimeTranslation
+    })
   }
 
   // 清空消息

@@ -27,6 +27,7 @@ declare class AIMeetingStore {
     tempTranscript: string;
     sourceLanguage: string;
     targetLanguage: string;
+    enableRealtimeTranslation: boolean;
     aiSuggestions: string[];
     constructor();
     display(): void;
@@ -49,6 +50,7 @@ declare class AIMeetingStore {
     updateMessageTranslation(messageId: string, translatedText: string): void;
     setSourceLanguage(lang: string): void;
     setTargetLanguage(lang: string): void;
+    toggleRealtimeTranslation(): void;
     clearMessages(): void;
     setMeetingSummary(summary: string): void;
     loadMeeting(meeting: MeetingRecord): void;

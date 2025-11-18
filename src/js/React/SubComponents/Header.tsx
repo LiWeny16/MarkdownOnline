@@ -240,7 +240,7 @@ const DrawerAppBar = observer((props: Props) => {
                     position: "relative",
                   }}
                 >
-                  AI 会议
+                  {t("t-ai-meeting-button")}
                 </MyButton>
               </Badge>
               <Suspense

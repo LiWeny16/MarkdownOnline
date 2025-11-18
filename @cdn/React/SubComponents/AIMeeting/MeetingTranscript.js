@@ -3,6 +3,7 @@ import * as React from "react";
 import { observer } from "mobx-react";
 import { useAIMeeting } from "@Mobx/AIMeeting";
 import { Box, Typography, Avatar, Paper, } from "@mui/material";
+import { useTranslation } from "react-i18next";
 // 生成头像颜色（根据名称生成一致的颜色）
 function getAvatarColor(name) {
     const colors = [
@@ -35,6 +36,7 @@ function getInitials(name) {
 }
 // 单条消息组件
 const MessageItem = observer(({ message, themeStyles, tempText, isLast }) => {
+    const { t } = useTranslation();
     const avatarColor = getAvatarColor(message.speaker);
     const initials = getInitials(message.speaker);
     const isDark = themeStyles.background === "#1e1e1e";
@@ -65,10 +67,11 @@ const MessageItem = observer(({ message, themeStyles, tempText, isLast }) => {
                             color: themeStyles.color,
                             borderRadius: 2,
                             borderLeft: `3px solid ${avatarColor}`,
-                        }, children: [_jsx(Typography, { variant: "caption", sx: { color: isDark ? "#7FFFD4" : "#2e7d32", fontWeight: "bold", mb: 0.5, display: "block" }, children: "\u7FFB\u8BD1" }), _jsx(Typography, { variant: "body2", sx: { whiteSpace: "pre-wrap", wordBreak: "break-word" }, children: message.translatedText })] }))] })] }));
+                        }, children: [_jsx(Typography, { variant: "caption", sx: { color: isDark ? "#7FFFD4" : "#2e7d32", fontWeight: "bold", mb: 0.5, display: "block" }, children: t("t-ai-meeting-translation") }), _jsx(Typography, { variant: "body2", sx: { whiteSpace: "pre-wrap", wordBreak: "break-word" }, children: message.translatedText })] }))] })] }));
 });
 const MeetingTranscript = observer(({ themeStyles }) => {
     const aiMeeting = useAIMeeting();
+    const { t } = useTranslation();
     const scrollRef = React.useRef(null);
     // 自动滚动到底部（响应消息和临时文本变化）
     React.useEffect(() => {
@@ -84,23 +87,10 @@ const MeetingTranscript = observer(({ themeStyles }) => {
                     p: 2,
                     background: themeStyles.headerBg,
                     borderBottom: `1px solid ${themeStyles.divider}`,
-                }, children: _jsx(Typography, { variant: "h6", sx: { fontWeight: "bold", fontSize: "1rem" }, children: "\uD83D\uDCDD \u4F1A\u8BAE\u8F6C\u5F55 & \u7FFB\u8BD1" }) }), _jsx(Box, { ref: scrollRef, sx: {
+                }, children: _jsx(Typography, { variant: "h6", sx: { fontWeight: "bold", fontSize: "1rem" }, children: t("t-ai-meeting-transcript-title") }) }), _jsx(Box, { ref: scrollRef, className: "uniform-scroller", sx: {
                     flex: 1,
                     overflowY: "auto",
                     p: 2,
-                    "&::-webkit-scrollbar": {
-                        width: "8px",
-                    },
-                    "&::-webkit-scrollbar-track": {
-                        background: themeStyles.background,
-                    },
-                    "&::-webkit-scrollbar-thumb": {
-                        background: themeStyles.divider,
-                        borderRadius: "4px",
-                    },
-                    "&::-webkit-scrollbar-thumb:hover": {
-                        background: themeStyles.color,
-                    },
                 }, children: aiMeeting.messages.length === 0 && !aiMeeting.tempTranscript ? (_jsx(Box, { sx: {
                         display: "flex",
                         alignItems: "center",
@@ -108,7 +98,7 @@ const MeetingTranscript = observer(({ themeStyles }) => {
                         height: "100%",
                         color: themeStyles.color,
                         opacity: 0.5,
-                    }, children: _jsx(Typography, { variant: "body1", children: "\u70B9\u51FB\u9EA6\u514B\u98CE\u6309\u94AE\u5F00\u59CB\u5F55\u97F3\uFF0C\u5B9E\u65F6\u8F6C\u5F55\u548C\u7FFB\u8BD1\u4F1A\u663E\u793A\u5728\u8FD9\u91CC" }) })) : (_jsxs(_Fragment, { children: [aiMeeting.messages.map((message, index) => (_jsx(MessageItem, { message: message, themeStyles: themeStyles, tempText: index === aiMeeting.messages.length - 1 ? aiMeeting.tempTranscript : undefined, isLast: index === aiMeeting.messages.length - 1 }, message.id))), aiMeeting.messages.length === 0 && aiMeeting.tempTranscript && (_jsxs(Box, { sx: {
+                    }, children: _jsx(Typography, { variant: "body1", children: t("t-ai-meeting-transcript-placeholder") }) })) : (_jsxs(_Fragment, { children: [aiMeeting.messages.map((message, index) => (_jsx(MessageItem, { message: message, themeStyles: themeStyles, tempText: index === aiMeeting.messages.length - 1 ? aiMeeting.tempTranscript : undefined, isLast: index === aiMeeting.messages.length - 1 }, message.id))), aiMeeting.messages.length === 0 && aiMeeting.tempTranscript && (_jsxs(Box, { sx: {
                                 display: "flex",
                                 gap: 1.5,
                                 mb: 2,

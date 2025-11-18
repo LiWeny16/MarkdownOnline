@@ -12,12 +12,15 @@ import {
   IconButton,
   Tooltip,
 } from "@mui/material"
+import { useTranslation } from "react-i18next"
 import MicIcon from "@mui/icons-material/Mic"
 import MicOffIcon from "@mui/icons-material/MicOff"
 import StopIcon from "@mui/icons-material/Stop"
 import PlayArrowIcon from "@mui/icons-material/PlayArrow"
 import HistoryIcon from "@mui/icons-material/History"
 import PersonIcon from "@mui/icons-material/Person"
+import TranslateIcon from "@mui/icons-material/Translate"
+import IOSSwitch from "@Com/myCom/Switches/SwitchIOS"
 import speechRecognition, { speechLanguageMap } from "@App/voice/speech"
 import { quickTranslate, BaiduLanguages } from "@App/ai/baidu"
 import alertUseArco from "@App/message/alert"
@@ -28,6 +31,7 @@ interface MeetingControlsProps {
 
 const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
   const aiMeeting = useAIMeeting()
+  const { t } = useTranslation()
   const [recognitionInstance, setRecognitionInstance] = React.useState<any>(null)
   const [meetingTitle, setMeetingTitle] = React.useState("")
 
@@ -42,11 +46,11 @@ const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
       // 清除临时转录文本
       aiMeeting.clearTempTranscript()
       aiMeeting.stopRecording()
-      alertUseArco("录音已停止", 2000)
+      alertUseArco(t("t-ai-meeting-recording-stopped"), 2000)
     } else {
       // 开始录音
       if (!aiMeeting.currentMeeting) {
-        alertUseArco("请先开始新会议", 2000)
+        alertUseArco(t("t-ai-meeting-please-start-meeting-first"), 2000)
         return
       }
 
@@ -78,8 +82,8 @@ const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
                 const updatedText = lastMessage.text + transcript
                 aiMeeting.updateFinalMessage(lastMessage.id, updatedText)
 
-                // 如果需要翻译，重新翻译整个文本
-                if (aiMeeting.targetLanguage) {
+                // 如果需要翻译且开关已开启，重新翻译整个文本
+                if (aiMeeting.enableRealtimeTranslation && aiMeeting.targetLanguage) {
                   try {
                     const sourceLang = BaiduLanguages[aiMeeting.sourceLanguage as keyof typeof BaiduLanguages] || "auto"
                     const translatedText = await quickTranslate(
@@ -106,8 +110,8 @@ const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
                 
                 aiMeeting.addMessage(newMessage)
 
-                // 自动翻译（仅对最终确认的文本进行翻译）
-                if (aiMeeting.targetLanguage) {
+                // 自动翻译（仅对最终确认的文本进行翻译，且开关已开启）
+                if (aiMeeting.enableRealtimeTranslation && aiMeeting.targetLanguage) {
                   try {
                     const sourceLang = BaiduLanguages[aiMeeting.sourceLanguage as keyof typeof BaiduLanguages] || "auto"
                     const translatedText = await quickTranslate(
@@ -130,10 +134,10 @@ const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
         
         setRecognitionInstance(instance)
         aiMeeting.startRecording()
-        alertUseArco("开始录音...", 2000)
+        alertUseArco(t("t-ai-meeting-recording-started"), 2000)
       } catch (error) {
         console.error("启动语音识别失败:", error)
-        alertUseArco("语音识别启动失败", 3000)
+        alertUseArco(t("t-ai-meeting-recognition-failed"), 3000)
       }
     }
   }
@@ -146,7 +150,7 @@ const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
       meetingTitle.trim() // 传入自定义标题，如果为空则使用默认标题
     )
     setMeetingTitle("") // 清空输入框
-    alertUseArco("新会议已创建，开始录音...", 2000)
+    alertUseArco(t("t-ai-meeting-meeting-created"), 2000)
     
     // 自动开始录音
     setTimeout(() => {
@@ -161,7 +165,7 @@ const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
       setRecognitionInstance(null)
     }
     await aiMeeting.endMeeting()
-    alertUseArco("会议已结束并保存", 2000)
+    alertUseArco(t("t-ai-meeting-meeting-ended"), 2000)
   }
 
   // 打开历史记录
@@ -187,16 +191,16 @@ const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
         onClick={handleStartMeeting}
         disabled={!!aiMeeting.currentMeeting && !aiMeeting.currentMeeting.endTime}
       >
-        新建会议
+        {t("t-ai-meeting-new-meeting")}
       </Button>
 
       {/* 会议名称输入框 */}
       <TextField
         size="small"
-        label="会议名称（可选）"
+        label={t("t-ai-meeting-meeting-name")}
         value={meetingTitle}
         onChange={(e) => setMeetingTitle(e.target.value)}
-        placeholder="留空则自动生成"
+        placeholder={t("t-ai-meeting-meeting-name-placeholder")}
         disabled={!!aiMeeting.currentMeeting && !aiMeeting.currentMeeting.endTime}
         sx={{ width: 200 }}
         onKeyPress={(e) => {
@@ -212,11 +216,11 @@ const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
         onClick={handleEndMeeting}
         disabled={!aiMeeting.currentMeeting || !!aiMeeting.currentMeeting.endTime}
       >
-        结束会议
+        {t("t-ai-meeting-end-meeting")}
       </Button>
 
       {/* 录音按钮 */}
-      <Tooltip title={aiMeeting.isRecording ? "停止录音" : "开始录音"}>
+      <Tooltip title={aiMeeting.isRecording ? t("t-ai-meeting-stop-recording") : t("t-ai-meeting-start-recording")}>
         <IconButton
           onClick={handleToggleRecording}
           disabled={!aiMeeting.currentMeeting || !!aiMeeting.currentMeeting.endTime}
@@ -233,7 +237,7 @@ const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
       </Tooltip>
 
       {/* 历史记录按钮 */}
-      <Tooltip title="历史记录">
+      <Tooltip title={t("t-ai-meeting-history")}>
         <IconButton onClick={handleOpenHistory}>
           <HistoryIcon />
         </IconButton>
@@ -244,7 +248,7 @@ const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
       {/* 发言人名称 */}
       <TextField
         size="small"
-        label="发言人"
+        label={t("t-ai-meeting-speaker")}
         value={aiMeeting.currentSpeaker}
         onChange={(e) => aiMeeting.setSpeaker(e.target.value)}
         disabled={aiMeeting.isRecording}
@@ -256,10 +260,10 @@ const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
 
       {/* 源语言选择 */}
       <FormControl size="small" sx={{ minWidth: 120 }}>
-        <InputLabel>源语言</InputLabel>
+        <InputLabel>{t("t-ai-meeting-source-language")}</InputLabel>
         <Select
           value={aiMeeting.sourceLanguage}
-          label="源语言"
+          label={t("t-ai-meeting-source-language")}
           onChange={(e) => aiMeeting.setSourceLanguage(e.target.value)}
           disabled={aiMeeting.isRecording}
         >
@@ -271,13 +275,23 @@ const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
         </Select>
       </FormControl>
 
+      {/* 实时翻译开关 */}
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+        <TranslateIcon sx={{ fontSize: 20, opacity: 0.7 }} />
+        <IOSSwitch
+          checked={aiMeeting.enableRealtimeTranslation}
+          onChange={() => aiMeeting.toggleRealtimeTranslation()}
+        />
+      </Box>
+
       {/* 目标翻译语言 */}
       <FormControl size="small" sx={{ minWidth: 120 }}>
-        <InputLabel>翻译为</InputLabel>
+        <InputLabel>{t("t-ai-meeting-translate-to")}</InputLabel>
         <Select
           value={aiMeeting.targetLanguage}
-          label="翻译为"
+          label={t("t-ai-meeting-translate-to")}
           onChange={(e) => aiMeeting.setTargetLanguage(e.target.value)}
+          disabled={!aiMeeting.enableRealtimeTranslation}
         >
           <MenuItem value="zh">中文</MenuItem>
           <MenuItem value="en">English</MenuItem>
@@ -286,7 +300,7 @@ const MeetingControls = observer(({ themeStyles }: MeetingControlsProps) => {
           <MenuItem value="de">Deutsch</MenuItem>
           <MenuItem value="spa">Español</MenuItem>
           <MenuItem value="it">Italiano</MenuItem>
-          <MenuItem value="kor">한국어</MenuItem>
+          <MenuItem value="kor">한国어</MenuItem>
           <MenuItem value="pt">Português</MenuItem>
           <MenuItem value="ru">Русский</MenuItem>
           <MenuItem value="th">ไทย</MenuItem>

@@ -57,6 +57,12 @@ class AIMeetingStore {
             writable: true,
             value: "en"
         }); // 目标翻译语言
+        Object.defineProperty(this, "enableRealtimeTranslation", {
+            enumerable: true,
+            configurable: true,
+            writable: true,
+            value: true
+        }); // 是否启用实时翻译
         // AI提示（暂时保留接口）
         Object.defineProperty(this, "aiSuggestions", {
             enumerable: true,
@@ -74,6 +80,7 @@ class AIMeetingStore {
             tempTranscript: observable,
             sourceLanguage: observable,
             targetLanguage: observable,
+            enableRealtimeTranslation: observable,
             aiSuggestions: observable,
         });
     }
@@ -259,6 +266,12 @@ class AIMeetingStore {
     }
     setTargetLanguage(lang) {
         this.targetLanguage = lang;
+    }
+    // 切换实时翻译开关
+    toggleRealtimeTranslation() {
+        runInAction(() => {
+            this.enableRealtimeTranslation = !this.enableRealtimeTranslation;
+        });
     }
     // 清空消息
     clearMessages() {

@@ -7,11 +7,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import CropFreeIcon from "@mui/icons-material/CropFree";
 import GroupsIcon from '@mui/icons-material/Groups';
 import MeetingTranscript from "./MeetingTranscript";
-import MeetingSummary from "./MeetingSummary";
+import MeetingAssistant from "./MeetingAssistant";
 import MeetingControls from "./MeetingControls";
 import { getTheme } from "@App/config/change";
+import { useTranslation } from "react-i18next";
 const AIMeetingDialog = observer(() => {
     const aiMeeting = useAIMeeting();
+    const { t } = useTranslation();
     const [windowSize, setWindowSize] = React.useState({
         width: window.innerWidth * 0.8,
         height: window.innerHeight * 0.9
@@ -100,7 +102,7 @@ const AIMeetingDialog = observer(() => {
                         borderBottom: `1px solid ${themeStyles.divider}`,
                         cursor: isDragging ? 'grabbing' : (isMaximized ? 'default' : 'grab'),
                         userSelect: 'none',
-                    }, children: [_jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [_jsx(GroupsIcon, { sx: { fontSize: 28 } }), _jsx(Typography, { variant: "h6", sx: { fontWeight: "bold" }, children: "AI \u4F1A\u8BAE - \u5B9E\u65F6\u8F6C\u5F55 & \u7FFB\u8BD1 & \u4F1A\u8BAE\u7EAA\u8981" })] }), _jsxs(Box, { sx: { display: 'flex', gap: 0.5, position: 'relative', zIndex: 1000 }, children: [_jsx(IconButton, { onClick: toggleMaximize, size: "small", children: _jsx(CropFreeIcon, { fontSize: "small" }) }), _jsx(IconButton, { onClick: handleClose, size: "small", children: _jsx(CloseIcon, { fontSize: "small" }) })] })] }), _jsx(MeetingControls, { themeStyles: themeStyles }), _jsx(Divider, { sx: { bgcolor: themeStyles.divider } }), _jsxs(Box, { sx: {
+                    }, children: [_jsxs(Box, { sx: { display: 'flex', alignItems: 'center', gap: 1 }, children: [_jsx(GroupsIcon, { sx: { fontSize: 28 } }), _jsx(Typography, { variant: "h6", sx: { fontWeight: "bold" }, children: t("t-ai-meeting-title") })] }), _jsxs(Box, { sx: { display: 'flex', gap: 0.5, position: 'relative', zIndex: 1000 }, children: [_jsx(IconButton, { onClick: toggleMaximize, size: "small", children: _jsx(CropFreeIcon, { fontSize: "small" }) }), _jsx(IconButton, { onClick: handleClose, size: "small", children: _jsx(CloseIcon, { fontSize: "small" }) })] })] }), _jsx(MeetingControls, { themeStyles: themeStyles }), _jsx(Divider, { sx: { bgcolor: themeStyles.divider } }), _jsxs(Box, { sx: {
                         flex: 1,
                         display: "flex",
                         overflow: "hidden",
@@ -120,7 +122,7 @@ const AIMeetingDialog = observer(() => {
                                 overflow: "hidden",
                                 border: `1px solid ${themeStyles.divider}`,
                                 borderRadius: 1,
-                            }, children: _jsx(MeetingSummary, { themeStyles: themeStyles }) })] }), (isDragging || isResizing) && (_jsx(Box, { sx: {
+                            }, children: _jsx(MeetingAssistant, { themeStyles: themeStyles }) })] }), (isDragging || isResizing) && (_jsx(Box, { sx: {
                         position: 'absolute',
                         top: 0,
                         left: 0,

@@ -110,7 +110,7 @@ const DrawerAppBar = observer((props) => {
                                             },
                                         }, children: _jsx(MyButton, { onClick: handleAIMeeting, startIcon: _jsx(GroupsIcon, {}), sx: {
                                                 position: "relative",
-                                            }, children: "AI \u4F1A\u8BAE" }) }), _jsx(Suspense, { fallback: _jsx(MyButton, { open: open, endIcon: _jsx(MoreVertIcon, {}), children: t("t-more") }), children: _jsx(LazyMenu, {}) }), _jsx(ImageManger, {}), _jsx(FileDrawer, {})] })] }) }), _jsx(Box, { sx: { display: { xs: "flex", sm: "none" } }, component: "nav", children: _jsx(Drawer, { container: container, variant: "temporary", open: mobileOpen, onClose: handleDrawerToggle, ModalProps: {
+                                            }, children: t("t-ai-meeting-button") }) }), _jsx(Suspense, { fallback: _jsx(MyButton, { open: open, endIcon: _jsx(MoreVertIcon, {}), children: t("t-more") }), children: _jsx(LazyMenu, {}) }), _jsx(ImageManger, {}), _jsx(FileDrawer, {})] })] }) }), _jsx(Box, { sx: { display: { xs: "flex", sm: "none" } }, component: "nav", children: _jsx(Drawer, { container: container, variant: "temporary", open: mobileOpen, onClose: handleDrawerToggle, ModalProps: {
                             keepMounted: true, // Better open performance on mobile.
                         }, sx: {
                             display: { xs: "block", sm: "none" },

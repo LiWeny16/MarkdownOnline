@@ -8,6 +8,7 @@ import {
   Paper,
   Divider,
 } from "@mui/material"
+import { useTranslation } from "react-i18next"
 
 interface MeetingTranscriptProps {
   themeStyles: any
@@ -55,6 +56,7 @@ const MessageItem = observer(({ message, themeStyles, tempText, isLast }: {
   tempText?: string;
   isLast?: boolean;
 }) => {
+  const { t } = useTranslation()
   const avatarColor = getAvatarColor(message.speaker)
   const initials = getInitials(message.speaker)
   const isDark = themeStyles.background === "#1e1e1e"
@@ -135,7 +137,7 @@ const MessageItem = observer(({ message, themeStyles, tempText, isLast }: {
               variant="caption"
               sx={{ color: isDark ? "#7FFFD4" : "#2e7d32", fontWeight: "bold", mb: 0.5, display: "block" }}
             >
-              翻译
+              {t("t-ai-meeting-translation")}
             </Typography>
             <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
               {message.translatedText}
@@ -149,6 +151,7 @@ const MessageItem = observer(({ message, themeStyles, tempText, isLast }: {
 
 const MeetingTranscript = observer(({ themeStyles }: MeetingTranscriptProps) => {
   const aiMeeting = useAIMeeting()
+  const { t } = useTranslation()
   const scrollRef = React.useRef<HTMLDivElement>(null)
 
   // 自动滚动到底部（响应消息和临时文本变化）
@@ -175,30 +178,18 @@ const MeetingTranscript = observer(({ themeStyles }: MeetingTranscriptProps) => 
         }}
       >
         <Typography variant="h6" sx={{ fontWeight: "bold", fontSize: "1rem" }}>
-          📝 会议转录 & 翻译
+          {t("t-ai-meeting-transcript-title")}
         </Typography>
       </Box>
 
       {/* 消息列表 */}
       <Box
         ref={scrollRef}
+        className="uniform-scroller"
         sx={{
           flex: 1,
           overflowY: "auto",
           p: 2,
-          "&::-webkit-scrollbar": {
-            width: "8px",
-          },
-          "&::-webkit-scrollbar-track": {
-            background: themeStyles.background,
-          },
-          "&::-webkit-scrollbar-thumb": {
-            background: themeStyles.divider,
-            borderRadius: "4px",
-          },
-          "&::-webkit-scrollbar-thumb:hover": {
-            background: themeStyles.color,
-          },
         }}
       >
         {aiMeeting.messages.length === 0 && !aiMeeting.tempTranscript ? (
@@ -213,7 +204,7 @@ const MeetingTranscript = observer(({ themeStyles }: MeetingTranscriptProps) => 
             }}
           >
             <Typography variant="body1">
-              点击麦克风按钮开始录音，实时转录和翻译会显示在这里
+              {t("t-ai-meeting-transcript-placeholder")}
             </Typography>
           </Box>
         ) : (

@@ -24,7 +24,7 @@ const lightTheme = createTheme({
     },
     secondary: {
       main: "#EEEEEE",
-      contrastText: "pink",
+      contrastText: "#ffc0cb",
     },
     info: {
       main: blue[200],
@@ -39,11 +39,11 @@ const darkTheme = createTheme({
   palette: {
     primary: {
       main: blue[400],
-      contrastText: "wheat",
+      contrastText: "#f5deb3",
     },
     secondary: {
       main: green[700],
-      contrastText: "wheat",
+      contrastText: "#f5deb3",
     },
     info: {
       main: green[600],

@@ -335,7 +335,7 @@ export default observer(function AIPromptPanel(props: any) {
               )}
             </Box>
           </Box>
-          <Box className="FLEX COW">
+          <Box className="FLEX COW" sx={{ alignItems: "center", paddingRight: "10px" }}>
             <Tooltip title="Ctrl+J">
               <IconButtonSq
                 style={{ padding: "0px 20px", fontWeight: "700" }}
@@ -353,15 +353,11 @@ export default observer(function AIPromptPanel(props: any) {
                 <PhotoCameraIcon style={{ fontSize: "1.2rem" }} />
               </IconButtonSq>
             </Tooltip>
-            <InputBase
-              multiline
-              disabled
-              fullWidth
-              sx={{ ml: 1, flex: 1 }}
-              maxRows={5}
-              placeholder="Press Ctrl + Enter To Send"
-              inputProps={{ "aria-label": "search google maps" }}
-            />
+            
+            <Box sx={{ ml: 1, flex: 1, display: 'flex', justifyContent: 'center', opacity: 0.5, userSelect: 'none' }}>
+               <Typography variant="caption">Press Ctrl + Enter To Send</Typography>
+            </Box>
+
             {/* 如果有图片，则在“接受AI并插入编辑器”按钮左边显示预览图，并增加删除按钮 */}
             {imageBase64 && (
               <Box sx={{ ml: 1, position: "relative", display: "inline-block" }}>
@@ -395,14 +391,16 @@ export default observer(function AIPromptPanel(props: any) {
               </Box>
             )}
             <Tooltip title="接受AI并插入编辑器">
-              <IconButtonSq
-                onClick={handleInsertAIResponse}
-                aria-label="插入"
-                disabled={!isEnd}
-                style={{ padding: "0px 20px", fontWeight: "700" }}
-              >
-                <WrapTextIcon style={{ fontSize: "1.2rem" }} />
-              </IconButtonSq>
+              <span>
+                <IconButtonSq
+                  onClick={handleInsertAIResponse}
+                  aria-label="插入"
+                  disabled={!isEnd}
+                  style={{ padding: "0px 20px", fontWeight: "700" }}
+                >
+                  <WrapTextIcon style={{ fontSize: "1.2rem" }} />
+                </IconButtonSq>
+              </span>
             </Tooltip>
           </Box>
         </Box>
