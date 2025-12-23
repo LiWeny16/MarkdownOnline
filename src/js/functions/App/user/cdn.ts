@@ -3,7 +3,7 @@
 export const cdnDomains = [
   "cdn.mengze.vip",
   "fastly.jsdelivr.net",
-  "cdn.jsdmirsror.com",
+  "cdn.jsdmirror.com",
   "cdn.jsdelivr.net",
   // "jsd.onmicrosoft.cn",
 ]
