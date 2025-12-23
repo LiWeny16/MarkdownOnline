@@ -36,13 +36,16 @@ const AIMeetingDialog = observer(() => {
 
     const isDark = getTheme() === "dark"
 
-    // 主题样式
+    // 主题样式 - 现代简洁风格
     const themeStyles = {
-        background: isDark ? "#1e1e1e" : "#ffffff",
-        color: isDark ? "#d8d8d8" : "#000000",
-        border: isDark ? "1px solid #404040" : "1px solid #e0e0e0",
-        headerBg: isDark ? "#2d2d30" : "#f5f5f5",
-        divider: isDark ? "#404040" : "#e0e0e0",
+        background: isDark ? "#1e1e1e" : "#f8f9fa",
+        color: isDark ? "#e0e0e0" : "#1a1a2e",
+        border: isDark ? "1px solid #333" : "1px solid #e8e8e8",
+        headerBg: isDark ? "#252526" : "#ffffff",
+        divider: isDark ? "#333" : "#e8e8e8",
+        cardBg: isDark ? "#2d2d30" : "#ffffff",
+        inputBg: isDark ? "#3c3c3c" : "#f0f0f0",
+        accent: "#90CAF9", // 蓝色强调色
     }
 
     const handleClose = () => {
@@ -107,9 +110,12 @@ const AIMeetingDialog = observer(() => {
                     maxWidth: 'none',
                     maxHeight: 'none',
                     background: themeStyles.background,
-                    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.3)',
+                    boxShadow: isDark 
+                        ? '0 8px 32px rgba(0, 0, 0, 0.5)' 
+                        : '0 4px 24px rgba(0, 0, 0, 0.08)',
                     overflow: 'hidden',
                     transition: (isDragging || isResizing) ? 'none' : 'all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1)',
+                    borderRadius: isMaximized ? 0 : 16,
                 }
             }}
         >
@@ -126,7 +132,8 @@ const AIMeetingDialog = observer(() => {
                 <Box
                     onMouseDown={handleMouseDown}
                     sx={{
-                        p: 2,
+                        px: 3,
+                        py: 2,
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
@@ -136,17 +143,31 @@ const AIMeetingDialog = observer(() => {
                     userSelect: 'none',
                 }}
             >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <GroupsIcon sx={{ fontSize: 28 }} />
-                        <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <GroupsIcon sx={{ fontSize: 26, color: themeStyles.accent }} />
+                        <Typography variant="h6" sx={{ fontWeight: 600, color: themeStyles.color, fontSize: '1.1rem' }}>
                             {t("t-ai-meeting-title")}
                         </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 0.5, position: 'relative', zIndex: 1000 }}>
-                        <IconButton onClick={toggleMaximize} size="small">
+                        <IconButton 
+                            onClick={toggleMaximize} 
+                            size="small"
+                            sx={{ 
+                                color: isDark ? '#888' : '#666',
+                                '&:hover': { bgcolor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }
+                            }}
+                        >
                             <CropFreeIcon fontSize="small" />
                         </IconButton>
-                        <IconButton onClick={handleClose} size="small">
+                        <IconButton 
+                            onClick={handleClose} 
+                            size="small"
+                            sx={{ 
+                                color: isDark ? '#888' : '#666',
+                                '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444' }
+                            }}
+                        >
                             <CloseIcon fontSize="small" />
                         </IconButton>
                     </Box>
@@ -163,8 +184,9 @@ const AIMeetingDialog = observer(() => {
                         flex: 1,
                         display: "flex",
                         overflow: "hidden",
-                        gap: 1,
-                        p: 2,
+                        gap: 2,
+                        p: 2.5,
+                        bgcolor: themeStyles.background,
                     }}
                 >
                     {/* 左侧：转录和翻译区域 (50%) */}
@@ -174,8 +196,10 @@ const AIMeetingDialog = observer(() => {
                             display: "flex",
                             flexDirection: "column",
                             overflow: "hidden",
+                            bgcolor: themeStyles.cardBg,
                             border: `1px solid ${themeStyles.divider}`,
-                            borderRadius: 1,
+                            borderRadius: 3,
+                            boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                         }}
                     >
                         <MeetingTranscript themeStyles={themeStyles} />
@@ -188,8 +212,10 @@ const AIMeetingDialog = observer(() => {
                             display: "flex",
                             flexDirection: "column",
                             overflow: "hidden",
+                            bgcolor: themeStyles.cardBg,
                             border: `1px solid ${themeStyles.divider}`,
-                            borderRadius: 1,
+                            borderRadius: 3,
+                            boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
                         }}
                     >
                         <MeetingAssistant themeStyles={themeStyles} />

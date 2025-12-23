@@ -14,22 +14,19 @@ interface MeetingTranscriptProps {
   themeStyles: any
 }
 
-// 生成头像颜色（根据名称生成一致的颜色）
-function getAvatarColor(name: string): string {
-  const colors = [
-    "#7FFFD4", // 薄荷绿
-    "#98D8C8", // 淡薄荷绿
-    "#6ECEB2", // 中薄荷绿
-    "#5BBEA0", // 深薄荷绿
-    "#8FD8D2", // 青薄荷
-  ]
-  
-  let hash = 0
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  }
-  
-  return colors[Math.abs(hash) % colors.length]
+// 根据角色获取头像颜色（不同角色不同颜色）
+const ROLE_COLOR_MAP: Record<string, string> = {
+  "产品经理": "#FF6B6B",      // 珊瑚红
+  "技术负责人": "#4ECDC4",    // 青绿色
+  "UI设计师": "#A78BFA",      // 紫罗兰
+  "前端开发": "#60A5FA",      // 天蓝色
+  "后端开发": "#34D399",      // 翡翠绿
+  "测试工程师": "#FBBF24",    // 金黄色
+  "项目经理": "#F472B6",      // 粉红色
+  "运营": "#FB923C",          // 橙色
+  "市场": "#22D3EE",          // 青色
+  "客户": "#E879F9",          // 洋红色
+  "其他": "#94A3B8",          // 灰蓝色
 }
 
 // 获取首字母
@@ -57,7 +54,18 @@ const MessageItem = observer(({ message, themeStyles, tempText, isLast }: {
   isLast?: boolean;
 }) => {
   const { t } = useTranslation()
-  const avatarColor = getAvatarColor(message.speaker)
+  const aiMeeting = useAIMeeting()
+  
+  // 根据发言人获取角色颜色
+  const getSpeakerColor = (speakerName: string): string => {
+    const participant = aiMeeting.participants.find(p => p.name === speakerName)
+    if (participant) {
+      return ROLE_COLOR_MAP[participant.role] || "#94A3B8"
+    }
+    return "#94A3B8"
+  }
+  
+  const avatarColor = getSpeakerColor(message.speaker)
   const initials = getInitials(message.speaker)
   const isDark = themeStyles.background === "#1e1e1e"
 
@@ -74,7 +82,7 @@ const MessageItem = observer(({ message, themeStyles, tempText, isLast }: {
       <Avatar
         sx={{
           bgcolor: avatarColor,
-          color: "#000",
+          color: "#fff",
           fontWeight: "bold",
           width: 40,
           height: 40,
@@ -127,15 +135,15 @@ const MessageItem = observer(({ message, themeStyles, tempText, isLast }: {
             elevation={1}
             sx={{
               p: 1.5,
-              bgcolor: isDark ? "#1a3a2e" : "#e8f5e9",
+              bgcolor: isDark ? "rgba(144, 202, 249, 0.1)" : "rgba(144, 202, 249, 0.08)",
               color: themeStyles.color,
               borderRadius: 2,
-              borderLeft: `3px solid ${avatarColor}`,
+              borderLeft: `3px solid #90CAF9`,
             }}
           >
             <Typography
               variant="caption"
-              sx={{ color: isDark ? "#7FFFD4" : "#2e7d32", fontWeight: "bold", mb: 0.5, display: "block" }}
+              sx={{ color: "#64B5F6", fontWeight: 600, mb: 0.5, display: "block" }}
             >
               {t("t-ai-meeting-translation")}
             </Typography>
@@ -144,6 +152,70 @@ const MessageItem = observer(({ message, themeStyles, tempText, isLast }: {
             </Typography>
           </Paper>
         )}
+      </Box>
+    </Box>
+  )
+})
+
+// 临时消息框组件（用于显示正在识别的文本）
+const TempMessageBox = observer(({ aiMeeting, themeStyles }: { aiMeeting: any; themeStyles: any }) => {
+  const isDark = themeStyles.background === "#1e1e1e"
+  
+  // 根据发言人获取角色颜色
+  const getSpeakerColor = (speakerName: string): string => {
+    const participant = aiMeeting.participants.find((p: any) => p.name === speakerName)
+    if (participant) {
+      return ROLE_COLOR_MAP[participant.role] || "#94A3B8"
+    }
+    return "#94A3B8"
+  }
+  
+  const avatarColor = getSpeakerColor(aiMeeting.currentSpeaker)
+  
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        gap: 1.5,
+        mb: 2,
+        alignItems: "flex-start",
+      }}
+    >
+      <Avatar
+        sx={{
+          bgcolor: avatarColor,
+          color: "#fff",
+          fontWeight: "bold",
+          width: 40,
+          height: 40,
+          fontSize: "1rem",
+        }}
+      >
+        {getInitials(aiMeeting.currentSpeaker)}
+      </Avatar>
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
+          <Typography variant="body2" sx={{ fontWeight: "bold", color: themeStyles.color }}>
+            {aiMeeting.currentSpeaker}
+          </Typography>
+          <Typography variant="caption" sx={{ color: isDark ? "#888" : "#666" }}>
+            {new Date().toLocaleTimeString("zh-CN")}
+          </Typography>
+        </Box>
+        <Paper
+          elevation={1}
+          sx={{
+            p: 1.5,
+            bgcolor: isDark ? "#2d2d30" : "#f5f5f5",
+            color: isDark ? "#888" : "#999",
+            borderRadius: 2,
+            fontStyle: "italic",
+          }}
+        >
+          <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+            {aiMeeting.tempTranscript} ...
+          </Typography>
+        </Paper>
       </Box>
     </Box>
   )
@@ -209,62 +281,25 @@ const MeetingTranscript = observer(({ themeStyles }: MeetingTranscriptProps) => 
           </Box>
         ) : (
           <>
-            {aiMeeting.messages.map((message, index) => (
-              <MessageItem
-                key={message.id}
-                message={message}
-                themeStyles={themeStyles}
-                tempText={index === aiMeeting.messages.length - 1 ? aiMeeting.tempTranscript : undefined}
-                isLast={index === aiMeeting.messages.length - 1}
-              />
-            ))}
-            {/* 如果没有消息但有临时文本，显示临时消息 */}
-            {aiMeeting.messages.length === 0 && aiMeeting.tempTranscript && (
-              <Box
-                sx={{
-                  display: "flex",
-                  gap: 1.5,
-                  mb: 2,
-                  alignItems: "flex-start",
-                }}
-              >
-                <Avatar
-                  sx={{
-                    bgcolor: getAvatarColor(aiMeeting.currentSpeaker),
-                    color: "#000",
-                    fontWeight: "bold",
-                    width: 40,
-                    height: 40,
-                    fontSize: "1rem",
-                  }}
-                >
-                  {getInitials(aiMeeting.currentSpeaker)}
-                </Avatar>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}>
-                    <Typography variant="body2" sx={{ fontWeight: "bold", color: themeStyles.color }}>
-                      {aiMeeting.currentSpeaker}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: themeStyles.background === "#1e1e1e" ? "#888" : "#666" }}>
-                      {new Date().toLocaleTimeString("zh-CN")}
-                    </Typography>
-                  </Box>
-                  <Paper
-                    elevation={1}
-                    sx={{
-                      p: 1.5,
-                      bgcolor: themeStyles.background === "#1e1e1e" ? "#2d2d30" : "#f5f5f5",
-                      color: themeStyles.background === "#1e1e1e" ? "#888" : "#999",
-                      borderRadius: 2,
-                      fontStyle: "italic",
-                    }}
-                  >
-                    <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                      {aiMeeting.tempTranscript} ...
-                    </Typography>
-                  </Paper>
-                </Box>
-              </Box>
+            {aiMeeting.messages.map((message, index) => {
+              const isLast = index === aiMeeting.messages.length - 1
+              // 只有当最后一条消息的说话人与当前说话人相同时，才在该消息后显示临时文本
+              const showTempText = isLast && message.speaker === aiMeeting.currentSpeaker
+              return (
+                <MessageItem
+                  key={message.id}
+                  message={message}
+                  themeStyles={themeStyles}
+                  tempText={showTempText ? aiMeeting.tempTranscript : undefined}
+                  isLast={isLast}
+                />
+              )
+            })}
+            {/* 如果没有消息但有临时文本，或者最后一条消息的说话人与当前说话人不同，显示新的临时消息框 */}
+            {((aiMeeting.messages.length === 0 && aiMeeting.tempTranscript) || 
+              (aiMeeting.messages.length > 0 && aiMeeting.tempTranscript && 
+               aiMeeting.messages[aiMeeting.messages.length - 1].speaker !== aiMeeting.currentSpeaker)) && (
+              <TempMessageBox aiMeeting={aiMeeting} themeStyles={themeStyles} />
             )}
           </>
         )}

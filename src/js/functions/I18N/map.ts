@@ -170,6 +170,18 @@ const map = {
       "t-ai-meeting-recognition-failed": "Speech recognition failed",
       "t-ai-meeting-meeting-created": "New meeting created, starting recording...",
       "t-ai-meeting-meeting-ended": "Meeting ended and saved",
+      // AI Meeting - Participants
+      "t-ai-meeting-participants": "Participants",
+      "t-ai-meeting-participants-title": "Manage Participants",
+      "t-ai-meeting-participants-desc": "Add participants and their roles. AI will automatically identify speakers based on conversation content.",
+      "t-ai-meeting-quick-switch": "Quick Switch",
+      "t-ai-meeting-add-participant": "Add Participant",
+      "t-ai-meeting-participant-add": "Add to Meeting",
+      "t-ai-meeting-participant-remove": "Remove from Meeting",
+      "t-ai-meeting-attending": "Attending",
+      "t-ai-meeting-not-attending": "Not Attending",
+      "t-ai-meeting-ai-speaker-detection": "AI Speaker Detection",
+      "t-ai-meeting-close": "Close",
       //
       "t-preview-mode-error":
         "Preview mode is enabled, can't save. Open another file!",
@@ -411,6 +423,18 @@ const map = {
       "t-ai-meeting-recognition-failed": "语音识别启动失败",
       "t-ai-meeting-meeting-created": "新会议已创建，开始录音...",
       "t-ai-meeting-meeting-ended": "会议已结束并保存",
+      // AI 会议 - 参会人管理
+      "t-ai-meeting-participants": "参会人员",
+      "t-ai-meeting-participants-title": "管理参会人员",
+      "t-ai-meeting-participants-desc": "添加参会人员及其岗位，AI将根据对话内容自动识别说话人。",
+      "t-ai-meeting-quick-switch": "快速切换",
+      "t-ai-meeting-add-participant": "添加参会人",
+      "t-ai-meeting-participant-add": "加入会议",
+      "t-ai-meeting-participant-remove": "离开会议",
+      "t-ai-meeting-attending": "参会中",
+      "t-ai-meeting-not-attending": "未参会",
+      "t-ai-meeting-ai-speaker-detection": "AI说话人识别",
+      "t-ai-meeting-close": "关闭",
       //
       "t-preview-mode-error": "预览模式你保存个屁，开另一个文件！",
       "t-save-success-local": "成功保存到本地！🎉",

@@ -153,3 +153,60 @@ class BigModel {
 
 const bigModel = new BigModel()
 export default bigModel
+
+/**
+ * AI 识别说话人
+ * 根据对话内容和参会人信息推断当前说话人
+ */
+export async function detectSpeaker(
+  transcript: string,
+  participants: Array<{ name: string; role: string }>,
+  recentMessages: Array<{ speaker: string; text: string }>,
+  currentSpeaker: string
+): Promise<string> {
+  if (participants.length === 0) return currentSpeaker
+  
+  const participantsDesc = participants.map(p => `${p.name}(${p.role})`).join("、")
+  const recentContext = recentMessages.slice(-5).map(m => `${m.speaker}: ${m.text}`).join("\n")
+  
+  const prompt = `你是一个说话人识别助手。根据以下信息判断当前说话的是谁。
+
+参会人员：${participantsDesc}
+
+最近对话：
+${recentContext}
+
+当前发言内容："${transcript}"
+
+请判断这句话最可能是哪位参会人员说的。只需要回复参会人的名字，不要其他内容。如果无法判断，回复"${currentSpeaker}"。`
+
+  return new Promise((resolve) => {
+    let result = currentSpeaker
+    
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${token}`,
+      },
+      body: JSON.stringify({
+        model: "GLM-4-flash",
+        stream: false,
+        messages: [
+          { role: "user", content: prompt }
+        ],
+      }),
+    })
+    .then(res => res.json())
+    .then(data => {
+      const content = data.choices?.[0]?.message?.content?.trim() || currentSpeaker
+      // 验证返回的名字是否在参会人列表中
+      const matched = participants.find(p => content.includes(p.name))
+      result = matched ? matched.name : currentSpeaker
+      resolve(result)
+    })
+    .catch(() => {
+      resolve(currentSpeaker)
+    })
+  })
+}

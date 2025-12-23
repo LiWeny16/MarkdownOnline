@@ -90,18 +90,30 @@ const MeetingAssistant = observer(({ themeStyles }: MeetingAssistantProps) => {
     setSummary("")
 
     try {
+      // 构建参会人信息
+      const activeParticipants = aiMeeting.participants.filter(p => p.isActive)
+      const participantsInfo = activeParticipants.length > 0
+        ? `参会人员：\n${activeParticipants.map(p => `- ${p.name}（${p.role}）`).join("\n")}\n\n`
+        : ""
+
       const meetingContent = aiMeeting.messages
         .filter((msg) => msg.isFinal)
-        .map((msg) => `${msg.speaker}: ${msg.text}`)
+        .map((msg) => {
+          // 尝试获取发言人的岗位信息
+          const participant = activeParticipants.find(p => p.name === msg.speaker)
+          const speakerLabel = participant ? `${msg.speaker}(${participant.role})` : msg.speaker
+          return `${speakerLabel}: ${msg.text}`
+        })
         .join("\n")
 
       const prompt = `请总结以下会议内容，提炼出关键要点、决策和行动项。用清晰的Markdown格式输出，包括：
-1. 会议概述
-2. 关键讨论点
-3. 重要决策
-4. 待办事项/行动项
+1. 会议概述（简要说明会议主题和参会人员）
+2. 各方观点（按参会人岗位角色归纳各自的主要观点）
+3. 关键讨论点
+4. 重要决策
+5. 待办事项/行动项（明确责任人）
 
-会议内容：
+${participantsInfo}会议内容：
 ${meetingContent}`
 
       let fullSummary = ""
@@ -253,13 +265,24 @@ ${recentMessages}`
       }}
     >
       {/* Tabs Header */}
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: themeStyles.headerBg }}>
+      <Box sx={{ borderBottom: 1, borderColor: themeStyles.divider, bgcolor: themeStyles.headerBg }}>
         <Tabs 
           value={tabValue} 
           onChange={(e, newValue) => setTabValue(newValue)}
-          textColor="primary"
-          indicatorColor="primary"
           variant="fullWidth"
+          sx={{
+            "& .MuiTab-root": {
+              textTransform: "none",
+              fontWeight: 500,
+              color: isDark ? "#888" : "#666",
+              "&.Mui-selected": {
+                color: "#90CAF9",
+              },
+            },
+            "& .MuiTabs-indicator": {
+              backgroundColor: "#90CAF9",
+            },
+          }}
         >
           <Tab label={t("t-ai-meeting-summary-tab")} icon={<AutoAwesomeIcon fontSize="small" />} iconPosition="start" />
           <Tab label={t("t-ai-meeting-assistant-tab")} icon={<LightbulbIcon fontSize="small" />} iconPosition="start" />
@@ -275,6 +298,14 @@ ${recentMessages}`
             startIcon={isGeneratingSummary ? <CircularProgress size={16} color="inherit" /> : <AutoAwesomeIcon />}
             onClick={handleGenerateSummary}
             disabled={isGeneratingSummary || aiMeeting.messages.length === 0}
+            sx={{
+              bgcolor: "#90CAF9",
+              color: "#1a1a2e",
+              borderRadius: 2,
+              textTransform: "none",
+              boxShadow: "none",
+              "&:hover": { bgcolor: "#64B5F6", boxShadow: "none" },
+            }}
           >
             {t("t-ai-meeting-generate-summary")}
           </Button>
@@ -284,6 +315,13 @@ ${recentMessages}`
             startIcon={<FileDownloadIcon />}
             onClick={handleExportToMonaco}
             disabled={!summary}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              borderColor: isDark ? "#555" : "#ddd",
+              color: themeStyles.color,
+              "&:hover": { borderColor: isDark ? "#777" : "#bbb" },
+            }}
           >
             {t("t-ai-meeting-export")}
           </Button>
@@ -293,6 +331,13 @@ ${recentMessages}`
             startIcon={<SaveIcon />}
             onClick={handleSaveMeeting}
             disabled={!aiMeeting.currentMeeting}
+            sx={{
+              borderRadius: 2,
+              textTransform: "none",
+              borderColor: isDark ? "#555" : "#ddd",
+              color: themeStyles.color,
+              "&:hover": { borderColor: isDark ? "#777" : "#bbb" },
+            }}
           >
             {t("t-ai-meeting-save")}
           </Button>
@@ -380,10 +425,18 @@ ${recentMessages}`
                 key={ctx.key}
                 label={ctx.label}
                 onClick={() => setSuggestionContext(ctx.key)}
-                color={suggestionContext === ctx.key ? "primary" : "default"}
-                variant={suggestionContext === ctx.key ? "filled" : "outlined"}
                 size="small"
                 clickable
+                sx={{
+                  borderRadius: 2,
+                  borderColor: isDark ? "#444" : "#ddd",
+                  bgcolor: suggestionContext === ctx.key ? "#90CAF9" : "transparent",
+                  color: suggestionContext === ctx.key ? "#1a1a2e" : (isDark ? "#ddd" : "#333"),
+                  fontWeight: 500,
+                  "&:hover": {
+                    bgcolor: suggestionContext === ctx.key ? "#64B5F6" : (isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.04)"),
+                  },
+                }}
               />
             ))}
           </Box>
@@ -393,6 +446,15 @@ ${recentMessages}`
             startIcon={isGeneratingSuggestions ? <CircularProgress size={16} color="inherit" /> : <RefreshIcon />}
             onClick={handleGenerateSuggestions}
             disabled={isGeneratingSuggestions || aiMeeting.messages.length === 0}
+            sx={{
+              bgcolor: "#90CAF9",
+              color: "#1a1a2e",
+              borderRadius: 2,
+              textTransform: "none",
+              fontWeight: 500,
+              boxShadow: "none",
+              "&:hover": { bgcolor: "#64B5F6", boxShadow: "none" },
+            }}
           >
             {t("t-ai-meeting-get-suggestions")}
           </Button>
@@ -432,7 +494,7 @@ ${recentMessages}`
                     }
                   >
                     <ListItemIcon sx={{ minWidth: 36, mt: 0.5 }}>
-                      <LightbulbIcon color="warning" fontSize="small" />
+                      <LightbulbIcon sx={{ color: "#90CAF9" }} fontSize="small" />
                     </ListItemIcon>
                     <ListItemText
                       primary={

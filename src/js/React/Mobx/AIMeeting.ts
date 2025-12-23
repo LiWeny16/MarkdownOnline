@@ -1,5 +1,28 @@
 import { observable, makeAutoObservable, runInAction } from "mobx"
 
+// 参会人类型
+export interface Participant {
+  id: string
+  name: string
+  role: string // 岗位
+  isActive: boolean // 是否参会
+}
+
+// 预设岗位列表
+export const PRESET_ROLES = [
+  "产品经理",
+  "技术负责人",
+  "UI设计师",
+  "前端开发",
+  "后端开发",
+  "测试工程师",
+  "项目经理",
+  "运营",
+  "市场",
+  "客户",
+  "其他",
+]
+
 // 会议消息类型
 export interface MeetingMessage {
   id: string
@@ -40,6 +63,15 @@ class AIMeetingStore {
   targetLanguage = "en" // 目标翻译语言
   enableRealtimeTranslation = true // 是否启用实时翻译
   
+  // 参会人管理
+  participants: Participant[] = [
+    { id: "p1", name: "参会人1", role: "产品经理", isActive: true },
+    { id: "p2", name: "参会人2", role: "技术负责人", isActive: true },
+    { id: "p3", name: "参会人3", role: "前端开发", isActive: true },
+    { id: "p4", name: "参会人4", role: "后端开发", isActive: true },
+  ]
+  enableAISpeakerDetection = true // 是否启用AI说话人识别
+  
   // AI提示（暂时保留接口）
   aiSuggestions: string[] = []
   
@@ -56,7 +88,89 @@ class AIMeetingStore {
       targetLanguage: observable,
       enableRealtimeTranslation: observable,
       aiSuggestions: observable,
+      participants: observable,
+      enableAISpeakerDetection: observable,
     })
+  }
+
+  // ========== 参会人管理方法 ==========
+  
+  // 获取活跃的参会人列表
+  get activeParticipants(): Participant[] {
+    return this.participants.filter(p => p.isActive)
+  }
+
+  // 添加参会人
+  addParticipant(name: string = "", role: string = "其他") {
+    runInAction(() => {
+      const id = `p${Date.now()}`
+      const defaultName = name || `参会人${this.participants.length + 1}`
+      this.participants.push({
+        id,
+        name: defaultName,
+        role,
+        isActive: true,
+      })
+    })
+  }
+
+  // 删除参会人
+  removeParticipant(id: string) {
+    runInAction(() => {
+      this.participants = this.participants.filter(p => p.id !== id)
+    })
+  }
+
+  // 更新参会人信息
+  updateParticipant(id: string, updates: Partial<Pick<Participant, "name" | "role">>) {
+    runInAction(() => {
+      const participant = this.participants.find(p => p.id === id)
+      if (participant) {
+        if (updates.name !== undefined) participant.name = updates.name
+        if (updates.role !== undefined) participant.role = updates.role
+      }
+    })
+  }
+
+  // 切换参会人激活状态
+  toggleParticipantActive(id: string) {
+    runInAction(() => {
+      const participant = this.participants.find(p => p.id === id)
+      if (participant) {
+        participant.isActive = !participant.isActive
+        // 如果当前发言人是这个人且被取消激活，切换到第一个激活的参会人
+        if (!participant.isActive && this.currentSpeaker === participant.name) {
+          const firstActive = this.participants.find(p => p.isActive)
+          if (firstActive) {
+            this.currentSpeaker = firstActive.name
+          }
+        }
+      }
+    })
+  }
+
+  // 切换当前发言人（快速切换）
+  switchToParticipant(id: string) {
+    runInAction(() => {
+      const participant = this.participants.find(p => p.id === id)
+      if (participant && participant.isActive) {
+        this.currentSpeaker = participant.name
+      }
+    })
+  }
+
+  // 切换AI说话人识别开关
+  toggleAISpeakerDetection() {
+    runInAction(() => {
+      this.enableAISpeakerDetection = !this.enableAISpeakerDetection
+    })
+  }
+
+  // 获取参会人信息描述（用于AI提示词）
+  getParticipantsDescription(): string {
+    const activeOnes = this.activeParticipants
+    if (activeOnes.length === 0) return ""
+    return activeOnes.map(p => `${p.name}(${p.role})`).join("、")
   }
 
   // 打开会议助手
