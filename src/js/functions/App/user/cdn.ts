@@ -33,8 +33,8 @@ export async function testCdns(): Promise<void> {
     ): Promise<CdnResult> {
       const controller = new AbortController()
       const signal = controller.signal
-      // 使用一个极小的文件或 HEAD 请求来测速
-      const url = `https://${domain}/npm/bigonion-kit@0.12.6/package.json`
+      // 使用一个极小的文件来测速（lodash 是 npm 下载量最大的包，CDN 缓存命中率极高）
+      const url = `https://${domain}/npm/lodash@4.17.21/package.json`
 
       const timeoutId = setTimeout(() => {
         controller.abort()
