@@ -67,6 +67,7 @@ import {
 } from '@App/text/tableEditor';
 import { getTableMetadata } from '@App/text/tableEditor';
 import { getTheme } from '@App/config/change';
+import markdownItLatex from '@Func/Parser/mdItPlugin/latex';
 
 // 🚀 主题样式函数
 const getTableThemeStyles = () => {
@@ -327,13 +328,19 @@ const ReactTable: React.FC<ReactTableProps> = React.memo(({ tableId, tableData: 
   // 🚀 新增：表格容器引用
   const tableContainerRef = useRef<HTMLDivElement>(null);
 
-  // 🚀 Part 1: 创建 markdown-it 实例，支持行内markdown语法
+  // 🚀 Part 1: 创建 markdown-it 实例，支持行内markdown语法和LaTeX公式
   const md = useMemo(() => {
     const mdInstance = new MarkdownIt({
       html: false,
       linkify: true,
       typographer: false,
       breaks: true // 启用换行转换
+    });
+
+    // 🚀 注册 LaTeX 插件，支持 $inline$ 和 $$block$$ 公式
+    mdInstance.use(markdownItLatex, {
+      throwOnError: false,
+      strict: false
     });
 
     // 🚀 添加自定义渲染规则以支持strikethrough
@@ -1870,6 +1877,7 @@ class TableManager {
   private static instance: TableManager;
   private mountedRoots = new Map<string, any>(); // 使用tableId作为key
   private lastTableStates = new Map<string, string>(); // 保存每个表格的最后状态hash
+  private pendingRoots = new Set<string>(); // 🚀 新增：跟踪正在创建的 root
 
   static getInstance(): TableManager {
     if (!TableManager.instance) {
@@ -1907,6 +1915,7 @@ class TableManager {
       const lastHash = this.lastTableStates.get(tableId);
       const existingRoot = this.mountedRoots.get(tableId);
       const hasContent = placeholder.children.length > 0;
+      const isPending = this.pendingRoots.has(tableId); // 🚀 检查是否正在创建中
 
       // 
       //   domHash: domTableHash,
@@ -1920,6 +1929,11 @@ class TableManager {
       // 如果没有找到注册表数据，跳过此表格
       if (!currentTableHash) {
         console.warn(`表格 ${tableId} 在注册表中未找到，跳过处理`);
+        return;
+      }
+
+      // 🚀 如果正在创建中，跳过
+      if (isPending) {
         return;
       }
 
@@ -1951,7 +1965,16 @@ class TableManager {
 
   // 创建新的表格根节点
   private createTableRoot(placeholder: HTMLElement, tableId: string, tableHash: string | null) {
+    // 🚀 防止重复创建：立即标记为 pending
+    if (this.pendingRoots.has(tableId)) {
+      return;
+    }
+    this.pendingRoots.add(tableId);
+
     try {
+      // 🚀 清空占位符内容，避免 React 警告
+      placeholder.innerHTML = '';
+      
       // 重置占位符样式
       placeholder.style.border = 'none';
       placeholder.style.background = 'transparent';
@@ -1964,6 +1987,13 @@ class TableManager {
         // 再次检查占位符是否仍然存在
         if (!document.contains(placeholder)) {
           console.warn(`表格 ${tableId} 的占位符已被移除`);
+          this.pendingRoots.delete(tableId); // 🚀 清理 pending 状态
+          return;
+        }
+
+        // 🚀 再次检查是否已经有 root（防止竞态条件）
+        if (this.mountedRoots.has(tableId)) {
+          this.pendingRoots.delete(tableId);
           return;
         }
 
@@ -1975,13 +2005,18 @@ class TableManager {
         if (tableHash) {
           this.lastTableStates.set(tableId, tableHash);
         }
+        
+        // 🚀 移除 pending 状态
+        this.pendingRoots.delete(tableId);
 
 
       }).catch(e => {
         console.error(`创建表格 ${tableId} 根节点失败:`, e);
+        this.pendingRoots.delete(tableId); // 🚀 清理 pending 状态
       });
     } catch (e) {
       console.error(`为表格 ${tableId} 创建根节点时发生错误:`, e);
+      this.pendingRoots.delete(tableId); // 🚀 清理 pending 状态
     }
   }
 
@@ -2023,6 +2058,7 @@ class TableManager {
     toDelete.forEach(tableId => {
       this.mountedRoots.delete(tableId);
       this.lastTableStates.delete(tableId);
+      this.pendingRoots.delete(tableId); // 🚀 同时清理 pending 状态
       // 🚀 清理同步监听器
       tableSyncManager.clearTableListeners(tableId);
     });
@@ -2053,6 +2089,7 @@ class TableManager {
     });
     this.mountedRoots.clear();
     this.lastTableStates.clear();
+    this.pendingRoots.clear(); // 🚀 清理所有 pending 状态
     // 🚀 清理所有同步监听器
     tableSyncManager.clearAllListeners();
   }
@@ -2062,7 +2099,9 @@ class TableManager {
     return {
       mountedRootsCount: this.mountedRoots.size,
       tableStatesCount: this.lastTableStates.size,
+      pendingRootsCount: this.pendingRoots.size, // 🚀 新增
       mountedTableIds: Array.from(this.mountedRoots.keys()),
+      pendingTableIds: Array.from(this.pendingRoots), // 🚀 新增
       tableStates: Object.fromEntries(this.lastTableStates),
       syncListenersCount: (tableSyncManager as any).syncListeners?.size || 0
     };

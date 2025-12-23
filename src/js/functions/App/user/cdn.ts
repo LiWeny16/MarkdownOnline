@@ -1,45 +1,54 @@
-import { getDataByKey, openDB, updateDB } from "@App/memory/db"
+// import { getDataByKey, openDB, updateDB } from "@App/memory/db"
 
 export const cdnDomains = [
-  "cdn.jsdmirror.com",
-  "cdn.jsdelivr.net",
+  "cdn.mengze.vip",
   "fastly.jsdelivr.net",
+  "cdn.jsdmirsror.com",
+  "cdn.jsdelivr.net",
   // "jsd.onmicrosoft.cn",
 ]
 export const cdnDomainsNpm = ["npm.elemecdn.com"]
 export default async function cdnInit() {
-  window._cdn = { failed: [], index: 0, cdn: cdnDomains }
+  // 1. 优先读取本地缓存的最佳 CDN
+  const preferredCDN = localStorage.getItem('preferred_cdn');
+  if (preferredCDN && cdnDomains.includes(preferredCDN)) {
+    // 将缓存的最佳 CDN 移到第一位
+    const index = cdnDomains.indexOf(preferredCDN);
+    if (index > -1) {
+      cdnDomains.splice(index, 1);
+      cdnDomains.unshift(preferredCDN);
+    }
+  }
+  window._cdn = { failed: [], index: 0, cdn: [...cdnDomains] }
 }
 
 type CdnResult = { domain: string; latency: number } | null
 
 export async function testCdns(): Promise<void> {
   return new Promise(async (resolve) => {
-    // 检查 CDN 是否可访问的函数，并返回响应时间
+    // 检查 CDN 是否可访问的函数
     async function checkCDNConnectivity(
       domain: string,
-      timeout: number = 1300
+      timeout: number = 2000
     ): Promise<CdnResult> {
       const controller = new AbortController()
       const signal = controller.signal
-      let url = `https://${domain}/npm/bigonion-kit@0.12.6/.vscode/settings.json`
-      if (domain === "cdn.jsdmirror.com") {
-        url = `https://${domain}/npm/bigonion-kit@0.12.6/.vscode/settings.json`
+      // 使用一个极小的文件或 HEAD 请求来测速
+      const url = `https://${domain}/npm/bigonion-kit@0.12.6/package.json`
 
-      }
-
-
-      // 设置一个定时器在指定的超时时间后中止请求
       const timeoutId = setTimeout(() => {
         controller.abort()
       }, timeout)
 
       try {
         const startTime = performance.now()
+        // 尝试使用 HEAD 请求以节省流量，如果不支持则回退到 GET
         const response = await fetch(url, {
+          method: 'HEAD',
           signal,
           cache: "no-store",
-        })
+        }).catch(() => fetch(url, { signal, cache: "no-store" })); // 回退
+
         const endTime = performance.now()
         clearTimeout(timeoutId)
 
@@ -48,53 +57,64 @@ export async function testCdns(): Promise<void> {
         }
 
         const latency = endTime - startTime
-        console.log(`CDN ${domain} is reachable. Response time: ${latency} ms`)
+        // console.log(`CDN ${domain} latency: ${Math.round(latency)}ms`)
         return { domain, latency }
-      } catch (error: any) {
-        if (error.name === "AbortError") {
-          console.error(`CDN ${domain} test failed: Timeout exceeded.`)
-        } else {
-          console.error(`CDN ${domain} test failed: ${error.message}`)
-        }
+      } catch (error) {
         return null
       }
     }
 
-    // 主函数，测试所有 CDN 域名，挑选并排序
-    async function testAndSortCDNs(
-      cdnDomains: string[],
-      timeout: number = 3000
-    ): Promise<string[]> {
-      const results: CdnResult[] = await Promise.all(
-        cdnDomains.map((domain) => {
-          try {
-            return checkCDNConnectivity(domain, timeout)
-          } catch (error) {
-            console.log(error);
-            return null
-          }
+    // 竞速模式：只要有一个成功，就立即返回
+    function raceToSuccess(domains: string[]): Promise<string> {
+      return new Promise((resolveRace, rejectRace) => {
+        let failureCount = 0;
+        let resolved = false;
 
-        })
-      )
-      // 过滤掉 CDN，
-      const sortedResults: CdnResult[] = results
-        .filter(
-          (result): result is { domain: string; latency: number } =>
-            result !== null
-        )
-        .sort((a, b) => a.latency - b.latency)
-      const sortedCDNDomains = sortedResults.map((result) => result!.domain)
-      window._cdn.cdn = sortedCDNDomains
-      return sortedCDNDomains
+        domains.forEach(domain => {
+          checkCDNConnectivity(domain, 1500).then(result => {
+            if (resolved) return;
+            
+            if (result) {
+              resolved = true;
+              resolveRace(result.domain);
+            } else {
+              failureCount++;
+              if (failureCount === domains.length) {
+                rejectRace(new Error("All CDNs failed"));
+              }
+            }
+          });
+        });
+      });
     }
+
     try {
-      // await testAndSortCDNs(cdnDomains)
-      resolve()
-    } catch (error) {
-      console.log("hifuck", error);
-      resolve()
-    }
+      // 设置 1秒 的软超时。如果 1秒内没选出最快的，就直接 resolve 继续运行，
+      // 但测速结果会在后台更新 localStorage，供下次使用。
+      const racePromise = raceToSuccess(window._cdn.cdn);
+      const timeoutPromise = new Promise<string>((_, reject) => 
+        setTimeout(() => reject(new Error("Timeout")), 1000)
+      );
 
+      const fastestDomain = await Promise.race([racePromise, timeoutPromise]);
+
+      // 如果竞速成功，更新当前列表和缓存
+      if (fastestDomain) {
+        console.log(`[CDN] Fastest detected: ${fastestDomain}`);
+        const currentList = window._cdn.cdn;
+        const index = currentList.indexOf(fastestDomain);
+        if (index > -1) {
+          currentList.splice(index, 1);
+          currentList.unshift(fastestDomain);
+        }
+        localStorage.setItem('preferred_cdn', fastestDomain);
+      }
+    } catch (error) {
+      // 超时或全失败，不做任何变更，沿用默认/缓存顺序
+      // console.warn("[CDN] Race timed out or failed, using default order.");
+    } finally {
+      resolve();
+    }
   })
 }
 
@@ -103,65 +123,35 @@ export async function testCdns(): Promise<void> {
  * @returns {Promise<void>} 在所有脚本加载成功后返回 Promise。
  */
 export async function loadScripts(): Promise<void> {
-  const openIndexedDB = (): Promise<IDBDatabase> => {
-    const onUpgradeNeeded = (db: IDBDatabase) => {
-      db.createObjectStore("scripts", { keyPath: "id" })
-      db.createObjectStore("styles", { keyPath: "id" })
-      db.createObjectStore("data", { keyPath: "id" })
-    }
-    return openDB("cache_DB", 1, onUpgradeNeeded)
-  }
-
-  const getDataFromIndexedDB = (
-    db: IDBDatabase,
-    table: string,
-    id: string
-  ): Promise<any> => {
-    return getDataByKey(db, table, id)
-  }
-
-  const saveDataToIndexedDB = (
-    db: IDBDatabase,
-    table: string,
-    id: string,
-    content: string
-  ): Promise<void> => {
-    return updateDB(db, table, { id, content })
-  }
   const loadOrFetch = async (
     tagType: string,
     tagId: string,
     tagUrl: string | URL | Request
   ): Promise<void> => {
-    const db = await openIndexedDB();
-    const tableName = tagType + "s";
-    let tagData = await getDataFromIndexedDB(db, tableName, tagId);
+    // 避免重复加载
+    if (document.querySelector(`[data-id="${tagId}"]`)) return;
 
-    if (!tagData) {
-      const response = await fetch(tagUrl);
-      if (!response.ok) throw new Error(`Failed to fetch ${tagUrl}`);
-      const tagContent = await response.text();
+    // 直接通过 fetch 请求，Service Worker 会自动拦截并处理缓存
+    const response = await fetch(tagUrl);
+    if (!response.ok) throw new Error(`Failed to fetch ${tagUrl}`);
+    const tagContent = await response.text();
 
-      // 检查是否有多个匿名 define 调用
+    // 检查是否有多个匿名 define 调用
+    if (tagType === 'script') {
       const defineCount = (tagContent.match(/define$/g) || []).length;
       if (defineCount > 1) {
         throw new Error(
           `Script at ${tagUrl} has multiple anonymous define calls`
         );
       }
-
-      await saveDataToIndexedDB(db, tableName, tagId, tagContent);
-      tagData = { content: tagContent };
     }
 
-    // 避免重复加载
-    if (!document.querySelector(`script[data-id="${tagId}"]`)) {
-      const tagElement = document.createElement(tagType);
-      tagElement.textContent = tagData.content;
-      tagElement.setAttribute("data-id", tagId);
-      document.head.appendChild(tagElement);
-    }
+    const tagElement = document.createElement(tagType);
+    tagElement.textContent = tagContent;
+    tagElement.setAttribute("data-id", tagId);
+    document.head.appendChild(tagElement);
   };
+
   const usefulDomain = window._cdn.cdn[0]
   const scripts = [
     {
@@ -202,7 +192,7 @@ export async function loadScripts(): Promise<void> {
     } catch (_e) {
       let url = new URL(resource.cdnUrl)
       url.host = window._cdn.cdn[1] ? window._cdn.cdn[1] : url.host
-      await loadFunction(resource.id, url.toString())
+      await loadFunction(type, resource.id, url.toString())
     }
   }
 
@@ -216,50 +206,6 @@ export async function loadScripts(): Promise<void> {
 }
 
 export async function preload() {
-  const dbPromise = indexedDB.open("cache_DB", 1)
-  dbPromise.onupgradeneeded = (event: any) => {
-    event.target.result.createObjectStore("scripts", { keyPath: "id" })
-    event.target.result.createObjectStore("styles", { keyPath: "id" })
-    event.target.result.createObjectStore("data", { keyPath: "id" })
-  }
-  const getScriptFromDB = (db: any, id: any) =>
-    new Promise((resolve, reject) => {
-      const transaction = db
-        .transaction("scripts")
-        .objectStore("scripts")
-        .get(id)
-      transaction.onsuccess = () => resolve(transaction.result)
-      transaction.onerror = () => reject(transaction.error)
-    })
-  const loadScripts = async (scripts: any) => {
-    const db: any = await new Promise((resolve, reject) => {
-      dbPromise.onsuccess = () => resolve(dbPromise.result)
-    })
-    let storeNames: any = db.objectStoreNames
-    // 保证最新数据库
-    if (!storeNames.contains("scripts") || !storeNames.contains("styles") || !storeNames.contains("data")) {
-      let deleteRequest = window.indexedDB.deleteDatabase("cache_DB")
-      deleteRequest.onsuccess = function (event) {
-        window.location.reload()
-      }
-    }
-    for (const { id, cdnUrl } of scripts) {
-      try {
-        const scriptData: any = await getScriptFromDB(db, id)
-        if (scriptData) {
-          const script = document.createElement("script")
-          script.textContent = scriptData.content
-          document.head.appendChild(script)
-        } else {
-          const script = document.createElement("script")
-          script.src = cdnUrl
-          document.head.appendChild(script)
-        }
-      } catch (error) {
-        console.error(`Error loading script ${id}:`, error)
-      }
-    }
-  }
   const scriptsToLoad = [
     {
       id: "katex",
@@ -276,5 +222,13 @@ export async function preload() {
         "https://cdn.jsdmirror.com/npm/markdown-it-incremental-dom/dist/markdown-it-incremental-dom.min.js",
     },
   ]
-  await loadScripts(scriptsToLoad)
+  
+  for (const { id, cdnUrl } of scriptsToLoad) {
+      // 简单地创建 script 标签，让浏览器发起请求，SW 会拦截处理
+      const script = document.createElement("script")
+      script.src = cdnUrl
+      script.crossOrigin = "anonymous"
+      // script.setAttribute("data-id", id) // 可选
+      document.head.appendChild(script)
+  }
 }

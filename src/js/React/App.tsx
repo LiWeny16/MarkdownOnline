@@ -1,6 +1,8 @@
 import React from "react"
 import Header from "./SubComponents/Header"
 import Body from "./SubComponents/Body"
+import AIMeetingDialog from "./SubComponents/AIMeeting/AIMeetingDialog"
+import MeetingHistory from "./SubComponents/AIMeeting/MeetingHistory"
 import { observer } from "mobx-react"
 
 import { createTheme, ThemeOptions, ThemeProvider } from "@mui/material/styles"
@@ -22,7 +24,7 @@ const lightTheme = createTheme({
     },
     secondary: {
       main: "#EEEEEE",
-      contrastText: "pink",
+      contrastText: "#ffc0cb",
     },
     info: {
       main: blue[200],
@@ -37,11 +39,11 @@ const darkTheme = createTheme({
   palette: {
     primary: {
       main: blue[400],
-      contrastText: "wheat",
+      contrastText: "#f5deb3",
     },
     secondary: {
       main: green[700],
-      contrastText: "wheat",
+      contrastText: "#f5deb3",
     },
     info: {
       main: green[600],
@@ -75,6 +77,9 @@ const App: any = observer(() => {
             <CircularProgress color="inherit" />
           </Backdrop>
         </Box>
+        {/* AI 会议助手 */}
+        <AIMeetingDialog />
+        <MeetingHistory />
         {/* Service Worker 开发者工具 - 开发环境显示，生产环境可通过快捷键开启 */}
         {/* <ServiceWorkerDevTools visible={isDevelopment} /> */}
       </ThemeProvider>

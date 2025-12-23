@@ -1,0 +1,34 @@
+{
+  "name": "baidu-translate-express",
+  "version": "1.0.0",
+  "description": "百度翻译API的Express代理服务器",
+  "main": "baidu-translate.js",
+  "scripts": {
+    "start": "node baidu-translate.js",
+    "dev": "nodemon baidu-translate.js",
+    "test": "node test-express.js"
+  },
+  "keywords": [
+    "baidu",
+    "translate",
+    "express",
+    "proxy"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "http-errors": "~1.6.3",
+    "morgan": "~1.9.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
+

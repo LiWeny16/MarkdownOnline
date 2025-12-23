@@ -32,6 +32,10 @@ import alertUseArco from "@App/message/alert"
 import { Suspense } from "react"
 import { useTranslation } from "react-i18next"
 import GuideDialog from "./SubHeader/Directory/Directory"
+import { useAIMeeting } from "@Mobx/AIMeeting"
+import SmartToyIcon from "@mui/icons-material/SmartToy"
+import GroupsIcon from '@mui/icons-material/Groups';
+import { Badge } from "@mui/material"
 const LazyMenu = React.lazy(() => import("./SubHeader/Menu"))
 
 interface Props {
@@ -58,12 +62,16 @@ const drawerWidth = 240
 const DrawerAppBar = observer((props: Props) => {
   const { t } = useTranslation()
   const theme = useTheme()
+  const aiMeeting = useAIMeeting()
   const { window } = props
   // const image = useImage()
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const [guideDialogOpen, setGuideDialogOpen] = React.useState(false)
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState)
+  }
+  const handleAIMeeting = () => {
+    aiMeeting.display()
   }
 
   const container =
@@ -212,6 +220,29 @@ const DrawerAppBar = observer((props: Props) => {
               >
                 {t("t-about")}
               </MyButton>
+              {/* AI 会议助手按钮 - 带 NEW 标记 */}
+              <Badge
+                badgeContent="NEW!"
+                color="error"
+                sx={{
+                  "& .MuiBadge-badge": {
+                    fontSize: "0.55rem",
+                    height: "16px",
+                    minWidth: "30px",
+                    fontWeight: "bold",
+                  },
+                }}
+              >
+                <MyButton
+                  onClick={handleAIMeeting}
+                  startIcon={<GroupsIcon />}
+                  sx={{
+                    position: "relative",
+                  }}
+                >
+                  {t("t-ai-meeting-button")}
+                </MyButton>
+              </Badge>
               <Suspense
                 fallback={
                   <MyButton open={open} endIcon={<MoreVertIcon />}>

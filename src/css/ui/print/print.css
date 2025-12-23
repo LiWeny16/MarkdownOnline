@@ -1,7 +1,4 @@
 @media print {
-  @page {
-    size: A4 portrait;
-  }
 
   ::-webkit-scrollbar {
     height: 0;

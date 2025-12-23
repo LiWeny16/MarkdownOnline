@@ -275,6 +275,141 @@ function getResourceType(url) {
     return null;
 }
 
+/**
+ * 后台更新 IndexedDB 缓存
+ * @param {Request} request 
+ * @param {string} resourceType 
+ * @param {object} cachedData 
+ */
+async function updateIndexedDBInBackground(request, resourceType, cachedData) {
+    try {
+        // devLog(`[后台更新] 检查资源更新 (${resourceType}):`, request.url);
+        
+        // 1. 尝试发起 HEAD 请求获取最新元数据 (轻量级检查)
+        try {
+            const headResponse = await fetch(request.clone(), { method: 'HEAD' });
+            if (headResponse.ok) {
+                const newEtag = headResponse.headers.get('ETag');
+                const newLength = headResponse.headers.get('Content-Length');
+                
+                const oldEtag = cachedData.headers['etag'] || cachedData.headers['ETag'];
+                const oldLength = cachedData.headers['content-length'] || cachedData.headers['Content-Length'];
+
+                // 如果 ETag 一致，直接返回，不下载
+                if (newEtag && oldEtag && newEtag === oldEtag) {
+                    // devLog('资源未变更 (ETag):', request.url);
+                    return;
+                }
+                // 如果没有 ETag 但有 Length 且一致，也返回 (弱校验)
+                if (newLength && oldLength && newLength === oldLength && !newEtag) {
+                     // devLog('资源未变更 (Size):', request.url);
+                    return;
+                }
+            }
+        } catch (headError) {
+            // HEAD 请求失败（如跨域或服务器不支持），降级到完整下载比对
+            // console.warn('[SW] HEAD 请求失败，降级到完整下载:', headError);
+        }
+
+        // 2. 如果 HEAD 检查发现变化或失败，执行完整下载比对
+        const fetchRequest = request.clone();
+        const response = await fetch(fetchRequest);
+        
+        if (!response || !response.ok || response.status !== 200) return;
+        
+        // 获取新的数据
+        const newBody = await response.clone().blob();
+        
+        // 简单的比对逻辑：对比大小和ETag
+        const newEtag = response.headers.get('ETag');
+        const oldEtag = cachedData.headers['etag'] || cachedData.headers['ETag'];
+        
+        let hasChanged = false;
+        
+        if (newEtag && oldEtag) {
+            if (newEtag !== oldEtag) {
+                hasChanged = true;
+                devLog(`[后台更新] ETag 不一致，资源已更新:`, request.url);
+            }
+        } else {
+            // 如果没有 ETag，对比大小
+            if (newBody.size !== cachedData.body.size) {
+                hasChanged = true;
+                devLog(`[后台更新] 大小不一致，资源已更新:`, request.url);
+            }
+        }
+        
+        if (hasChanged) {
+            const headers = {};
+            for (const [key, value] of response.headers.entries()) {
+                headers[key] = value;
+            }
+            
+            await setToDB({
+                url: request.url,
+                body: newBody,
+                headers: headers,
+                status: response.status,
+                statusText: response.statusText,
+                resourceType: resourceType
+            });
+            devLog(`[后台更新] IndexedDB 缓存已更新:`, request.url);
+        }
+        
+    } catch (error) {
+        console.warn('[SW] 后台更新 IndexedDB 失败:', error);
+    }
+}
+
+/**
+ * 后台更新 Cache API 缓存
+ * @param {Request} request 
+ * @param {string} cacheName 
+ * @param {Response} cachedResponse
+ */
+async function updateCacheAPIInBackground(request, cacheName, cachedResponse) {
+    try {
+        // 1. 尝试 HEAD 请求 (轻量级检查)
+        if (cachedResponse) {
+            try {
+                const headResponse = await fetch(request.clone(), { method: 'HEAD' });
+                if (headResponse.ok) {
+                    const newEtag = headResponse.headers.get('ETag');
+                    const oldEtag = cachedResponse.headers.get('ETag');
+                    
+                    if (newEtag && oldEtag && newEtag === oldEtag) {
+                        // devLog('Cache API 资源未变更 (ETag):', request.url);
+                        return;
+                    }
+                }
+            } catch (e) {
+                // HEAD 失败忽略
+            }
+        }
+
+        // 2. 下载并更新
+        const cache = await caches.open(cacheName);
+        const response = await fetch(request.clone());
+        if (response && response.status === 200) {
+             // 添加缓存时间戳
+             const modifiedResponseToCache = new Response(response.body, {
+                status: response.status,
+                statusText: response.statusText,
+                headers: new Headers({
+                    ...Object.fromEntries(response.headers.entries()),
+                    'X-Cache-Timestamp': Date.now().toString()
+                })
+            });
+
+             // Cache API 的 put 会覆盖旧的
+             await cache.put(request, modifiedResponseToCache);
+             // devLog(`[后台更新] Cache API 已更新:`, request.url);
+        }
+    } catch (e) { 
+        // console.warn('[SW] 后台更新 Cache API 失败:', e);
+    }
+}
+
 // --- 4. 缓存策略 (Caching Strategies) ---
 
 /**
@@ -293,6 +428,9 @@ async function cacheFirstWithIndexedDB(request, resourceType) {
     if (cachedData) {
         const age = Date.now() - cachedData.timestamp;
         const maxAge = isDevelopment ? config.development.shortCacheAge : config.maxCacheAge;
+
+        // [Stale-While-Revalidate] 触发后台更新检查
+        updateIndexedDBInBackground(request, resourceType, cachedData);
 
         // 开发环境使用更短的缓存时间
         if (age < maxAge) {
@@ -467,6 +605,9 @@ async function cacheFirstWithCacheAPI(request) {
         const cachedResponse = await cache.match(request);
 
         if (cachedResponse) {
+            // [Stale-While-Revalidate] 触发后台更新检查
+            updateCacheAPIInBackground(request, config.cacheApiName, cachedResponse);
+
             // 检查缓存是否过期
             const cacheTime = cachedResponse.headers.get('X-Cache-Timestamp');
             if (cacheTime) {
@@ -729,6 +870,14 @@ self.addEventListener('fetch', (event) => {
     }
 
     // --- 路由逻辑 ---
+    
+    // [HTML 策略] HTML 文件始终使用网络优先，确保入口文件最新
+    if (request.mode === 'navigate' || (request.headers.get('Accept') && request.headers.get('Accept').includes('text/html'))) {
+        devLog('HTML请求使用网络优先:', url.pathname);
+        event.respondWith(networkFirst(request));
+        return;
+    }
+
     const resourceType = getResourceType(url.href);
 
     if (resourceType) {

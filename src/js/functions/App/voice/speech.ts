@@ -7,7 +7,7 @@ let speechRecognition = (lang: string, startIt = true, callBack: Function) => {
   recognition.lang = lang
   // 设置参数
   recognition.continuous = true // 设置为持续识别模式
-  recognition.interimResults = false
+  recognition.interimResults = true // 启用实时结果（包含临时文本）
 
   // 开始语音识别
   if (startIt) {
@@ -18,11 +18,23 @@ let speechRecognition = (lang: string, startIt = true, callBack: Function) => {
   }
   // 监听识别结果
   recognition.onresult = (event: any) => {
-    let transcript = event.results[event.results.length - 1][0].transcript
-    // console.log(transcript, transcript.length) // 输出结果到控制台
-    transcript = transcript.replace(/ /g, "")
+    let transcript = ""
+    let isFinal = false
+
+    // 遍历所有结果
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      transcript = event.results[i][0].transcript
+      isFinal = event.results[i].isFinal
+    }
+
+    // console.log(transcript, transcript.length, "isFinal:", isFinal) // 输出结果到控制台
+    // 只对中文去除空格，其他语言（如英文）保留空格
+    if (lang.startsWith("zh")) {
+      transcript = transcript.replace(/ /g, "")
+    }
     window._speechData.speechResult = transcript
-    callBack(transcript.length)
+    window._speechData.isFinal = isFinal // 保存是否为最终结果
+    callBack(transcript.length, isFinal)
     if (recognizing === false) {
       recognition.stopRecognition()
     }

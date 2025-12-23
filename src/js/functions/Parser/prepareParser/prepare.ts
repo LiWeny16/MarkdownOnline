@@ -4,16 +4,170 @@ import { markdownParser } from "@Func/Init/allInit"
 import kit from "bigonion-kit"
 import mermaid from "mermaid"
 
+// 🚀 Mermaid 缓存管理器
+class MermaidCacheManager {
+  private static instance: MermaidCacheManager;
+  private cache = new Map<string, string>(); // hash -> 渲染结果
+  private maxCacheSize = 50; // 最大缓存数量
+  private hits = 0; // 缓存命中次数
+  private misses = 0; // 缓存未命中次数
+
+  static getInstance(): MermaidCacheManager {
+    if (!MermaidCacheManager.instance) {
+      MermaidCacheManager.instance = new MermaidCacheManager();
+    }
+    return MermaidCacheManager.instance;
+  }
+
+  // 简单的哈希函数
+  private simpleHash(str: string): string {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // 转换为32位整数
+    }
+    return Math.abs(hash).toString(36);
+  }
+
+  // 获取缓存的渲染结果
+  get(content: string): string | null {
+    const hash = this.simpleHash(content);
+    const result = this.cache.get(hash) || null;
+
+    // 🚀 记录命中情况
+    if (result) {
+      this.hits++;
+    } else {
+      this.misses++;
+    }
+
+    return result;
+  }
+
+  // 设置缓存
+  set(content: string, rendered: string): void {
+    const hash = this.simpleHash(content);
+
+    // 如果缓存已满，删除最早的条目
+    if (this.cache.size >= this.maxCacheSize) {
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey) {
+        this.cache.delete(firstKey);
+      }
+    }
+
+    this.cache.set(hash, rendered);
+  }
+
+  // 清空缓存
+  clear(): void {
+    this.cache.clear();
+    this.hits = 0;
+    this.misses = 0;
+  }
+
+  // 获取缓存统计信息
+  getStats() {
+    const total = this.hits + this.misses;
+    const hitRate = total > 0 ? ((this.hits / total) * 100).toFixed(1) : '0.0';
+
+    return {
+      size: this.cache.size,
+      maxSize: this.maxCacheSize,
+      hits: this.hits,
+      misses: this.misses,
+      hitRate: `${hitRate}%`
+    };
+  }
+}
+
+const mermaidCache = MermaidCacheManager.getInstance();
+
+// 🚀 图片缓存管理器
+class ImageCacheManager {
+  private static instance: ImageCacheManager;
+  private cache = new Map<string, string>(); // src路径 -> base64结果
+  private maxCacheSize = 100; // 图片缓存可以更大一些
+  private hits = 0; // 缓存命中次数
+  private misses = 0; // 缓存未命中次数
+
+  static getInstance(): ImageCacheManager {
+    if (!ImageCacheManager.instance) {
+      ImageCacheManager.instance = new ImageCacheManager();
+    }
+    return ImageCacheManager.instance;
+  }
+
+  // 获取缓存的图片
+  get(src: string): string | null {
+    const result = this.cache.get(src) || null;
+
+    // 🚀 记录命中情况
+    if (result) {
+      this.hits++;
+    } else {
+      this.misses++;
+    }
+
+    return result;
+  }
+
+  // 设置缓存
+  set(src: string, base64: string): void {
+    // 如果缓存已满，删除最早的条目
+    if (this.cache.size >= this.maxCacheSize) {
+      const firstKey = this.cache.keys().next().value;
+      if (firstKey) {
+        this.cache.delete(firstKey);
+      }
+    }
+
+    this.cache.set(src, base64);
+  }
+
+  // 清空缓存
+  clear(): void {
+    this.cache.clear();
+    this.hits = 0;
+    this.misses = 0;
+  }
+
+  // 获取缓存统计信息
+  getStats() {
+    const total = this.hits + this.misses;
+    const hitRate = total > 0 ? ((this.hits / total) * 100).toFixed(1) : '0.0';
+
+    return {
+      size: this.cache.size,
+      maxSize: this.maxCacheSize,
+      hits: this.hits,
+      misses: this.misses,
+      hitRate: `${hitRate}%`
+    };
+  }
+}
+
+const imageCache = ImageCacheManager.getInstance();
+
 /**
  * @description 预解析，来处理异步信息，因为markdown-it天然不支持异步
  * @returns env
  */
 export default async function prepareParser(originalMd: string) {
   /**
-   * @description 渲染mermaid, 等待更新，全量渲染性能消耗巨大
+   * @description 渲染mermaid，使用缓存优化性能
    */
   async function prepareMermaid(mermaidToken: { content: any }) {
     let src = mermaidToken.content
+
+    // 🚀 先检查缓存
+    const cachedResult = mermaidCache.get(src);
+    if (cachedResult) {
+      return cachedResult;
+    }
+
+    // 🚀 缓存未命中，进行真正的渲染
     let parsedSrc
     try {
       await mermaid.parse(src, { suppressErrors: false })
@@ -23,9 +177,17 @@ export default async function prepareParser(originalMd: string) {
           src
         )
       }
-      return parsedSrc!.svg
+      const result = parsedSrc!.svg;
+
+      // 🚀 存入缓存
+      mermaidCache.set(src, result);
+
+      return result;
     } catch (error) {
-      return `<pre class="ERR">Mermaid 渲染失败</pre>`
+      const errorResult = `<pre class="ERR">Mermaid 渲染失败</pre>`;
+      // 🚀 错误结果也缓存，避免重复尝试解析错误的内容
+      mermaidCache.set(src, errorResult);
+      return errorResult;
     }
   }
 
@@ -58,17 +220,26 @@ export default async function prepareParser(originalMd: string) {
   }
 
   /**
-   * @description 准备图片
+   * @description 准备图片，使用缓存优化性能
    */
   async function prepareImage(imageToken: { attrGet: (arg0: string) => any }) {
     let src = imageToken.attrGet("src")
+
+    // 🚀 先检查缓存（除了 VF 图片，因为 VF 图片从数据库读取较快）
+    if (!src.startsWith("/vf/")) {
+      const cachedImage = imageCache.get(src);
+      if (cachedImage) {
+        return cachedImage;
+      }
+    }
+
     if (src.startsWith("/vf/")) {
-      // VF 图片处理保持原样
+      // VF 图片处理保持原样（不缓存，因为数据库查询已经够快）
       let imgId = src.match(/\d+/)?.[0]
       if (!imgId) {
         return undefined
       }
-      
+
       return await readMemoryImg("uuid", parseInt(imgId)).then((e) => {
         if (e && e.length > 0 && e[0] && e[0].imgBase64) {
           return e[0].imgBase64
@@ -84,11 +255,18 @@ export default async function prepareParser(originalMd: string) {
         const folderManager = new FileFolderManager()
 
         if (folderManager.getTopDirectoryHandle()) {
-          return await folderManager.readFileContent(
+          const result = await folderManager.readFileContent(
             folderManager.getTopDirectoryHandle()!,
             decodeURIComponent(src).slice(2),
             true
-          )
+          );
+
+          // 🚀 存入缓存
+          if (result) {
+            imageCache.set(src, result);
+          }
+
+          return result;
         } else {
           // 未打开文件夹的提示 - 双语错误提示
           const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120">
@@ -100,7 +278,12 @@ export default async function prepareParser(originalMd: string) {
           </svg>`
           // 手动编码为 base64，避免 btoa 中文问题
           const base64 = btoa(unescape(encodeURIComponent(svgContent)))
-          return `data:image/svg+xml;base64,${base64}`
+          const errorImage = `data:image/svg+xml;base64,${base64}`;
+
+          // 🚀 错误图片也缓存
+          imageCache.set(src, errorImage);
+
+          return errorImage;
         }
       } catch (error) {
         // 路径错误或文件不存在的提示 - 双语错误提示  
@@ -113,11 +296,18 @@ export default async function prepareParser(originalMd: string) {
         </svg>`
         // 手动编码为 base64，避免 btoa 中文问题
         const base64 = btoa(unescape(encodeURIComponent(svgContent)))
-        return `data:image/svg+xml;base64,${base64}`
+        const errorImage = `data:image/svg+xml;base64,${base64}`;
+
+        // 🚀 错误图片也缓存
+        imageCache.set(src, errorImage);
+
+        return errorImage;
       }
     } else {
-      // 其他类型的 src，返回原始值
-      return src
+      // 其他类型的 src（网络图片等），返回原始值
+      // 🚀 这些也可以缓存，避免重复处理
+      imageCache.set(src, src);
+      return src;
     }
   }
 
@@ -164,19 +354,19 @@ export default async function prepareParser(originalMd: string) {
     return ""
   }
   md.render(originalMd, {}) //预先解析一次找出所有图片token
-  
+
   // 处理图片 token
   for (const imageToken of imageTokens) {
     let temp = await prepareImage(imageToken) //异步获取图片链接并替换
     vfImgSrcArr.push(temp)
   }
-  
+
   // 处理 mermaid token
   for (const mermaidToken of mermaidTokens) {
     let temp = await prepareMermaid(mermaidToken)
     mermaidParsedArr.push(temp)
   }
-  
+
   // 处理 PDF token
   for (const pdfToken of pdfTokens) {
     let temp = await preparePDF(pdfToken)
@@ -190,8 +380,37 @@ export default async function prepareParser(originalMd: string) {
     pdfParsedArr: pdfParsedArr,
     pdfSeq: 0,
   }
+
+  // 🚀 输出缓存统计信息（开发环境）
+  if (process.env.NODE_ENV === 'development') {
+    const mermaidStats = mermaidCache.getStats();
+    const imageStats = imageCache.getStats();
+    console.log(`📊 解析缓存统计:`, {
+      mermaid: {
+        size: `${mermaidStats.size}/${mermaidStats.maxSize}`,
+        hitRate: mermaidStats.hitRate,
+        hits: mermaidStats.hits,
+        misses: mermaidStats.misses
+      },
+      images: {
+        size: `${imageStats.size}/${imageStats.maxSize}`,
+        hitRate: imageStats.hitRate,
+        hits: imageStats.hits,
+        misses: imageStats.misses
+      },
+      parsed: {
+        images: imageTokens.length,
+        mermaid: mermaidTokens.length,
+        pdf: pdfTokens.length
+      }
+    });
+  }
+
   return env
 }
+
+// 🚀 导出缓存管理器，方便外部访问
+export { mermaidCache, imageCache, MermaidCacheManager, ImageCacheManager };
 
 // function importInline(state:any, silent:any) {
 //   const max = state.posMax;

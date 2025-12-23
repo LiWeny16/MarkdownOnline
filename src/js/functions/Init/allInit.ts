@@ -206,6 +206,7 @@ export default function allInit(
     processing: false,
     speechResult: "",
     speech: null,
+    isFinal: false,
   }
 
   /**
