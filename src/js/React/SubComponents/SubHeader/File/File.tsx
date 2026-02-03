@@ -889,7 +889,8 @@ const FileDrawer = observer(function FileDrawer() {
         >
           <Box
             sx={{
-              width: "4.6svw",
+              width: { xs: "50px", sm: "60px", md: "70px" },
+              maxWidth: "70px",
               height: "100svh",
               display: "flex",
               background:
@@ -900,7 +901,8 @@ const FileDrawer = observer(function FileDrawer() {
           >
             <Stack
               sx={{
-                width: 60,
+                width: { xs: 50, sm: 60, md: 70 },
+                maxWidth: 70,
                 height: "100vh",
                 alignItems: "center",
                 paddingTop: 2,
@@ -943,7 +945,9 @@ const FileDrawer = observer(function FileDrawer() {
           </Box>
           <Box
             sx={{
-              width: "23svw",
+              width: { xs: "250px", sm: "280px", md: "320px", lg: "360px" },
+              maxWidth: "400px",
+              minWidth: "250px",
               height: "100svh",
               display: "flex",
               flexDirection: "column",
@@ -951,8 +955,10 @@ const FileDrawer = observer(function FileDrawer() {
           >
             <Box
               sx={{
-                width: "23svw",
+                width: "100%",
                 height: "10svh",
+                maxHeight: "60px",
+                minHeight: "50px",
                 alignItems: "center",
                 mt: "4px",
                 justifyContent: "center",
@@ -1077,8 +1083,10 @@ function SquareClickIconButton({
   const button = (
     <Button
       sx={{
-        width: "4.6svw",
-        height: "4.6svw",
+        width: { xs: "46px", sm: "50px", md: "56px" },
+        height: { xs: "46px", sm: "50px", md: "56px" },
+        minWidth: "46px",
+        maxWidth: "56px",
         backgroundColor: "transparent",
         "&:hover": {
           backgroundColor: theme.palette.action.hover,

@@ -74,10 +74,12 @@ export default function SettingsRoute() {
         className="transparent-scrollbar"
         sx={{
           overflow: "scroll",
-          flex: "0 0 30%",
+          flex: { xs: "0 0 35%", sm: "0 0 32%", md: "0 0 28%", lg: "0 0 25%" },
+          minWidth: "180px",
+          maxWidth: "280px",
           minHeight: 20,
           overflowX: "hidden",
-          borderRight: "solid rgba(0, 0, 0, 0.12)",
+          borderRight: "1px solid rgba(0, 0, 0, 0.12)",
         }}
       >
         <SimpleTreeView
@@ -89,7 +91,8 @@ export default function SettingsRoute() {
           sx={{
             userSelect: "none",
             minHeight: 270,
-            maxWidth: 300,
+            maxWidth: 280,
+            width: "100%",
           }}
         >
           <CustomTreeItem

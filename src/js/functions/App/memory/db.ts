@@ -40,6 +40,60 @@ export function openDB(
 }
 
 /**
+ * 打开缓存数据库的辅助函数，确保 "data" 对象存储存在
+ * @returns 数据库实例
+ */
+export async function openCacheDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const indexedDB =
+      window.indexedDB ||
+      (window as any).mozIndexedDB ||
+      (window as any).webkitIndexedDB ||
+      (window as any).msIndexedDB;
+
+    // 先打开数据库获取当前版本
+    const checkRequest = indexedDB.open("cache_DB");
+
+    checkRequest.onsuccess = function (event) {
+      const existingDb = (event.target as IDBOpenDBRequest).result;
+      const currentVersion = existingDb.version;
+      const hasDataStore = existingDb.objectStoreNames.contains("data");
+      existingDb.close();
+
+      if (hasDataStore) {
+        // 对象存储已存在，直接打开
+        const openRequest = indexedDB.open("cache_DB", currentVersion);
+        openRequest.onsuccess = (e) => resolve((e.target as IDBOpenDBRequest).result);
+        openRequest.onerror = (e) => reject(e);
+      } else {
+        // 需要升级版本创建对象存储
+        const upgradeRequest = indexedDB.open("cache_DB", currentVersion + 1);
+        upgradeRequest.onupgradeneeded = function (e) {
+          const db = (e.target as IDBOpenDBRequest).result;
+          if (!db.objectStoreNames.contains("data")) {
+            db.createObjectStore("data", { keyPath: "id" });
+          }
+        };
+        upgradeRequest.onsuccess = (e) => resolve((e.target as IDBOpenDBRequest).result);
+        upgradeRequest.onerror = (e) => reject(e);
+      }
+    };
+
+    checkRequest.onerror = function (event) {
+      reject(event);
+    };
+
+    checkRequest.onupgradeneeded = function (event) {
+      // 数据库首次创建
+      const db = (event.target as IDBOpenDBRequest).result;
+      if (!db.objectStoreNames.contains("data")) {
+        db.createObjectStore("data", { keyPath: "id" });
+      }
+    };
+  });
+}
+
+/**
  * 新增数据
  * @param db 数据库实例
  * @param storeName 仓库名称
@@ -383,13 +437,10 @@ export async function fetchAndStoreJSON(
     const jsonData = JSON.parse(new TextDecoder("utf-8").decode(concatenatedChunks));
 
     // 5. 存入 IndexedDB
-    const db = await openDB("cache_DB", 1, (db, event) => {
-      if (!db.objectStoreNames.contains("data")) {
-        db.createObjectStore("data", { keyPath: "id", autoIncrement: true });
-      }
-    });
+    const db = await openCacheDB();
 
-    await addData(db, "data", { id: name, data: jsonData });
+    // 使用 put 而不是 add，以便更新已存在的数据
+    await updateDB(db, "data", { id: name, data: jsonData });
 
     // 确保进度为100%（防止 UI 误差）
     if (onProgress) onProgress(100);
@@ -408,7 +459,7 @@ export async function fetchAndStoreJSON(
  */
 export async function fetchStoredJSON(id: string): Promise<any | null> {
   try {
-    const db = await openDB("cache_DB", 1);
+    const db = await openCacheDB();
     const data = await getDataByKey(db, "data", id);
     if (data) {
       // console.log(`读取 ID:${id} 的数据:`, data);

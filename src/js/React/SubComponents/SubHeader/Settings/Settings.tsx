@@ -37,8 +37,10 @@ export default function Settings(props: any) {
           sx={{
             background: theme === "light" ? "#F8FAFB" : "",
             padding: "1rem",
-            height: "68vh",
-            width: "70vw",
+            height: { xs: "80vh", sm: "75vh", md: "68vh" },
+            width: { xs: "95vw", sm: "85vw", md: "70vw" },
+            maxWidth: "1200px",
+            maxHeight: "800px",
           }}
         >
           <IconBreadcrumbs></IconBreadcrumbs>
@@ -46,12 +48,11 @@ export default function Settings(props: any) {
 
           <Box
             sx={{
-              height: "58vh",
+              height: "calc(100% - 40px)",
               display: "flex",
               background: theme === "light" ? "#F8FAFB" : "",
               padding: "5px",
               flexDirection: "row",
-              borderRradius: "50px",
               borderRadius: "5px",
             }}
           >

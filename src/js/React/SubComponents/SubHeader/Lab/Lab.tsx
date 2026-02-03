@@ -4,7 +4,7 @@ import { Box, Typography, Card, Button, Divider, CircularProgress } from "@mui/m
 import { useTranslation } from "react-i18next";
 import { getTheme } from "@App/config/change";
 import ScienceIcon from "@mui/icons-material/Science";
-import { deleteDB, fetchAndStoreJSON, openDB, fetchStoredJSON } from "@App/memory/db";
+import { deleteDB, fetchAndStoreJSON, openCacheDB, fetchStoredJSON } from "@App/memory/db";
 import alertUseArco from "@App/message/alert";
 
 export default function Lab(props: any) {
@@ -128,7 +128,7 @@ export default function Lab(props: any) {
 
     // 卸载功能
     const uninstallData = async (id: string) => {
-        const db = await openDB("cache_DB");
+        const db = await openCacheDB();
         deleteDB(db, "data", id);
         setInstallStatus((prev) => ({ ...prev, [id]: "not_installed" }));
     };

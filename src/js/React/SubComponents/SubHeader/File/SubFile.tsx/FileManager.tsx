@@ -165,7 +165,9 @@ const StyledTreeItemRoot = styled(TreeItem2Root)(({ theme }) => ({
       : theme.palette.grey[400],
   position: "relative",
   [`& .${treeItemClasses.groupTransition}`]: {
-    marginLeft: theme.spacing(3.5),
+    marginLeft: theme.spacing(2),
+    paddingLeft: theme.spacing(2.5),
+    borderLeft: `1px dashed ${theme.palette.mode === "light" ? theme.palette.grey[300] : theme.palette.grey[700]}`,
   },
 })) as unknown as typeof TreeItem2Root
 
@@ -228,8 +230,13 @@ const CustomTreeItemContent = styled(TreeItem2Content)(({ theme }) => ({
   },
 }))
 
-function TransitionComponent(props: TransitionProps) {
-  return <Collapse {...props} />
+function TransitionComponent(props: TransitionProps & { className?: string }) {
+  return (
+    <Collapse 
+      {...props} 
+      className={clsx(props.className, treeItemClasses.groupTransition)}
+    />
+  )
 }
 interface CustomLabelProps {
   children: React.ReactNode
