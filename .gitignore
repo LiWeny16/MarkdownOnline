@@ -33,3 +33,5 @@ learning/
 backup/*
 /public/models
 /docs/models
+# BitFun snapshot data - auto managed
+.bitfun/
