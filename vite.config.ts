@@ -141,10 +141,10 @@ export default defineConfig({
 
       // 1. 注册策略与开发选项
       // --------------------------
-      registerType: 'autoUpdate', // 自动更新 Service Worker，无需用户手动刷新。这能解决您之前遇到的开发死循环问题。
-      // devOptions: {
-      //   enabled: true, // 在开发模式 (`npm run dev`) 中也启用 Service Worker，方便调试。
-      // },
+      registerType: 'autoUpdate',
+      devOptions: {
+        enabled: false, // 开发环境禁用 PWA SW，避免缓存干扰热更新
+      },
 
       // 2. PWA Manifest 配置 (应用清单)
       // --------------------------------

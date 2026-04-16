@@ -106,12 +106,17 @@ const MeetingAssistant = observer(({ themeStyles }: MeetingAssistantProps) => {
         })
         .join("\n")
 
-      const prompt = `请总结以下会议内容，提炼出关键要点、决策和行动项。用清晰的Markdown格式输出，包括：
-1. 会议概述（简要说明会议主题和参会人员）
-2. 各方观点（按参会人岗位角色归纳各自的主要观点）
-3. 关键讨论点
-4. 重要决策
-5. 待办事项/行动项（明确责任人）
+      const prompt = `你是一位专业的会议记录助手。请根据以下会议内容，生成一份结构清晰、专业详实的会议总结报告。
+
+要求：
+1. 使用 Markdown 格式输出，层级分明
+2. 输出结构如下：
+   - **会议基本信息**（时间、主题、参会人员）
+   - **议程回顾**（按发言顺序梳理主要讨论内容）
+   - **核心要点**（提炼各方观点的关键信息）
+   - **决策记录**（明确记录已达成共识的事项）
+   - **行动项**（列出明确的待办事项，标注责任人，如无法确定则标注"待定"）
+   - **下一步计划**（如有）
 
 ${participantsInfo}会议内容：
 ${meetingContent}`
@@ -136,7 +141,8 @@ ${meetingContent}`
           alertUseArco(t("t-ai-meeting-summary-failed"), 3000)
           setIsGeneratingSummary(false)
         },
-        ""
+        "",
+        "opus"
       )
     } catch (error) {
       console.error("生成总结失败:", error)

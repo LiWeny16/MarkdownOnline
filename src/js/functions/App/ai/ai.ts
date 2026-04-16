@@ -1,11 +1,10 @@
 import getSelectionText from "@App/text/getSelection";
 
 // BigModel.ts
-const token = "4f0f9e54e52e43faadbf24c9a7754b00" + "." + "Xon9PmRyJShYVVJ7"
-const url = "https://open.bigmodel.cn/api/paas/v4/chat/completions"
+const authToken = "98d9a399675116e5256e9082c192bc06eb6434937af99f201252e9424c7a5652"
+const url = "https://ecs.letshare.fun/api/glm/chat/completions"
 
 class BigModel {
-  protected static token: string = token
   private abortController: AbortController | null = null
 
   /**
@@ -31,7 +30,8 @@ class BigModel {
     onMessage: (message: string) => void,
     onComplete: (finalMessage: string) => void,
     onError: (error: any) => void,
-    base64: string
+    base64: string,
+    forceModel?: string
   ) {
     const getContent = () => {
       if (base64) {
@@ -51,9 +51,9 @@ class BigModel {
         return content
       }
     }
+    const model = forceModel || (base64 ? "vision" : "sonnet")
     const data = {
-      model: base64 ? "GLM-4.6V" : "GLM-4.7-flash",
-      tool: "web-search-pro",
+      model,
       stream: true, // 启用流式响应
       messages: [
         {
@@ -85,7 +85,7 @@ class BigModel {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `${token}`,
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify(data),
         signal: this.abortController.signal, // 添加信号以支持中断
@@ -187,10 +187,10 @@ ${recentContext}
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `${token}`,
+        Authorization: `Bearer ${authToken}`,
       },
       body: JSON.stringify({
-        model: "GLM-4-flash",
+        model: "sonnet",
         stream: false,
         messages: [
           { role: "user", content: prompt }
