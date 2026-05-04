@@ -2,28 +2,152 @@
 <html lang="zh">
 
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MECVY6R2JX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MECVY6R2JX');
+  </script>
   <meta charset="UTF-8" />
   <!-- <link rel="manifest" href="manifest.json"> -->
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Markdown 在线编辑-Online</title>
-  <!-- seo -->
+  <title>Markdown Online Editor - 专业在线 Markdown 编辑器 | 支持 LaTeX/Mermaid/AI 写作</title>
+  <meta name="description"
+    content="基于 VSCode Monaco 内核的专业在线 Markdown 编辑器。支持实时预览、LaTeX 数学公式、Mermaid 图表、代码高亮(100+语言)、AI 写作辅助、PDF/HTML 导出。开源免费，无需安装，浏览器即用。" />
+  <meta name="keywords"
+    content="Markdown在线编辑器,Markdown在线预览,在线Markdown,Markdown Editor Online,Monaco Editor,LaTeX编辑器,Mermaid图表,Markdown AI助手,开源Markdown编辑器" />
+  <meta name="author" content="Bigonion" />
+  <meta name="robots" content="index,follow" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="canonical" href="https://md.bigonion.cn" />
+
+  <!-- 搜索引擎验证 -->
   <meta name="msvalidate.01" content="411D1135BD0F14F46E1AE89FE6D56B0B" />
   <meta name="360-site-verification" content="8db5eb57adbae2614dfae7f98b2b20c3" />
   <meta name="google-site-verification" content="9FW6GAfTY7G0K-EZp7WnBea4W_F1J6YZtPm_BsSPKoE" />
-  <!-- google -->
   <meta name="baidu-site-verification" content="codeva-hzBlKJjDZx" />
-  <!-- 百度 -->
-  <!-- /seo -->
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=yes" />
-  <meta name="keywords"
-    content="markdown在线,markdown在线编辑,markdown在线预览,在线markdown,markdown在线编辑器,markdown online,md在线,bigonion,Markdwon editor,大聪花" />
-  <meta name="author" content="bigonion,bigonion@bigonion.cn" />
-  <meta name="robots" content="index,follow" />
-  <meta name="format-detection" content="telephone=no" />
-  <meta name="description"
-    content="markdown在线编辑,markdown在线展示,markdown在线支持latex公式支持,基于showdown marked katex,html在线展示,方便调试与快速实现目标效果,支持markdown基础语法和部分拓展语法, 预计新增:LATEX拓展语法和PDF导出（已完成）md文件读取" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://md.bigonion.cn" />
+  <meta property="og:title" content="Markdown Online Editor - 专业在线 Markdown 编辑器 | 基于 VSCode 内核" />
+  <meta property="og:description"
+    content="基于 VSCode Monaco 内核的专业在线 Markdown 编辑器。支持 LaTeX 公式、Mermaid 图表、AI 写作辅助、代码高亮，开源免费。" />
+  <meta property="og:image" content="https://md.bigonion.cn/favicon.ico" />
+  <meta property="og:image:width" content="256" />
+  <meta property="og:image:height" content="256" />
+  <meta property="og:site_name" content="Markdown Online Editor" />
+  <meta property="og:locale" content="zh_CN" />
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://md.bigonion.cn" />
+  <meta name="twitter:title" content="Markdown Online Editor - 专业在线 Markdown 编辑器 | 基于 VSCode 内核" />
+  <meta name="twitter:description"
+    content="基于 VSCode Monaco 内核的专业在线 Markdown 编辑器。支持 LaTeX 公式、Mermaid 图表、AI 写作辅助、代码高亮，开源免费。" />
+  <meta name="twitter:image" content="https://md.bigonion.cn/favicon.ico" />
+
   <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "name": "Markdown Online Editor",
+        "alternateName": ["MarkdownOL", "Markdown在线编辑器"],
+        "url": "https://md.bigonion.cn",
+        "description": "基于 VSCode Monaco 内核的专业在线 Markdown 编辑器，支持实时预览、LaTeX 公式、Mermaid 图表、AI 写作辅助。",
+        "inLanguage": ["zh-CN", "en-US"],
+        "author": {
+          "@type": "Person",
+          "name": "Bigonion",
+          "email": "bigonion@bigonion.cn",
+          "url": "https://bigonion.cn"
+        },
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://md.bigonion.cn/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Markdown Online Editor",
+        "applicationCategory": "EditorApplication",
+        "operatingSystem": "Any",
+        "url": "https://md.bigonion.cn",
+        "description": "基于 VSCode Monaco 内核的专业在线 Markdown 编辑器。支持 LaTeX 数学公式、Mermaid 流程图/时序图/甘特图、100+ 编程语言语法高亮、AI 写作助手、PDF/HTML 导出、PWA 离线支持。",
+        "softwareVersion": "3.0.0",
+        "featureList": [
+          "VSCode Monaco 编辑器内核",
+          "LaTeX 数学公式渲染 (KaTeX)",
+          "Mermaid 图表支持 (流程图/时序图/甘特图)",
+          "AI 写作助手集成",
+          "PDF/HTML 多格式导出",
+          "代码高亮 (100+ 编程语言)",
+          "文件管理系统 (多文件/文件夹)",
+          "PWA 离线支持",
+          "明暗主题切换"
+        ],
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "CNY",
+          "availability": "https://schema.org/InStock"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Bigonion",
+          "url": "https://bigonion.cn"
+        },
+        "codeRepository": "https://github.com/LiWeny16/MarkdownOnline",
+        "license": "https://opensource.org/licenses/MIT"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Markdown Online Editor 是什么？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Markdown Online Editor 是一款基于 VSCode Monaco 编辑器内核的专业在线 Markdown 编辑器。它提供实时双栏预览、LaTeX 数学公式渲染、Mermaid 图表支持、100+ 编程语言代码高亮、AI 写作辅助等功能。完全开源免费，无需安装任何软件，打开浏览器即可获得媲美桌面应用的编辑体验。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "如何使用 LaTeX 数学公式？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "使用 $$ 包裹块级公式（如 $$E = mc^2$$），使用 $ 包裹行内公式（如 $E = mc^2$）。编辑器基于 KaTeX 渲染引擎，提供极速的公式渲染性能，支持所有常用数学符号和环境。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "支持哪些图表类型？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "通过 Mermaid 语法支持流程图(Flowchart)、时序图(Sequence Diagram)、甘特图(Gantt Chart)、类图(Class Diagram)、状态图(State Diagram)、饼图(Pie Chart)、思维导图等多种图表类型。使用代码块指定 mermaid 语言即可。"
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "如何导出 Markdown 文档？",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "支持导出为 PDF、HTML、Markdown 源文件等多种格式。导出功能保留完整的格式、图表、公式和代码高亮效果，适合学术写作、技术文档、项目报告等场景。"
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
@@ -323,9 +447,7 @@
 
 <body>
   <h1 style="display: none">
-    简约、极速的markdown在线编辑,支持markdown在线预览,markdown基础语法和拓展语法,代码高亮,emoji文本,截图插入。
-    支持完整的流程图、饼图、思维导图等等,
-    丰富的导出方式PDF、jpg、txt。数学公式, Latex公式也一并支持...
+    Markdown Online Editor - 专业在线 Markdown 编辑器。基于 VSCode Monaco 内核，支持实时预览、LaTeX 数学公式、Mermaid 流程图/时序图/甘特图、100+ 编程语言代码高亮、AI 写作辅助、PDF/HTML 导出、文件管理、PWA 离线支持。开源免费，无需安装，浏览器即用。
   </h1>
   
   <!-- 🎨 加载骨架 - 与 React 应用容器并列，实现无冲突过渡 -->
