@@ -2,7 +2,7 @@
 
 # 🚀 Markdown Online Editor
 
-**Professional Online Markdown Editor | Powered by VSCode Editor Core**
+**Monaco Kernel · Live Preview · LaTeX & Mermaid · AI Assistant · Free & Open Source**
 
 [![Version](https://img.shields.io/badge/version-v3.0.0-blue.svg)](https://github.com/LiWeny16/MarkdownOnline)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE-MIT)
@@ -10,279 +10,159 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178c6.svg)](https://www.typescriptlang.org/)
 [![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-Latest-0066cc.svg)](https://microsoft.github.io/monaco-editor/)
 
-[🌐 Live Demo](https://md.bigonion.cn) | [📖 中文文档](./README.md) | [🐛 Report Issues](https://github.com/LiWeny16/MarkdownOnline/issues)
+[🌐 Live Demo](https://md.bigonion.cn) · [📖 中文文档](./README.md) · [🐛 Report Bug](https://github.com/LiWeny16/MarkdownOnline/issues)
 
 </div>
 
 ---
 
-## ✨ Introduction
+## 🤔 Why MarkdownOL?
 
-**Markdown Online Editor** is a powerful online Markdown editor integrated with VSCode Monaco Editor core, providing a professional-grade editing experience. No installation required - enjoy a desktop-like smooth experience right in your browser.
+There are plenty of Markdown editors — but every option forces a tradeoff. **VSCode preview won't auto-open**. **Typora now costs $14.99**. **HackMD requires internet**. **Obsidian has steep setup**.
 
-### 🎯 Key Features
+MarkdownOL combines the **VSCode editing engine** with **dedicated writing-tool features** in a single browser tab:
 
-- 🎨 **Monaco Editor** - Powered by VSCode editor core with complete syntax highlighting and IntelliSense
-- 📁 **File Management** - Support for folders, multi-file management, and local storage persistence
-- 🎭 **Real-time Preview** - Dual-pane synchronized scrolling with WYSIWYG experience
-- 🧮 **LaTeX Formulas** - Complete mathematical formula rendering support (KaTeX)
-- 📊 **Mermaid Diagrams** - Flowcharts, sequence diagrams, Gantt charts, and more
-- 🎨 **Code Highlighting** - Syntax highlighting for 100+ programming languages
-- 🖼️ **Image Management** - Local image upload, management, and preview
-- 🌓 **Theme Switching** - Light and dark themes to protect your eyes
-- 💾 **Export Features** - Support for PDF, HTML, and other formats
-- ⚡ **AI Assistant** - Integrated AI writing assistant
-- 📱 **Responsive Design** - Perfect adaptation for mobile and desktop
+| What you want | MarkdownOL | VSCode | Typora | HackMD |
+|--------------|:---------:|:------:|:------:|:------:|
+| VSCode-level editing | ✅ Monaco kernel | ✅ | ❌ | ❌ |
+| Live preview by default | ✅ Auto side-by-side | ❌ Manual Ctrl+K V | ✅ WYSIWYG | ✅ |
+| LaTeX math | ✅ KaTeX (fast) | ⚠️ Extension needed | ✅ | ✅ |
+| Mermaid diagrams | ✅ Multiple types | ⚠️ Extension needed | ✅ | ⚠️ |
+| AI writing assistant | ✅ Built-in | ⚠️ Copilot (paid) | ❌ | ❌ |
+| Image drag & drop | ✅ Auto-managed | ⚠️ Config needed | ✅ | ❌ |
+| Fully offline | ✅ PWA | ✅ | ✅ | ❌ |
+| 🆓 100% free | ✅ MIT Open Source | ✅ | ❌ $14.99 | ✅ |
+
+> **In one sentence**: VSCode editing power + Typora writing experience + zero install + 100% free and open source.
+
+---
+
+## ✨ Features
+
+### 🎨 Editing Experience
+
+- **Monaco Editor Kernel** — The same industrial-grade editor engine powering VS Code, used by **20+ million developers** worldwide. Full syntax highlighting, IntelliSense, multi-cursor editing, and code folding
+- **Live Side-by-Side Preview** — Write on the left, rendered preview on the right with synchronized scrolling. Always on by default — no manual shortcut needed
+- **100+ Language Highlighting** — Powered by highlight.js, covering JavaScript, TypeScript, Python, Rust, Go, Java, C++, SQL, and more
+- **Dark & Light Themes** — Auto-follows system preference (`prefers-color-scheme`), with manual toggle
+
+### 🧮 Content Authoring
+
+- **LaTeX Math** — Rendered with **KaTeX** (developed by Khan Academy, **10x faster** than MathJax). Supports inline formulas, block equations, matrices, integrals, and complete math notation
+- **Mermaid Diagrams** — Flowchart, Sequence, Gantt, Class, State, ER, Pie, Mind Map, Timeline, and more — using GitHub/GitLab native syntax
+- **GitHub-Flavored Emoji** — `:rocket:` renders as 🚀
+- **Enhanced Tables** — Multi-line tables with column spanning (multimd-table)
+
+### ⚡ Productivity
+
+- **AI Writing Assistant** — Built-in AI for smart autocompletion and content refinement
+- **Image Manager** — Paste screenshots (Ctrl+V) or drag & drop images directly into the editor. Paths auto-managed — no `markdown.copyFiles.destination` config needed. Works out of the box with Hugo, Hexo, Jekyll, Zenn, and other static site generators
+- **File System** — Multi-file, nested folders, LocalStorage persistence
+- **One-Click Export** — PDF print (preserved formatting), PNG image (html2canvas), Markdown source
+- **Auto TOC** — Table of contents generated from heading hierarchy
+- **PWA Offline** — Works without internet after first visit. Add to home screen on mobile for a native app experience
+
+---
 
 ## 🚀 Quick Start
 
-### 📦 Installation
-
 ```bash
-# Using npm
-npm install
-
-# Or using yarn
-yarn install
-
-# Or using pnpm
-pnpm install
+pnpm install      # Recommended, or npm / yarn
+npm run dev        # Start → http://localhost:5173
+npm run build      # Production build
 ```
 
-### 💻 Local Development
+### Deploy
 
-```bash
-# Start development server
-npm run dev
+| Platform | How |
+|----------|-----|
+| **Vercel** (Recommended) | Fork → Import → One-click, auto CDN + HTTPS |
+| **Netlify** | Connect repo, Build: `npm run build`, Publish: `docs` |
+| **Cloudflare Pages** | Connect repo, framework preset: `Vite` |
+| **Self-Hosted** | Build → serve `docs/` with Nginx or Apache |
 
-# Visit http://localhost:5173
-```
-
-### 🏗️ Build for Production
-
-```bash
-# Build the project
-npm run build
-
-# Preview the build
-npm run preview
-```
-
-### 🌐 Deployment
-
-#### Vercel Deployment (Recommended)
-
-1. Fork this project to your GitHub account
-2. Import the project on [Vercel](https://vercel.com)
-3. One-click deployment with automatic configuration
-
-#### Netlify Deployment
-
-1. Connect your GitHub repository
-2. Build command: `npm run build`
-3. Publish directory: `docs`
-
-#### Self-hosted Deployment
-
-```bash
-# Build the project
-npm run build
-
-# Deploy the docs directory to your server
-# Host static files with Nginx, Apache, or other web servers
-```
-
-**Nginx Configuration Example:**
-
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    root /path/to/docs;
-    index index.html;
-
-    location / {
-        try_files $uri $uri/ /index.html;
-    }
-}
-```
+---
 
 ## 📚 Tech Stack
 
-| Technology | Description |
-|------------|-------------|
-| **React 18** | Modern component-based UI framework |
-| **TypeScript** | Type-safe JavaScript superset |
-| **Vite** | Next-generation frontend build tool |
-| **Monaco Editor** | VSCode editor core for professional coding |
-| **MobX** | Simple and scalable state management |
-| **Material-UI** | React UI component library |
-| **markdown-it** | Powerful Markdown parser |
-| **KaTeX** | Fast math typesetting library |
-| **Mermaid** | Text-based diagram generation |
-| **Vite PWA** | Progressive Web App support |
+| Technology | Role | Why |
+|-----------|------|-----|
+| **React 18** | UI Framework | Concurrent rendering |
+| **TypeScript** | Type System | Compile-time safety |
+| **Vite** | Build Tool | esbuild + Rollup, 10x+ faster dev startup |
+| **Monaco Editor** | Editor Engine | Same core as VS Code, open-sourced by Microsoft |
+| **MobX** | State Management | Transparent reactive programming (TFRP) |
+| **Material-UI** | UI Components | Google Material Design |
+| **markdown-it** | Parser | Plugin-based, 7k+ GitHub stars |
+| **KaTeX** | Math Rendering | 10x faster than MathJax, built by Khan Academy |
+| **Mermaid** | Diagram Engine | Text-driven, 72k+ GitHub stars |
+| **Vite PWA** | Offline | Service Worker + cache strategy |
 
-## 📖 Usage Guide
-
-### LaTeX Mathematical Formulas
-
-Use `$$` for block formulas and `$` for inline formulas:
-
-```latex
-Block formula:
-$$
-E = mc^2
-$$
-
-Inline formula: The mass-energy equation $E = mc^2$ is important
-```
-
-### Mermaid Flowcharts
-
-Use code blocks with `mermaid` language:
-
-````markdown
-```mermaid
-graph TD
-    A[Start] --> B{Condition}
-    B -->|Option 1| C[Execute Plan A]
-    B -->|Option 2| D[Execute Plan B]
-    C --> E[End]
-    D --> E
-```
-````
-
-### Emoji
-
-Use emoji codes directly:
-
-```markdown
-:heart: :smile: :rocket: :star:
-```
-
-### Code Highlighting
-
-Support for 100+ programming languages:
-
-````markdown
-```python
-def hello_world():
-    print("Hello, Markdown!")
-```
-
-```javascript
-const greeting = () => {
-    console.log("Hello, Markdown!");
-};
-```
-````
-
-### Enhanced Tables
-
-Support for multi-line tables (multimd-table):
-
-```markdown
-|             |          Grouping           ||
-| First Header  | Second Header | Third Header |
-| ------------- | :-----------: | -----------: |
-| Content       |          *Long Cell*        ||
-| Content       |   **Cell**    |         Cell |
-```
-
-### Task Lists
-
-```markdown
-- [x] Completed task
-- [ ] Pending task
-- [ ] Another todo item
-```
-
-For more syntax, see the [Complete Markdown Guide](https://www.markdownguide.org/)
+---
 
 ## 🗺️ Roadmap
 
-### ✅ Completed
+**Done** — Monaco integration · File management · LaTeX (KaTeX) · Mermaid diagrams · AI assistant · PDF/image/MD export · Image manager · Auto TOC · Themes · PWA
 
-- ✅ VSCode Monaco Editor integration
-- ✅ Complete file management system (with folder support)
-- ✅ LaTeX mathematical formula rendering
-- ✅ Mermaid diagram support
-- ✅ AI writing assistant integration
-- ✅ PDF/HTML export functionality
-- ✅ Image manager
-- ✅ Table of contents (TOC) auto-generation
-- ✅ Multi-theme support
-- ✅ PWA support
+**In Progress** — WebAssembly runtime · Jupyter-style code cells
 
-### 🚧 In Progress
+**Planned** — Real-time collaboration (WebSocket/WebRTC) · Cloud sync (GitHub Gist / GitLab) · Advanced AI (summarize / translate / grammar) · Plugin system
 
-- 🚧 WebAssembly script runtime environment
-- 🚧 Jupyter-style code cell execution
+---
 
-### 📋 Planned
+## ❓ FAQ
 
-- 📋 Real-time collaborative editing
-- 📋 Cloud synchronization
-- 📋 Enhanced AI features
-- 📋 Plugin system
+**Q: How is this different from VSCode's Markdown editor?**
 
-## 🤝 Contributing
+Same Monaco kernel. Plus: always-on live preview, LaTeX/Mermaid, AI assistant, image manager, file system. **Zero install**.
 
-Contributions, issues, and feature requests are welcome!
+**Q: Can it replace Typora?**
 
-1. Fork this project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+For most use cases, yes. Typora is now paid ($14.99). MarkdownOL offers comparable split-pane feedback with stronger code highlighting (Monaco) and is free & open source.
 
-## 📄 License
+**Q: How does it compare to HackMD / StackEdit?**
 
-This project is licensed under the [MIT](./LICENSE-MIT) License
+HackMD's edge is real-time collaboration. MarkdownOL's edge is the editor engine (Monaco vs CodeMirror), built-in AI assistant, image management, and PWA offline — features not found in other online editors.
 
-```
-Copyright (c) 2022-present Bigonion
-```
+**Q: What diagrams are supported?**
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline?ref=badge_large&issueType=license)
+All Mermaid-native syntax: Flowchart, Sequence, Gantt, Class, State, ER, Pie, Mind Map, Timeline, and more. Same syntax as GitHub/GitLab/Notion.
+
+**Q: How do I insert images? How do I export?**
+
+Paste (Ctrl+V) or drag & drop for images — paths auto-managed. Export to **PDF print** (preserved formatting), **PNG image** (html2canvas), or **Markdown source**.
+
+**Q: Pricing? Data privacy?**
+
+Free, MIT open source. Documents stored in browser LocalStorage — no server upload. AI features call a remote API. PWA-enabled for offline use on desktop and mobile.
+
+---
 
 ## 🔗 Links
 
-- **Live Demo**: [md.bigonion.cn](https://md.bigonion.cn)
-- **GitHub**: [github.com/LiWeny16/MarkdownOnline](https://github.com/LiWeny16/MarkdownOnline)
-- **Author**: [bigonion.cn](https://bigonion.cn)
-- **Issues**: [GitHub Issues](https://github.com/LiWeny16/MarkdownOnline/issues)
+[Live Demo](https://md.bigonion.cn) · [GitHub](https://github.com/LiWeny16/MarkdownOnline) · [Author](https://bigonion.cn) · [Report Issue](https://github.com/LiWeny16/MarkdownOnline/issues) · 📧 bigonion@bigonion.cn
 
-## 👨‍💻 About the Author
+---
 
-**Bigonion**
-- 📧 Email: bigonion@bigonion.cn
-- 🌐 Website: [bigonion.cn](https://bigonion.cn)
+## 📄 License & Acknowledgments
 
-## 🙏 Acknowledgments
+MIT License. Copyright (c) 2022-present Bigonion.
 
-Thanks to all contributors who have helped make this project better:
+Thanks to all contributors:
 
 <a href="https://github.com/LiWeny16/MarkdownOnline/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=LiWeny16/MarkdownOnline&max=1000" />
 </a>
 
-Special thanks to these amazing open-source projects:
+Built on the shoulders of [React](https://reactjs.org/) · [Monaco Editor](https://microsoft.github.io/monaco-editor/) · [Vite](https://vitejs.dev/) · [markdown-it](https://github.com/markdown-it/markdown-it) · [KaTeX](https://katex.org/) · [Mermaid](https://mermaid.js.org/).
 
-- [React](https://reactjs.org/) - JavaScript library for building user interfaces
-- [Monaco Editor](https://microsoft.github.io/monaco-editor/) - VSCode editor core
-- [Vite](https://vitejs.dev/) - Next-generation frontend build tool
-- [markdown-it](https://github.com/markdown-it/markdown-it) - Markdown parser
-- [KaTeX](https://katex.org/) - Math typesetting library
-- [Mermaid](https://mermaid.js.org/) - Diagram generation tool
-
-For a complete list of dependencies, see the [Dependency Report](/public/LICENSES/report.md)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline?ref=badge_large&issueType=license)
 
 ---
 
 <div align="center">
 
-**If this project helps you, please give it a ⭐️**
+**If this helps you, please give it a ⭐️**
 
 Made with ❤️ by [Bigonion](https://github.com/LiWeny16)
 

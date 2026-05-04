@@ -2,7 +2,7 @@
 
 # 🚀 Markdown Online Editor
 
-**专业级在线 Markdown 编辑器 | 基于 VSCode Monaco 编辑器内核**
+**Monaco 内核 · 实时预览 · LaTeX & Mermaid · AI 写作 · 开源免费**
 
 [![Version](https://img.shields.io/badge/version-v3.0.0-blue.svg)](https://github.com/LiWeny16/MarkdownOnline)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](./LICENSE-MIT)
@@ -10,282 +10,159 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178c6.svg)](https://www.typescriptlang.org/)
 [![Monaco Editor](https://img.shields.io/badge/Monaco_Editor-Latest-0066cc.svg)](https://microsoft.github.io/monaco-editor/)
 
-[🌐 在线体验](https://md.bigonion.cn) | [📖 English](./README-EN.md) | [🐛 问题反馈](https://github.com/LiWeny16/MarkdownOnline/issues)
+[🌐 在线体验](https://md.bigonion.cn) · [📖 English](./README-EN.md) · [🐛 问题反馈](https://github.com/LiWeny16/MarkdownOnline/issues)
 
 </div>
 
 ---
 
-## ✨ 项目简介
+## 🤔 为什么选择 MarkdownOL？
 
-**Markdown Online Editor** 是一款功能强大的在线 Markdown 编辑器，集成了驱动 Visual Studio Code 的 **Monaco Editor** 编辑器内核——全球超过 **2,000 万开发者** 日常使用的编辑器技术。Markdown 作为技术写作的事实标准，已被 GitHub、GitLab、Stack Overflow、Reddit 等平台采用，**超过 90% 的技术文档** 使用 Markdown 格式编写。
+Markdown 写作工具很多，但总有一处让你妥协——**VSCode 预览要手动打开**，**Typora 已收费（$14.99）**，**HackMD 离线不可用**，**Obsidian 配置繁琐**。
 
-本项目将桌面级的专业编辑体验带到浏览器中——无需安装任何软件，即可享受媲美 VS Code 的流畅体验。
+MarkdownOL 把 **VSCode 的编辑体验** 和 **专业写作工具的功能** 放进一个浏览器标签页：
 
-### 🎯 核心特性
+| 你想要的 | MarkdownOL | VSCode | Typora | HackMD |
+|---------|:---------:|:------:|:------:|:------:|
+| VSCode 级别编辑体验 | ✅ Monaco 内核 | ✅ | ❌ | ❌ |
+| 默认实时预览 | ✅ 自动双栏 | ❌ 手动 Ctrl+K V | ✅ WYSIWYG | ✅ |
+| LaTeX 数学公式 | ✅ KaTeX 极速 | ⚠️ 需插件 | ✅ | ✅ |
+| Mermaid 图表 | ✅ 多种 | ⚠️ 需插件 | ✅ | ⚠️ |
+| AI 写作助手 | ✅ 内置 | ⚠️ Copilot 收费 | ❌ | ❌ |
+| 图片拖放/粘贴 | ✅ 自动管理 | ⚠️ 需配置路径 | ✅ | ❌ |
+| 完全离线可用 | ✅ PWA | ✅ | ✅ | ❌ |
+| 🆓 完全免费 | ✅ MIT 开源 | ✅ | ❌ $14.99 | ✅ |
 
-- 🎨 **Monaco 编辑器** - 驱动 VS Code 的工业级编辑器内核，提供完整的语法高亮和智能补全（IntelliSense）
-- 📁 **文件管理系统** - 支持文件夹、多文件管理，基于 LocalStorage 的持久化存储
-- 🎭 **实时预览** - 双栏同步滚动渲染，所见即所得（WYSIWYG）
-- 🧮 **LaTeX 公式** - 基于 KaTeX 引擎的数学公式渲染，KaTeX 被 Khan Academy、Stack Exchange 等平台采用
-- 📊 **Mermaid 图表** - 支持流程图、时序图、甘特图、类图、状态图等多种图表类型
-- 🎨 **代码高亮** - 支持 100+ 编程语言语法高亮，覆盖主流和新兴语言
-- 🖼️ **图片管理** - 本地图片上传、管理和预览，支持拖放操作
-- 🌓 **主题切换** - 明暗主题切换，减少长时间写作的眼疲劳
-- 💾 **导出功能** - 支持 PDF、HTML 等多种格式导出，保留完整格式和图表
-- ⚡ **AI 辅助** - 集成 AI 写作助手，提供智能续写和内容优化
-- 📱 **响应式设计** - 完美适配移动端和桌面端，支持 PWA 离线使用
+> **一句话**：保留 VSCode 的编辑手感 + Typora 级别写作体验 + 浏览器即开即用 + 完全开源免费。
+
+---
+
+## ✨ 核心特性
+
+### 🎨 编辑体验
+
+- **Monaco 编辑器内核** — 驱动 VS Code 的工业级编辑器组件，全球 **2,000 万开发者** 的选择。完整保留语法高亮、IntelliSense 智能补全、多光标编辑、代码折叠
+- **双栏实时预览** — 左写右看，同步滚动，所见即所得。默认自动激活，无需每次手动打开
+- **100+ 语言代码高亮** — 基于 highlight.js，覆盖 JavaScript、TypeScript、Python、Rust、Go、Java、C++ 等主流语言
+- **明暗主题切换** — 自动跟随系统偏好，支持手动切换
+
+### 🧮 内容创作
+
+- **LaTeX 数学公式** — 基于 **KaTeX** 渲染引擎（Khan Academy 开发，比 MathJax 快 **10 倍**），支持行内公式、块级公式、矩阵、积分等完整数学环境
+- **Mermaid 图表** — 支持流程图、时序图、甘特图、类图、状态图、ER 图、饼图、思维导图、时间线等多种图表类型。GitHub/GitLab 原生语法，学会即用
+- **Emoji 表情** — 遵循 GitHub 规范，`:smile:` 即时渲染
+- **增强表格** — 多行表格、列合并（multimd-table）
+
+### ⚡ 效率工具
+
+- **AI 写作助手** — 内置 AI 辅助，智能续写和内容优化
+- **图片管理器** — 拖放/粘贴截图自动插入，路径自动管理，无需手动配置。对 Hugo、Hexo、Jekyll、Zenn 等 SSG 开箱即用
+- **文件管理系统** — 多文件、文件夹层级、LocalStorage 持久化存储
+- **一键导出** — PDF 打印（保留格式和图表）、图片 PNG（html2canvas 渲染）、Markdown 源文件
+- **TOC 自动生成** — 基于标题层级的目录导航
+- **PWA 离线支持** — 首次访问后离线可用，移动端可添加到主屏幕
+
+---
 
 ## 🚀 快速开始
 
-### 📦 安装依赖
-
 ```bash
-# 使用 npm
-npm install
-
-# 或使用 yarn
-yarn install
-
-# 或使用 pnpm（推荐，磁盘效率更高）
-pnpm install
+pnpm install      # 推荐 pnpm，或 npm / yarn
+npm run dev        # 启动 → http://localhost:5173
+npm run build      # 生产构建
 ```
 
-### 💻 本地开发
+### 部署
 
-```bash
-# 启动开发服务器（基于 Vite，毫秒级热更新）
-npm run dev
+| 平台 | 说明 |
+|------|------|
+| **Vercel**（推荐） | Fork → 导入 → 一键部署，自动 CDN + HTTPS |
+| **Netlify** | 连接仓库，Build: `npm run build`，Publish: `docs` |
+| **Cloudflare Pages** | 连接仓库，框架预设: `Vite` |
+| **自部署** | 构建后托管 `docs/` 目录到 Nginx/Apache |
 
-# 访问 http://localhost:5173
-```
-
-### 🏗️ 构建生产版本
-
-```bash
-# 构建生产版本（含 Tree Shaking 和代码分割）
-npm run build
-
-# 预览构建结果
-npm run preview
-```
-
-### 🌐 部署
-
-#### Vercel 部署（推荐）
-
-1. Fork 本项目到您的 GitHub 账号
-2. 在 [Vercel](https://vercel.com) 导入项目
-3. 一键部署，自动配置 CDN 和 HTTPS
-
-项目也支持部署到 Netlify、Cloudflare Pages、GitHub Pages 等现代静态托管平台。
+---
 
 ## 📚 技术栈
 
-| 技术 | 分类 | 说明 |
+| 技术 | 角色 | 亮点 |
 |------|------|------|
-| **React 18** | 前端框架 | 采用 Concurrent 渲染模式，提供现代化的组件开发体验 |
-| **TypeScript** | 类型系统 | 静态类型检查，减少运行时错误 |
-| **Vite** | 构建工具 | 基于 esbuild 和 Rollup，开发服务器启动速度提升 10x+ |
-| **Monaco Editor** | 编辑器内核 | Visual Studio Code 的开源编辑器组件，完整保留 VSCode 编辑体验 |
-| **MobX** | 状态管理 | 响应式状态管理，透明的函数响应式编程（TFRP） |
-| **Material-UI** | UI 框架 | 遵循 Google Material Design 规范 |
-| **markdown-it** | Markdown 解析 | 插件化的 Markdown 解析器，GitHub 7,000+ Stars |
-| **KaTeX** | 公式渲染 | 比 MathJax 快 10x 的数学公式渲染引擎 |
-| **Mermaid** | 图表生成 | 文本驱动的图表生成工具，GitHub 72,000+ Stars |
-| **Vite PWA** | 离线支持 | 渐进式 Web 应用，支持离线缓存和安装 |
+| **React 18** | UI 框架 | Concurrent 渲染 |
+| **TypeScript** | 类型系统 | 静态类型安全 |
+| **Vite** | 构建工具 | esbuild + Rollup，启动提速 10x+ |
+| **Monaco Editor** | 编辑器内核 | VS Code 同款，Microsoft 开源 |
+| **MobX** | 状态管理 | 响应式 TFRP |
+| **Material-UI** | UI 组件 | Material Design 规范 |
+| **markdown-it** | Markdown 解析 | 插件化架构，GitHub 7k+ ⭐ |
+| **KaTeX** | 公式渲染 | 比 MathJax 快 10x，Khan Academy 出品 |
+| **Mermaid** | 图表引擎 | GitHub 72k+ ⭐，文本驱动 |
+| **Vite PWA** | 离线能力 | Service Worker + 缓存策略 |
 
-## 📖 使用指南
+---
 
-### LaTeX 数学公式
+## 🗺️ 路线图
 
-基于 KaTeX 引擎（Khan Academy 开发的极速 LaTeX 渲染器），支持行内和块级公式：
+**已完成** — Monaco 集成 · 文件管理 · LaTeX 渲染 · Mermaid 图表 · AI 助手 · PDF/图片/MD 导出 · 图片管理 · TOC · 多主题 · PWA
 
-```latex
-块级公式：
-$$
-E = mc^2
-$$
+**开发中** — WebAssembly 脚本运行 · Jupyter 风格代码单元格
 
-行内公式：质能方程 $E = mc^2$ 由爱因斯坦于 1905 年提出
-```
+**计划中** — 实时协同编辑（WebSocket/WebRTC） · 云端同步（GitHub Gist / GitLab） · 高级 AI（总结/翻译/语法） · 插件系统
 
-支持的数学环境包括矩阵、积分、求和、极限、希腊字母、运算符等标准 LaTeX 语法。
+---
 
-### Mermaid 图表
+## ❓ FAQ
 
-遵循 Mermaid 标准语法（被 GitHub、GitLab 原生支持），在代码块中指定 `mermaid` 语言：
+**Q: 和 VS Code 的 Markdown 编辑有什么不同？**
 
-````markdown
-```mermaid
-graph TD
-    A[开始] --> B{判断条件}
-    B -->|条件1| C[执行方案A]
-    B -->|条件2| D[执行方案B]
-    C --> E[结束]
-    D --> E
-```
-````
+相同的 Monaco 内核，额外提供：默认实时预览、LaTeX/Mermaid、AI 助手、图片管理器、文件管理。**无需安装**。
 
-支持的图表类型：流程图（Flowchart）、时序图（Sequence Diagram）、甘特图（Gantt Chart）、类图（Class Diagram）、状态图（State Diagram）、ER 图（Entity Relationship Diagram）、饼图（Pie Chart）。
+**Q: 可以替代 Typora 吗？**
 
-### Emoji 表情
+多数场景可以。Typora 已转为付费（$14.99），MarkdownOL 提供双栏即时反馈 + Monaco 级别的代码高亮和智能提示。完全开源免费。
 
-遵循 GitHub Emoji 规范，直接使用简写代码：
+**Q: 和 HackMD / StackEdit 有什么不同？**
 
-```markdown
-:heart: :smile: :rocket: :star:
-```
+HackMD 强在实时协同。MarkdownOL 强在编辑器内核（Monaco vs CodeMirror）、内置 AI 助手、图片管理、PWA 离线——这些是其他在线编辑器没有的。
 
-### 代码高亮
+**Q: 支持哪些图表？**
 
-基于 highlight.js，支持 100+ 编程语言：
+Mermaid 语法原生支持的图表均可渲染：流程图、时序图、甘特图、类图、状态图、ER 图、饼图、思维导图、时间线等。与 GitHub/GitLab/Notion 语法一致。
 
-````markdown
-```python
-def hello_world():
-    print("Hello, Markdown!")
-```
+**Q: 图片怎么插入？怎么导出？**
 
-```javascript
-const greeting = () => {
-    console.log("Hello, Markdown!");
-};
-```
-````
+Ctrl+V 粘贴或拖放自动插入，路径自动管理。导出支持 **PDF 打印**（保留格式）、**图片 PNG**（html2canvas）、**Markdown 源文件**。
 
-覆盖 JavaScript、TypeScript、Python、Rust、Go、Java、C++、SQL 等主流编程语言。
+**Q: 收费吗？数据安全吗？**
 
-### 表格增强
+完全免费，MIT 开源。文档数据存储在浏览器 LocalStorage，不上传服务器。AI 功能会调用远程 API。移动端支持 PWA 离线使用。
 
-基于 markdown-it-multimd-table 插件，支持复杂的多行表格和列合并：
+---
 
-```markdown
-|             |          Grouping           ||
-| First Header  | Second Header | Third Header |
-| ------------- | :-----------: | -----------: |
-| Content       |          *Long Cell*        ||
-| Content       |   **Cell**    |         Cell |
-```
+## 🔗 链接
 
-### 任务列表
+[在线体验](https://md.bigonion.cn) · [GitHub](https://github.com/LiWeny16/MarkdownOnline) · [作者主页](https://bigonion.cn) · [问题反馈](https://github.com/LiWeny16/MarkdownOnline/issues) · 📧 bigonion@bigonion.cn
 
-支持 GitHub Flavored Markdown 任务列表：
+---
 
-```markdown
-- [x] 已完成的任务
-- [ ] 待完成的任务
-- [ ] 另一个待办事项
-```
+## 📄 协议 · 致谢
 
-更多语法请参考 [Markdown 完整指南](https://markdown.com.cn/intro.html)
+本项目基于 [MIT](./LICENSE-MIT) 协议开源。Copyright (c) 2022-present Bigonion。
 
-## 🗺️ 开发路线图
-
-### ✅ 已完成
-
-- ✅ VSCode Monaco 编辑器集成（含 IntelliSense 智能补全）
-- ✅ 完整的文件管理系统（支持文件夹层级结构）
-- ✅ LaTeX 数学公式渲染（KaTeX，支持 40+ 数学环境）
-- ✅ Mermaid 图表支持（7 种图表类型）
-- ✅ AI 写作助手集成
-- ✅ PDF/HTML 导出（保留完整格式和样式）
-- ✅ 图片管理器
-- ✅ TOC 目录自动生成（markdown-it-github-toc）
-- ✅ 多主题支持（亮色/暗色，跟随系统偏好）
-- ✅ PWA 离线支持
-
-### 🚧 开发中
-
-- 🚧 WebAssembly 脚本运行环境 — 在浏览器中直接运行 Python/JavaScript 代码
-- 🚧 Jupyter 风格代码单元格 — 交互式代码执行和可视化
-
-### 📋 计划中
-
-- 📋 实时协同编辑 — 基于 WebSocket/WebRTC 的多人协作
-- 📋 云端同步 — 支持 GitHub Gist、GitLab Snippet 等多平台同步
-- 📋 高级 AI 功能 — 内容总结、翻译、语法检查和风格优化
-- 📋 插件系统 — 开放的扩展架构，支持社区贡献
-
-## 🤝 贡献指南
-
-欢迎贡献代码、报告问题或提出建议！本项目遵循开源社区最佳实践。
-
-1. Fork 本项目
-2. 创建您的特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交您的更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 打开一个 Pull Request
-
-## 📄 开源协议
-
-本项目采用 [MIT](./LICENSE-MIT) 协议开源 —— 这是开源社区最宽松的许可协议之一，允许自由使用、修改和分发。
-
-```
-Copyright (c) 2022-present Bigonion
-```
-
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline?ref=badge_large&issueType=license)
-
-## ❓ 常见问题（FAQ）
-
-### Markdown Online Editor 是什么？
-
-Markdown Online Editor 是一款基于 VSCode Monaco 编辑器内核的专业在线 Markdown 编辑器。它提供实时双栏预览、LaTeX 数学公式渲染（KaTeX）、Mermaid 图表支持、100+ 编程语言代码高亮、AI 写作辅助等功能。完全开源（MIT 协议），打开浏览器即可使用，无需安装任何软件。
-
-### 和 VS Code 的 Markdown 编辑有什么不同？
-
-本项目使用与 VS Code 相同的 Monaco Editor 内核，保留了完整的编辑器功能（语法高亮、智能补全、代码折叠等），同时增加了：实时预览、一键导出（PDF/HTML）、Mermaid 图表渲染、AI 写作助手、文件管理等增强功能，且无需安装任何软件。
-
-### 是否需要注册账号？
-
-不需要。所有数据存储在浏览器的 LocalStorage 中，不会上传到任何服务器。你的文档完全私密，保存在本地。
-
-### 如何导出我的文档？
-
-支持导出为 PDF（保留完整格式和图表）、HTML（独立文件，包含样式）、Markdown 源文件（.md）等格式。导出操作完全在浏览器端完成，无需服务端支持。
-
-### 数据安全吗？
-
-数据完全存储在浏览器本地，不会上传到服务器。项目为 MIT 开源协议，源码完全透明，可以自行构建部署。对于敏感内容，建议使用本地部署版本。
-
-## 🔗 相关链接
-
-- **在线体验**: [md.bigonion.cn](https://md.bigonion.cn)
-- **GitHub 仓库**: [github.com/LiWeny16/MarkdownOnline](https://github.com/LiWeny16/MarkdownOnline)
-- **作者主页**: [bigonion.cn](https://bigonion.cn)
-- **问题反馈**: [GitHub Issues](https://github.com/LiWeny16/MarkdownOnline/issues)
-
-## 👨‍💻 关于作者
-
-**Bigonion**
-- 📧 Email: bigonion@bigonion.cn
-- 🌐 Website: [bigonion.cn](https://bigonion.cn)
-
-## 🙏 致谢
-
-感谢所有为本项目做出贡献的开发者：
+感谢贡献者：
 
 <a href="https://github.com/LiWeny16/MarkdownOnline/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=LiWeny16/MarkdownOnline&max=1000" />
 </a>
 
-感谢以下开源项目的支持：
+感谢 [React](https://reactjs.org/) · [Monaco Editor](https://microsoft.github.io/monaco-editor/) · [Vite](https://vitejs.dev/) · [markdown-it](https://github.com/markdown-it/markdown-it) · [KaTeX](https://katex.org/) · [Mermaid](https://mermaid.js.org/) 等优秀开源项目。
 
-- [React](https://reactjs.org/) - Meta 开源的 JavaScript 用户界面库，全球数百万开发者使用
-- [Monaco Editor](https://microsoft.github.io/monaco-editor/) - Microsoft 开源的 VSCode 编辑器内核
-- [Vite](https://vitejs.dev/) - Evan You 创建的下一代前端构建工具
-- [markdown-it](https://github.com/markdown-it/markdown-it) - 高性能可扩展的 Markdown 解析器
-- [KaTeX](https://katex.org/) - Khan Academy 创作的极速数学公式渲染引擎
-- [Mermaid](https://mermaid.js.org/) - 文本驱动的图表生成工具
-
-完整的依赖列表请查看 [依赖报告](/public/LICENSES/report.md)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline.svg?type=large&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2FLiWeny16%2FMarkdownOnline?ref=badge_large&issueType=license)
 
 ---
 
 <div align="center">
 
-**如果这个项目对您有帮助，请给它一个 ⭐️**
+**如果对你有帮助，点个 ⭐️ 吧**
 
 Made with ❤️ by [Bigonion](https://github.com/LiWeny16)
 
