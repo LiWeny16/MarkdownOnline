@@ -259,6 +259,7 @@ const defaultConfig: IConfig = {
         imgStorePath: "/images/",
         htmlOrMdStyle: "md",
       },
+      aiModel: "sonnet",
     },
   },
 }

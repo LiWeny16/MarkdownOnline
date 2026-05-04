@@ -49,9 +49,12 @@ type SettingsBasic = {
   editorAutoWrap: boolean
   language: "zh" | "en"
 }
+export type AIModel = "sonnet" | "opus"
+
 type SettingsAd = {
   mermaidTheme: MermaidTheme
   imageSettings: ImageSettings
+  aiModel: AIModel
 }
 type MermaidTheme = "default" | "forest" | "dark" | "neutral" | "null"
 export interface ImageSettings {

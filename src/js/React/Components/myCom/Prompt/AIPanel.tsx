@@ -3,6 +3,8 @@ import {
   Box,
   Divider,
   InputBase,
+  Menu,
+  MenuItem,
   styled,
   Typography,
   Tooltip
@@ -16,11 +18,15 @@ import WrapTextIcon from "@mui/icons-material/WrapText"
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera"
 import CloseIcon from "@mui/icons-material/Close"
 import StopIcon from "@mui/icons-material/Stop"
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome"
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
+import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp"
 import ScrollableBox from "../Layout/ScrollBox"
 import bigModel from "@App/ai/ai"
+import type { AIModel } from "@Root/js/React/Mobx/Config"
 import { insertTextMonacoAtCursor } from "@App/text/insertTextAtCursor"
 import getSelectionText from "@App/text/getSelection"
-import { changeStates, getTheme } from "@App/config/change"
+import { changeSettings, changeStates, getSettings, getTheme } from "@App/config/change"
 
 const panelClass = ".prompt-panel-content"
 const IconButtonSq = React.memo(
@@ -70,6 +76,10 @@ export default observer(function AIPromptPanel(props: any) {
   const [isEnd, setIsEnd] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isStreaming, setIsStreaming] = useState(false) // 新增：跟踪是否正在流式回答
+  const [selectedModel, setSelectedModel] = useState<AIModel>(
+    getSettings().advanced.aiModel || "sonnet"
+  )
+  const [modelMenuAnchor, setModelMenuAnchor] = useState<null | HTMLElement>(null)
   // 存储上传或粘贴的图片 Base64 数据
   const [imageBase64, setImageBase64] = useState<string>("")
   // 隐藏的文件上传控件引用（现将其渲染在 Backdrop 外部）
@@ -112,16 +122,14 @@ export default observer(function AIPromptPanel(props: any) {
   }
 
   const handleBackdropMouseUp = (e: React.MouseEvent) => {
-    if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
-      handleClose()
-    }
+    if (e.target !== e.currentTarget) return
+    handleClose()
   }
 
   const handleBackdropContextMenu = (e: React.MouseEvent) => {
-    if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
-      handleClose()
-      e.preventDefault()
-    }
+    if (e.target !== e.currentTarget) return
+    handleClose()
+    e.preventDefault()
   }
 
   const handleInputKeyDown = (event: any) => {
@@ -173,16 +181,37 @@ export default observer(function AIPromptPanel(props: any) {
     }
   }
 
+  const handleModelMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    if (isStreaming) return
+    setModelMenuAnchor(event.currentTarget)
+  }
+
+  const handleModelMenuClose = () => {
+    setModelMenuAnchor(null)
+  }
+
+  const handleModelChange = (nextModel: AIModel) => {
+    setSelectedModel(nextModel)
+    changeSettings({
+      advanced: {
+        aiModel: nextModel,
+      },
+    })
+    handleModelMenuClose()
+  }
+
   const handleSend = () => {
     const inputValue = inputQsRef.current!.value
     if (!inputValue || isStreaming) return // 如果正在流式回答，禁用发送
-    
+
+    const forceModel = imageBase64 ? undefined : selectedModel
+
     setAnswerBoxState(true)
     setAiResponse("")
     setIsLoading(true)
     setIsEnd(false)
     setIsStreaming(true) // 开始流式回答
-    
+
     bigModel.askAI(
       inputValue,
       getSelectionText(),
@@ -204,7 +233,8 @@ export default observer(function AIPromptPanel(props: any) {
         setIsLoading(false)
         setIsStreaming(false) // 结束流式回答
       },
-      imageBase64 // 传递图片 Base64 数据
+      imageBase64,
+      forceModel
     )
     inputQsRef.current!.value = ""
     handleClearImgRestore()
@@ -295,7 +325,7 @@ export default observer(function AIPromptPanel(props: any) {
                 fullWidth
                 inputRef={inputQsRef}
                 maxRows={5}
-                placeholder={isStreaming ? "AI正在回答中，请稍候..." : "Search in GLM-4 AI Model"}
+                placeholder={isStreaming ? "AI正在回答中，请稍候..." : "向 AI 提问"}
                 inputProps={{ "aria-label": "search google maps" }}
               /></Box>
             <Box sx={{ position: "relative", display: "inline-block" }}>
@@ -343,6 +373,47 @@ export default observer(function AIPromptPanel(props: any) {
                 <ChatIcon style={{ fontSize: "1.2rem", marginRight: "4px" }} /> Ask AI
               </IconButtonSq>
             </Tooltip>
+            <Tooltip title="切换模型">
+              <IconButtonSq
+                onClick={handleModelMenuOpen}
+                aria-label="切换模型"
+                disabled={isStreaming}
+                style={{ padding: "0px 16px", fontWeight: "700", gap: "4px" }}
+              >
+                <AutoAwesomeIcon style={{ fontSize: "1.05rem" }} />
+                <span style={{ lineHeight: 1, textTransform: "capitalize" }}>{selectedModel}</span>
+                {modelMenuAnchor ? (
+                  <ArrowDropUpIcon style={{ fontSize: "1.2rem" }} />
+                ) : (
+                  <ArrowDropDownIcon style={{ fontSize: "1.2rem" }} />
+                )}
+              </IconButtonSq>
+            </Tooltip>
+            <Menu
+              anchorEl={modelMenuAnchor}
+              open={Boolean(modelMenuAnchor)}
+              onClose={handleModelMenuClose}
+              transformOrigin={{ horizontal: "left", vertical: "top" }}
+              anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
+              sx={{ zIndex: 2000 }}
+              slotProps={{
+                paper: {
+                  sx: {
+                    mt: 0.5,
+                    minWidth: 150,
+                    borderRadius: "14px",
+                    zIndex: 2000,
+                  },
+                },
+              }}
+            >
+              <MenuItem selected={selectedModel === "sonnet"} onClick={() => handleModelChange("sonnet")}>
+                <AutoAwesomeIcon style={{ fontSize: "1rem", marginRight: 8 }} /> Sonnet
+              </MenuItem>
+              <MenuItem selected={selectedModel === "opus"} onClick={() => handleModelChange("opus")}>
+                <AutoAwesomeIcon style={{ fontSize: "1rem", marginRight: 8 }} /> Opus
+              </MenuItem>
+            </Menu>
             {/* 图片选择按钮 */}
             <Tooltip title="选择图片">
               <IconButtonSq
@@ -353,7 +424,7 @@ export default observer(function AIPromptPanel(props: any) {
                 <PhotoCameraIcon style={{ fontSize: "1.2rem" }} />
               </IconButtonSq>
             </Tooltip>
-            
+
             <Box sx={{ ml: 1, flex: 1, display: 'flex', justifyContent: 'center', opacity: 0.5, userSelect: 'none' }}>
                <Typography variant="caption">Press Ctrl + Enter To Send</Typography>
             </Box>
